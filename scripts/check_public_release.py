@@ -152,7 +152,7 @@ HIGH_RISK_PATTERNS: tuple[RiskPattern, ...] = (
 DOCUMENT_TRACE_PATTERNS: tuple[RiskPattern, ...] = (
     RiskPattern(
         name="document_ai_trace_tool",
-        regex=re.compile(r"(?i)\b(?:codex|chatgpt|claude)\b"),
+        regex=re.compile(r"(?i)\b(?:codex|chatgpt|claude|openai|gpt|llm)\b"),
         message="公开文档包含 AI 工具或辅助生成痕迹",
     ),
     RiskPattern(

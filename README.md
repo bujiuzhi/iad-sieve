@@ -136,7 +136,7 @@ scripts/run_main_experiment.sh 42 100000 cs.CL
 
 - 声称全领域 SOTA。
 - 将 Open-v2/Open-v3 表述为第三方原始人工金标。
-- 将 LLM judge 表述为人工标注替代品。
+- 将自动候选筛选结果表述为人工标注替代品。
 - 在缺少跨来源和跨领域证据时声称无偏泛化。
 
 ## 提交前检查

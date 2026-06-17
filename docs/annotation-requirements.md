@@ -189,7 +189,7 @@ paper_b: Query Optimization in Relational Databases
 
 - 每条样本至少由 2 名标注员独立标注；
 - 标注员不应看到模型最终预测结果；
-- 可展示候选证据，但应避免展示 LLM 生成的结论性标签；
+- 可展示候选证据，但不得展示自动候选器给出的结论性标签；
 - 两名标注员不一致时进入仲裁。
 
 ### 阶段 3：仲裁
@@ -237,8 +237,7 @@ paper_b: Query Optimization in Relational Databases
 - SciRepEval / SciDocs proximity pair；
 - OpenAlex same topic；
 - OpenCitations shared references；
-- SPECTER2 / SciNCL 高相似但 DOI 不同；
-- LLM 辅助筛选的 hard negative。
+- SPECTER2 / SciNCL 高相似但 DOI 不同。
 
 ### unrelated 候选
 
@@ -259,29 +258,29 @@ paper_b: Query Optimization in Relational Databases
 - 元数据字段不完整；
 - 模型之间预测冲突的样本。
 
-## 弱标签辅助筛选边界
+## 候选筛选边界
 
-大语言模型只可作为候选筛选或解释辅助，适用范围包括：
+自动候选器只可作为抽样和复核队列构建工具，适用范围包括：
 
-- 生成候选 hard negative；
-- 提供 pair 解释；
-- 生成 silver label；
-- 帮助筛选需要人工复核的争议样本。
+- 召回候选 hard negative；
+- 汇总 pair 证据；
+- 构建 silver 候选样本；
+- 筛选需要人工复核的争议样本。
 
-大语言模型不得作为：
+自动候选器不得作为：
 
 - 最终人工 gold label；
 - 仲裁员；
 - 评价模型优劣的唯一依据。
 
-若使用模型辅助筛选，标注流程应保留两套字段：
+若使用自动候选筛选，标注流程应保留两套字段：
 
 ```text
-llm_suggested_label：模型建议标签，只用于分析
+candidate_source：候选来源，只用于追踪抽样来源
 final_label：人工最终标签，用于论文评估
 ```
 
-正式标注时，默认不向标注员展示 `llm_suggested_label`，避免标注偏置。
+正式标注时，不向标注员展示候选器给出的结论性标签，避免标注偏置。
 
 ## 验收产物
 

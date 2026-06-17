@@ -181,7 +181,6 @@ SciRepEval / SciDocs proxy
 OpenAlex same-topic different-work
 OpenCitations shared-reference
 high semantic similarity + different identity evidence
-LLM silver hard negative
 ```
 
 ### unrelated
@@ -264,7 +263,6 @@ gold
 distant
 proxy
 silver
-llm_silver
 human_audit
 ```
 
@@ -277,7 +275,6 @@ SPECTER2 cosine
 SciNCL cosine
 sentence-transformers scientific model
 Ditto / RoBERTa pair classifier
-LLM pair judge
 single-space union-find
 IAD-Sieve rule-only
 ```

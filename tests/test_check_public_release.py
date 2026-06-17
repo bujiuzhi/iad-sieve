@@ -59,6 +59,17 @@ def test_scan_document_traces_flags_work_record_text(tmp_path: Path) -> None:
     assert findings[0].category == "document_work_record"
 
 
+def test_scan_document_traces_flags_auxiliary_model_terms(tmp_path: Path) -> None:
+    """验证公开文档中的辅助模型痕迹会被识别。"""
+
+    _write_text(tmp_path / "docs" / "notes.md", "LLM pair judge is used for review.\n")
+
+    findings = scan_document_traces(tmp_path, DOCUMENT_TRACE_PATTERNS)
+
+    assert len(findings) == 1
+    assert findings[0].category == "document_ai_trace_tool"
+
+
 def test_scan_document_traces_ignores_code_model_names(tmp_path: Path) -> None:
     """验证代码中的合法 GPT/OpenAI baseline 名称不会按文档痕迹误报。"""
 
