@@ -20,11 +20,12 @@ REQUIRED_FILES = [
     ROOT / "main.tex",
     ROOT / "references.bib",
     ROOT / "README.md",
+    ROOT / "MANIFEST.md",
+    ROOT / "cover_letter.md",
+    ROOT / "submission_quality_audit.md",
     ROOT / "scripts" / "audit_manuscript.py",
     ROOT / "scripts" / "build_latex_pdf.sh",
-    ROOT / "scripts" / "build_preview_pdf.py",
     ROOT / "build" / "iad-risk-manuscript-latex.pdf",
-    ROOT / "build" / "iad-risk-manuscript-preview.pdf",
 ]
 REQUIRED_SECTIONS = [
     r"\begin{abstract}",
@@ -170,6 +171,23 @@ def check_pdf(pdf_path: Path, required_text: str = "IAD-Risk") -> list[str]:
     return errors
 
 
+def check_pdf_freshness(pdf_path: Path, source_path: Path) -> list[str]:
+    """Check whether the generated PDF is newer than the LaTeX source.
+
+    参数:
+        pdf_path: Generated PDF path.
+        source_path: Main LaTeX source path.
+
+    返回:
+        list[str]: Error messages for stale PDF output.
+    """
+    if not pdf_path.exists() or not source_path.exists():
+        return []
+    if pdf_path.stat().st_mtime < source_path.stat().st_mtime:
+        return [f"{pdf_path.name} is older than {source_path.name}; rebuild the LaTeX PDF"]
+    return []
+
+
 def check_latex_toolchain(strict_latex: bool) -> tuple[list[str], list[str]]:
     """Check local LaTeX toolchain availability.
 
@@ -207,8 +225,9 @@ def main() -> int:
     manuscript_text = manuscript_path.read_text(encoding="utf-8") if manuscript_path.exists() else ""
     errors.extend(check_sections(manuscript_text))
     errors.extend(check_forbidden_claims(manuscript_text))
-    errors.extend(check_pdf(ROOT / "build" / "iad-risk-manuscript-latex.pdf"))
-    errors.extend(check_pdf(ROOT / "build" / "iad-risk-manuscript-preview.pdf"))
+    latex_pdf_path = ROOT / "build" / "iad-risk-manuscript-latex.pdf"
+    errors.extend(check_pdf(latex_pdf_path))
+    errors.extend(check_pdf_freshness(latex_pdf_path, manuscript_path))
     latex_warnings, latex_errors = check_latex_toolchain(args.strict_latex)
     warnings.extend(latex_warnings)
     errors.extend(latex_errors)

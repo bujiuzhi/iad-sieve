@@ -10,13 +10,14 @@ This directory is the single workspace for journal submission materials. It keep
 manuscript/
   main.tex
   references.bib
+  cover_letter.md
+  MANIFEST.md
+  submission_quality_audit.md
   scripts/
     audit_manuscript.py
     build_latex_pdf.sh
-    build_preview_pdf.py
   build/
     iad-risk-manuscript-latex.pdf
-    iad-risk-manuscript-preview.pdf
 ```
 
 ## Build
@@ -27,14 +28,6 @@ Formal LaTeX build:
 cd manuscript
 tectonic main.tex
 mv main.pdf build/iad-risk-manuscript-latex.pdf
-```
-
-Preview PDF generated from the same manuscript text:
-
-```bash
-python manuscript/scripts/build_preview_pdf.py \
-  --input manuscript/main.tex \
-  --output manuscript/build/iad-risk-manuscript-preview.pdf
 ```
 
 Quality gate:

@@ -152,6 +152,14 @@ This study has four limitations. First, OpenAlex/OpenCitations hard negatives ar
 
 IAD-Risk addresses a specific failure mode in scholarly entity matching: the tendency to confuse agenda similarity with work identity. By separating identity and agenda evidence and gating automatic merges through false-merge risk, the framework makes deduplication safer under stratified gold, proxy, and silver evaluation. The current evidence supports targeted false-merge suppression and a reproducible benchmark contract. Future work should complete human audit, expand source-heldout validation, and compile the final submission under the target journal template.
 
+\section*{Data and Code Availability}
+
+The source code, benchmark construction scripts, public-release checks, and manuscript build scripts are organized in the project repository. Raw third-party data are not redistributed in the repository because the original sources have their own access conditions and licenses. The repository instead provides data-processing commands, schema contracts, fixture tests, and artifact-release guidance so that reviewers can reproduce the benchmark construction from public sources and verify generated artifacts through manifests and checksums.
+
+\section*{Competing Interests}
+
+The authors declare no competing interests.
+
 \bibliographystyle{plainnat}
 \bibliography{references}
 

@@ -1,0 +1,15 @@
+# Cover Letter
+
+Dear Editor,
+
+We submit the manuscript titled "IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication" for consideration as a research article.
+
+This work studies a practical failure mode in scholarly entity matching: semantically related papers can share a research agenda without describing the same scholarly work. Such identity-agenda confusion can create false merges in digital libraries, literature review systems, citation graphs, and recommendation pipelines. The manuscript proposes IAD-Risk, a risk-aware framework that separates identity evidence from agenda evidence and gates automatic merges by false-merge risk.
+
+The manuscript contributes a provenance-aware evaluation contract, IAD-Bench, and reports stratified evidence over gold, proxy, and silver labels. The claims are intentionally conservative: OpenAlex and OpenCitations labels are treated as silver hard-negative evidence, not as human gold, and the manuscript does not claim broad method superiority.
+
+We believe the paper is relevant to readers interested in scholarly data integration, entity matching, scientific document representation, and reliable literature intelligence systems.
+
+Sincerely,
+
+Anonymous Authors
