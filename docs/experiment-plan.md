@@ -19,8 +19,8 @@ gold：DeepMatcher same_work
 distant：DOI / arXiv / OpenAlex work id
 proxy：SciRepEval / SciDocs same_agenda
 silver：OpenAlex / OpenCitations agenda_non_identity
-llm_silver：GPT 或其他 LLM 辅助软标签
-human_audit：后续人工增强，不进入当前 P0-P3 依赖
+llm_silver：LLM 辅助软标签
+human_audit：后续人工增强，不作为 P0-P3 自动化链路依赖
 ```
 
 所有结果必须按标签强度分层报告。
@@ -143,9 +143,9 @@ python -m iad_sieve.cli build-iad-bench \
   --seed 42
 ```
 
-当前 v1 产物为 1,000 条 OpenAlex Works、963 篇有效文档、10,000 对 `agenda_non_identity` silver hard negative。该数据只用于公开 hard-negative 压力测试，不能替代 same_work gold 或 human audit。
+v1 参考产物包含 1,000 条 OpenAlex Works、963 篇有效文档、10,000 对 `agenda_non_identity` silver hard negative。该数据只用于公开 hard-negative 压力测试，不能替代 same_work gold 或 human audit。
 
-IAD-Bench-Open-v2 是当前不依赖新增人工标注的主实验数据包。它把 py_entitymatching 公开 DBLP-ACM same_work gold 与 OpenAlex hard negative 合并，形成同时包含 identity 正负样本和 agenda_non_identity 压力样本的分层 benchmark。
+IAD-Bench-Open-v2 是不依赖新增人工标注的主实验数据包。它把 py_entitymatching 公开 DBLP-ACM same_work gold 与 OpenAlex hard negative 合并，形成同时包含 identity 正负样本和 agenda_non_identity 压力样本的分层 benchmark。
 
 命令：
 
@@ -165,7 +165,7 @@ python -m iad_sieve.cli build-iad-bench \
   --seed 42
 ```
 
-当前 v2 产物：
+v2 参考产物：
 
 ```text
 document_count：1,737
@@ -229,9 +229,9 @@ LLM 输出不能作为 gold；
 
 ### 1.5 Human Audit
 
-人工审查暂不进入当前工作阻塞项。
+人工审查不作为自动化复现链路的前置条件。
 
-后续增强目标：
+增强目标：
 
 ```text
 500-1,000 pair
@@ -241,7 +241,7 @@ same_work / same_agenda_non_identity / unrelated / uncertain 分层
 
 ## 2. IAD-Bench 构造
 
-P1 已实现 IAD-Bench 构造器，统一输出：
+IAD-Bench 构造器统一输出：
 
 ```text
 iad_bench_documents.jsonl
@@ -290,7 +290,7 @@ python -m iad_sieve.cli build-iad-bench \
 
 下一步不是改字段契约，而是扩大 `source_dirs` 到真实公开数据输出目录，并在 RQ 报告中持续保留 `--iad-bench-summaries`。
 
-当前主实验构造命令：
+主实验构造命令：
 
 ```bash
 python -m iad_sieve.cli build-iad-bench \
@@ -321,7 +321,7 @@ sentence-transformers scientific model
 single-space union-find
 ```
 
-已接入执行框架：
+执行框架命令：
 
 ```bash
 python -m iad_sieve.cli run-representation-baseline \
@@ -375,7 +375,7 @@ execution_mode = actual_model 才能作为真实强 baseline；
 execution_mode = fallback 只能作为工程接口验证。
 ```
 
-当前 IAD-Bench-Open-v2 已完成 SciNCL actual_model 对比：
+IAD-Bench-Open-v2 的 SciNCL actual_model 对比结果：
 
 ```text
 system：scincl_cosine_open_v2
@@ -398,7 +398,7 @@ RoBERTa pair classifier
 DeepMatcher
 ```
 
-已接入：
+接口要求：
 
 ```text
 run-entity-matching-baseline CLI
@@ -408,9 +408,9 @@ heuristic_entity_matcher fallback
 baseline_family = entity_matching
 ```
 
-审稿边界：当前 RoBERTa/DistilBERT 是 pair-classification 迁移 baseline，不是 Ditto/DeepMatcher 论文级复现。若投稿强调实体匹配强基线，需要继续补 Ditto/DeepMatcher 专用实现或公开 checkpoint。
+审稿边界：RoBERTa/DistilBERT 是 pair-classification 迁移 baseline，不是 Ditto/DeepMatcher 论文级复现。若投稿强调实体匹配强基线，需要继续补 Ditto/DeepMatcher 专用实现或公开 checkpoint。
 
-当前 IAD-Bench-Open-v2 已完成两个 transformers entity-matching actual_model 对比：
+IAD-Bench-Open-v2 的 transformers entity-matching actual_model 对比结果：
 
 ```text
 system：distilbert_mrpc_open_v2
@@ -428,7 +428,7 @@ same_work_f1：0.824691
 hard_negative_false_merge_rate_mean：0.000103
 ```
 
-解释：RoBERTa pair classifier 已经是较强对照，hard-negative 误合并率接近 IAD-Risk；因此后续创新论证不能只说“比 baseline 低误合并”，还要证明 IAD-Risk 在可解释风险分解、弱监督扩展和不同标签层泛化上有额外价值。
+解释：RoBERTa pair classifier 是较强对照，hard-negative 误合并率接近 IAD-Risk；因此创新论证不能只说“比 baseline 低误合并”，还要证明 IAD-Risk 在可解释风险分解、弱监督扩展和不同标签层泛化上有额外价值。
 
 ### 3.4 LLM baseline
 
@@ -438,7 +438,7 @@ few-shot LLM pair judge
 LLM with explanation
 ```
 
-已接入：
+接口要求：
 
 ```text
 run-llm-judge-baseline CLI
@@ -447,7 +447,7 @@ fallback lexical judgment
 baseline_family = llm_judge
 ```
 
-审稿边界：当前环境没有 `OPENAI_API_KEY`，只能生成 `execution_mode = fallback` 的链路验证产物；只有 API 实际调用成功并输出 `execution_mode = api_model` 时，审稿矩阵才会把 LLM judge 计为真实强 baseline。
+审稿边界：缺少 `OPENAI_API_KEY` 时只能生成 `execution_mode = fallback` 的链路验证产物；只有 API 实际调用成功并输出 `execution_mode = api_model` 时，审稿矩阵才会把 LLM judge 计为真实强 baseline。
 
 统一输出：
 
@@ -478,7 +478,7 @@ p_agenda_non_identity
 p_false_merge_risk
 ```
 
-已接入命令：
+训练命令：
 
 ```bash
 python -m iad_sieve.cli train-iad-risk-model \
@@ -498,7 +498,7 @@ iad_risk_summary.jsonl
 iad_risk_predictions.jsonl
 ```
 
-当前 fixture 结果：
+fixture 参考结果：
 
 ```text
 same_work_f1 = 1.0
@@ -506,7 +506,7 @@ same_agenda_f1 = 0.8
 agenda_non_identity_f1 = 0.8
 ```
 
-当前 IAD-Bench-Open-v2 结果：
+IAD-Bench-Open-v2 参考结果：
 
 ```bash
 python -m iad_sieve.cli train-iad-risk-model \
@@ -544,7 +544,7 @@ same_agenda 在 v2 中因缺少平衡 proxy 标签作为 auxiliary head，不能
 
 ### P3.2 transformer dual encoder
 
-当前升级方向不是把 SciNCL/SPECTER2 只作为外部 cosine baseline，而是把冻结科学文献 Transformer 表示接入 IAD-Risk 主方法：
+升级方向不是把 SciNCL/SPECTER2 只作为外部 cosine baseline，而是把冻结科学文献 Transformer 表示接入 IAD-Risk 主方法：
 
 ```text
 document encoder：SPECTER2 / SciNCL / SciBERT
@@ -582,7 +582,7 @@ python -m iad_sieve.cli train-iad-risk-transformer-model \
   --risk-threshold 0.5
 ```
 
-当前实现边界：
+实现边界：
 
 ```text
 这是 frozen encoder + transparent risk heads，不是端到端微调；
@@ -590,7 +590,7 @@ python -m iad_sieve.cli train-iad-risk-transformer-model \
 训练特征禁止使用 label_provenance、label_source、label_strength 等标签来源字段，避免数据泄漏。
 ```
 
-当前 IAD-Bench-Open-v2 actual_model 结果：
+IAD-Bench-Open-v2 actual_model 参考结果：
 
 ```text
 encoder：malteos/scincl
@@ -764,26 +764,22 @@ human_audit result
 只报告普通 false_merge_rate 而不报告 hard_negative_false_merge_rate。
 ```
 
-## 8. 当前验收状态
+## 8. 验收条件
 
-当前已完成 P0 课题重构、P1 IAD-Bench fixture 级构造器、P2 强 baseline 执行框架、部分真实强 baseline 运行、P3 lightweight IAD-Risk 模型和 hard-negative 错误分析，不声称 LLM API baseline、人工 gold 或大规模实验已完成。
+实验报告应区分链路验证、真实模型运行和论文主实验，不把未运行的强 baseline、人工 gold 或大规模实验写成既有结果。
 
-已完成：
+最低验收项：
 
-1. 核心文档改为 IAD-Risk；
-2. IAD-Bench 契约写入；
-3. 最终课题包导出新文档；
-4. 审稿风险矩阵能指出 model depth、strong baseline、label provenance 风险；
-5. IAD-Bench 构造器输出 provenance summary；
-6. RQ 报告接入 `iad_bench_provenance`；
-7. IAD-Risk lightweight 模型输出 `iad_risk_model` 证据层；
-8. SciNCL、RoBERTa/DistilBERT pair classifier 已产生 `actual_model` 证据；
-9. `build-baseline-error-analysis` 输出 `hard_negative_false_merge_rate` 和错误案例；
-10. `run-single-space-union-baseline` 输出普通并查集合并对照；
-11. `run-iad-evidence-bootstrap` 输出 IAD-Risk 与强 baseline 分层置信区间；
-12. 本地与远程测试通过。
+1. IAD-Bench 契约、数据处理流程和 provenance summary 可复验。
+2. RQ 报告能追踪 `iad_bench_provenance` 证据层。
+3. IAD-Risk 模型输出 `iad_risk_model` 证据层。
+4. SciNCL、RoBERTa/DistilBERT 或同等级强 baseline 至少包含 `actual_model` 结果。
+5. `build-baseline-error-analysis` 输出 `hard_negative_false_merge_rate` 和错误案例。
+6. `run-single-space-union-baseline` 输出普通并查集合并对照。
+7. `run-iad-evidence-bootstrap` 输出 IAD-Risk 与强 baseline 分层置信区间。
+8. 自动化测试和公开发布检查通过。
 
-待完成：
+投稿增强项：
 
 1. 多 topic / 多学科公开数据扩展到 50k-150k pair；
 2. LLM judge `api_model` 实际运行；

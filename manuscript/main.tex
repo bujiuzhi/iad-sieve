@@ -1,0 +1,158 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage[numbers,sort&compress]{natbib}
+
+\title{IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication}
+\author{Anonymous Authors}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Scholarly entity matching must distinguish whether two records describe the same work, not merely whether they discuss the same research agenda. Modern scientific representations and pair classifiers often improve semantic matching, but a high semantic score can also connect different papers in the same task, benchmark, or citation community. This paper studies this failure mode as \emph{identity-agenda confusion} and proposes IAD-Risk, a risk-aware framework that separates identity evidence from agenda evidence before making merge decisions. IAD-Risk combines stratified data provenance, identity and agenda relation heads, and false-merge risk gating to prevent agenda-level hard negatives from entering automatic merge clusters. We evaluate the framework with IAD-Bench, a benchmark contract that separates DeepMatcher gold labels, SciRepEval/SciDocs-style proxy labels, and OpenAlex/OpenCitations silver hard negatives. On IAD-Bench-Open-v2, transformer-backed IAD-Risk variants retain high same-work performance while reducing hard-negative false merges that affect single-space scientific representation baselines. The results support a conservative conclusion: identity-agenda disentanglement is a practical mechanism for safer scholarly deduplication, while human audit and broader source-heldout validation remain necessary before making broad method-ranking claims.
+\end{abstract}
+
+\section{Introduction}
+
+Scholarly knowledge systems rely on entity matching to decide whether multiple records describe the same scientific work. Digital libraries, literature review tools, citation graphs, recommender systems, and evidence synthesis pipelines all require stable work identities because a false merge can combine evidence from different papers and distort downstream analysis. This paper focuses on scholarly work deduplication: given two scholarly records with titles, abstracts, authors, venues, identifiers, topics, and citations, the system must decide whether the records can be safely merged as the same work.
+
+The central challenge is that topical similarity is not identity evidence. Two papers can share a task, dataset, method family, citation neighborhood, or OpenAlex topic while making different contributions. Scientific representation models such as SPECTER and SciNCL are valuable because they bring related papers close in embedding space \citep{cohan2020specter,ostendorff2022scincl}, but the same behavior can create false-merge risk when a deduplication system treats semantic closeness as work identity. This failure is particularly important in scholarly settings because false merges are harder to repair than missed duplicates: once distinct papers are clustered as one work, citation counts, recommendation signals, and review evidence can be contaminated.
+
+We formulate this failure mode as identity-agenda confusion. Identity refers to whether two records denote the same scholarly work. Agenda refers to whether two records discuss the same research problem, benchmark, method family, or citation community. Existing entity matching methods \citep{fellegi1969record,mudgal2018deep,li2020ditto} typically optimize pair classification, while scholarly document representation methods optimize semantic relatedness. Neither objective alone forces the model to learn that same-agenda pairs can be high-risk non-identities.
+
+We propose IAD-Risk, a risk-aware identity-agenda disentanglement framework for scholarly work deduplication. IAD-Risk learns separate signals for same-work identity, same-agenda relatedness, agenda-non-identity hard negatives, and false-merge risk. A pair is eligible for automatic merging only when identity evidence is sufficiently strong and agenda-non-identity risk remains below a merge threshold. This selective decision rule turns deduplication from a high-recall similarity problem into a risk-calibrated safety problem.
+
+The paper makes three contributions. First, it defines identity-agenda confusion as a targeted failure mode in scholarly entity matching and introduces hard-negative false-merge rate as a reviewer-facing metric. Second, it presents IAD-Bench, a provenance-aware benchmark contract that keeps gold, proxy, silver, LLM-silver, and human-audit labels separate. Third, it evaluates IAD-Risk against representation, entity matching, LLM judge, and single-space union baselines under the same pair contract. The current evidence supports targeted false-merge suppression under stratified evaluation; it does not support a broad method-ranking claim or a claim that silver labels replace human gold.
+
+\section{Related Work}
+
+Entity matching and record linkage provide the classical foundation for deciding whether records refer to the same real-world entity \citep{fellegi1969record}. Deep learning methods have extended this line by learning pair representations and matching functions from labeled examples \citep{mudgal2018deep,li2020ditto}. These systems are strong baselines for scholarly deduplication, but their standard formulation usually treats each pair as a same-entity classification problem and does not explicitly model agenda-level hard negatives.
+
+Scientific document representation methods learn embeddings that capture citation, topical, and semantic relatedness. SPECTER uses citation-informed supervision to learn document-level representations \citep{cohan2020specter}, and SciNCL further improves scientific representations with neighborhood contrastive learning \citep{ostendorff2022scincl}. These methods are appropriate baselines because they capture scientific relatedness, yet their strength is also a risk for deduplication: a representation that intentionally brings related papers close can over-connect papers that share an agenda but are not the same work.
+
+Open scholarly metadata sources enable reproducible benchmark construction, but their signals must be interpreted carefully. OpenAlex provides a large open index of scholarly works and concepts \citep{priem2022openalex}, and OpenCitations provides open citation data \citep{heibi2019opencitations}. These sources are useful for constructing agenda-level hard negatives through shared topics or references. However, such labels are silver evidence, not human gold. IAD-Bench therefore treats data provenance as part of the experimental protocol rather than as bookkeeping.
+
+\section{Problem Formulation}
+
+Let $d_i$ and $d_j$ be two scholarly records. The target identity label $y^{I}_{ij}$ indicates whether the records describe the same scholarly work. The agenda label $y^{A}_{ij}$ indicates whether the records discuss a related research agenda. A hard negative is a pair with high agenda evidence but negative identity evidence:
+\[
+y^{A}_{ij}=1,\quad y^{I}_{ij}=0.
+\]
+This pair should not be merged even if the documents are semantically close.
+
+We evaluate merge safety with hard-negative false-merge rate:
+\[
+\mathrm{HNFMR} = \frac{\#\{(i,j): \hat{m}_{ij}=1, y^{A}_{ij}=1, y^{I}_{ij}=0\}}{\#\{(i,j): y^{A}_{ij}=1, y^{I}_{ij}=0\}},
+\]
+where $\hat{m}_{ij}$ is the automatic merge decision. The goal is not only to maximize same-work F1, but also to control HNFMR under explicit evidence provenance.
+
+\section{IAD-Bench}
+
+IAD-Bench is a benchmark contract for organizing scholarly pair evidence. It is not a claim that every label has the same evidential status. Each pair stores relation labels, expected identity labels, expected agenda labels, label source, label strength, provenance, split, and hard-negative level.
+
+\begin{table}[t]
+\caption{IAD-Bench label layers. Gold, proxy, and silver labels are reported separately to avoid overstating evidence strength.}
+\label{tab:label-layers}
+\centering
+\begin{tabular}{lll}
+\toprule
+Layer & Source & Use in this paper \\
+\midrule
+Gold & DeepMatcher / py\_entitymatching & Same-work identity evaluation \\
+Proxy & SciRepEval / SciDocs-style proximity & Same-agenda analysis \\
+Silver & OpenAlex / OpenCitations & Agenda-non-identity hard negatives \\
+LLM-silver & LLM pair judgments & Auxiliary analysis and baseline \\
+Human audit & Planned manual review & Future validation \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The Open-v2 benchmark variant used in the core evidence combines 415 DeepMatcher gold pairs with 10,000 OpenAlex-derived silver hard negatives, producing 10,415 pair records over 1,737 documents. The DeepMatcher component provides same-work gold labels, while the OpenAlex component stresses same-agenda non-identity behavior. This design is intentionally conservative: OpenAlex and OpenCitations are used to expose false-merge risk, not to replace human gold.
+
+\section{Method}
+
+\subsection{Overview}
+
+IAD-Risk converts scholarly deduplication into selective risk-aware matching. Given a candidate pair, the model estimates identity, agenda, agenda-non-identity, and false-merge risk signals. The final merge decision is made only when identity evidence exceeds a same-work threshold and risk evidence remains below blocking thresholds.
+
+\subsection{Identity and Agenda Signals}
+
+IAD-Risk separates the representation space into identity-oriented and agenda-oriented evidence. Identity evidence includes strong identifiers, near-duplicate titles, author overlap, year and venue agreement, and work-level metadata. Agenda evidence includes shared research topics, similar abstracts, citation neighborhoods, shared references, and scientific representation similarity. The separation is necessary because the same feature can have different meanings: high embedding similarity may indicate same work, but it may also indicate two different papers in the same research area.
+
+\subsection{Multi-Task Risk Heads}
+
+The model predicts four pair-level quantities: $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, $p_{\mathrm{ani}}$, and $p_{\mathrm{risk}}$. The same-work head estimates identity. The same-agenda head estimates topical relatedness. The agenda-non-identity head detects pairs that are related but should not be merged. The false-merge risk head converts these signals into a safety constraint. A full IAD-Risk model therefore has a direct mechanism for representing the case that ordinary semantic similarity hides.
+
+\subsection{Risk-Aware Merge Decision}
+
+The merge policy is:
+\[
+\hat{m}_{ij}=1 \quad \mathrm{iff}\quad
+p_{\mathrm{work}}\geq \tau_w,\quad
+p_{\mathrm{ani}}<\tau_a,\quad
+p_{\mathrm{risk}}<\tau_r,\quad
+\mathrm{cannot\_link}_{ij}=0.
+\]
+This rule is deliberately selective. It can reject or defer high-risk pairs instead of forcing every semantically related pair into a binary match decision. The same decision interface also supports constrained union-find clustering, where cannot-link evidence prevents transitive false merges.
+
+\section{Experiments}
+
+\subsection{Experimental Questions}
+
+The experiments ask four questions. RQ1 tests whether IAD-Risk preserves same-work matching performance on gold labels. RQ2 tests whether it reduces false merges on agenda-level hard negatives. RQ3 tests whether the agenda-non-identity and false-merge risk components are necessary. RQ4 tests whether results remain interpretable under gold, proxy, and silver label strata.
+
+\subsection{Baselines}
+
+We compare with rule-based matching, SPECTER2 adapter cosine, SciNCL cosine, RoBERTa-style pair classification, LLM pair judge outputs, and single-space union baselines. Baselines are evaluated through the same pair contract so that same-work F1 and hard-negative false-merge rate can be compared without mixing label strengths.
+
+\subsection{Main Open-v2 Results}
+
+\begin{table}[t]
+\caption{Open-v2 evidence snapshot. Lower false-merge rate is better. The table reports conservative rows supported by current output summaries.}
+\label{tab:openv2-results}
+\centering
+\begin{tabular}{lrrrr}
+\toprule
+System & Pairs & Same-work F1 $\uparrow$ & FMR $\downarrow$ & HNFMR $\downarrow$ \\
+\midrule
+SciNCL cosine & 10415 & 0.054 & 0.785 & 0.790 \\
+SPECTER2 adapter cosine & 10415 & 0.044 & 0.999 & 0.999 \\
+RoBERTa pair classifier & 10415 & 0.825 & 0.001 & 0.0001 \\
+IAD-Risk transformer (SciNCL) & 1042 test & 0.980 & 0.001 & 0.000 \\
+IAD-Risk transformer (SPECTER2) & 1042 test & 0.980 & 0.001 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The Open-v2 evidence shows why identity-agenda disentanglement is necessary. Single-space scientific representation baselines preserve topical relatedness, but their merge threshold can produce high false-merge rates on OpenAlex silver hard negatives. IAD-Risk transformer variants keep high same-work F1 on the held-out Open-v2 test split while suppressing hard-negative false merges. RoBERTa pair classification is a strong baseline and narrows the gap substantially; therefore the paper does not make broad superiority claims. Instead, the main result is that explicit risk heads provide a transparent and controllable mechanism for false-merge suppression.
+
+\subsection{Extended Evidence and Boundaries}
+
+Open-v3 and source-heldout experiments provide additional stress tests, but their results must be interpreted with care. Some source-heldout settings train only identity heads or lack full agenda-non-identity supervision, so they support evidence about generalization pressure rather than broad ranking claims. The manuscript therefore treats Open-v2 as the core mechanism demonstration and Open-v3 as extended validation.
+
+\section{Ablation and Reviewer-Facing Analysis}
+
+The central ablation question is whether false-merge control depends on explicit agenda-non-identity and risk signals. Removing agenda-non-identity supervision or false-merge risk gating should primarily affect hard-negative false-merge rate, not only same-work F1. This is the correct reviewer-facing metric because a model can perform well on ordinary duplicate matching while still over-merging topically close but distinct papers.
+
+Reviewer audits also require claim discipline. The current evidence supports identity-agenda risk modeling, stratified benchmark construction, and targeted false-merge suppression. It does not support claims that OpenAlex labels are human gold, that the system has broad domain superiority, or that manual annotation has already been completed.
+
+\section{Limitations}
+
+This study has four limitations. First, OpenAlex/OpenCitations hard negatives are silver labels, not human gold. They are useful for stress testing but must be reported separately from DeepMatcher gold labels. Second, SciRepEval/SciDocs-style proximity is a proxy for agenda relatedness, not proof of identity or non-identity. Third, source-heldout generalization remains mixed across model variants and should be expanded before making broad claims across scholarly domains. Fourth, a 500-1,000 pair human audit is still needed for a stronger journal submission package.
+
+\section{Conclusion}
+
+IAD-Risk addresses a specific failure mode in scholarly entity matching: the tendency to confuse agenda similarity with work identity. By separating identity and agenda evidence and gating automatic merges through false-merge risk, the framework makes deduplication safer under stratified gold, proxy, and silver evaluation. The current evidence supports targeted false-merge suppression and a reproducible benchmark contract. Future work should complete human audit, expand source-heldout validation, and compile the final submission under the target journal template.
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}

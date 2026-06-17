@@ -187,7 +187,7 @@ paper_b: Query Optimization in Relational Databases
 
 - 每条样本至少由 2 名标注员独立标注；
 - 标注员不应看到模型最终预测结果；
-- 可展示候选证据，但应避免展示 GPT 生成的结论性标签；
+- 可展示候选证据，但应避免展示 LLM 生成的结论性标签；
 - 两名标注员不一致时进入仲裁。
 
 ### 阶段 3：仲裁
@@ -236,7 +236,7 @@ paper_b: Query Optimization in Relational Databases
 - OpenAlex same topic；
 - OpenCitations shared references；
 - SPECTER2 / SciNCL 高相似但 DOI 不同；
-- GPT 辅助筛选的 hard negative。
+- LLM 辅助筛选的 hard negative。
 
 ### unrelated 候选
 
@@ -257,16 +257,16 @@ paper_b: Query Optimization in Relational Databases
 - 元数据字段不完整；
 - 模型之间预测冲突的样本。
 
-## GPT 辅助使用边界
+## LLM 辅助使用边界
 
-GPT 可以用于：
+LLM 可以用于：
 
 - 生成候选 hard negative；
 - 提供 pair 解释；
 - 生成 silver label；
 - 帮助筛选需要人工复核的争议样本。
 
-GPT 不应作为：
+LLM 不应作为：
 
 - 最终人工 gold label；
 - 仲裁员；
@@ -275,7 +275,7 @@ GPT 不应作为：
 建议标注流程中保留两套字段：
 
 ```text
-llm_suggested_label：GPT 建议标签，只用于分析
+llm_suggested_label：LLM 建议标签，只用于分析
 final_label：人工最终标签，用于论文评估
 ```
 

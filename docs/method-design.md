@@ -304,27 +304,27 @@ calibration_error
 在 same_work F1 不明显下降的情况下，hard_negative_false_merge_rate 是否降低。
 ```
 
-## 10. 分阶段实现
+## 10. 分阶段设计
 
 ### P0
 
-完成文档主线、IAD-Bench 契约、导出包和审稿矩阵。
+定义研究主线、IAD-Bench 契约、导出包和审稿矩阵。
 
 ### P1
 
-已实现 IAD-Bench 构造器，输出统一文档、pair、split、summary、provenance summary 和 dataset card。该阶段解决标签来源追踪问题，但不等同于完成大规模实验证据。
+IAD-Bench 构造器输出统一文档、pair、split、summary、provenance summary 和 dataset card。该阶段解决标签来源追踪问题，但不等同于完成大规模实验证据。
 
 ### P2
 
-已完成强 baseline 执行框架：representation baseline 可生成统一 pair score，外部 baseline 评估器会保留 `baseline_family` 与 `execution_mode`，审稿矩阵只接受真实执行证据。
+强 baseline 执行框架需要让 representation baseline 生成统一 pair score；外部 baseline 评估器保留 `baseline_family` 与 `execution_mode`，审稿矩阵只接受真实执行证据。
 
 该阶段仍必须实际覆盖 SPECTER2/SciNCL、Ditto/RoBERTa、LLM pair judge 和 single-space union-find。`execution_mode=fallback` 只能作为工程接口验证。
 
 ### P3
 
-已实现 lightweight dual-space model：使用 identity、agenda、risk 三组特征训练 `same_work`、`same_agenda`、`agenda_non_identity` 三个 head，并由 `p_false_merge_risk` 控制 `merge_prediction`。
+Lightweight dual-space model 使用 identity、agenda、risk 三组特征训练 `same_work`、`same_agenda`、`agenda_non_identity` 三个 head，并由 `p_false_merge_risk` 控制 `merge_prediction`。
 
-待扩展 transformer-based model。当前 lightweight 实现能支撑模型结构证据，但期刊主实验仍需要更强表示模型和大规模验证。
+Transformer-based model 属于后续扩展方向。lightweight 实现能支撑模型结构证据，但期刊主实验仍需要更强表示模型和大规模验证。
 
 ### P4
 

@@ -10,7 +10,7 @@ Risk-Calibrated Scientific Entity Matching under Agenda-Level Confounders.
 
 ## 关键结论
 
-本仓库提交源码、测试、小型 fixture、脚本和公开文档；不提交原始大数据、实验输出、模型权重、远程连接配置和本地历史归档。完整复现依赖公开数据来源、下载脚本、manifest、checksum 和单独发布的 artifact。
+本仓库提交源码、测试、小型 fixture、脚本和公开文档；不提交原始大数据、实验输出、模型权重和远程连接配置。完整复现依赖公开数据来源、下载脚本、manifest、checksum 和单独发布的 artifact。
 
 ## 架构概览
 
@@ -38,11 +38,11 @@ python -m iad_sieve.cli --help
 | `src/iad_sieve/` | 核心 Python 包 |
 | `tests/` | 自动化测试与小型公开 fixture |
 | `scripts/` | 数据下载、实验运行、CUDA 检查和公开发布检查 |
-| `docs/` | 课题目标、方法、实验、数据契约、论文大纲和复现边界 |
+| `docs/` | 方法、实验、数据契约、数据处理、论文大纲和复现边界 |
 | `data/` | 本地数据目录，仅提交 `data/README.md` |
 | `outputs/` | 本地实验产物目录，仅提交 `outputs/README.md` |
 
-详细边界见 [docs/project-structure.md](docs/project-structure.md)，文档导航见 [docs/README.md](docs/README.md)。
+文档导航见 [docs/README.md](docs/README.md)。
 
 ## 安装
 
@@ -118,9 +118,6 @@ scripts/run_main_experiment.sh 42 100000 cs.CL
 | 主题 | 文档 |
 | --- | --- |
 | 文档索引 | [docs/README.md](docs/README.md) |
-| 目录与版本控制边界 | [docs/project-structure.md](docs/project-structure.md) |
-| 命名规范 | [docs/naming-convention.md](docs/naming-convention.md) |
-| 研究目标 | [docs/GOAL.md](docs/GOAL.md) |
 | 方法设计 | [docs/method-design.md](docs/method-design.md) |
 | 实验计划 | [docs/experiment-plan.md](docs/experiment-plan.md) |
 | IAD-Bench 契约 | [docs/iad-bench-contract.md](docs/iad-bench-contract.md) |
@@ -128,7 +125,6 @@ scripts/run_main_experiment.sh 42 100000 cs.CL
 | 标注规范 | [docs/annotation-requirements.md](docs/annotation-requirements.md) |
 | 论文大纲 | [docs/paper-outline.md](docs/paper-outline.md) |
 | 数据与 artifact 发布 | [docs/data-and-artifact-release.md](docs/data-and-artifact-release.md) |
-| 公开发布检查 | [docs/public-release-checklist.md](docs/public-release-checklist.md) |
 
 ## 论文主张边界
 
@@ -153,7 +149,7 @@ python -m compileall -q src tests scripts
 pytest -q
 ```
 
-确认 `git status --ignored --short` 中只有 `data/`、`outputs/`、本地归档和缓存类文件保持未提交。
+确认 `git status --ignored --short` 中只有 `data/`、`outputs/` 和缓存类文件保持未提交。
 
 ## License
 

@@ -42,3 +42,5 @@ remote_connection_profile*.json
 *.egg-info/
 dist/
 build/
+!/manuscript/build/
+!/manuscript/build/*.pdf
