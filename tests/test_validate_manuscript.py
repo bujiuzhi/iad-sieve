@@ -222,6 +222,46 @@ def test_check_operating_point_disclosure_rejects_missing_threshold_boundary() -
     assert any("post-hoc best test thresholds" in error for error in errors)
 
 
+def test_check_baseline_scope_alignment_accepts_reported_result_scope() -> None:
+    """验证 baseline 描述与主结果表范围一致时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Baselines}",
+            "The main table reports two scientific representation cosine baselines.",
+            "SciNCL cosine and SPECTER2 adapter cosine are representation rows.",
+            "RoBERTa pair classification is the supervised pair-classifier baseline.",
+            "Other repository baseline utilities are not used as primary manuscript evidence.",
+            "They require metric summaries, prediction files, thresholds, and checksums.",
+            r"\label{tab:openv2-results}",
+        ]
+    )
+
+    errors = module.check_baseline_scope_alignment(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_baseline_scope_alignment_rejects_unreported_primary_baselines() -> None:
+    """验证未进入主结果表的 baseline 不得写成已完成主证据。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Baselines}",
+            "The completed actual-model baselines include rule-based matching.",
+            "The completed set also includes single-space union baselines.",
+            r"\label{tab:openv2-results}",
+        ]
+    )
+
+    errors = module.check_baseline_scope_alignment(manuscript_text)
+
+    assert any("rule-based matching" in error for error in errors)
+    assert any("single-space union baselines" in error for error in errors)
+
+
 def test_check_cover_letter_accepts_required_submission_statements() -> None:
     """验证 cover letter 含正式投稿声明时可通过检查。"""
 

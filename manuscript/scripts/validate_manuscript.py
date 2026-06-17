@@ -301,6 +301,39 @@ def check_operating_point_disclosure(manuscript_text: str) -> list[str]:
     return [f"operating point disclosure missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
 
 
+def check_baseline_scope_alignment(manuscript_text: str) -> list[str]:
+    """Check whether the baseline section matches the reported result table.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for baseline-scope mismatches.
+    """
+    if r"\label{tab:openv2-results}" not in manuscript_text:
+        return []
+    required_markers = [
+        r"\subsection{Baselines}",
+        "main table reports two scientific representation cosine baselines",
+        "SciNCL cosine",
+        "SPECTER2 adapter cosine",
+        "RoBERTa pair classification",
+        "not used as primary manuscript evidence",
+        "metric summaries, prediction files, thresholds, and checksums",
+    ]
+    errors = [f"baseline scope alignment missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+    unsupported_primary_phrases = [
+        "completed actual-model baselines include rule-based matching",
+        "single-space union baselines",
+    ]
+    errors.extend(
+        f"baseline scope lists unsupported primary evidence phrase: {phrase}"
+        for phrase in unsupported_primary_phrases
+        if phrase in manuscript_text
+    )
+    return errors
+
+
 def check_split_leakage_controls(manuscript_text: str) -> list[str]:
     """Check whether evaluation split and leakage boundaries are stated.
 
@@ -704,6 +737,7 @@ def main() -> int:
     errors.extend(check_error_taxonomy(manuscript_text))
     errors.extend(check_validity_threats(manuscript_text))
     errors.extend(check_operating_point_disclosure(manuscript_text))
+    errors.extend(check_baseline_scope_alignment(manuscript_text))
     errors.extend(check_split_leakage_controls(manuscript_text))
     errors.extend(check_scope_compatibility(manuscript_text))
     errors.extend(check_result_claim_boundary(manuscript_text, supplementary_text))
