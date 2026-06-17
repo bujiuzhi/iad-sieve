@@ -245,6 +245,28 @@ def check_operating_point_disclosure(manuscript_text: str) -> list[str]:
     return [f"operating point disclosure missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
 
 
+def check_related_work_positioning(manuscript_text: str) -> list[str]:
+    """Check whether related work includes closest-work positioning.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing related-work positioning markers.
+    """
+    required_markers = [
+        r"\label{tab:closest-work-positioning}",
+        "Positioning against the closest lines of work",
+        "End-to-end entity resolution systems",
+        "Neural entity matching",
+        "Scientific document representations",
+        "Open scholarly metadata benchmarks",
+        "false-merge risk gates",
+        "gold, proxy, and silver strata",
+    ]
+    return [f"related work positioning missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+
+
 def check_highlights(highlights_text: str) -> list[str]:
     """Check submission highlights format and scope.
 
@@ -438,6 +460,7 @@ def main() -> int:
     errors.extend(check_forbidden_claims(keywords_text))
     errors.extend(check_forbidden_claims(cover_letter_text))
     errors.extend(check_method_feature_contract(manuscript_text))
+    errors.extend(check_related_work_positioning(manuscript_text))
     errors.extend(check_operating_point_disclosure(manuscript_text))
     errors.extend(check_result_claim_boundary(manuscript_text, supplementary_text))
     errors.extend(check_highlights(highlights_text))
