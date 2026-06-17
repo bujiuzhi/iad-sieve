@@ -81,6 +81,7 @@ FORBIDDEN_PHRASES = [
     "OpenAlex labels are gold",
     "OpenCitations labels are gold",
     "universal superiority",
+    "Universal method superiority",
     "all scholarly domains",
 ]
 
@@ -315,6 +316,7 @@ def check_scope_compatibility(manuscript_text: str) -> list[str]:
         "Held-out IAD-Risk rows",
         "same released prediction scope",
         "manual-validation slice",
+        "A claim that this stronger comparison has already been completed",
     ]
     return [f"Open-v2 scope compatibility missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
 
