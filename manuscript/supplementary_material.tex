@@ -1,0 +1,140 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[hidelinks]{hyperref}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\emergencystretch=3em
+
+\title{Supplementary Material for IAD-Risk}
+\author{Anonymous Authors}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Scope}
+
+This supplementary material documents the reproducibility boundary for the manuscript ``IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication.'' It is intended to accompany the main manuscript, not to replace the project repository or the final artifact release. The repository contains executable code, fixture data, schema contracts, and build scripts; large third-party raw data, model checkpoints, and full experimental outputs are kept outside Git and must be distributed through an artifact release when numerical result reproduction is required.
+
+\section{Reproduction Levels}
+
+\begin{table}[h]
+\caption{Reproduction levels and expected evidence.}
+\centering
+\small
+\begin{tabular}{L{0.12\linewidth}L{0.35\linewidth}L{0.43\linewidth}}
+\toprule
+Level & Required input & Evidence produced \\
+\midrule
+L0 & Source tree and configured Python environment & CLI help, public-release scan, unit tests, and PDF build logs. \\
+L1 & Public miniature fixtures in \texttt{tests/fixtures} & Eval-source files and an IAD-Bench fixture package with the documented schema. \\
+L2 & Independently obtained public raw files & Rebuilt DeepMatcher, SciRepEval-style, OpenAlex-style, and OpenCitations-derived evaluation sources. \\
+L3 & Released artifact package & Fixed tables, predictions, logs, manifests, checksums, and commit identifiers for result audit. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{No-Network Fixture Rebuild}
+
+The fixture rebuild validates the data adapters and IAD-Bench schema without depending on external network access. It is not a substitute for the full paper experiment.
+
+\small
+\begin{verbatim}
+python -m iad_sieve.cli prepare-deepmatcher \
+  --table-a tests/fixtures/deepmatcher/tableA.csv \
+  --table-b tests/fixtures/deepmatcher/tableB.csv \
+  --pairs tests/fixtures/deepmatcher/test.csv \
+  --dataset-name deepmatcher_fixture \
+  --output-dir outputs/repro_fixture/deepmatcher
+
+python -m iad_sieve.cli prepare-scirepeval-proximity \
+  --metadata tests/fixtures/scirepeval/metadata.jsonl \
+  --pairs tests/fixtures/scirepeval/scidocs_cite_pairs.csv \
+  --dataset-name scirepeval_fixture \
+  --output-dir outputs/repro_fixture/scirepeval
+
+python -m iad_sieve.cli prepare-openalex-weak-labels \
+  --works tests/fixtures/openalex/works.jsonl \
+  --citations tests/fixtures/openalex/coci.csv \
+  --dataset-name openalex_fixture \
+  --output-dir outputs/repro_fixture/openalex \
+  --min-shared-references 1 \
+  --max-pairs 20
+
+python -m iad_sieve.cli build-iad-bench \
+  --source-dirs \
+    outputs/repro_fixture/deepmatcher \
+    outputs/repro_fixture/scirepeval \
+    outputs/repro_fixture/openalex \
+  --output-dir outputs/repro_fixture/iad_bench \
+  --seed 42
+\end{verbatim}
+\normalsize
+
+\section{Public-Source Rebuild}
+
+For full data reconstruction, raw public files should be obtained from their original sources and placed under local \texttt{data/raw/} directories. These directories are intentionally excluded from Git. The project keeps conversion commands and schema contracts under version control, while source licenses and access conditions remain governed by the original providers.
+
+\small
+\begin{verbatim}
+python -m iad_sieve.cli prepare-deepmatcher \
+  --table-a data/raw/deepmatcher/DBLP-ACM/tableA.csv \
+  --table-b data/raw/deepmatcher/DBLP-ACM/tableB.csv \
+  --pairs data/raw/deepmatcher/DBLP-ACM/test.csv \
+  --dataset-name DBLP-ACM \
+  --output-dir data/processed/eval_sources/deepmatcher_dblp_acm
+
+python -m iad_sieve.cli prepare-scirepeval-proximity \
+  --metadata data/raw/scirepeval/metadata.jsonl \
+  --pairs data/raw/scirepeval/scidocs_cite_pairs.csv \
+  --dataset-name scidocs_cite \
+  --output-dir data/processed/eval_sources/scirepeval_scidocs_cite
+
+python -m iad_sieve.cli prepare-openalex-weak-labels \
+  --works data/raw/openalex/works_cs_sample.jsonl \
+  --citations data/raw/opencitations/coci.csv \
+  --dataset-name openalex_cs_sample \
+  --output-dir data/processed/eval_sources/openalex_cs_sample \
+  --min-shared-references 1 \
+  --max-pairs 5000
+
+python -m iad_sieve.cli build-iad-bench \
+  --source-dirs \
+    data/processed/eval_sources/deepmatcher_dblp_acm \
+    data/processed/eval_sources/scirepeval_scidocs_cite \
+    data/processed/eval_sources/openalex_cs_sample \
+  --output-dir data/processed/iad_bench/open_v3 \
+  --train-ratio 0.8 \
+  --dev-ratio 0.1 \
+  --seed 42
+\end{verbatim}
+\normalsize
+
+\section{Artifact Package Requirements}
+
+Full numerical result reproduction should use a released artifact package rather than raw Git-tracked files. A complete artifact package should contain a manifest, checksums, tables, predictions, configuration files, logs, and the commit identifier used to generate the results.
+
+\small
+\begin{verbatim}
+paper-artifacts/
+  README.md
+  manifest.json
+  checksums.sha256
+  configs/
+  tables/
+  predictions/
+  reports/
+  logs/
+\end{verbatim}
+\normalsize
+
+The manifest should record the source data version, processing commands, dependency versions, random seeds, thresholds, split configuration, hardware summary, and SHA256 checksum for every result file. The checksums should be validated before using artifact files to support claims in the manuscript.
+
+\section{Claim Boundary}
+
+The main manuscript treats DeepMatcher-style labels as gold identity evidence. It treats SciRepEval and SciDocs-style proximity as same-agenda proxy evidence. It treats OpenAlex and OpenCitations-derived pairs as silver hard-negative evidence. OpenAlex and OpenCitations signals are not human gold labels. LLM-derived rows, when present, are auxiliary unless an API-backed execution log and artifact record are available. Broad method-ranking claims require stronger source-heldout evidence and manual validation beyond the current manuscript package.
+
+\end{document}

@@ -18,6 +18,7 @@ LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_FILES = [
     ROOT / "main.tex",
+    ROOT / "supplementary_material.tex",
     ROOT / "references.bib",
     ROOT / "README.md",
     ROOT / "MANIFEST.md",
@@ -25,6 +26,7 @@ REQUIRED_FILES = [
     ROOT / "scripts" / "validate_manuscript.py",
     ROOT / "scripts" / "build_latex_pdf.sh",
     ROOT / "build" / "iad-risk-manuscript-latex.pdf",
+    ROOT / "build" / "iad-risk-supplementary-material.pdf",
 ]
 REQUIRED_SECTIONS = [
     r"\begin{abstract}",
@@ -247,8 +249,12 @@ def main() -> int:
     errors.extend(check_forbidden_claims(manuscript_text))
     errors.extend(check_bibliography_depth(bibliography_text))
     latex_pdf_path = ROOT / "build" / "iad-risk-manuscript-latex.pdf"
+    supplementary_path = ROOT / "supplementary_material.tex"
+    supplementary_pdf_path = ROOT / "build" / "iad-risk-supplementary-material.pdf"
     errors.extend(check_pdf(latex_pdf_path))
     errors.extend(check_pdf_freshness(latex_pdf_path, manuscript_path))
+    errors.extend(check_pdf(supplementary_pdf_path, "Supplementary Material"))
+    errors.extend(check_pdf_freshness(supplementary_pdf_path, supplementary_path))
     latex_warnings, latex_errors = check_latex_toolchain(args.strict_latex)
     warnings.extend(latex_warnings)
     errors.extend(latex_errors)

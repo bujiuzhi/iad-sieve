@@ -5,11 +5,13 @@
 | Path | Purpose |
 | --- | --- |
 | `main.tex` | Main LaTeX manuscript |
+| `supplementary_material.tex` | Supplementary reproducibility material |
 | `references.bib` | Bibliography entries |
 | `cover_letter.md` | Cover letter source |
 | `scripts/validate_manuscript.py` | Manuscript package validation |
 | `scripts/build_latex_pdf.sh` | Formal LaTeX PDF build script |
 | `build/iad-risk-manuscript-latex.pdf` | Formal compiled PDF |
+| `build/iad-risk-supplementary-material.pdf` | Formal compiled supplementary PDF |
 
 ## Build Commands
 

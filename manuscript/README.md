@@ -9,6 +9,7 @@ This directory contains the journal manuscript source, bibliography, build scrip
 ```text
 manuscript/
   main.tex
+  supplementary_material.tex
   references.bib
   cover_letter.md
   MANIFEST.md
@@ -17,6 +18,7 @@ manuscript/
     build_latex_pdf.sh
   build/
     iad-risk-manuscript-latex.pdf
+    iad-risk-supplementary-material.pdf
 ```
 
 ## Build
@@ -27,6 +29,8 @@ Formal LaTeX build:
 cd manuscript
 tectonic main.tex
 mv main.pdf build/iad-risk-manuscript-latex.pdf
+tectonic supplementary_material.tex
+mv supplementary_material.pdf build/iad-risk-supplementary-material.pdf
 ```
 
 Manuscript validation:
