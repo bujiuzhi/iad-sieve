@@ -12,6 +12,7 @@ manuscript/
   supplementary_material.tex
   references.bib
   cover_letter.md
+  highlights.md
   MANIFEST.md
   scripts/
     validate_manuscript.py

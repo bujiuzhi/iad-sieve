@@ -23,6 +23,7 @@ REQUIRED_FILES = [
     ROOT / "README.md",
     ROOT / "MANIFEST.md",
     ROOT / "cover_letter.md",
+    ROOT / "highlights.md",
     ROOT / "scripts" / "validate_manuscript.py",
     ROOT / "scripts" / "build_latex_pdf.sh",
     ROOT / "build" / "iad-risk-manuscript-latex.pdf",
@@ -148,6 +149,26 @@ def check_bibliography_depth(bibliography_text: str) -> list[str]:
     return []
 
 
+def check_highlights(highlights_text: str) -> list[str]:
+    """Check submission highlights format and scope.
+
+    参数:
+        highlights_text: Highlights Markdown text.
+
+    返回:
+        list[str]: Error messages for invalid highlights.
+    """
+    bullet_lines = [line for line in highlights_text.splitlines() if line.startswith("- ")]
+    errors: list[str] = []
+    if not 3 <= len(bullet_lines) <= 6:
+        errors.append(f"highlights has {len(bullet_lines)} bullet lines; expected 3 to 6")
+    for line in bullet_lines:
+        word_count = len(line[2:].split())
+        if word_count > 22:
+            errors.append(f"highlight is too long ({word_count} words): {line}")
+    return errors
+
+
 def extract_first_page_text(pdf_path: Path) -> tuple[str, list[str]]:
     """Extract text from the first page of a PDF.
 
@@ -265,9 +286,13 @@ def main() -> int:
     errors.extend(check_sections(manuscript_text, REQUIRED_SECTIONS, "main manuscript"))
     supplementary_path = ROOT / "supplementary_material.tex"
     supplementary_text = supplementary_path.read_text(encoding="utf-8") if supplementary_path.exists() else ""
+    highlights_path = ROOT / "highlights.md"
+    highlights_text = highlights_path.read_text(encoding="utf-8") if highlights_path.exists() else ""
     errors.extend(check_sections(supplementary_text, REQUIRED_SUPPLEMENT_SECTIONS, "supplementary material"))
     errors.extend(check_forbidden_claims(manuscript_text))
     errors.extend(check_forbidden_claims(supplementary_text))
+    errors.extend(check_forbidden_claims(highlights_text))
+    errors.extend(check_highlights(highlights_text))
     errors.extend(check_bibliography_depth(bibliography_text))
     latex_pdf_path = ROOT / "build" / "iad-risk-manuscript-latex.pdf"
     supplementary_pdf_path = ROOT / "build" / "iad-risk-supplementary-material.pdf"

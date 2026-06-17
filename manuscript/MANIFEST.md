@@ -8,6 +8,7 @@
 | `supplementary_material.tex` | Supplementary reproducibility material |
 | `references.bib` | Bibliography entries |
 | `cover_letter.md` | Cover letter source |
+| `highlights.md` | Submission highlights |
 | `scripts/validate_manuscript.py` | Manuscript package validation |
 | `scripts/build_latex_pdf.sh` | Formal LaTeX PDF build script |
 | `build/iad-risk-manuscript-latex.pdf` | Formal compiled PDF |
