@@ -46,6 +46,16 @@ REQUIRED_SECTIONS = [
     r"\section*{Ethics Statement}",
     r"\section*{Competing Interests}",
 ]
+REQUIRED_SUPPLEMENT_SECTIONS = [
+    r"\section{Scope}",
+    r"\section{Reproduction Levels}",
+    r"\section{No-Network Fixture Rebuild}",
+    r"\section{Public-Source Rebuild}",
+    r"\section{Artifact Package Requirements}",
+    r"\section{Claim-Evidence Matrix}",
+    r"\section{Uncertainty and Ablation Requirements}",
+    r"\section{Claim Boundary}",
+]
 MIN_BIB_ENTRIES = 10
 FORBIDDEN_PHRASES = [
     "state-of-the-art",
@@ -90,16 +100,18 @@ def check_required_files() -> list[str]:
     return errors
 
 
-def check_sections(manuscript_text: str) -> list[str]:
-    """Check required manuscript sections.
+def check_sections(document_text: str, required_sections: list[str], document_name: str) -> list[str]:
+    """Check required document sections.
 
     参数:
-        manuscript_text: LaTeX manuscript source.
+        document_text: LaTeX document source.
+        required_sections: Required section markers.
+        document_name: Human-readable document name.
 
     返回:
         list[str]: Error messages for missing sections.
     """
-    return [f"missing required section marker: {section}" for section in REQUIRED_SECTIONS if section not in manuscript_text]
+    return [f"{document_name} missing required section marker: {section}" for section in required_sections if section not in document_text]
 
 
 def check_forbidden_claims(manuscript_text: str) -> list[str]:
@@ -248,9 +260,10 @@ def main() -> int:
     manuscript_text = manuscript_path.read_text(encoding="utf-8") if manuscript_path.exists() else ""
     bibliography_path = ROOT / "references.bib"
     bibliography_text = bibliography_path.read_text(encoding="utf-8") if bibliography_path.exists() else ""
-    errors.extend(check_sections(manuscript_text))
+    errors.extend(check_sections(manuscript_text, REQUIRED_SECTIONS, "main manuscript"))
     supplementary_path = ROOT / "supplementary_material.tex"
     supplementary_text = supplementary_path.read_text(encoding="utf-8") if supplementary_path.exists() else ""
+    errors.extend(check_sections(supplementary_text, REQUIRED_SUPPLEMENT_SECTIONS, "supplementary material"))
     errors.extend(check_forbidden_claims(manuscript_text))
     errors.extend(check_forbidden_claims(supplementary_text))
     errors.extend(check_bibliography_depth(bibliography_text))

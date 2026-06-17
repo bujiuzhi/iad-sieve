@@ -133,6 +133,34 @@ paper-artifacts/
 
 The manifest should record the source data version, processing commands, dependency versions, random seeds, thresholds, split configuration, hardware summary, and SHA256 checksum for every result file. The checksums should be validated before using artifact files to support claims in the manuscript.
 
+\section{Claim-Evidence Matrix}
+
+Table~\ref{tab:claim-evidence} maps the major manuscript claims to the evidence required for responsible interpretation. The matrix is part of the submission boundary: a claim should be weakened or removed if the corresponding evidence file is absent from the released artifact package.
+
+\begin{table}[h]
+\caption{Claim-evidence matrix for the main manuscript.}
+\label{tab:claim-evidence}
+\centering
+\small
+\begin{tabular}{L{0.26\linewidth}L{0.30\linewidth}L{0.34\linewidth}}
+\toprule
+Claim & Required evidence & Boundary \\
+\midrule
+Identity-agenda confusion is a practical false-merge risk. & Open-v2 hard-negative evaluation with FMR and HNFMR fields. & Supports a targeted scholarly deduplication failure mode, not a prevalence estimate for all domains. \\
+IAD-Risk suppresses hard-negative false merges under the reported setting. & IAD-Risk prediction files, metric summaries, split identifiers, thresholds, and checksums. & Supports targeted false-merge suppression; does not establish broad method superiority. \\
+IAD-Bench is provenance-aware. & Pair schema, label strength, label source, provenance fields, and fixture rebuild commands. & Supports a benchmark contract; does not turn silver or proxy labels into human gold. \\
+Repository-level reproduction is possible without committing raw data. & L0/L1 fixture rebuild, public-release scan, unit tests, and documented public-source commands. & Verifies code and schema behavior; full numerical reproduction requires L2/L3 source files or artifacts. \\
+LLM pair-judge evidence is auxiliary unless executed with traceable logs. & API-backed execution summary, model name, prompt version, output file, and checksum. & Does not replace human annotation and should not be merged with human-gold labels. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Uncertainty and Ablation Requirements}
+
+Result packages that report confidence intervals should include bootstrap outputs generated from the exact prediction files used in the manuscript tables. The repository provides \emph{run-iad-evidence-bootstrap} for stratified pair-level intervals and \emph{run-bootstrap} for general metric intervals. A numerical interval should be cited only when the corresponding CSV file, command log, random seed, and checksum are present in the artifact package.
+
+Mechanism claims should be tied to explicit ablation outputs. The repository provides \emph{run-iad-ablation-suite} for comparing full IAD-Risk decisions with variants that remove risk gating, agenda-non-identity blocking, or single-space separation. Without those outputs, the main manuscript should keep the mechanism claim at the level of stratified HNFMR evidence rather than claiming a complete ablation study.
+
 \section{Claim Boundary}
 
 The main manuscript treats DeepMatcher-style labels as gold identity evidence. It treats SciRepEval and SciDocs-style proximity as same-agenda proxy evidence. It treats OpenAlex and OpenCitations-derived pairs as silver hard-negative evidence. OpenAlex and OpenCitations signals are not human gold labels. LLM-derived rows, when present, are auxiliary unless an API-backed execution log and artifact record are available. Broad method-ranking claims require stronger source-heldout evidence and manual validation beyond the current manuscript package.
