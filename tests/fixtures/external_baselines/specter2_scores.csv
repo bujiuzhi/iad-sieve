@@ -1,0 +1,3 @@
+source_document_id,target_document_id,score
+deepmatcher:DBLP-ACM:tableA:a1,deepmatcher:DBLP-ACM:tableB:b1,0.93
+deepmatcher:DBLP-ACM:tableA:a1,deepmatcher:DBLP-ACM:tableB:b2,0.35
