@@ -47,6 +47,7 @@ REQUIRED_SECTIONS = [
     r"\section{Experiments}",
     r"\subsection{Threshold Selection and Uncertainty Reporting}",
     r"\subsection{Claim-Evidence Boundary for Result Interpretation}",
+    r"\subsection{Result Audit Trail}",
     r"\section{Mechanism and Error Analysis}",
     r"\section{Limitations}",
     r"\section{Threats to Validity}",
@@ -153,6 +154,43 @@ def check_bibliography_depth(bibliography_text: str) -> list[str]:
     if entry_count < MIN_BIB_ENTRIES:
         return [f"bibliography has {entry_count} entries; expected at least {MIN_BIB_ENTRIES}"]
     return []
+
+
+def check_result_claim_boundary(manuscript_text: str, supplementary_text: str) -> list[str]:
+    """Check result-table audit and claim-evidence boundaries.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
+
+    返回:
+        list[str]: Error messages for missing result-boundary markers.
+    """
+    if r"\label{tab:openv2-results}" not in manuscript_text:
+        return []
+    required_main_markers = [
+        r"\subsection{Claim-Evidence Boundary for Result Interpretation}",
+        r"\subsection{Result Audit Trail}",
+        r"\label{tab:claim-evidence-boundary-main}",
+        "prediction or score file",
+        "metric summary",
+        "checksum or manifest",
+        "does not support a broad method-ranking claim",
+    ]
+    required_supplement_markers = [
+        r"\section{Artifact Package Requirements}",
+        r"\section{Claim-Evidence Matrix}",
+        "checksums.sha256",
+        "released artifact package",
+    ]
+    errors: list[str] = []
+    for marker in required_main_markers:
+        if marker not in manuscript_text:
+            errors.append(f"Open-v2 result table missing manuscript audit boundary marker: {marker}")
+    for marker in required_supplement_markers:
+        if marker not in supplementary_text:
+            errors.append(f"Open-v2 result table missing supplementary artifact boundary marker: {marker}")
+    return errors
 
 
 def check_highlights(highlights_text: str) -> list[str]:
@@ -323,6 +361,7 @@ def main() -> int:
     errors.extend(check_forbidden_claims(supplementary_text))
     errors.extend(check_forbidden_claims(highlights_text))
     errors.extend(check_forbidden_claims(keywords_text))
+    errors.extend(check_result_claim_boundary(manuscript_text, supplementary_text))
     errors.extend(check_highlights(highlights_text))
     errors.extend(check_keywords(keywords_text))
     errors.extend(check_bibliography_depth(bibliography_text))

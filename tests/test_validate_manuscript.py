@@ -111,3 +111,43 @@ def test_check_keywords_rejects_long_keyword() -> None:
     errors = module.check_keywords(keywords_text)
 
     assert any("keyword is too long" in error for error in errors)
+
+
+def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
+    """验证主结果表具备审计边界时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Claim-Evidence Boundary for Result Interpretation}",
+            r"\label{tab:claim-evidence-boundary-main}",
+            r"\subsection{Result Audit Trail}",
+            "Each row uses a prediction or score file, metric summary, and checksum or manifest.",
+            "The evidence does not support a broad method-ranking claim.",
+            r"\label{tab:openv2-results}",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Artifact Package Requirements}",
+            r"\section{Claim-Evidence Matrix}",
+            "The released artifact package includes checksums.sha256.",
+        ]
+    )
+
+    errors = module.check_result_claim_boundary(manuscript_text, supplementary_text)
+
+    assert errors == []
+
+
+def test_check_result_claim_boundary_rejects_result_table_without_audit_trail() -> None:
+    """验证主结果表缺少审计边界会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\label{tab:openv2-results}"
+    supplementary_text = ""
+
+    errors = module.check_result_claim_boundary(manuscript_text, supplementary_text)
+
+    assert any("Result Audit Trail" in error for error in errors)
+    assert any("Artifact Package Requirements" in error for error in errors)

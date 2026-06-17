@@ -308,6 +308,10 @@ Repository-level reproduction is possible without committing raw data. & Public 
 \end{tabular}
 \end{table}
 
+\subsection{Result Audit Trail}
+
+Table~\ref{tab:openv2-results} should be read together with the artifact boundary in Table~\ref{tab:claim-evidence-boundary-main}. Each numerical row must be traceable to three audit objects: a prediction or score file, a metric summary produced from that file, and a checksum or manifest entry that fixes the artifact version. The Git repository verifies the schema, fixture rebuild, public-release boundary, manuscript build, and submission package, but it deliberately does not store raw third-party data, large model outputs, or full prediction files. Therefore the manuscript treats the Open-v2 table as a supported evidence snapshot and reserves full numerical reproduction for the released L3 artifact package.
+
 \subsection{Main Open-v2 Results}
 
 \begin{table}[H]
