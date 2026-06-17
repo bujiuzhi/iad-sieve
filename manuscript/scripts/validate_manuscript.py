@@ -47,6 +47,7 @@ REQUIRED_SECTIONS = [
     r"\subsection{Feature and Head Specification}",
     r"\subsection{Implementation and Reproducibility}",
     r"\section{Experiments}",
+    r"\subsection{Split and Leakage Controls}",
     r"\subsection{Threshold Selection and Uncertainty Reporting}",
     r"\subsection{Operating Point Disclosure}",
     r"\subsection{Claim-Evidence Boundary for Result Interpretation}",
@@ -270,6 +271,30 @@ def check_operating_point_disclosure(manuscript_text: str) -> list[str]:
         "Prediction file, model JSON, thresholds, and checksums",
     ]
     return [f"operating point disclosure missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+
+
+def check_split_leakage_controls(manuscript_text: str) -> list[str]:
+    """Check whether evaluation split and leakage boundaries are stated.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing split-control markers.
+    """
+    required_markers = [
+        r"\subsection{Split and Leakage Controls}",
+        r"\label{tab:split-leakage-controls}",
+        "Training uses only the declared training split",
+        "threshold selection uses validation evidence",
+        "Metadata fields that identify source, provenance, or split",
+        "Unordered pair leakage guard",
+        "Label-stratum coverage audit",
+        "Source-heldout readiness audit",
+        "Topic-heldout readiness audit",
+        "not be claimed when topic coverage is insufficient",
+    ]
+    return [f"split and leakage controls missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
 
 
 def check_scope_compatibility(manuscript_text: str) -> list[str]:
@@ -567,6 +592,7 @@ def main() -> int:
     errors.extend(check_related_work_positioning(manuscript_text))
     errors.extend(check_error_taxonomy(manuscript_text))
     errors.extend(check_operating_point_disclosure(manuscript_text))
+    errors.extend(check_split_leakage_controls(manuscript_text))
     errors.extend(check_scope_compatibility(manuscript_text))
     errors.extend(check_result_claim_boundary(manuscript_text, supplementary_text))
     errors.extend(check_highlights(highlights_text))
