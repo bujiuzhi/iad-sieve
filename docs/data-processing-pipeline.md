@@ -1,12 +1,12 @@
 # 数据处理流水线
 
-## 问题拆解
+## Scope
 
-远程仓库不提交原始数据时，复现能力不能依赖口头说明。仓库必须保留可审计的数据处理代码、CLI 入口、输入输出契约、小型 fixture 和正式 artifact 发布规则。
+远程仓库不提交原始数据时，复现能力不能依赖口头说明。仓库必须保留可复查的数据处理代码、CLI 入口、输入输出契约、小型 fixture 和正式 artifact 发布规则。
 
 本项目的数据处理目标分为两类：一类是把公开来源转换为统一的 `eval_documents.jsonl` 与 `eval_pairs.jsonl`；另一类是把多个来源合并为带 provenance、label strength 和 split 的 IAD-Bench 契约文件。
 
-## 关键结论
+## Repository Boundary
 
 本仓库不提交 `data/` 下的真实原始数据，也不提交 `outputs/` 下的实验产物；但保留了从公开原始数据到 IAD-Bench 的处理代码和可运行 CLI。第三方复现时应自行获取公开来源数据，把文件放入本地 `data/raw/`，再按本文命令生成 `data/processed/` 或 `outputs/` 产物。
 
@@ -243,4 +243,4 @@ python -m iad_sieve.cli build-iad-bench-source-bias-diagnostic \
 - 外部数据许可是否允许重新分发原始副本。
 - 论文主实验的大规模输出和模型权重。
 
-正式投稿或审稿复验应配套 artifact release，包含 manifest、checksum、处理日期、提交哈希、依赖版本和运行命令。
+正式论文复验应配套 artifact release，包含 manifest、checksum、处理日期、提交哈希、依赖版本和运行命令。

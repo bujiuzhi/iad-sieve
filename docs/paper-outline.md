@@ -1,6 +1,6 @@
 # IAD-Risk 论文大纲
 
-## 问题拆解
+## Positioning
 
 论文不能写成“实现了一个文献去重系统”，而要写成：
 
@@ -10,7 +10,7 @@
 
 IAD-Risk 的论文目标是证明双空间风险学习能降低 hard negative false merge。
 
-## 关键结论
+## Working Title
 
 建议论文题目：
 
@@ -204,7 +204,7 @@ single-space union-find
 IAD-Sieve rule-only
 ```
 
-审稿重点：
+重点证据：
 
 ```text
 强 baseline 是否也会在 same_agenda_non_identity hard negative 上误合并。
@@ -249,19 +249,19 @@ OpenAlex topic 过粗
 
 ```text
 OpenAlex / SciRepEval / LLM 标签不是 gold；
-人工 audit 暂作为后续增强；
+人工复核暂作为后续增强；
 双空间模型效果依赖 hard negative 构造质量；
 不同领域的合并规则可能不同。
 ```
 
-## 11. Reviewer Defense
+## 11. Evidence Boundary
 
-| 审稿质疑 | 回应 |
+| 潜在质疑 | 回应 |
 | --- | --- |
 | baseline 太弱 | 加入 SPECTER2、SciNCL、Ditto、LLM |
 | 模型不新 | 创新在 identity-agenda risk formulation 与 hard negative false merge |
 | weak label 不可信 | IAD-Bench 强制 label provenance，分层报告 |
-| 无人工 gold | P4 增加 human audit；P0-P3 不夸大结论 |
+| 缺少人工 gold | P4 增加人工复核样本；P0-P3 不夸大结论 |
 | 只是工程系统 | IAD-Sieve 降为 baseline，IAD-Risk 作为主方法 |
 
 ## 12. 结论

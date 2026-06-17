@@ -1,6 +1,6 @@
 # IAD-Risk 实验计划
 
-## 问题拆解
+## Objective
 
 IAD-Risk 的实验不能只证明去重 F1，而要证明：
 
@@ -10,7 +10,7 @@ IAD-Risk 的实验不能只证明去重 F1，而要证明：
 
 因此实验必须同时覆盖 same_work gold、same_agenda proxy、agenda_non_identity silver、强模型 baseline 和双空间风险学习消融。
 
-## 关键结论
+## Evidence Structure
 
 实验主线采用 IAD-Bench 分层证据链：
 
@@ -20,7 +20,7 @@ distant：DOI / arXiv / OpenAlex work id
 proxy：SciRepEval / SciDocs same_agenda
 silver：OpenAlex / OpenCitations agenda_non_identity
 llm_silver：LLM 辅助软标签
-human_audit：后续人工增强，不作为 P0-P3 自动化链路依赖
+human_audit：后续人工复核增强，不作为 P0-P3 自动化链路依赖
 ```
 
 所有结果必须按标签强度分层报告。
@@ -183,7 +183,7 @@ human_audit_pair_count：0
 ```text
 v2 可以作为公开可复现实验主线；
 OpenAlex 仍是 silver，不写成人工 gold；
-DBLP-ACM gold 规模偏小，投稿前需继续扩展 DBLP-Scholar、Dirty DBLP 系列或 human audit。
+DBLP-ACM gold 规模偏小，正式论文扩展前需继续补充 DBLP-Scholar、Dirty DBLP 系列或人工复核样本。
 ```
 
 构造规则：
@@ -368,7 +368,7 @@ python -m iad_sieve.cli evaluate-external-baseline \
   --execution-mode actual_model
 ```
 
-审稿边界：
+证据边界：
 
 ```text
 execution_mode = actual_model 才能作为真实强 baseline；
@@ -408,7 +408,7 @@ heuristic_entity_matcher fallback
 baseline_family = entity_matching
 ```
 
-审稿边界：RoBERTa/DistilBERT 是 pair-classification 迁移 baseline，不是 Ditto/DeepMatcher 论文级复现。若投稿强调实体匹配强基线，需要继续补 Ditto/DeepMatcher 专用实现或公开 checkpoint。
+证据边界：RoBERTa/DistilBERT 是 pair-classification 迁移 baseline，不是 Ditto/DeepMatcher 论文级复现。若论文强调实体匹配强基线，需要继续补 Ditto/DeepMatcher 专用实现或公开 checkpoint。
 
 IAD-Bench-Open-v2 的 transformers entity-matching actual_model 对比结果：
 
@@ -447,7 +447,7 @@ fallback lexical judgment
 baseline_family = llm_judge
 ```
 
-审稿边界：缺少 `OPENAI_API_KEY` 时只能生成 `execution_mode = fallback` 的链路验证产物；只有 API 实际调用成功并输出 `execution_mode = api_model` 时，审稿矩阵才会把 LLM judge 计为真实强 baseline。
+证据边界：缺少 `OPENAI_API_KEY` 时只能生成 `execution_mode = fallback` 的链路验证产物；只有 API 实际调用成功并输出 `execution_mode = api_model` 时，证据矩阵才会把 LLM judge 计为真实强 baseline。
 
 统一输出：
 
@@ -613,7 +613,7 @@ test：
 bootstrap hard_negative_false_merge_rate_mean = 0.0
 ```
 
-审稿解释：
+结果解释：
 
 ```text
 Transformer 版比 lightweight 版本更能支撑模型深度和 split-aware 训练；
@@ -779,10 +779,10 @@ human_audit result
 7. `run-iad-evidence-bootstrap` 输出 IAD-Risk 与强 baseline 分层置信区间。
 8. 自动化测试和公开发布检查通过。
 
-投稿增强项：
+后续增强项：
 
 1. 多 topic / 多学科公开数据扩展到 50k-150k pair；
 2. LLM judge `api_model` 实际运行；
 3. Transformer 级 IAD-Risk 双空间模型；
 4. 远程大样本验证；
-5. 后续 human audit 增强。
+5. 后续人工复核增强。

@@ -7,16 +7,14 @@
 | `main.tex` | Main LaTeX manuscript |
 | `references.bib` | Bibliography entries |
 | `cover_letter.md` | Generic cover letter draft |
-| `submission_checklist.md` | Final pre-upload checklist |
-| `submission_quality_audit.md` | Claim and readiness audit |
-| `scripts/audit_manuscript.py` | Manuscript package audit |
+| `scripts/validate_manuscript.py` | Manuscript package validation |
 | `scripts/build_latex_pdf.sh` | Formal LaTeX PDF build script |
 | `build/iad-risk-manuscript-latex.pdf` | Formal compiled PDF |
 
 ## Build Commands
 
 ```bash
-python manuscript/scripts/audit_manuscript.py
+python manuscript/scripts/validate_manuscript.py
 cd manuscript && ./scripts/build_latex_pdf.sh
 ```
 

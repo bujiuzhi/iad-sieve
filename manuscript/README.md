@@ -12,10 +12,8 @@ manuscript/
   references.bib
   cover_letter.md
   MANIFEST.md
-  submission_checklist.md
-  submission_quality_audit.md
   scripts/
-    audit_manuscript.py
+    validate_manuscript.py
     build_latex_pdf.sh
   build/
     iad-risk-manuscript-latex.pdf
@@ -31,10 +29,10 @@ tectonic main.tex
 mv main.pdf build/iad-risk-manuscript-latex.pdf
 ```
 
-Quality gate:
+Manuscript validation:
 
 ```bash
-python manuscript/scripts/audit_manuscript.py
+python manuscript/scripts/validate_manuscript.py
 ```
 
 ## Submission Status

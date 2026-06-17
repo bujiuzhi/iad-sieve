@@ -20,7 +20,7 @@
 \maketitle
 
 \begin{abstract}
-Scholarly entity matching must distinguish whether two records describe the same work, not merely whether they discuss the same research agenda. Modern scientific representations and pair classifiers often improve semantic matching, but a high semantic score can also connect different papers in the same task, benchmark, or citation community. This paper studies this failure mode as \emph{identity-agenda confusion} and proposes IAD-Risk, a risk-aware framework that separates identity evidence from agenda evidence before making merge decisions. IAD-Risk combines stratified data provenance, identity and agenda relation heads, and false-merge risk gating to prevent agenda-level hard negatives from entering automatic merge clusters. We evaluate the framework with IAD-Bench, a benchmark contract that separates DeepMatcher gold labels, SciRepEval/SciDocs-style proxy labels, and OpenAlex/OpenCitations silver hard negatives. On IAD-Bench-Open-v2, transformer-backed IAD-Risk variants retain high same-work performance while reducing hard-negative false merges that affect single-space scientific representation baselines. The results support a conservative conclusion: identity-agenda disentanglement is a practical mechanism for safer scholarly deduplication, while additional human audit and broader source-heldout validation remain necessary before making broad method-ranking claims.
+Scholarly entity matching must distinguish whether two records describe the same work, not merely whether they discuss the same research agenda. Modern scientific representations and pair classifiers often improve semantic matching, but a high semantic score can also connect different papers in the same task, benchmark, or citation community. This paper studies this failure mode as \emph{identity-agenda confusion} and proposes IAD-Risk, a risk-aware framework that separates identity evidence from agenda evidence before making merge decisions. IAD-Risk combines stratified data provenance, identity and agenda relation heads, and false-merge risk gating to prevent agenda-level hard negatives from entering automatic merge clusters. We evaluate the framework with IAD-Bench, a benchmark contract that separates DeepMatcher gold labels, SciRepEval/SciDocs-style proxy labels, and OpenAlex/OpenCitations silver hard negatives. On IAD-Bench-Open-v2, transformer-backed IAD-Risk variants retain high same-work performance while reducing hard-negative false merges that affect single-space scientific representation baselines. The results support a conservative conclusion: identity-agenda disentanglement is a practical mechanism for safer scholarly deduplication, while additional manual validation and broader source-heldout validation remain necessary before making broad method-ranking claims.
 \end{abstract}
 
 \section{Introduction}
@@ -33,7 +33,7 @@ We formulate this failure mode as identity-agenda confusion. Identity refers to 
 
 We propose IAD-Risk, a risk-aware identity-agenda disentanglement framework for scholarly work deduplication. IAD-Risk learns separate signals for same-work identity, same-agenda relatedness, agenda-non-identity hard negatives, and false-merge risk. A pair is eligible for automatic merging only when identity evidence is sufficiently strong and agenda-non-identity risk remains below a merge threshold. This selective decision rule turns deduplication from a high-recall similarity problem into a risk-calibrated safety problem.
 
-The paper makes three contributions. First, it defines identity-agenda confusion as a targeted failure mode in scholarly entity matching and introduces hard-negative false-merge rate as a safety metric. Second, it presents IAD-Bench, a provenance-aware benchmark contract that keeps gold, proxy, silver, LLM-silver, and human-audit labels separate. Third, it evaluates IAD-Risk against representation, entity matching, LLM judge, and single-space union baselines under the same pair contract. The current evidence supports targeted false-merge suppression under stratified evaluation; it does not support a broad method-ranking claim or a claim that silver labels replace human gold.
+The paper makes three contributions. First, it defines identity-agenda confusion as a targeted failure mode in scholarly entity matching and introduces hard-negative false-merge rate as a safety metric. Second, it presents IAD-Bench, a provenance-aware benchmark contract that keeps gold, proxy, silver, LLM-silver, and human-reviewed labels separate. Third, it evaluates IAD-Risk against representation, entity matching, LLM judge, and single-space union baselines under the same pair contract. The current evidence supports targeted false-merge suppression under stratified evaluation; it does not support a broad method-ranking claim or a claim that silver labels replace human gold.
 
 \section{Related Work}
 
@@ -67,6 +67,7 @@ IAD-Bench is a benchmark contract for organizing scholarly pair evidence. It is 
 \caption{IAD-Bench label layers. Gold, proxy, and silver labels are reported separately to avoid overstating evidence strength.}
 \label{tab:label-layers}
 \centering
+\small
 \begin{tabular}{lll}
 \toprule
 Layer & Source & Use in this paper \\
@@ -75,7 +76,7 @@ Gold & DeepMatcher / py\_entitymatching & Same-work identity evaluation \\
 Proxy & SciRepEval / SciDocs-style proximity & Same-agenda analysis \\
 Silver & OpenAlex / OpenCitations & Agenda-non-identity hard negatives \\
 LLM-silver & LLM pair judgments & Auxiliary analysis and baseline \\
-Human audit & Planned manual review & Future validation \\
+Manual validation & Planned human review & Future validation \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -146,7 +147,7 @@ This rule is deliberately selective. It can reject or defer high-risk pairs inst
 
 \subsection{Experimental Questions}
 
-The experiments ask four questions. RQ1 tests whether IAD-Risk preserves same-work matching performance on gold labels. RQ2 tests whether it reduces false merges on agenda-level hard negatives. RQ3 tests whether the agenda-non-identity and false-merge risk components are necessary. RQ4 tests whether results remain interpretable under gold, proxy, and silver label strata.
+The experiments ask four questions. RQ1 tests whether IAD-Risk preserves same-work matching performance on gold labels. RQ2 tests whether it reduces false merges on agenda-level hard negatives. RQ3 examines whether the observed behavior is consistent with the proposed risk mechanism. RQ4 tests whether results remain interpretable under gold, proxy, and silver label strata.
 
 \begin{table}[H]
 \caption{Evaluation protocol. Each question is tied to a label stratum and a metric so that evidence strength is not mixed across sources.}
@@ -158,7 +159,7 @@ Question & Evidence layer & Primary metric & Interpretation \\
 \midrule
 RQ1 & Gold identity pairs & Same-work F1 & Duplicate matching ability \\
 RQ2 & Silver hard negatives & HNFMR & False-merge safety \\
-RQ3 & Ablation variants & FMR and HNFMR & Contribution of risk signals \\
+RQ3 & Mechanism analysis & FMR and HNFMR & Role of risk signals \\
 RQ4 & Gold/proxy/silver strata & Split metrics & Provenance-aware robustness \\
 \bottomrule
 \end{tabular}
@@ -197,15 +198,15 @@ The Open-v2 evidence shows why identity-agenda disentanglement is necessary. Sin
 
 Open-v3 and source-heldout experiments provide additional stress tests, but their results must be interpreted with care. Some source-heldout settings train only identity heads or lack full agenda-non-identity supervision, so they support evidence about generalization pressure rather than broad ranking claims. The manuscript therefore treats Open-v2 as the core mechanism demonstration and Open-v3 as extended validation.
 
-\section{Ablation and Error Analysis}
+\section{Mechanism and Error Analysis}
 
-The central ablation question is whether false-merge control depends on explicit agenda-non-identity and risk signals. Removing agenda-non-identity supervision or false-merge risk gating should primarily affect hard-negative false-merge rate, not only same-work F1. This metric is necessary because a model can perform well on ordinary duplicate matching while still over-merging topically close but distinct papers.
+The central mechanism question is whether false-merge control depends on explicit agenda-non-identity and risk signals. A full ablation would remove agenda-non-identity supervision or false-merge risk gating and measure the resulting change in hard-negative false-merge rate. The current manuscript therefore treats HNFMR as the primary mechanism metric and reports the supported Open-v2 comparison conservatively rather than claiming a complete ablation study.
 
 The error analysis emphasizes claim discipline. The current evidence supports identity-agenda risk modeling, stratified benchmark construction, and targeted false-merge suppression. It does not support claims that OpenAlex labels are human gold, that the system has broad domain superiority, or that manual annotation has already been completed.
 
 \section{Limitations}
 
-This study has four limitations. First, OpenAlex/OpenCitations hard negatives are silver labels, not human gold. They are useful for stress testing but must be reported separately from DeepMatcher gold labels. Second, SciRepEval/SciDocs-style proximity is a proxy for agenda relatedness, not proof of identity or non-identity. Third, source-heldout generalization remains mixed across model variants and should be expanded before making broad claims across scholarly domains. Fourth, a 500-1,000 pair human audit is still needed for a stronger journal submission package.
+This study has four limitations. First, OpenAlex/OpenCitations hard negatives are silver labels, not human gold. They are useful for stress testing but must be reported separately from DeepMatcher gold labels. Second, SciRepEval/SciDocs-style proximity is a proxy for agenda relatedness, not proof of identity or non-identity. Third, source-heldout generalization remains mixed across model variants and should be expanded before making broad claims across scholarly domains. Fourth, a 500-1,000 pair manual validation set is still needed for a stronger journal submission package.
 
 \section{Threats to Validity}
 
@@ -213,11 +214,11 @@ Construct validity depends on whether the label strata measure the intended rela
 
 \section{Conclusion}
 
-IAD-Risk addresses a specific failure mode in scholarly entity matching: the tendency to confuse agenda similarity with work identity. By separating identity and agenda evidence and gating automatic merges through false-merge risk, the framework makes deduplication safer under stratified gold, proxy, and silver evaluation. The current evidence supports targeted false-merge suppression and a reproducible benchmark contract. Future work should complete human audit, expand source-heldout validation, and compile the final submission under the target journal template.
+IAD-Risk addresses a specific failure mode in scholarly entity matching: the tendency to confuse agenda similarity with work identity. By separating identity and agenda evidence and gating automatic merges through false-merge risk, the framework makes deduplication safer under stratified gold, proxy, and silver evaluation. The current evidence supports targeted false-merge suppression and a reproducible benchmark contract. Future work should complete manual validation, expand source-heldout validation, and compile the final submission under the target journal template.
 
 \section*{Data and Code Availability}
 
-The source code, benchmark construction scripts, public-release checks, and manuscript build scripts are organized in the project repository. Raw third-party data are not redistributed in the repository because the original sources have their own access conditions and licenses. The repository instead provides data-processing commands, schema contracts, fixture tests, and artifact-release guidance so that reviewers can reproduce the benchmark construction from public sources and verify generated artifacts through manifests and checksums.
+The source code, benchmark construction scripts, public-release checks, and manuscript build scripts are organized in the project repository. Raw third-party data are not redistributed in the repository because the original sources have their own access conditions and licenses. The repository instead provides data-processing commands, schema contracts, fixture tests, and artifact-release guidance so that independent readers can reproduce the benchmark construction from public sources and verify generated artifacts through manifests and checksums.
 
 \section*{Competing Interests}
 

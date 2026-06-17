@@ -2,13 +2,13 @@
 
 Risk-Calibrated Scientific Entity Matching under Agenda-Level Confounders.
 
-## 问题拆解
+## Overview
 
 科研文献去重和实体匹配不能只依赖文本相似度。预印本、会议版、期刊扩展版、数据集条目和引用记录可能指向同一研究工作；但同一议题下的不同论文也会高度相似。错误合并会污染综述、推荐、聚类和证据追踪。
 
 `IAD-Sieve` 的目标是在可解释的风险约束下识别“可以安全合并”的科学实体，而不是尽量合并更多相似文献。
 
-## 关键结论
+## Repository Boundary
 
 本仓库提交源码、测试、小型 fixture、脚本和公开文档；不提交原始大数据、实验输出、模型权重和远程连接配置。完整复现依赖公开数据来源、下载脚本、manifest、checksum 和单独发布的 artifact。
 
@@ -22,7 +22,7 @@ Risk-Calibrated Scientific Entity Matching under Agenda-Level Confounders.
   -> deduplication      cannot-link 与受约束 union-find
   -> clustering         主题图、簇标签和反馈
   -> ranking            新颖性、代表性、桥接性排序
-  -> evaluation         benchmark、baseline、bootstrap、审稿证据
+  -> evaluation         benchmark、baseline、bootstrap、evidence reports
 ```
 
 核心代码位于 `src/iad_sieve/`，CLI 入口为：
@@ -91,7 +91,7 @@ pytest -q
 | L1 | 单元测试 | `tests/fixtures/` | 验证算法和评测协议 |
 | L2 | 小样本开发实验 | 公开来源小样本 | 验证端到端流程 |
 | L3 | 论文主实验 | 完整数据与外部 baseline | 生成论文表格和证据包 |
-| L4 | 第三方复验 | 固定 artifact release | 审稿或读者复现 |
+| L4 | 第三方复验 | 固定 artifact release | 独立读者复现 |
 
 数据与 artifact 发布策略见 [docs/data-and-artifact-release.md](docs/data-and-artifact-release.md)。
 从公开原始数据到 IAD-Bench 的处理命令见 [docs/data-processing-pipeline.md](docs/data-processing-pipeline.md)。
@@ -126,7 +126,7 @@ scripts/run_main_experiment.sh 42 100000 cs.CL
 | 论文大纲 | [docs/paper-outline.md](docs/paper-outline.md) |
 | 数据与 artifact 发布 | [docs/data-and-artifact-release.md](docs/data-and-artifact-release.md) |
 
-## 论文主张边界
+## Claim Boundary
 
 适合主张：
 

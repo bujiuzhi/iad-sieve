@@ -1,6 +1,6 @@
-"""Audit the manuscript package before journal submission.
+"""Validate the manuscript package before journal submission.
 
-The audit checks file completeness, unsupported claim wording, core section
+The validation checks file completeness, unsupported claim wording, core section
 coverage, PDF readability, and local LaTeX toolchain availability.
 """
 
@@ -22,9 +22,7 @@ REQUIRED_FILES = [
     ROOT / "README.md",
     ROOT / "MANIFEST.md",
     ROOT / "cover_letter.md",
-    ROOT / "submission_checklist.md",
-    ROOT / "submission_quality_audit.md",
-    ROOT / "scripts" / "audit_manuscript.py",
+    ROOT / "scripts" / "validate_manuscript.py",
     ROOT / "scripts" / "build_latex_pdf.sh",
     ROOT / "build" / "iad-risk-manuscript-latex.pdf",
 ]
@@ -38,7 +36,7 @@ REQUIRED_SECTIONS = [
     r"\subsection{Training Objective}",
     r"\subsection{Implementation and Reproducibility}",
     r"\section{Experiments}",
-    r"\section{Ablation and Error Analysis}",
+    r"\section{Mechanism and Error Analysis}",
     r"\section{Limitations}",
     r"\section{Threats to Validity}",
     r"\section{Conclusion}",
@@ -58,7 +56,7 @@ FORBIDDEN_PHRASES = [
 
 
 def parse_arguments() -> argparse.Namespace:
-    """Parse audit command arguments.
+    """Parse validation command arguments.
 
     参数:
         无。
@@ -66,7 +64,7 @@ def parse_arguments() -> argparse.Namespace:
     返回:
         argparse.Namespace: Parsed arguments.
     """
-    parser = argparse.ArgumentParser(description="Audit the manuscript package.")
+    parser = argparse.ArgumentParser(description="Validate the manuscript package.")
     parser.add_argument("--strict-latex", action="store_true", help="Fail if no local LaTeX engine is available.")
     return parser.parse_args()
 
@@ -212,7 +210,7 @@ def check_latex_toolchain(strict_latex: bool) -> tuple[list[str], list[str]]:
     """Check local LaTeX toolchain availability.
 
     参数:
-        strict_latex: Whether missing LaTeX engines should fail the audit.
+        strict_latex: Whether missing LaTeX engines should fail the validation.
 
     返回:
         tuple[list[str], list[str]]: Warnings and errors.
@@ -228,7 +226,7 @@ def check_latex_toolchain(strict_latex: bool) -> tuple[list[str], list[str]]:
 
 
 def main() -> int:
-    """Run manuscript audit checks.
+    """Run manuscript validation checks.
 
     参数:
         无。
@@ -261,7 +259,7 @@ def main() -> int:
         for error in errors:
             LOGGER.error(error)
         return 1
-    LOGGER.info("manuscript audit passed")
+    LOGGER.info("manuscript validation passed")
     return 0
 
 
