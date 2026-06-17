@@ -18,6 +18,7 @@ manuscript/
   scripts/
     validate_manuscript.py
     verify_fixture_rebuild.py
+    build_submission_package.py
     build_latex_pdf.sh
   build/
     iad-risk-manuscript-latex.pdf
@@ -46,6 +47,12 @@ No-network fixture rebuild verification:
 
 ```bash
 python manuscript/scripts/verify_fixture_rebuild.py
+```
+
+Submission package build:
+
+```bash
+python manuscript/scripts/build_submission_package.py
 ```
 
 ## Submission Boundary

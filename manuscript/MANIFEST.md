@@ -12,6 +12,7 @@
 | `keywords.md` | Submission keywords |
 | `scripts/validate_manuscript.py` | Manuscript package validation |
 | `scripts/verify_fixture_rebuild.py` | No-network fixture rebuild verification |
+| `scripts/build_submission_package.py` | Self-contained submission package builder |
 | `scripts/build_latex_pdf.sh` | Formal LaTeX PDF build script |
 | `build/iad-risk-manuscript-latex.pdf` | Formal compiled PDF |
 | `build/iad-risk-supplementary-material.pdf` | Formal compiled supplementary PDF |
@@ -21,6 +22,7 @@
 ```bash
 python manuscript/scripts/validate_manuscript.py
 python manuscript/scripts/verify_fixture_rebuild.py
+python manuscript/scripts/build_submission_package.py
 cd manuscript && ./scripts/build_latex_pdf.sh
 ```
 

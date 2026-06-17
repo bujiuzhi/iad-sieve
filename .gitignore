@@ -44,3 +44,4 @@ dist/
 build/
 !/manuscript/build/
 !/manuscript/build/*.pdf
+/manuscript/build/submission_package/
