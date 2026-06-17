@@ -148,6 +148,28 @@ p_{\mathrm{risk}}<\tau_r,\quad
 \]
 This rule is deliberately selective. It can reject or defer high-risk pairs instead of forcing every semantically related pair into a binary match decision. The same decision interface also supports constrained union-find clustering, where cannot-link evidence prevents transitive false merges.
 
+\subsection{Failure-Control Rationale}
+
+IAD-Risk is designed as a failure-control framework rather than as another similarity scorer. Table~\ref{tab:failure-controls} summarizes how each design choice addresses a specific false-merge pathway. The table also states the remaining boundary for each control, because a safety mechanism should make its unsupported cases explicit.
+
+\begin{table}[H]
+\caption{Failure-control rationale of IAD-Risk. Each component targets a concrete way in which agenda-level similarity can be mistaken for work identity.}
+\label{tab:failure-controls}
+\centering
+\small
+\begin{tabular}{L{0.26\linewidth}L{0.34\linewidth}L{0.30\linewidth}}
+\toprule
+Failure pathway & Design response & Remaining boundary \\
+\midrule
+Topically close papers receive high semantic similarity. & Separate agenda evidence from identity evidence before the merge gate. & Requires the benchmark to include agenda-level hard negatives. \\
+Silver metadata is treated as if it were human gold. & Preserve label strength and provenance, and mask supervision by valid label source. & Silver labels support stress testing, not exhaustive truth claims. \\
+Pairwise errors contaminate clusters through transitivity. & Apply risk gating before constrained union-find and respect cannot-link evidence. & Cluster-level guarantees require complete cannot-link coverage. \\
+Thresholds turn a classifier into an unsafe automatic merger. & Expose work, ANI, and risk thresholds and evaluate held-out merge decisions. & Threshold transfer should be rechecked under new source distributions. \\
+Auxiliary LLM or proxy labels are over-interpreted. & Keep auxiliary rows separate unless traceable execution logs and artifact records exist. & LLM rows remain non-human evidence even when reproducible. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Implementation Details}
 
 The reported transformer variants use frozen scientific document encoders rather than end-to-end fine-tuning. For each candidate pair, the implementation builds three feature groups: identity features combine transformer distances with identifiers, author overlap, venue, and year signals; agenda features combine semantic similarity with topic and citation overlap; agenda-non-identity features add conflict indicators such as different identifiers and year conflict. The three relation heads are trained on the training split, and the merge policy exposes $\tau_w$, $\tau_a$, and $\tau_r$ as configurable thresholds. Unless a validation protocol overrides them, the implementation uses 0.5 for all three thresholds.

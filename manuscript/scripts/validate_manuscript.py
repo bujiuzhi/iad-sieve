@@ -36,6 +36,7 @@ REQUIRED_SECTIONS = [
     r"\section{IAD-Bench}",
     r"\section{Method}",
     r"\subsection{Training Objective}",
+    r"\subsection{Failure-Control Rationale}",
     r"\subsection{Implementation and Reproducibility}",
     r"\section{Experiments}",
     r"\section{Mechanism and Error Analysis}",
