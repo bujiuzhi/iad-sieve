@@ -1,10 +1,10 @@
-# Journal Manuscript Package
+# 期刊投稿材料
 
-## Scope
+## 目录用途
 
-This directory contains the journal manuscript source, bibliography, build scripts, and compiled PDF. It is separate from project documentation and experiment outputs.
+本目录保存期刊稿件源码、参考文献、构建脚本和编译后的 PDF。该目录与项目技术文档、数据目录和实验输出目录分离。
 
-## Files
+## 文件清单
 
 ```text
 manuscript/
@@ -26,9 +26,9 @@ manuscript/
     iad-risk-supplementary-material.pdf
 ```
 
-## Build
+## 构建命令
 
-Formal LaTeX build:
+正式 LaTeX 构建：
 
 ```bash
 cd manuscript
@@ -38,25 +38,25 @@ tectonic supplementary_material.tex
 mv supplementary_material.pdf build/iad-risk-supplementary-material.pdf
 ```
 
-Manuscript validation:
+稿件校验：
 
 ```bash
 python manuscript/scripts/validate_manuscript.py
 ```
 
-No-network fixture rebuild verification:
+无网络 fixture 重建校验：
 
 ```bash
 python manuscript/scripts/verify_fixture_rebuild.py
 ```
 
-Submission package build:
+投稿包构建：
 
 ```bash
 python manuscript/scripts/build_submission_package.py
 python manuscript/scripts/validate_submission_package.py
 ```
 
-## Submission Boundary
+## 投稿边界
 
-The manuscript uses a template-independent LaTeX source. Before journal upload, adapt `main.tex` to the selected journal class file if required and set the author metadata according to the journal's submission rules. The evidence supports a conservative claim: IAD-Risk models identity-agenda confusion and reduces false-merge risk under stratified gold/proxy/silver evaluation. The manuscript must not claim broad method superiority or completed human gold annotation.
+稿件当前使用模板无关的 LaTeX 源文件。正式投稿前，应按目标期刊要求替换 `main.tex` 的文档类并设置作者信息。现有证据支持保守主张：IAD-Risk 在 gold/proxy/silver 分层评估下建模身份-议题混杂并降低误合并风险，不应主张全领域方法优越性或已完成完整人工金标。

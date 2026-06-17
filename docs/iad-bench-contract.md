@@ -1,12 +1,12 @@
 # IAD-Bench 数据契约
 
-## Overview
+## 契约目标
 
 IAD-Risk 需要同时使用公开 gold、proxy benchmark、weak / silver label、LLM 生成候选标签和人工复核标签。若这些标签混在同一个指标里，读者无法判断结论的证据强度。
 
 IAD-Bench 的目标是把不同来源的科研文献 pair 统一成可追踪、可分层、可复现实验数据。它不是一个单一数据集名称，而是一套数据组织契约。
 
-## Core Rule
+## 核心规则
 
 所有 IAD-Bench 样本必须显式标注：
 
@@ -168,7 +168,7 @@ same authors and similar title but content not enough
 | `split` | `train`、`dev`、`test`、`audit` |
 | `hard_negative_level` | `none`、`low`、`medium`、`high` |
 
-## Split 规则
+## 切分规则
 
 ### train
 
@@ -296,9 +296,9 @@ label_strength_breakdown
 - 用训练中见过的 weak pair 作为无说明测试结果；
 - 只报告普通 F1，不报告 hard negative false merge。
 
-## 验收标准
+## 质量要求
 
-IAD-Bench P1 完成标准：
+IAD-Bench 的最低可用要求：
 
 1. 至少接入 DeepMatcher same_work gold；
 2. 至少接入 SciRepEval / SciDocs same_agenda proxy；
@@ -308,7 +308,7 @@ IAD-Bench P1 完成标准：
 6. 输出 label provenance summary；
 7. 报告 gold、proxy、silver 分层指标。
 
-期刊增强标准：
+投稿级补充要求：
 
 1. 增加 500-1,000 条 `human_audit`；
 2. 输出双标一致率和仲裁结果；

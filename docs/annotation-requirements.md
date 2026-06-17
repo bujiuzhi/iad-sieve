@@ -1,3 +1,5 @@
+# 人工标注规范
+
 ## 标注对象
 
 每条样本是一对科研文献：
@@ -170,7 +172,7 @@ paper_b: Query Optimization in Relational Databases
 - 检查字段是否足够；
 - 发现标签定义歧义；
 - 统一 same_work 与 same_agenda_non_identity 的边界；
-- 修改标注规范。
+- 修订标注规范。
 
 ### 阶段 2：正式双标
 
@@ -257,25 +259,25 @@ paper_b: Query Optimization in Relational Databases
 - 元数据字段不完整；
 - 模型之间预测冲突的样本。
 
-## LLM 辅助使用边界
+## 弱标签辅助筛选边界
 
-LLM 可以用于：
+大语言模型只可作为候选筛选或解释辅助，适用范围包括：
 
 - 生成候选 hard negative；
 - 提供 pair 解释；
 - 生成 silver label；
 - 帮助筛选需要人工复核的争议样本。
 
-LLM 不应作为：
+大语言模型不得作为：
 
 - 最终人工 gold label；
 - 仲裁员；
 - 评价模型优劣的唯一依据。
 
-建议标注流程中保留两套字段：
+若使用模型辅助筛选，标注流程应保留两套字段：
 
 ```text
-llm_suggested_label：LLM 建议标签，只用于分析
+llm_suggested_label：模型建议标签，只用于分析
 final_label：人工最终标签，用于论文评估
 ```
 
@@ -283,7 +285,7 @@ final_label：人工最终标签，用于论文评估
 
 ## 验收产物
 
-标准部门最终应交付：
+人工标注数据包应包含：
 
 1. `iad_risk_human_gold.jsonl`：逐条人工标注结果；
 2. `iad_risk_human_gold.csv`：便于抽查的表格版本；

@@ -2,13 +2,13 @@
 
 Risk-Calibrated Scientific Entity Matching under Agenda-Level Confounders.
 
-## Overview
+## 项目概述
 
 科研文献去重和实体匹配不能只依赖文本相似度。预印本、会议版、期刊扩展版、数据集条目和引用记录可能指向同一研究工作；但同一议题下的不同论文也会高度相似。错误合并会污染综述、推荐、聚类和证据追踪。
 
 `IAD-Sieve` 的目标是在可解释的风险约束下识别“可以安全合并”的科学实体，而不是尽量合并更多相似文献。
 
-## Repository Boundary
+## 仓库边界
 
 本仓库提交源码、测试、小型 fixture、脚本和公开文档；不提交原始大数据、实验输出、模型权重和远程连接配置。完整复现依赖公开数据来源、下载脚本、manifest、checksum 和单独发布的 artifact。
 
@@ -124,7 +124,7 @@ scripts/run_main_experiment.sh 42 100000 cs.CL
 | 标注规范 | [docs/annotation-requirements.md](docs/annotation-requirements.md) |
 | 数据与 artifact 发布 | [docs/data-and-artifact-release.md](docs/data-and-artifact-release.md) |
 
-## Claim Boundary
+## 论文主张边界
 
 适合主张：
 
@@ -149,6 +149,6 @@ pytest -q
 
 确认 `git status --ignored --short` 中只有 `data/`、`outputs/` 和缓存类文件保持未提交。
 
-## License
+## 许可边界
 
-代码许可证和数据再发布许可证需要在正式公开前补齐。第三方原始数据遵循各自来源的许可与使用条款。
+本仓库不再分发第三方原始数据。代码、衍生评测包和实验产物的再发布范围以仓库维护者发布的许可文件、artifact release 说明和第三方数据来源条款为准。

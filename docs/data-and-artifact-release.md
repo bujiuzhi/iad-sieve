@@ -1,10 +1,10 @@
 # 数据集与实验产物发布说明
 
-## Overview
+## 发布范围
 
 本项目的数据体系由“公开原始来源、项目衍生评测包、实验输出产物”三层组成。公开仓库应包含可复现流程和小型测试夹具，但不直接提交大规模原始数据、模型权重和服务器产物。
 
-## Repository Boundary
+## 仓库边界
 
 `IAD-Bench-Open-v2` 和 `IAD-Bench-Open-v3` 是项目构建的数据集变体；它们不是第三方原封不动发布的数据集。论文中应称为“derived benchmark packages”或“project-built benchmark variants from public sources”。
 
@@ -89,7 +89,7 @@ sha256sum -c checksums.sha256
 python -m iad_sieve.cli --help
 ```
 
-## Evidence Boundary
+## 证据边界
 
 独立复验通常关注三类问题：
 

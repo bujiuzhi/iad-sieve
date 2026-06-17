@@ -1,10 +1,10 @@
 # Outputs Directory
 
-## Scope
+## 目录用途
 
 `outputs/` 用于本地保存实验产物、模型权重、复现实验结果和最终 artifact 包。真实产物默认不进入 Git 仓库，仓库只提交本说明文件。
 
-## Repository Boundary
+## 仓库边界
 
 不要把实验输出、模型 checkpoint、远程 profile、日志或最终 artifact 包直接提交到 Git。需要公开的产物应通过 GitHub Release、Zenodo、OSF 或对象存储发布，并附 manifest 与 checksum。
 

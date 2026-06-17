@@ -1,24 +1,24 @@
-# Manuscript Manifest
+# 稿件材料清单
 
-## Files
+## 文件清单
 
-| Path | Purpose |
+| 路径 | 用途 |
 | --- | --- |
-| `main.tex` | Main LaTeX manuscript |
-| `supplementary_material.tex` | Supplementary reproducibility material |
-| `references.bib` | Bibliography entries |
-| `cover_letter.md` | Cover letter source |
-| `highlights.md` | Submission highlights |
-| `keywords.md` | Submission keywords |
-| `scripts/validate_manuscript.py` | Manuscript package validation |
-| `scripts/verify_fixture_rebuild.py` | No-network fixture rebuild verification |
-| `scripts/build_submission_package.py` | Self-contained submission package builder |
-| `scripts/validate_submission_package.py` | Submission package integrity validator |
-| `scripts/build_latex_pdf.sh` | Formal LaTeX PDF build script |
-| `build/iad-risk-manuscript-latex.pdf` | Formal compiled PDF |
-| `build/iad-risk-supplementary-material.pdf` | Formal compiled supplementary PDF |
+| `main.tex` | 主稿 LaTeX 源文件 |
+| `supplementary_material.tex` | 补充材料 LaTeX 源文件 |
+| `references.bib` | 参考文献条目 |
+| `cover_letter.md` | 投稿信 |
+| `highlights.md` | 亮点说明 |
+| `keywords.md` | 关键词 |
+| `scripts/validate_manuscript.py` | 稿件材料校验 |
+| `scripts/verify_fixture_rebuild.py` | 无网络 fixture 重建校验 |
+| `scripts/build_submission_package.py` | 投稿包构建脚本 |
+| `scripts/validate_submission_package.py` | 投稿包完整性校验 |
+| `scripts/build_latex_pdf.sh` | 正式 PDF 构建脚本 |
+| `build/iad-risk-manuscript-latex.pdf` | 主稿 PDF |
+| `build/iad-risk-supplementary-material.pdf` | 补充材料 PDF |
 
-## Build Commands
+## 构建命令
 
 ```bash
 python manuscript/scripts/validate_manuscript.py
@@ -28,6 +28,6 @@ python manuscript/scripts/validate_submission_package.py
 cd manuscript && ./scripts/build_latex_pdf.sh
 ```
 
-## Submission Boundary
+## 投稿边界
 
-This package is template-independent. Before journal upload, adapt `main.tex` to the selected journal class file if required and set the author metadata according to the target journal's submission rules.
+该材料包当前不绑定具体期刊模板。正式上传前，应按目标期刊要求调整 `main.tex` 文档类并补充作者元数据。

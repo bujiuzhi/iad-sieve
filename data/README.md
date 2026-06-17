@@ -1,10 +1,10 @@
 # Data Directory
 
-## Scope
+## 目录用途
 
 `data/` 用于本地保存原始数据、下载数据、中间样本和处理后评测输入。真实数据默认不进入 Git 仓库，仓库只提交本说明文件。
 
-## Repository Boundary
+## 仓库边界
 
 不要把原始大数据、第三方压缩包、下载缓存或本地构造样本提交到 Git。公开复现应依赖数据来源说明、下载脚本、manifest、checksum 和可公开 fixture。
 

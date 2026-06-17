@@ -1,6 +1,6 @@
 # IAD-Risk 方法设计
 
-## Motivation
+## 设计动机
 
 科研文献去重中，语义相似性有两种含义：
 
@@ -11,7 +11,7 @@
 
 传统单空间相似度把这两类关系混在一起，容易把同议题论文误合并为同一文献。IAD-Risk 的设计目标是显式分离身份空间和议题空间，并把同议题非同身份样本作为 hard negative 建模。
 
-## Core Design
+## 核心设计
 
 IAD-Risk 是一个风险学习框架：
 
@@ -142,7 +142,7 @@ identifier 缺失或冲突
 same_agenda 高但 p_same_work 不高
 ```
 
-## 4. 训练目标
+## 4. 样本构造
 
 ### same_work
 
@@ -203,7 +203,7 @@ low title and abstract similarity
 no shared author / reference / keyword
 ```
 
-## 5. 训练目标
+## 5. 优化目标
 
 训练损失覆盖三个监督关系：
 
@@ -268,7 +268,7 @@ llm_silver
 human_audit
 ```
 
-## 8. Baseline 接口
+## 8. 基线接口
 
 IAD-Risk 必须和以下强 baseline 对比：
 
