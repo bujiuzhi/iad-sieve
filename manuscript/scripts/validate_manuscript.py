@@ -201,6 +201,34 @@ def check_abstract_quantitative_evidence(manuscript_text: str) -> list[str]:
     return [f"abstract missing bounded quantitative evidence marker: {marker}" for marker in required_markers if marker not in abstract_text]
 
 
+def check_contribution_evidence_summary(manuscript_text: str) -> list[str]:
+    """Check whether the introduction aligns contributions with evidence and claim boundaries.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing contribution-evidence markers.
+    """
+    required_markers = [
+        r"\label{tab:contribution-evidence-summary}",
+        "Contribution-evidence summary",
+        "Identity-agenda confusion as a scholarly deduplication failure mode",
+        "IAD-Bench as a provenance-aware pair contract",
+        "IAD-Risk as a risk-aware merge mechanism",
+        "hard-negative false-merge rate",
+        "Gold, proxy, silver, and manual-validation layers",
+        "same-work F1=0.980",
+        "HNFMR=0.000",
+        "not a broad method-ranking claim",
+    ]
+    return [
+        f"contribution-evidence summary missing marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
+
+
 def check_bibliography_depth(bibliography_text: str) -> list[str]:
     """Check whether the bibliography has enough source coverage.
 
@@ -789,6 +817,7 @@ def main() -> int:
         )
     )
     errors.extend(check_abstract_quantitative_evidence(manuscript_text))
+    errors.extend(check_contribution_evidence_summary(manuscript_text))
     errors.extend(check_method_feature_contract(manuscript_text))
     errors.extend(check_related_work_positioning(manuscript_text))
     errors.extend(check_error_taxonomy(manuscript_text))

@@ -153,6 +153,41 @@ def test_check_result_claim_boundary_rejects_result_table_without_audit_trail() 
     assert any("Artifact Package Requirements" in error for error in errors)
 
 
+def test_check_contribution_evidence_summary_accepts_complete_summary() -> None:
+    """验证贡献、证据和边界对齐完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\label{tab:contribution-evidence-summary}",
+            "Contribution-evidence summary",
+            "Identity-agenda confusion as a scholarly deduplication failure mode.",
+            "IAD-Bench as a provenance-aware pair contract.",
+            "IAD-Risk as a risk-aware merge mechanism.",
+            "The paper reports hard-negative false-merge rate.",
+            "Gold, proxy, silver, and manual-validation layers are separated.",
+            "The result includes same-work F1=0.980 and HNFMR=0.000.",
+            "The manuscript makes not a broad method-ranking claim.",
+        ]
+    )
+
+    errors = module.check_contribution_evidence_summary(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_contribution_evidence_summary_rejects_missing_boundary() -> None:
+    """验证贡献表缺少证据边界时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\label{tab:contribution-evidence-summary}"
+
+    errors = module.check_contribution_evidence_summary(manuscript_text)
+
+    assert any("IAD-Risk as a risk-aware merge mechanism" in error for error in errors)
+    assert any("not a broad method-ranking claim" in error for error in errors)
+
+
 def test_check_method_feature_contract_accepts_complete_contract() -> None:
     """验证方法特征契约完整时可通过检查。"""
 
