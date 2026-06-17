@@ -39,8 +39,10 @@ REQUIRED_SECTIONS = [
     r"\section{Experiments}",
     r"\section{Ablation and Error Analysis}",
     r"\section{Limitations}",
+    r"\section{Threats to Validity}",
     r"\section{Conclusion}",
 ]
+MIN_BIB_ENTRIES = 10
 FORBIDDEN_PHRASES = [
     "state-of-the-art",
     "state of the art",
@@ -111,6 +113,21 @@ def check_forbidden_claims(manuscript_text: str) -> list[str]:
         if phrase.lower() in lowered_text:
             errors.append(f"forbidden or unsafe claim phrase found: {phrase}")
     return errors
+
+
+def check_bibliography_depth(bibliography_text: str) -> list[str]:
+    """Check whether the bibliography has enough source coverage.
+
+    参数:
+        bibliography_text: BibTeX source text.
+
+    返回:
+        list[str]: Error messages for insufficient bibliography depth.
+    """
+    entry_count = bibliography_text.count("@")
+    if entry_count < MIN_BIB_ENTRIES:
+        return [f"bibliography has {entry_count} entries; expected at least {MIN_BIB_ENTRIES}"]
+    return []
 
 
 def extract_first_page_text(pdf_path: Path) -> tuple[str, list[str]]:
@@ -225,8 +242,11 @@ def main() -> int:
     errors.extend(check_required_files())
     manuscript_path = ROOT / "main.tex"
     manuscript_text = manuscript_path.read_text(encoding="utf-8") if manuscript_path.exists() else ""
+    bibliography_path = ROOT / "references.bib"
+    bibliography_text = bibliography_path.read_text(encoding="utf-8") if bibliography_path.exists() else ""
     errors.extend(check_sections(manuscript_text))
     errors.extend(check_forbidden_claims(manuscript_text))
+    errors.extend(check_bibliography_depth(bibliography_text))
     latex_pdf_path = ROOT / "build" / "iad-risk-manuscript-latex.pdf"
     errors.extend(check_pdf(latex_pdf_path))
     errors.extend(check_pdf_freshness(latex_pdf_path, manuscript_path))

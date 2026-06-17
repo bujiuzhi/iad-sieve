@@ -17,6 +17,7 @@ The package is suitable for Q2/B-class submission preparation under a conservati
 | IAD-Risk uses provenance-aware multi-task supervision. | `manuscript/main.tex`, Training Objective | Supported as the training design |
 | IAD-Bench separates gold, proxy, silver, LLM-silver, and human-audit evidence. | `manuscript/main.tex`, IAD-Bench; `docs/iad-bench-contract.md` | Supported by the benchmark contract |
 | Open-v2 evidence supports targeted hard-negative false-merge suppression. | `manuscript/main.tex`, Experiments table and discussion | Supported within the Open-v2 boundary |
+| The manuscript explicitly states validity threats. | `manuscript/main.tex`, Threats to Validity | Supported as reviewer-risk control |
 | The method is broadly superior across scholarly domains. | Not supported by current evidence | Excluded from the manuscript |
 | Human gold annotation is complete. | Not supported by current evidence | Excluded from the manuscript |
 
@@ -29,6 +30,7 @@ The package is suitable for Q2/B-class submission preparation under a conservati
 | Experimental strength | Strongest evidence is Open-v2; Open-v3 should remain extended evidence | Avoid broad ranking language |
 | Evaluation completeness | Label provenance is explicit; human audit remains incomplete | Report gold, proxy, and silver strata separately |
 | Method soundness | Risk-aware merge gating is technically coherent and reproducible | Keep thresholds and cannot-link constraints visible |
+| Validity analysis | Construct, internal, external, and reproducibility threats are stated | Keep limitations tied to evidence strata |
 
 ## Independent Reviewer Checks
 
