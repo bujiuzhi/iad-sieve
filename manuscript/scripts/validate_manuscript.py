@@ -363,6 +363,30 @@ def check_error_taxonomy(manuscript_text: str) -> list[str]:
     return [f"error taxonomy missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
 
 
+def check_validity_threats(manuscript_text: str) -> list[str]:
+    """Check whether threats to validity state concrete reviewer-facing boundaries.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing validity-threat markers.
+    """
+    required_markers = [
+        r"\label{tab:validity-threats}",
+        "Threats to validity and claim boundaries",
+        "Construct validity",
+        "Internal validity",
+        "External validity",
+        "Conclusion validity",
+        "Reproducibility",
+        "Operational validity",
+        "not turn proxy or silver evidence into human-adjudicated truth",
+        "Full numeric audit requires L2/L3 artifacts",
+    ]
+    return [f"validity threats missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+
+
 def check_highlights(highlights_text: str) -> list[str]:
     """Check submission highlights format and scope.
 
@@ -591,6 +615,7 @@ def main() -> int:
     errors.extend(check_method_feature_contract(manuscript_text))
     errors.extend(check_related_work_positioning(manuscript_text))
     errors.extend(check_error_taxonomy(manuscript_text))
+    errors.extend(check_validity_threats(manuscript_text))
     errors.extend(check_operating_point_disclosure(manuscript_text))
     errors.extend(check_split_leakage_controls(manuscript_text))
     errors.extend(check_scope_compatibility(manuscript_text))

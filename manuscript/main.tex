@@ -501,6 +501,28 @@ This study has four limitations. First, OpenAlex/OpenCitations hard negatives ar
 
 Construct validity depends on whether the label strata measure the intended relations. DeepMatcher pairs provide same-work identity evidence, but OpenAlex/OpenCitations hard negatives are silver stress-test pairs rather than manual non-identity gold. Internal validity depends on threshold selection and split separation; therefore threshold-sensitive systems must select thresholds on validation data and report held-out metrics. External validity is limited by the current source mix: the Open-v2 evidence supports the identity-agenda mechanism, while broader claims require more source-heldout and domain-diverse evaluation. Reproducibility depends on public data availability and stable processing scripts because the repository deliberately avoids redistributing large third-party data files.
 
+Table~\ref{tab:validity-threats} summarizes the main validity risks and the safeguards used in the manuscript. The table is intentionally conservative: a mitigation reduces a specific reviewer concern, but it does not turn proxy or silver evidence into human-adjudicated truth.
+
+\begin{table}[H]
+\caption{Threats to validity and claim boundaries. Each risk is paired with the current mitigation and the remaining statement that should not be over-claimed.}
+\label{tab:validity-threats}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.20\linewidth}L{0.27\linewidth}L{0.25\linewidth}L{0.18\linewidth}}
+\toprule
+Validity dimension & Main risk & Current mitigation & Remaining boundary \\
+\midrule
+Construct validity & Silver hard negatives may include metadata-derived noise. & Label strength is preserved, and silver rows are reported as stress-test evidence. & Not a replacement for manual non-identity gold. \\
+Internal validity & Threshold choice or split leakage can inflate held-out metrics. & Validation-based operating points, split fields, and pair-leakage audits are required. & Numerical claims need released predictions and logs. \\
+External validity & Open-v2 may not cover every scholarly source, topic, or version policy. & Claims are tied to Open-v2 and source-heldout evidence boundaries. & Broad deployment requires domain-diverse validation. \\
+Conclusion validity & Mechanism-consistent HNFMR evidence may be mistaken for full causality. & Ablation requirements are stated before component-level causal claims. & Complete causality requires no-gate, no-ANI, and single-space variants. \\
+Reproducibility & Raw third-party data and large predictions are not stored in Git. & Public-source commands, fixtures, manifests, checksums, and artifact rules are provided. & Full numeric audit requires L2/L3 artifacts. \\
+Operational validity & Cluster-level errors can propagate through transitive merges. & Risk gating and cannot-link-aware clustering are described. & Cluster guarantees need complete cannot-link coverage. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Conclusion}
 
 IAD-Risk addresses a specific failure mode in scholarly entity matching: the tendency to confuse agenda similarity with work identity. By separating identity and agenda evidence and gating automatic merges through false-merge risk, the framework makes deduplication safer under stratified gold, proxy, and silver evaluation. The current evidence supports targeted false-merge suppression and a reproducible benchmark contract. Additional validation should expand independent manual review and source-heldout evaluation before the framework is used for broad method ranking across scholarly domains.
