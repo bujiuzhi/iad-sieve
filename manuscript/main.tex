@@ -171,6 +171,10 @@ RQ4 & Gold/proxy/silver strata & Split metrics & Provenance-aware robustness \\
 \end{tabular}
 \end{table}
 
+\subsection{Evaluation Metrics}
+
+Same-work F1 is computed on pairs whose identity labels come from the gold layer. Ordinary false-merge rate (FMR) is the fraction of non-identity pairs that the system marks for automatic merging. Hard-negative false-merge rate (HNFMR) is the same error measured only on agenda-level hard negatives, where topic or citation evidence is high but identity evidence is negative. Reporting both FMR and HNFMR separates general matching errors from the specific identity-agenda confusion that this paper studies.
+
 \subsection{Baselines}
 
 The completed actual-model baselines include rule-based matching, SPECTER2 adapter cosine, SciNCL cosine, RoBERTa-style pair classification, and single-space union baselines. The repository also provides an LLM pair-judge interface, but LLM rows are not treated as primary evidence unless the API-backed execution mode is present. Baselines are evaluated through the same pair contract so that same-work F1 and hard-negative false-merge rate can be compared without mixing label strengths.
