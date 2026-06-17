@@ -13,6 +13,7 @@
 \usepackage[numbers,sort&compress]{natbib}
 \usetikzlibrary{arrows.meta,positioning}
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\emergencystretch=3em
 
 \title{IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication}
 \author{Anonymous Authors}
@@ -264,6 +265,27 @@ L3 result audit & Released tables, predictions, logs, manifests, and checksums &
 \end{tabular}
 \end{table}
 
+\subsection{Claim-Evidence Boundary for Result Interpretation}
+
+The result interpretation follows a conservative claim-evidence boundary. Each reported conclusion must be tied to a label stratum, an output artifact, and a statement of what the evidence does not prove. This boundary is especially important because the benchmark combines gold identity pairs with proxy and silver stress-test evidence rather than treating all rows as one homogeneous test set.
+
+\begin{table}[H]
+\caption{Claim-evidence boundary used to interpret the reported results. Each claim class is paired with the supporting evidence and the claims that are intentionally not made.}
+\label{tab:claim-evidence-boundary-main}
+\centering
+\small
+\begin{tabular}{L{0.24\linewidth}L{0.30\linewidth}L{0.34\linewidth}}
+\toprule
+Claim class & Required support & Boundary not claimed \\
+\midrule
+Identity-agenda confusion is a concrete false-merge pathway. & Hard-negative false-merge rate on agenda-level silver pairs, compared with single-space scientific representation baselines. & A prevalence estimate for all scholarly corpora. \\
+IAD-Risk reduces risky automatic merges in the reported setting. & Held-out Open-v2 IAD-Risk predictions, thresholds, metric summaries, and checksums. & Universal method superiority or a claim that every source distribution is covered. \\
+IAD-Bench supports provenance-aware evaluation. & Pair schema fields for relation type, label source, label strength, provenance, split, and hard-negative level. & A claim that proxy or silver rows are human-gold labels. \\
+Repository-level reproduction is possible without committing raw data. & Public code, fixture tests, documented data-processing commands, manifest rules, and PDF build scripts. & Full numerical reproduction without public source files or a released artifact package. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Main Open-v2 Results}
 
 \begin{table}[H]
@@ -291,9 +313,26 @@ Open-v3 and source-heldout experiments provide additional stress tests, but thei
 
 \section{Mechanism and Error Analysis}
 
-The central mechanism question is whether false-merge control depends on explicit agenda-non-identity supervision and the derived risk score. A full ablation would remove agenda-non-identity supervision or false-merge risk gating and measure the resulting change in hard-negative false-merge rate. The current manuscript therefore treats HNFMR as the primary mechanism metric and reports the supported Open-v2 comparison conservatively rather than claiming a complete ablation study.
+The central mechanism question is whether false-merge control follows from explicit agenda-non-identity supervision and the derived risk score. The supported Open-v2 comparison gives mechanism-consistent evidence: single-space scientific representations can over-merge agenda-related hard negatives, while IAD-Risk makes agenda-non-identity evidence a direct blocking signal. This does not by itself establish a complete causal ablation. A complete ablation package must compare the full gate with variants that remove risk gating, remove agenda-non-identity supervision, or collapse identity and agenda evidence into one score.
 
-The error analysis emphasizes claim discipline. The current evidence supports identity-agenda risk modeling, stratified benchmark construction, and targeted false-merge suppression. It does not support claims that OpenAlex labels are human gold, that the system has broad domain superiority, or that manual annotation has already been completed.
+\begin{table}[H]
+\caption{Mechanism evidence and reviewer-facing interpretation. The table separates current evidence from ablation outputs that would be required for a stronger causal claim.}
+\label{tab:mechanism-evidence}
+\centering
+\small
+\begin{tabular}{L{0.26\linewidth}L{0.32\linewidth}L{0.32\linewidth}}
+\toprule
+Mechanism question & Current evidence & Reviewer-facing boundary \\
+\midrule
+Does topical relatedness create merge risk? & Representation baselines show high false-merge rates on OpenAlex silver hard negatives. & Supports a targeted failure mode, not a universal prevalence estimate. \\
+Does explicit risk gating suppress hard-negative merges? & IAD-Risk transformer variants keep low HNFMR under the reported Open-v2 split. & Supports the reported contract and thresholds; transfer must be rechecked on new source mixes. \\
+Is the gain caused by each IAD-Risk component? & The current manuscript reports mechanism-consistent HNFMR evidence. & A full causal claim requires ablations removing risk gating, ANI supervision, and single-space separation. \\
+Can cluster-level contamination be eliminated? & The method supports cannot-link-aware constrained union-find. & Guarantees require sufficient cannot-link coverage and cluster-level artifact audits. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The error analysis emphasizes claim discipline. The current evidence supports identity-agenda risk modeling, stratified benchmark construction, and targeted false-merge suppression. It does not support claims that OpenAlex labels are human gold, that the system has broad domain superiority, that component-level ablations have already closed every mechanism question, or that manual annotation has already been completed.
 
 \section{Limitations}
 
