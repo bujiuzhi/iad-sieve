@@ -12,6 +12,7 @@ manuscript/
   references.bib
   cover_letter.md
   MANIFEST.md
+  submission_checklist.md
   submission_quality_audit.md
   scripts/
     audit_manuscript.py

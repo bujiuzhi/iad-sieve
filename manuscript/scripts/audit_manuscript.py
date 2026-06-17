@@ -22,6 +22,7 @@ REQUIRED_FILES = [
     ROOT / "README.md",
     ROOT / "MANIFEST.md",
     ROOT / "cover_letter.md",
+    ROOT / "submission_checklist.md",
     ROOT / "submission_quality_audit.md",
     ROOT / "scripts" / "audit_manuscript.py",
     ROOT / "scripts" / "build_latex_pdf.sh",

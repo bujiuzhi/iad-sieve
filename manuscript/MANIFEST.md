@@ -7,6 +7,7 @@
 | `main.tex` | Main LaTeX manuscript |
 | `references.bib` | Bibliography entries |
 | `cover_letter.md` | Generic cover letter draft |
+| `submission_checklist.md` | Final pre-upload checklist |
 | `submission_quality_audit.md` | Claim and readiness audit |
 | `scripts/audit_manuscript.py` | Manuscript package audit |
 | `scripts/build_latex_pdf.sh` | Formal LaTeX PDF build script |
