@@ -3,6 +3,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{booktabs}
 \usepackage{array}
+\usepackage{float}
 \usepackage[hidelinks]{hyperref}
 
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
@@ -169,6 +170,28 @@ Repository-level reproduction is possible without committing raw data. & L0/L1 f
 Result packages that report confidence intervals should include bootstrap outputs generated from the exact prediction files used in the manuscript tables. The repository provides \emph{run-iad-evidence-bootstrap} for stratified pair-level intervals and \emph{run-bootstrap} for general metric intervals. A numerical interval should be cited only when the corresponding CSV file, command log, random seed, and checksum are present in the artifact package.
 
 Mechanism claims should be tied to explicit ablation outputs. The repository provides \emph{run-iad-ablation-suite} for comparing full IAD-Risk decisions with variants that remove risk gating, agenda-non-identity blocking, or single-space separation. Without those outputs, the main manuscript should keep the mechanism claim at the level of stratified HNFMR evidence rather than claiming a complete ablation study.
+
+\section{Manual Validation Protocol}
+
+Manual validation is a future evidence layer for assessing label precision and difficult boundary cases; it is not completed in the current manuscript package. A defensible validation slice should sample 500--1,000 pairs across the strata most likely to affect claim strength: OpenAlex/OpenCitations silver hard negatives, high-score representation false-merge candidates, IAD-Risk blocked or deferred pairs, version-boundary cases, identifier conflicts, and sparse-metadata cases.
+
+\begin{table}[H]
+\caption{Manual validation protocol required before stronger label-precision claims.}
+\label{tab:manual-validation-protocol}
+\centering
+\small
+\begin{tabular}{L{0.24\linewidth}L{0.32\linewidth}L{0.34\linewidth}}
+\toprule
+Protocol item & Requirement & Claim boundary \\
+\midrule
+Sampling & Stratified 500--1,000 pair slice across silver hard negatives, model-disagreement pairs, version-boundary pairs, and sparse-metadata pairs. & The slice estimates difficult-case precision; it is not a prevalence estimate for all scholarly records. \\
+Review process & two independent reviewers inspect titles, authors, venues, identifiers, abstracts, and citation context while blind to model scores and merge decisions. & Model outputs cannot determine the human label. \\
+Label schema & Reviewers choose same work, agenda non-identity, unrelated, version boundary, or uncertain, and record a short evidence note. & Uncertain cases remain separate and are not forced into gold labels. \\
+Adjudication & Disagreements are resolved by an adjudication log that records the final relation, rationale, and reviewer IDs or anonymous reviewer codes. & Adjudicated labels become auditable only when the log is released. \\
+Reporting & The artifact package reports inter-annotator agreement, per-stratum counts, conflict rates, and checksums for the reviewed slice. & The manuscript must not claim human gold or stronger label precision until these files exist. \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Claim Boundary}
 

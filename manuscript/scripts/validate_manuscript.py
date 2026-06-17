@@ -70,6 +70,7 @@ REQUIRED_SUPPLEMENT_SECTIONS = [
     r"\section{Artifact Package Requirements}",
     r"\section{Claim-Evidence Matrix}",
     r"\section{Uncertainty and Ablation Requirements}",
+    r"\section{Manual Validation Protocol}",
     r"\section{Claim Boundary}",
 ]
 MIN_BIB_ENTRIES = 10
@@ -409,6 +410,32 @@ def check_extended_protocol_boundary(manuscript_text: str) -> list[str]:
         if phrase in manuscript_text
     )
     return errors
+
+
+def check_manual_validation_protocol(supplementary_text: str) -> list[str]:
+    """Check whether the supplementary material defines manual validation requirements.
+
+    参数:
+        supplementary_text: Supplementary LaTeX source.
+
+    返回:
+        list[str]: Error messages for missing manual-validation protocol markers.
+    """
+    required_markers = [
+        r"\section{Manual Validation Protocol}",
+        "future evidence layer",
+        "500--1,000 pairs",
+        "two independent reviewers",
+        "blind to model scores",
+        "adjudication log",
+        "inter-annotator agreement",
+        "must not claim human gold",
+    ]
+    return [
+        f"manual validation protocol missing marker: {marker}"
+        for marker in required_markers
+        if marker not in supplementary_text
+    ]
 
 
 def check_related_work_positioning(manuscript_text: str) -> list[str]:
@@ -771,6 +798,7 @@ def main() -> int:
     errors.extend(check_split_leakage_controls(manuscript_text))
     errors.extend(check_scope_compatibility(manuscript_text))
     errors.extend(check_extended_protocol_boundary(manuscript_text))
+    errors.extend(check_manual_validation_protocol(supplementary_text))
     errors.extend(check_result_claim_boundary(manuscript_text, supplementary_text))
     errors.extend(check_highlights(highlights_text))
     errors.extend(check_keywords(keywords_text))

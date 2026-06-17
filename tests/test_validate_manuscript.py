@@ -300,6 +300,41 @@ def test_check_extended_protocol_boundary_rejects_unreported_extended_results() 
     assert any("extended validation" in error for error in errors)
 
 
+def test_check_manual_validation_protocol_accepts_complete_protocol() -> None:
+    """验证补充材料包含人工验证协议时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    supplementary_text = "\n".join(
+        [
+            r"\section{Manual Validation Protocol}",
+            "Manual validation is a future evidence layer.",
+            "The protocol samples 500--1,000 pairs.",
+            "It uses two independent reviewers.",
+            "Reviewers are blind to model scores.",
+            "The release includes an adjudication log.",
+            "The artifact reports inter-annotator agreement.",
+            "The manuscript must not claim human gold before the files exist.",
+        ]
+    )
+
+    errors = module.check_manual_validation_protocol(supplementary_text)
+
+    assert errors == []
+
+
+def test_check_manual_validation_protocol_rejects_vague_manual_review() -> None:
+    """验证泛泛提到人工验证但缺少协议细节时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    supplementary_text = r"\section{Manual Validation Protocol}" + "\nManual validation is future work."
+
+    errors = module.check_manual_validation_protocol(supplementary_text)
+
+    assert any("500--1,000 pairs" in error for error in errors)
+    assert any("two independent reviewers" in error for error in errors)
+    assert any("inter-annotator agreement" in error for error in errors)
+
+
 def test_check_cover_letter_accepts_required_submission_statements() -> None:
     """验证 cover letter 含正式投稿声明时可通过检查。"""
 
