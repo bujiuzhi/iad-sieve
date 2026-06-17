@@ -7,6 +7,8 @@ import json
 import zipfile
 from pathlib import Path
 
+import pytest
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_PATH = PROJECT_ROOT / "manuscript" / "scripts" / "build_submission_package.py"
@@ -88,6 +90,84 @@ def _write_required_manuscript_files(manuscript_root: Path) -> None:
     _write_file(manuscript_root / "build" / "iad-risk-supplementary-material.pdf", b"%PDF-1.5 supp\n")
 
 
+def _write_unresolved_submission_metadata(manuscript_root: Path) -> None:
+    """写入未完成正式投稿信息的元数据。
+
+    参数:
+        manuscript_root: 临时稿件目录。
+
+    返回:
+        无。
+    """
+    _write_file(
+        manuscript_root / "submission_metadata.yml",
+        "\n".join(
+            [
+                "submission:",
+                '  target_journal: ""',
+                "  target_journal_template_bound: false",
+                "  author_metadata_required_before_final_upload: true",
+                "",
+                "authors: []",
+                "",
+                "corresponding_author:",
+                '  name: ""',
+                '  affiliation: ""',
+                '  email: ""',
+            ]
+        )
+        + "\n",
+    )
+
+
+def _write_final_upload_metadata(manuscript_root: Path) -> None:
+    """写入满足正式上传门禁的投稿元数据。
+
+    参数:
+        manuscript_root: 临时稿件目录。
+
+    返回:
+        无。
+    """
+    _write_file(
+        manuscript_root / "submission_metadata.yml",
+        "\n".join(
+            [
+                "submission:",
+                '  title: "IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication"',
+                '  article_type: "research_article"',
+                '  review_mode: "anonymous_review"',
+                '  target_journal: "Journal of Scholarly Data"',
+                "  target_journal_template_bound: true",
+                "  author_metadata_required_before_final_upload: true",
+                "",
+                "authors:",
+                '  - name: "Example Author"',
+                '    affiliation: "Example University"',
+                '    email: "author@example.edu"',
+                '    orcid: "0000-0000-0000-0000"',
+                "",
+                "corresponding_author:",
+                '  name: "Example Author"',
+                '  affiliation: "Example University"',
+                '  email: "author@example.edu"',
+                '  orcid: "0000-0000-0000-0000"',
+                "",
+                "statements:",
+                '  competing_interests: "The authors declare no competing interests."',
+                '  data_code_availability: "The repository provides source code and fixtures."',
+                "",
+                "artifact_boundary:",
+                "  raw_third_party_data_included: false",
+                "  full_numeric_audit_requires_external_artifact: true",
+                "  broad_method_ranking_claimed: false",
+                "  silver_labels_claimed_as_human_gold: false",
+            ]
+        )
+        + "\n",
+    )
+
+
 def test_build_submission_package_writes_manifest_checksums_and_zip(tmp_path) -> None:
     """验证投稿包生成器只打包正式投稿材料。"""
 
@@ -123,6 +203,38 @@ def test_build_submission_package_writes_manifest_checksums_and_zip(tmp_path) ->
     assert "submission_package/checksums.sha256" in zip_names
 
 
+def test_build_submission_package_rejects_final_upload_with_unresolved_metadata(tmp_path) -> None:
+    """验证投稿包生成器在正式上传模式下拒绝未填写元数据。"""
+
+    module = _load_submission_package_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_unresolved_submission_metadata(manuscript_root)
+
+    with pytest.raises(ValueError) as exc_info:
+        module.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
+
+    assert "target journal is empty" in str(exc_info.value)
+    assert "author list is empty" in str(exc_info.value)
+
+
+def test_build_submission_package_accepts_final_upload_with_filled_metadata(tmp_path) -> None:
+    """验证投稿包生成器接受完整正式上传元数据。"""
+
+    module = _load_submission_package_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_final_upload_metadata(manuscript_root)
+
+    summary = module.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
+
+    assert summary["file_count"] == 11
+
+
 def test_validate_submission_package_accepts_generated_package(tmp_path) -> None:
     """验证投稿包校验器接受生成器产物。"""
 
@@ -135,6 +247,41 @@ def test_validate_submission_package_accepts_generated_package(tmp_path) -> None
 
     builder.build_submission_package(manuscript_root, output_dir, zip_path)
     errors = validator.validate_submission_package(output_dir, zip_path)
+
+    assert errors == []
+
+
+def test_validate_submission_package_rejects_final_upload_with_unresolved_metadata(tmp_path) -> None:
+    """验证投稿包校验器在正式上传模式下拒绝未填写元数据。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_unresolved_submission_metadata(manuscript_root)
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path)
+    errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True)
+
+    assert any("target journal is empty" in error for error in errors)
+    assert any("corresponding author email is empty" in error for error in errors)
+
+
+def test_validate_submission_package_accepts_final_upload_with_filled_metadata(tmp_path) -> None:
+    """验证投稿包校验器接受完整正式上传元数据。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_final_upload_metadata(manuscript_root)
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
+    errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True)
 
     assert errors == []
 

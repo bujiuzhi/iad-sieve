@@ -69,6 +69,14 @@ FORBIDDEN_NAME_FRAGMENTS = [
     "remote_connection",
     "api_key",
 ]
+FINAL_UPLOAD_BLOCKED_MARKERS = {
+    'target_journal: ""': "target journal is empty",
+    "target_journal_template_bound: false": "target journal template is not bound",
+    "authors: []": "author list is empty",
+    'name: ""': "corresponding author name is empty",
+    'affiliation: ""': "corresponding author affiliation is empty",
+    'email: ""': "corresponding author email is empty",
+}
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -83,6 +91,7 @@ def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Validate a generated journal submission package.")
     parser.add_argument("--package-dir", default=str(DEFAULT_PACKAGE_DIR), help="Generated package directory.")
     parser.add_argument("--zip-path", default=str(DEFAULT_ZIP_PATH), help="Generated package zip path.")
+    parser.add_argument("--final-upload", action="store_true", help="Require target journal and real author metadata.")
     parser.add_argument("--log-level", default="INFO", help="Logging level.")
     return parser.parse_args()
 
@@ -212,6 +221,22 @@ def check_file_membership(file_names: set[str], location: str) -> list[str]:
     return errors
 
 
+def check_final_upload_metadata_text(metadata_text: str) -> list[str]:
+    """Check final-upload submission metadata text.
+
+    参数:
+        metadata_text: Metadata YAML text.
+
+    返回:
+        list[str]: Error messages for unresolved final-upload metadata.
+    """
+    return [
+        f"final upload metadata unresolved: {message}"
+        for marker, message in FINAL_UPLOAD_BLOCKED_MARKERS.items()
+        if marker in metadata_text
+    ]
+
+
 def check_forbidden_path_name(path_name: str, location: str) -> list[str]:
     """Check whether a path name contains forbidden paths or fragments.
 
@@ -234,11 +259,12 @@ def check_forbidden_path_name(path_name: str, location: str) -> list[str]:
     return errors
 
 
-def validate_package_directory(package_dir: Path) -> list[str]:
+def validate_package_directory(package_dir: Path, final_upload: bool = False) -> list[str]:
     """Validate the generated package directory.
 
     参数:
         package_dir: Generated package directory.
+        final_upload: Whether to require journal and author metadata for final upload.
 
     返回:
         list[str]: Error messages.
@@ -257,8 +283,14 @@ def validate_package_directory(package_dir: Path) -> list[str]:
         errors.extend(check_forbidden_path_name(path.name, str(package_dir)))
     checksums_path = package_dir / "checksums.sha256"
     manifest_path = package_dir / "submission_manifest.json"
+    metadata_path = package_dir / "submission_metadata.yml"
     if manifest_path.exists():
         errors.extend(check_manifest_text(manifest_path.read_text(encoding="utf-8")))
+    if final_upload:
+        if metadata_path.exists():
+            errors.extend(check_final_upload_metadata_text(metadata_path.read_text(encoding="utf-8")))
+        else:
+            errors.append("package directory missing submission_metadata.yml for final upload")
     if checksums_path.exists():
         try:
             checksums = parse_checksums(checksums_path.read_text(encoding="utf-8"))
@@ -281,11 +313,12 @@ def validate_package_directory(package_dir: Path) -> list[str]:
     return errors
 
 
-def validate_zip_archive(zip_path: Path) -> list[str]:
+def validate_zip_archive(zip_path: Path, final_upload: bool = False) -> list[str]:
     """Validate the generated package zip archive.
 
     参数:
         zip_path: Zip archive path.
+        final_upload: Whether to require journal and author metadata for final upload.
 
     返回:
         list[str]: Error messages.
@@ -323,6 +356,12 @@ def validate_zip_archive(zip_path: Path) -> list[str]:
             except KeyError as exc:
                 return errors + [f"zip archive missing required metadata file: {exc}"]
             errors.extend(check_manifest_text(manifest_text))
+            if final_upload:
+                try:
+                    metadata_text = archive.read(f"{PACKAGE_ROOT_NAME}/submission_metadata.yml").decode("utf-8")
+                except KeyError as exc:
+                    return errors + [f"zip archive missing submission_metadata.yml for final upload: {exc}"]
+                errors.extend(check_final_upload_metadata_text(metadata_text))
             try:
                 checksums = parse_checksums(checksums_text)
             except ValueError as exc:
@@ -351,17 +390,38 @@ def validate_zip_archive(zip_path: Path) -> list[str]:
     return errors
 
 
-def validate_submission_package(package_dir: Path, zip_path: Path) -> list[str]:
+def unique_errors(errors: list[str]) -> list[str]:
+    """Remove duplicate validation errors while preserving order.
+
+    参数:
+        errors: Validation error messages.
+
+    返回:
+        list[str]: De-duplicated validation error messages.
+    """
+    seen_errors: set[str] = set()
+    unique_error_list: list[str] = []
+    for error in errors:
+        if error in seen_errors:
+            continue
+        seen_errors.add(error)
+        unique_error_list.append(error)
+    return unique_error_list
+
+
+def validate_submission_package(package_dir: Path, zip_path: Path, final_upload: bool = False) -> list[str]:
     """Validate the package directory and zip archive.
 
     参数:
         package_dir: Generated package directory.
         zip_path: Generated zip archive path.
+        final_upload: Whether to require journal and author metadata for final upload.
 
     返回:
         list[str]: Error messages.
     """
-    return validate_package_directory(package_dir) + validate_zip_archive(zip_path)
+    errors = validate_package_directory(package_dir, final_upload) + validate_zip_archive(zip_path, final_upload)
+    return unique_errors(errors)
 
 
 def main() -> int:
@@ -376,7 +436,7 @@ def main() -> int:
     args = parse_arguments()
     logging.basicConfig(level=getattr(logging, args.log_level.upper(), logging.INFO), format="%(levelname)s %(message)s")
     try:
-        errors = validate_submission_package(Path(args.package_dir).resolve(), Path(args.zip_path).resolve())
+        errors = validate_submission_package(Path(args.package_dir).resolve(), Path(args.zip_path).resolve(), args.final_upload)
     except Exception as exc:  # noqa: BLE001
         LOGGER.error("submission package validation failed: %s", exc)
         return 1

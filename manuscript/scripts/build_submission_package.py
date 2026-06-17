@@ -32,6 +32,14 @@ SUBMISSION_FILES = [
     ("build/iad-risk-manuscript-latex.pdf", "main_pdf"),
     ("build/iad-risk-supplementary-material.pdf", "supplementary_pdf"),
 ]
+FINAL_UPLOAD_BLOCKED_MARKERS = {
+    'target_journal: ""': "target journal is empty",
+    "target_journal_template_bound: false": "target journal template is not bound",
+    "authors: []": "author list is empty",
+    'name: ""': "corresponding author name is empty",
+    'affiliation: ""': "corresponding author affiliation is empty",
+    'email: ""': "corresponding author email is empty",
+}
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -47,6 +55,7 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR), help="Directory for copied package files.")
     parser.add_argument("--zip-path", default=str(DEFAULT_ZIP_PATH), help="Output zip path.")
     parser.add_argument("--no-zip", action="store_true", help="Skip zip creation.")
+    parser.add_argument("--final-upload", action="store_true", help="Require target journal and real author metadata.")
     parser.add_argument("--log-level", default="INFO", help="Logging level.")
     return parser.parse_args()
 
@@ -114,6 +123,26 @@ def copy_submission_files(manuscript_root: Path, output_dir: Path) -> list[dict]
             }
         )
     return records
+
+
+def check_final_upload_metadata(manuscript_root: Path) -> list[str]:
+    """Check whether submission metadata is ready for final journal upload.
+
+    参数:
+        manuscript_root: Manuscript root directory.
+
+    返回:
+        list[str]: Error messages for unresolved final-upload metadata.
+    """
+    metadata_path = manuscript_root / "submission_metadata.yml"
+    if not metadata_path.exists():
+        return ["missing submission_metadata.yml for final upload"]
+    metadata_text = metadata_path.read_text(encoding="utf-8")
+    return [
+        f"final upload metadata unresolved: {message}"
+        for marker, message in FINAL_UPLOAD_BLOCKED_MARKERS.items()
+        if marker in metadata_text
+    ]
 
 
 def write_manifest(output_dir: Path, records: list[dict]) -> Path:
@@ -209,17 +238,30 @@ def create_zip_archive(output_dir: Path, zip_path: Path) -> Path:
     return zip_path
 
 
-def build_submission_package(manuscript_root: Path, output_dir: Path, zip_path: Path | None = None) -> dict:
+def build_submission_package(
+    manuscript_root: Path,
+    output_dir: Path,
+    zip_path: Path | None = None,
+    final_upload: bool = False,
+) -> dict:
     """Build the submission package directory and optional zip archive.
 
     参数:
         manuscript_root: Manuscript root directory.
         output_dir: Package output directory.
         zip_path: Optional zip archive path.
+        final_upload: Whether to require journal and author metadata for final upload.
 
     返回:
         dict: Build summary.
+
+    异常:
+        ValueError: Raised when final-upload metadata is unresolved.
     """
+    if final_upload:
+        final_upload_errors = check_final_upload_metadata(manuscript_root)
+        if final_upload_errors:
+            raise ValueError("; ".join(final_upload_errors))
     remove_existing_output(output_dir, zip_path)
     records = copy_submission_files(manuscript_root, output_dir)
     manifest_path = write_manifest(output_dir, records)
@@ -249,7 +291,7 @@ def main() -> int:
     logging.basicConfig(level=getattr(logging, args.log_level.upper(), logging.INFO), format="%(levelname)s %(message)s")
     zip_path = None if args.no_zip else Path(args.zip_path).resolve()
     try:
-        build_submission_package(MANUSCRIPT_ROOT, Path(args.output_dir).resolve(), zip_path)
+        build_submission_package(MANUSCRIPT_ROOT, Path(args.output_dir).resolve(), zip_path, args.final_upload)
     except Exception as exc:  # noqa: BLE001
         LOGGER.error("submission package build failed: %s", exc)
         return 1
