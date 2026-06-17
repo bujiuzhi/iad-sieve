@@ -29,11 +29,14 @@ python -m iad_sieve.cli --help
 - `tests/`：自动化测试与小规模 fixture。
 - `scripts/`：可复现实验脚本、环境检查脚本和公开发布检查脚本。
 - `docs/`：方法、实验、数据、审稿风险和投稿辅助材料。
+- `data/README.md`：数据目录边界说明。
+- `outputs/README.md`：实验产物目录边界说明。
 
 ## 不应提交内容
 
 - `data/`：原始数据、下载数据、中间样本。
 - `outputs/`：实验输出、模型、embedding、报告临时产物。
+- `outputs/remote_connection_profile.local.json`：远程连接 profile。
 - `docs/_local_archive/`：本地历史记录和长过程日志。
 - 远程服务器地址、用户名、密钥路径和连接配置。
 - `.env`、token、API key、私钥、模型 checkpoint。
@@ -74,7 +77,8 @@ artifact 包至少包含：
 ## 提交远程仓库前的人工确认
 
 - README 中没有服务器地址、用户名、密钥路径和本机绝对路径。
-- `.gitignore` 已覆盖 `data/`、`outputs/`、模型权重和本地配置。
+- `.gitignore` 已覆盖 `data/`、`outputs/` 的真实内容、模型权重和本地配置。
+- `data/` 与 `outputs/` 中只有 README 占位文件进入 Git 跟踪。
 - 测试夹具足够小，可以公开。
 - 大规模结果已准备单独 artifact 发布方案。
 - 论文表格中的每个数字能追溯到命令、输入和输出文件。

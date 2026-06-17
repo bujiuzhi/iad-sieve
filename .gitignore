@@ -18,8 +18,10 @@ remote_connection_profile*.json
 *.secret.*
 /docs/_local_archive/
 /docs/superpowers/
-/data/
-/outputs/
+/data/*
+!/data/README.md
+/outputs/*
+!/outputs/README.md
 /outputs/_archives/
 /models/
 *.index

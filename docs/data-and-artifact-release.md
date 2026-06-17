@@ -8,6 +8,8 @@
 
 `IAD-Bench-Open-v2` 和 `IAD-Bench-Open-v3` 是项目构建的数据集变体；它们不是第三方原封不动发布的数据集。论文中应称为“derived benchmark packages”或“project-built benchmark variants from public sources”。
 
+Git 仓库只提交 `data/README.md` 和 `outputs/README.md` 作为目录说明。真实数据、远程回传结果、模型权重和论文产物应通过 artifact release 或受控对象存储分发，并用 manifest 与 checksum 固定版本。
+
 ## 数据层次
 
 | 层次 | 内容 | 是否进入 Git 仓库 | 说明 |
@@ -17,6 +19,23 @@
 | Open-v2/Open-v3 衍生包 | 清洗、分层、切分后的实体匹配评测包 | 建议单独发布 | 可作为论文 artifact，附 manifest 和哈希 |
 | 实验输出 | baseline、ablation、bootstrap、error analysis、paper artifacts | 建议单独发布 | 不进入 Git 仓库，发布到 release/Zenodo/OSF |
 | 远程运行配置 | 服务器地址、用户名、密钥路径 | 否 | 只保留本地，不公开 |
+
+## Git 仓库边界
+
+公开仓库应保留：
+
+- 源码、CLI 和可运行测试。
+- 小型公开 fixture。
+- 数据 schema、构建流程和下载脚本。
+- 数据与产物目录说明。
+- 实验命令、随机种子、阈值和验收脚本。
+
+公开仓库不应保留：
+
+- `data/raw/`、`data/interim/`、`data/processed/` 的真实大文件。
+- `outputs/` 下的实验输出、模型、日志和最终课题包。
+- `outputs/remote_connection_profile.local.json` 或任何远程连接配置。
+- API key、SSH key、token、本机路径或服务器地址。
 
 ## Open-v2 与 Open-v3 的定位
 
@@ -62,6 +81,13 @@ paper-artifacts/
 - 数据来源、下载日期和处理命令。
 - 随机种子、阈值和 split 配置。
 - 每个输出文件的 SHA256。
+
+建议同时提供 `checksums.sha256`，并在 README 中写清楚如何用以下命令验收：
+
+```bash
+sha256sum -c checksums.sha256
+python -m iad_sieve.cli --help
+```
 
 ## 审稿风险控制
 

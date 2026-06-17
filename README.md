@@ -2,48 +2,47 @@
 
 Risk-Calibrated Scientific Entity Matching under Agenda-Level Confounders.
 
-规范命名见 [docs/naming-convention.md](docs/naming-convention.md)：公开仓库名使用 `iad-sieve`，Python 包名使用 `iad_sieve`，论文方法名使用 `IAD-Sieve`。
-
 ## 问题拆解
 
-本仓库面向“科研文献实体匹配/去重”场景：同一研究工作可能以预印本、会议版、期刊扩展版、数据集条目或引用记录等形态出现。传统相似度合并容易把“同主题但非同一实体”的论文误合并，进而污染综述、推荐、聚类和证据追踪结果。
+科研文献去重和实体匹配不能只依赖文本相似度。预印本、会议版、期刊扩展版、数据集条目和引用记录可能指向同一研究工作；但同一议题下的不同论文也会高度相似。错误合并会污染综述、推荐、聚类和证据追踪。
 
-`IAD-Sieve` 的核心目标不是最大化合并数量，而是在可解释的风险约束下识别“可以安全合并”的科学实体。
+`IAD-Sieve` 的目标是在可解释的风险约束下识别“可以安全合并”的科学实体，而不是尽量合并更多相似文献。
 
 ## 关键结论
 
-当前仓库已经按公开复现方向整理为四类内容：
+本仓库提交源码、测试、小型 fixture、脚本和公开文档；不提交原始大数据、实验输出、模型权重、远程连接配置和本地历史归档。完整复现依赖公开数据来源、下载脚本、manifest、checksum 和单独发布的 artifact。
 
-- `src/`：可运行的核心代码，包括候选生成、语义表示、关系打分、风险校准、受约束合并和评测模块。
-- `tests/`：小规模夹具与自动化测试，用于验证算法逻辑、评测协议和投稿前检查项。
-- `docs/`：课题重构、方法设计、实验方案、审稿风险、数据发布和公开仓库清单。
-- `scripts/`：数据下载、实验运行、CUDA 检查和公开发布前自检脚本。
+## 架构概览
 
-大规模原始数据、训练产物、模型权重和远程连接配置不纳入仓库版本控制；它们保留在本地或单独的 artifact release 中。
+```text
+输入文献元数据
+  -> preprocessing      文本、作者、标识符规范化
+  -> candidates         标题、词项、标识符、向量候选召回
+  -> relations          候选对特征、关系分类、阈值适配
+  -> deduplication      cannot-link 与受约束 union-find
+  -> clustering         主题图、簇标签和反馈
+  -> ranking            新颖性、代表性、桥接性排序
+  -> evaluation         benchmark、baseline、bootstrap、审稿证据
+```
 
-## 方法概览
+核心代码位于 `src/iad_sieve/`，CLI 入口为：
 
-`IAD-Sieve` 使用分阶段流程降低误合并风险：
+```bash
+python -m iad_sieve.cli --help
+```
 
-1. 候选召回：基于标题、词项、标识符和向量近邻生成候选论文对。
-2. 关系建模：区分 duplicate、successor、related、conflict 等关系，而不是把所有相似论文压成单一相似度。
-3. 风险校准：在 held-out source 或压力集上校准合并阈值，优先控制 false merge。
-4. 受约束合并：通过 cannot-link、污染检测和 union-find 约束，阻止高风险边进入实体簇。
-5. 证据审计：输出 baseline、ablation、bootstrap、error analysis 和 reviewer-facing evidence matrix。
+## 目录结构
 
-## 数据集边界
+| 路径 | 说明 |
+| --- | --- |
+| `src/iad_sieve/` | 核心 Python 包 |
+| `tests/` | 自动化测试与小型公开 fixture |
+| `scripts/` | 数据下载、实验运行、CUDA 检查和公开发布检查 |
+| `docs/` | 方法、实验、数据发布、远程运行、投稿和审稿材料 |
+| `data/` | 本地数据目录，仅提交 `data/README.md` |
+| `outputs/` | 本地实验产物目录，仅提交 `outputs/README.md` |
 
-`IAD-Bench-Open-v2` 与 `IAD-Bench-Open-v3` 是本项目构建的衍生评测包，不是第三方直接发布的原始数据集。它们基于公开来源组合、清洗、分层和切分，用于测试“议题级混杂”下的实体匹配风险。
-
-涉及的数据来源包括：
-
-- arXiv metadata：用于论文元数据、主题过滤和大规模候选生成。
-- DeepMatcher / py_entitymatching structured benchmarks：用于实体匹配金标对比。
-- OpenAlex works：用于开放论文元数据和弱监督关系构造。
-- OpenCitations COCI：用于引用关系辅助验证。
-- SciRepEval / SciDocs style metadata：用于语义接近但不应合并的压力评测。
-
-原始数据默认放在 `data/`，实验输出默认放在 `outputs/`。这两个目录已被 `.gitignore` 排除。
+详细边界见 [docs/project-structure.md](docs/project-structure.md)，文档导航见 [docs/README.md](docs/README.md)。
 
 ## 安装
 
@@ -55,7 +54,7 @@ conda activate iad-sieve
 python -m pip install -e .
 ```
 
-可选的 SPECTER2 adapter 依赖：
+可选 SPECTER2 adapter 依赖：
 
 ```bash
 python -m pip install -e ".[specter2]"
@@ -70,9 +69,33 @@ python -m compileall -q src tests scripts
 pytest -q
 ```
 
-`python scripts/check_public_release.py` 会扫描公开发布风险，包括本机路径、远程地址、密钥片段、大文件和不应提交的本地产物。
+`scripts/check_public_release.py` 会扫描公开范围内的大文件、密钥片段、本机路径和远程路径线索。
 
-## 复现实验
+## 数据与复现
+
+`IAD-Bench-Open-v2` 和 `IAD-Bench-Open-v3` 是项目基于公开来源构建的衍生评测包，不是第三方原封不动发布的原始金标数据集。
+
+涉及来源包括：
+
+- arXiv metadata。
+- DeepMatcher / py_entitymatching structured benchmarks。
+- OpenAlex works。
+- OpenCitations COCI。
+- SciRepEval / SciDocs style metadata。
+
+复现分级：
+
+| 等级 | 目标 | 输入 | 用途 |
+| --- | --- | --- | --- |
+| L0 | 安装与 CLI 验证 | 无大数据 | 检查仓库可用性 |
+| L1 | 单元测试 | `tests/fixtures/` | 验证算法和评测协议 |
+| L2 | 小样本开发实验 | 公开来源小样本 | 验证端到端流程 |
+| L3 | 论文主实验 | 完整数据与外部 baseline | 生成论文表格和证据包 |
+| L4 | 第三方复验 | 固定 artifact release | 审稿或读者复现 |
+
+数据与 artifact 发布策略见 [docs/data-and-artifact-release.md](docs/data-and-artifact-release.md)。
+
+## 实验入口
 
 小规模开发实验：
 
@@ -87,26 +110,36 @@ scripts/run_dev_experiment.sh 1000 42 cs.CL
 scripts/run_main_experiment.sh 42 100000 cs.CL
 ```
 
-完整论文复现需要额外准备公开数据源、外部 baseline 分数或训练环境。数据与 artifact 发布策略见 [docs/data-and-artifact-release.md](docs/data-and-artifact-release.md)。
+远程 GPU 和大样本运行说明见 [docs/remote-dev-setup.md](docs/remote-dev-setup.md)。仓库不会保存服务器地址、用户名、私钥路径或 API key。
 
-## 论文写作边界
+## 文档入口
 
-适合在论文中主张：
+| 主题 | 文档 |
+| --- | --- |
+| 文档索引 | [docs/README.md](docs/README.md) |
+| 目录与版本控制边界 | [docs/project-structure.md](docs/project-structure.md) |
+| 命名规范 | [docs/naming-convention.md](docs/naming-convention.md) |
+| 方法设计 | [docs/method-design.md](docs/method-design.md) |
+| IAD-Bench 契约 | [docs/iad-bench-contract.md](docs/iad-bench-contract.md) |
+| 数据与 artifact 发布 | [docs/data-and-artifact-release.md](docs/data-and-artifact-release.md) |
+| 公开发布检查 | [docs/public-release-checklist.md](docs/public-release-checklist.md) |
 
-- 在科学实体匹配中，议题级混杂会导致相似度合并产生高代价 false merge。
-- 风险校准和受约束合并可以把目标从“尽量多合并”调整为“在错误预算下安全合并”。
-- Open-v2/Open-v3 提供了可复验的衍生压力评测框架，但不替代人工大规模金标。
+## 论文主张边界
 
-不建议在没有额外证据时主张：
+适合主张：
 
-- 全领域 SOTA。
-- 对所有开放论文库均可无偏泛化。
-- Open-v2/Open-v3 等同于人工全金标数据集。
-- LLM judge 可以替代人工标注或第三方金标。
+- 议题级混杂会显著增加科学实体匹配中的 false merge 风险。
+- 风险校准和受约束合并可以把目标从“多合并”调整为“在错误预算下安全合并”。
+- Open-v2/Open-v3 是可复验的衍生压力评测框架。
 
-## 公开发布前检查
+需要避免：
 
-提交远程仓库前执行：
+- 声称全领域 SOTA。
+- 将 Open-v2/Open-v3 表述为第三方原始人工金标。
+- 将 LLM judge 表述为人工标注替代品。
+- 在缺少跨来源和跨领域证据时声称无偏泛化。
+
+## 提交前检查
 
 ```bash
 python scripts/check_public_release.py
@@ -114,20 +147,8 @@ python -m compileall -q src tests scripts
 pytest -q
 ```
 
-详细清单见 [docs/public-release-checklist.md](docs/public-release-checklist.md)。
-
-## 目录结构
-
-```text
-iad-sieve/
-  src/iad_sieve/      # 核心包
-  tests/              # 自动化测试与小型公开夹具
-  scripts/            # 运行脚本与发布前检查
-  docs/               # 研究设计、实验方案、投稿与发布文档
-  data/               # 本地原始/中间数据，不提交
-  outputs/            # 本地实验产物，不提交
-```
+确认 `git status --ignored --short` 中只有 `data/`、`outputs/`、本地归档和缓存类文件保持未提交。
 
 ## License
 
-代码许可证和数据再发布许可证需要在正式公开前补齐。原始公开数据仍遵循各自来源的许可与使用条款。
+代码许可证和数据再发布许可证需要在正式公开前补齐。第三方原始数据遵循各自来源的许可与使用条款。
