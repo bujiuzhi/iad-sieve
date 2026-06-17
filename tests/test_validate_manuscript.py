@@ -187,6 +187,41 @@ def test_check_method_feature_contract_rejects_missing_feature_boundary() -> Non
     assert any("different-identifier conflicts" in error for error in errors)
 
 
+def test_check_operating_point_disclosure_accepts_complete_disclosure() -> None:
+    """验证运行点披露完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Operating Point Disclosure}",
+            r"\label{tab:operating-point-disclosure}",
+            "The table reports fixed operating points, not post-hoc best test thresholds.",
+            "Representation cosine baselines use a fixed score threshold.",
+            "RoBERTa pair classifier uses a pair probability threshold.",
+            "IAD-Risk transformer variants use a risk gate.",
+            r"The default $\tau_w=\tau_a=\tau_r=0.5$ applies unless overridden.",
+            "Score file, metric summary, and threshold entry are required.",
+            "Prediction file, model JSON, thresholds, and checksums are required.",
+        ]
+    )
+
+    errors = module.check_operating_point_disclosure(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_operating_point_disclosure_rejects_missing_threshold_boundary() -> None:
+    """验证缺少运行点边界会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\subsection{Operating Point Disclosure}"
+
+    errors = module.check_operating_point_disclosure(manuscript_text)
+
+    assert any("operating-point-disclosure" in error for error in errors)
+    assert any("post-hoc best test thresholds" in error for error in errors)
+
+
 def test_check_cover_letter_accepts_required_submission_statements() -> None:
     """验证 cover letter 含正式投稿声明时可通过检查。"""
 

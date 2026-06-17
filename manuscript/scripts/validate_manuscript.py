@@ -48,6 +48,7 @@ REQUIRED_SECTIONS = [
     r"\subsection{Implementation and Reproducibility}",
     r"\section{Experiments}",
     r"\subsection{Threshold Selection and Uncertainty Reporting}",
+    r"\subsection{Operating Point Disclosure}",
     r"\subsection{Claim-Evidence Boundary for Result Interpretation}",
     r"\subsection{Result Audit Trail}",
     r"\section{Mechanism and Error Analysis}",
@@ -218,6 +219,30 @@ def check_method_feature_contract(manuscript_text: str) -> list[str]:
         "it is not a training feature",
     ]
     return [f"method feature contract missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+
+
+def check_operating_point_disclosure(manuscript_text: str) -> list[str]:
+    """Check whether result operating points are disclosed for review.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing operating-point markers.
+    """
+    required_markers = [
+        r"\subsection{Operating Point Disclosure}",
+        r"\label{tab:operating-point-disclosure}",
+        "fixed operating points",
+        "post-hoc best test thresholds",
+        "Representation cosine baselines",
+        "RoBERTa pair classifier",
+        "IAD-Risk transformer variants",
+        r"default $\tau_w=\tau_a=\tau_r=0.5$",
+        "Score file, metric summary, and threshold entry",
+        "Prediction file, model JSON, thresholds, and checksums",
+    ]
+    return [f"operating point disclosure missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
 
 
 def check_highlights(highlights_text: str) -> list[str]:
@@ -413,6 +438,7 @@ def main() -> int:
     errors.extend(check_forbidden_claims(keywords_text))
     errors.extend(check_forbidden_claims(cover_letter_text))
     errors.extend(check_method_feature_contract(manuscript_text))
+    errors.extend(check_operating_point_disclosure(manuscript_text))
     errors.extend(check_result_claim_boundary(manuscript_text, supplementary_text))
     errors.extend(check_highlights(highlights_text))
     errors.extend(check_keywords(keywords_text))
