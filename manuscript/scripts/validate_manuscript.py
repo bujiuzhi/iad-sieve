@@ -98,6 +98,7 @@ def parse_arguments() -> argparse.Namespace:
     """
     parser = argparse.ArgumentParser(description="Validate the manuscript package.")
     parser.add_argument("--strict-latex", action="store_true", help="Fail if no local LaTeX engine is available.")
+    parser.add_argument("--final-upload", action="store_true", help="Require target journal and real author metadata.")
     return parser.parse_args()
 
 
@@ -510,6 +511,26 @@ def check_submission_metadata(metadata_text: str) -> list[str]:
     return [f"submission metadata missing marker: {marker}" for marker in required_markers if marker not in metadata_text]
 
 
+def check_final_upload_metadata(metadata_text: str) -> list[str]:
+    """Check metadata fields that must be filled before final journal upload.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages for unresolved final-upload metadata.
+    """
+    blocked_markers = {
+        'target_journal: ""': "target journal is empty",
+        "target_journal_template_bound: false": "target journal template is not bound",
+        "authors: []": "author list is empty",
+        'name: ""': "corresponding author name is empty",
+        'affiliation: ""': "corresponding author affiliation is empty",
+        'email: ""': "corresponding author email is empty",
+    }
+    return [f"final upload metadata unresolved: {message}" for marker, message in blocked_markers.items() if marker in metadata_text]
+
+
 def extract_first_page_text(pdf_path: Path) -> tuple[str, list[str]]:
     """Extract text from the first page of a PDF.
 
@@ -655,6 +676,8 @@ def main() -> int:
     errors.extend(check_cover_letter(cover_letter_text))
     errors.extend(check_submission_material_quantitative_summary(highlights_text, cover_letter_text))
     errors.extend(check_submission_metadata(submission_metadata_text))
+    if args.final_upload:
+        errors.extend(check_final_upload_metadata(submission_metadata_text))
     errors.extend(check_bibliography_depth(bibliography_text))
     latex_pdf_path = ROOT / "build" / "iad-risk-manuscript-latex.pdf"
     supplementary_pdf_path = ROOT / "build" / "iad-risk-supplementary-material.pdf"

@@ -253,3 +253,49 @@ def test_check_cover_letter_rejects_missing_submission_statements() -> None:
 
     assert any("not under consideration elsewhere" in error for error in errors)
     assert any("no competing interests" in error for error in errors)
+
+
+def test_check_final_upload_metadata_rejects_placeholders() -> None:
+    """验证 final-upload 门禁会拒绝未填写的投稿元数据。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = "\n".join(
+        [
+            'target_journal: ""',
+            "target_journal_template_bound: false",
+            "authors: []",
+            'name: ""',
+            'affiliation: ""',
+            'email: ""',
+        ]
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any("target journal is empty" in error for error in errors)
+    assert any("author list is empty" in error for error in errors)
+    assert any("corresponding author email is empty" in error for error in errors)
+
+
+def test_check_final_upload_metadata_accepts_filled_metadata() -> None:
+    """验证 final-upload 门禁接受已填写目标期刊和作者信息的元数据。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = "\n".join(
+        [
+            'target_journal: "Journal of Scholarly Data"',
+            "target_journal_template_bound: true",
+            "authors:",
+            '  - name: "Example Author"',
+            '    affiliation: "Example University"',
+            '    email: "author@example.edu"',
+            "corresponding_author:",
+            '  name: "Example Author"',
+            '  affiliation: "Example University"',
+            '  email: "author@example.edu"',
+        ]
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert errors == []
