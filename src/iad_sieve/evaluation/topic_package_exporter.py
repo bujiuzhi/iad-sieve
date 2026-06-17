@@ -19,6 +19,7 @@ CORE_DOCS = [
     ("docs/method-design.md", "method_design"),
     ("docs/experiment-plan.md", "experiment_plan"),
     ("docs/iad-bench-contract.md", "iad_bench_contract"),
+    ("docs/data-processing-pipeline.md", "data_processing_pipeline"),
     ("docs/annotation-requirements.md", "annotation_requirements"),
     ("docs/paper-outline.md", "paper_outline"),
     ("docs/data-and-artifact-release.md", "data_artifact_release"),

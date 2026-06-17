@@ -94,6 +94,7 @@ pytest -q
 | L4 | 第三方复验 | 固定 artifact release | 审稿或读者复现 |
 
 数据与 artifact 发布策略见 [docs/data-and-artifact-release.md](docs/data-and-artifact-release.md)。
+从公开原始数据到 IAD-Bench 的处理命令见 [docs/data-processing-pipeline.md](docs/data-processing-pipeline.md)。
 
 ## 实验入口
 
@@ -123,6 +124,7 @@ scripts/run_main_experiment.sh 42 100000 cs.CL
 | 方法设计 | [docs/method-design.md](docs/method-design.md) |
 | 实验计划 | [docs/experiment-plan.md](docs/experiment-plan.md) |
 | IAD-Bench 契约 | [docs/iad-bench-contract.md](docs/iad-bench-contract.md) |
+| 数据处理流水线 | [docs/data-processing-pipeline.md](docs/data-processing-pipeline.md) |
 | 标注规范 | [docs/annotation-requirements.md](docs/annotation-requirements.md) |
 | 论文大纲 | [docs/paper-outline.md](docs/paper-outline.md) |
 | 数据与 artifact 发布 | [docs/data-and-artifact-release.md](docs/data-and-artifact-release.md) |

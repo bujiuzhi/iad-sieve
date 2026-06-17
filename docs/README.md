@@ -6,7 +6,7 @@
 
 ## 关键结论
 
-当前公开 `docs/` 保持为 11 个文件，覆盖“课题是什么、方法如何做、数据如何构造、实验如何复现、论文如何写、哪些内容不能提交”。这比保留大量过程文件更适合公开仓库和第三方阅读。
+当前公开 `docs/` 保持为 12 个文件，覆盖“课题是什么、方法如何做、数据如何构造、数据如何处理、实验如何复现、论文如何写、哪些内容不能提交”。这比保留大量过程文件更适合公开仓库和第三方阅读。
 
 ## 推荐阅读顺序
 
@@ -19,6 +19,7 @@
 | 方法设计 | `method-design.md` | 查看 IAD-Sieve 的核心流程和模块 |
 | 实验计划 | `experiment-plan.md` | 查看评测数据、baseline、消融和复现实验入口 |
 | 数据契约 | `iad-bench-contract.md` | 查看 IAD-Bench 字段、标签和 provenance 约定 |
+| 数据处理 | `data-processing-pipeline.md` | 查看公开原始数据到 IAD-Bench 的处理代码和命令 |
 | 标注规范 | `annotation-requirements.md` | 查看人工 audit 和标签边界要求 |
 | 论文大纲 | `paper-outline.md` | 查看论文结构、主张边界和写作组织 |
 | 数据发布 | `data-and-artifact-release.md` | 查看数据、fixture、artifact release 和 checksum 策略 |
@@ -35,6 +36,7 @@ docs/
   method-design.md
   experiment-plan.md
   iad-bench-contract.md
+  data-processing-pipeline.md
   annotation-requirements.md
   paper-outline.md
   data-and-artifact-release.md
