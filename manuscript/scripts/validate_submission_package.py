@@ -76,6 +76,14 @@ FINAL_UPLOAD_BLOCKED_MARKERS = {
     'name: ""': "corresponding author name is empty",
     'affiliation: ""': "corresponding author affiliation is empty",
     'email: ""': "corresponding author email is empty",
+    "target_journal_selected: false": "target journal checklist item is incomplete",
+    "target_journal_template_applied: false": "target journal template checklist item is incomplete",
+    "author_metadata_completed: false": "author metadata checklist item is incomplete",
+    "corresponding_author_completed: false": "corresponding author checklist item is incomplete",
+    "manuscript_pdf_rebuilt_after_template: false": "manuscript PDF rebuild checklist item is incomplete",
+    "supplementary_pdf_rebuilt_after_template: false": "supplementary PDF rebuild checklist item is incomplete",
+    "submission_system_files_verified: false": "submission system file checklist item is incomplete",
+    "artifact_release_prepared_or_linked: false": "artifact release checklist item is incomplete",
 }
 
 

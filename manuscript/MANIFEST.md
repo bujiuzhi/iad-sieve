@@ -32,3 +32,7 @@ cd manuscript && ./scripts/build_latex_pdf.sh
 ## 投稿边界
 
 该材料包当前不绑定具体期刊模板。正式上传前，应按目标期刊要求调整 `main.tex` 文档类并补充作者元数据。
+
+## 正式上传检查项
+
+`submission_metadata.yml` 中的 `final_upload_checklist` 记录正式上传前必须完成的项目。当前预投稿包保持匿名预投稿状态；正式上传前应至少完成目标期刊选择、期刊模板套用、作者信息、通讯作者信息、模板后 PDF 重建、投稿系统文件核对和 artifact release 链接。

@@ -478,6 +478,14 @@ def test_check_final_upload_metadata_rejects_placeholders() -> None:
             'name: ""',
             'affiliation: ""',
             'email: ""',
+            "target_journal_selected: false",
+            "target_journal_template_applied: false",
+            "author_metadata_completed: false",
+            "corresponding_author_completed: false",
+            "manuscript_pdf_rebuilt_after_template: false",
+            "supplementary_pdf_rebuilt_after_template: false",
+            "submission_system_files_verified: false",
+            "artifact_release_prepared_or_linked: false",
         ]
     )
 
@@ -486,6 +494,7 @@ def test_check_final_upload_metadata_rejects_placeholders() -> None:
     assert any("target journal is empty" in error for error in errors)
     assert any("author list is empty" in error for error in errors)
     assert any("corresponding author email is empty" in error for error in errors)
+    assert any("artifact release checklist item is incomplete" in error for error in errors)
 
 
 def test_check_final_upload_metadata_accepts_filled_metadata() -> None:
@@ -504,6 +513,15 @@ def test_check_final_upload_metadata_accepts_filled_metadata() -> None:
             '  name: "Example Author"',
             '  affiliation: "Example University"',
             '  email: "author@example.edu"',
+            "final_upload_checklist:",
+            "  target_journal_selected: true",
+            "  target_journal_template_applied: true",
+            "  author_metadata_completed: true",
+            "  corresponding_author_completed: true",
+            "  manuscript_pdf_rebuilt_after_template: true",
+            "  supplementary_pdf_rebuilt_after_template: true",
+            "  submission_system_files_verified: true",
+            "  artifact_release_prepared_or_linked: true",
         ]
     )
 

@@ -680,6 +680,15 @@ def check_submission_metadata(metadata_text: str) -> list[str]:
         "full_numeric_audit_requires_external_artifact: true",
         "broad_method_ranking_claimed: false",
         "silver_labels_claimed_as_human_gold: false",
+        "final_upload_checklist:",
+        "target_journal_selected: false",
+        "target_journal_template_applied: false",
+        "author_metadata_completed: false",
+        "corresponding_author_completed: false",
+        "manuscript_pdf_rebuilt_after_template: false",
+        "supplementary_pdf_rebuilt_after_template: false",
+        "submission_system_files_verified: false",
+        "artifact_release_prepared_or_linked: false",
     ]
     return [f"submission metadata missing marker: {marker}" for marker in required_markers if marker not in metadata_text]
 
@@ -700,6 +709,14 @@ def check_final_upload_metadata(metadata_text: str) -> list[str]:
         'name: ""': "corresponding author name is empty",
         'affiliation: ""': "corresponding author affiliation is empty",
         'email: ""': "corresponding author email is empty",
+        "target_journal_selected: false": "target journal checklist item is incomplete",
+        "target_journal_template_applied: false": "target journal template checklist item is incomplete",
+        "author_metadata_completed: false": "author metadata checklist item is incomplete",
+        "corresponding_author_completed: false": "corresponding author checklist item is incomplete",
+        "manuscript_pdf_rebuilt_after_template: false": "manuscript PDF rebuild checklist item is incomplete",
+        "supplementary_pdf_rebuilt_after_template: false": "supplementary PDF rebuild checklist item is incomplete",
+        "submission_system_files_verified: false": "submission system file checklist item is incomplete",
+        "artifact_release_prepared_or_linked: false": "artifact release checklist item is incomplete",
     }
     return [f"final upload metadata unresolved: {message}" for marker, message in blocked_markers.items() if marker in metadata_text]
 

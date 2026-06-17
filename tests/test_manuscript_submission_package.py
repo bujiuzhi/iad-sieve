@@ -114,6 +114,16 @@ def _write_unresolved_submission_metadata(manuscript_root: Path) -> None:
                 '  name: ""',
                 '  affiliation: ""',
                 '  email: ""',
+                "",
+                "final_upload_checklist:",
+                "  target_journal_selected: false",
+                "  target_journal_template_applied: false",
+                "  author_metadata_completed: false",
+                "  corresponding_author_completed: false",
+                "  manuscript_pdf_rebuilt_after_template: false",
+                "  supplementary_pdf_rebuilt_after_template: false",
+                "  submission_system_files_verified: false",
+                "  artifact_release_prepared_or_linked: false",
             ]
         )
         + "\n",
@@ -162,6 +172,16 @@ def _write_final_upload_metadata(manuscript_root: Path) -> None:
                 "  full_numeric_audit_requires_external_artifact: true",
                 "  broad_method_ranking_claimed: false",
                 "  silver_labels_claimed_as_human_gold: false",
+                "",
+                "final_upload_checklist:",
+                "  target_journal_selected: true",
+                "  target_journal_template_applied: true",
+                "  author_metadata_completed: true",
+                "  corresponding_author_completed: true",
+                "  manuscript_pdf_rebuilt_after_template: true",
+                "  supplementary_pdf_rebuilt_after_template: true",
+                "  submission_system_files_verified: true",
+                "  artifact_release_prepared_or_linked: true",
             ]
         )
         + "\n",
@@ -218,6 +238,7 @@ def test_build_submission_package_rejects_final_upload_with_unresolved_metadata(
 
     assert "target journal is empty" in str(exc_info.value)
     assert "author list is empty" in str(exc_info.value)
+    assert "artifact release checklist item is incomplete" in str(exc_info.value)
 
 
 def test_build_submission_package_accepts_final_upload_with_filled_metadata(tmp_path) -> None:
@@ -267,6 +288,7 @@ def test_validate_submission_package_rejects_final_upload_with_unresolved_metada
 
     assert any("target journal is empty" in error for error in errors)
     assert any("corresponding author email is empty" in error for error in errors)
+    assert any("artifact release checklist item is incomplete" in error for error in errors)
 
 
 def test_validate_submission_package_accepts_final_upload_with_filled_metadata(tmp_path) -> None:

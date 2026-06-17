@@ -31,3 +31,13 @@ artifact_boundary:
   full_numeric_audit_requires_external_artifact: true
   broad_method_ranking_claimed: false
   silver_labels_claimed_as_human_gold: false
+
+final_upload_checklist:
+  target_journal_selected: false
+  target_journal_template_applied: false
+  author_metadata_completed: false
+  corresponding_author_completed: false
+  manuscript_pdf_rebuilt_after_template: false
+  supplementary_pdf_rebuilt_after_template: false
+  submission_system_files_verified: false
+  artifact_release_prepared_or_linked: false
