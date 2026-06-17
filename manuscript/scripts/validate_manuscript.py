@@ -51,6 +51,7 @@ REQUIRED_SECTIONS = [
     r"\subsection{Operating Point Disclosure}",
     r"\subsection{Claim-Evidence Boundary for Result Interpretation}",
     r"\subsection{Result Audit Trail}",
+    r"\subsection{Scope Compatibility of the Open-v2 Table}",
     r"\section{Mechanism and Error Analysis}",
     r"\section{Limitations}",
     r"\section{Threats to Validity}",
@@ -269,6 +270,28 @@ def check_operating_point_disclosure(manuscript_text: str) -> list[str]:
         "Prediction file, model JSON, thresholds, and checksums",
     ]
     return [f"operating point disclosure missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+
+
+def check_scope_compatibility(manuscript_text: str) -> list[str]:
+    """Check whether mixed-scope Open-v2 rows have a clear interpretation boundary.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing scope-compatibility markers.
+    """
+    required_markers = [
+        r"\subsection{Scope Compatibility of the Open-v2 Table}",
+        r"\label{tab:scope-compatibility}",
+        "scope-bounded evidence table",
+        "not a single leaderboard",
+        "Full pair-scope representation baselines",
+        "Held-out IAD-Risk rows",
+        "same released prediction scope",
+        "manual-validation slice",
+    ]
+    return [f"Open-v2 scope compatibility missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
 
 
 def check_related_work_positioning(manuscript_text: str) -> list[str]:
@@ -544,6 +567,7 @@ def main() -> int:
     errors.extend(check_related_work_positioning(manuscript_text))
     errors.extend(check_error_taxonomy(manuscript_text))
     errors.extend(check_operating_point_disclosure(manuscript_text))
+    errors.extend(check_scope_compatibility(manuscript_text))
     errors.extend(check_result_claim_boundary(manuscript_text, supplementary_text))
     errors.extend(check_highlights(highlights_text))
     errors.extend(check_keywords(keywords_text))

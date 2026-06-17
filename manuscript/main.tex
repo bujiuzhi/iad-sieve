@@ -396,6 +396,30 @@ IAD-Risk transformer (SPECTER2) & 1042 test & 0.980 & 0.001 & 0.000 \\
 
 The Open-v2 evidence shows why identity-agenda disentanglement is necessary. Single-space scientific representation baselines preserve topical relatedness, but their merge threshold can produce high false-merge rates on OpenAlex silver hard negatives. IAD-Risk transformer variants keep high same-work F1 on the held-out Open-v2 test split while suppressing hard-negative false merges. RoBERTa pair classification is a strong baseline and narrows the gap substantially; therefore the paper does not make broad superiority claims. Instead, the main result is that relation heads plus an explicit risk score provide a transparent and controllable mechanism for false-merge suppression.
 
+\subsection{Scope Compatibility of the Open-v2 Table}
+
+The Open-v2 table is a scope-bounded evidence table, not a single leaderboard. Full pair-scope representation baselines test whether single-space scientific relatedness can over-merge agenda-level hard negatives across the available Open-v2 pairs. Held-out IAD-Risk rows test whether risk-gated transformer variants preserve same-work performance and suppress hard-negative merges under a split-based model-evaluation protocol. The valid comparison is therefore mechanistic: semantic relatedness alone is unsafe as automatic merge evidence, while explicit risk gating can block hard-negative merges in the reported held-out setting.
+
+\begin{table}[H]
+\caption{Scope compatibility for interpreting the Open-v2 evidence snapshot. The table states what each row family supports and which stronger comparison remains outside the current evidence.}
+\label{tab:scope-compatibility}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.22\linewidth}L{0.20\linewidth}L{0.26\linewidth}L{0.22\linewidth}}
+\toprule
+Row family & Pair scope & Supported interpretation & Not supported \\
+\midrule
+Representation baselines & Full available Open-v2 pair scope. & Tests whether one-space scientific relatedness creates hard-negative merge risk. & A tuned neural pair-classifier ranking under the same held-out prediction file. \\
+RoBERTa pair classifier & Full available Open-v2 pair scope. & Shows that a strong supervised pair classifier can suppress most hard-negative merges. & A component-level explanation of identity-agenda risk control. \\
+IAD-Risk transformer variants & Held-out Open-v2 test scope. & Tests whether explicit identity, agenda, and ANI heads support risk-gated held-out decisions. & A general ranking over every baseline before all rows share the same released prediction scope. \\
+Future stronger comparison & Same released prediction scope plus manual-validation slice. & Would support a stricter leaderboard and stronger label-precision claims. & Already completed by the current evidence snapshot. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This scope boundary is important for review. The evidence is sufficient for the paper's conservative claim that identity-agenda disentanglement is a practical false-merge control mechanism. It is not sufficient for a broad ranking claim until all row families are regenerated with the same released prediction scope, threshold-selection logs, checksums, and an independent manual-validation slice.
+
 \subsection{Extended Evidence and Boundaries}
 
 Open-v3 and source-heldout experiments provide additional stress tests, but their results must be interpreted with care. Some source-heldout settings train only identity heads or lack full agenda-non-identity supervision, so they support evidence about generalization pressure rather than broad ranking claims. The manuscript therefore treats Open-v2 as the core mechanism demonstration and Open-v3 as extended validation.
