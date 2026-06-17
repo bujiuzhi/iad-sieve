@@ -267,6 +267,28 @@ def check_related_work_positioning(manuscript_text: str) -> list[str]:
     return [f"related work positioning missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
 
 
+def check_error_taxonomy(manuscript_text: str) -> list[str]:
+    """Check whether the mechanism section includes error taxonomy boundaries.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing error-taxonomy markers.
+    """
+    required_markers = [
+        r"\label{tab:error-taxonomy}",
+        "Error taxonomy for identity-agenda confusion",
+        "Same task, different contribution",
+        "Citation-neighborhood neighbor",
+        "Version or extension boundary",
+        "Identifier conflict",
+        "Sparse metadata",
+        "diagnostic rather than a measured error distribution",
+    ]
+    return [f"error taxonomy missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+
+
 def check_highlights(highlights_text: str) -> list[str]:
     """Check submission highlights format and scope.
 
@@ -461,6 +483,7 @@ def main() -> int:
     errors.extend(check_forbidden_claims(cover_letter_text))
     errors.extend(check_method_feature_contract(manuscript_text))
     errors.extend(check_related_work_positioning(manuscript_text))
+    errors.extend(check_error_taxonomy(manuscript_text))
     errors.extend(check_operating_point_disclosure(manuscript_text))
     errors.extend(check_result_claim_boundary(manuscript_text, supplementary_text))
     errors.extend(check_highlights(highlights_text))
