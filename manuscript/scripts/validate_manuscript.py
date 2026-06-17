@@ -42,6 +42,7 @@ REQUIRED_SECTIONS = [
     r"\subsection{Failure-Control Rationale}",
     r"\subsection{Implementation and Reproducibility}",
     r"\section{Experiments}",
+    r"\subsection{Threshold Selection and Uncertainty Reporting}",
     r"\subsection{Claim-Evidence Boundary for Result Interpretation}",
     r"\section{Mechanism and Error Analysis}",
     r"\section{Limitations}",

@@ -234,6 +234,28 @@ RQ4 & Gold/proxy/silver strata & Split metrics & Provenance-aware robustness \\
 
 Same-work F1 is computed on pairs whose identity labels come from the gold layer. Ordinary false-merge rate (FMR) is the fraction of non-identity pairs that the system marks for automatic merging. Hard-negative false-merge rate (HNFMR) is the same error measured only on agenda-level hard negatives, where topic or citation evidence is high but identity evidence is negative. Reporting both FMR and HNFMR separates general matching errors from the specific identity-agenda confusion that this paper studies.
 
+\subsection{Threshold Selection and Uncertainty Reporting}
+
+Threshold-sensitive systems are evaluated under a fixed selection protocol rather than by choosing the best test threshold after observing results. Merge thresholds are selected on validation evidence when validation rows are available; otherwise, the default implementation threshold is reported as a fixed operating point. The test split is then used only for final metric reporting. This protocol is necessary because a small threshold change can alter FMR and HNFMR more strongly than it alters same-work F1.
+
+\begin{table}[H]
+\caption{Threshold and uncertainty reporting protocol. The protocol separates what is required for the current main table from what is required for stronger follow-up claims.}
+\label{tab:threshold-uncertainty-protocol}
+\centering
+\small
+\begin{tabular}{L{0.23\linewidth}L{0.33\linewidth}L{0.34\linewidth}}
+\toprule
+Item & Reporting rule & Reviewer-facing purpose \\
+\midrule
+Merge thresholds & Record $\tau_w$, $\tau_a$, $\tau_r$, validation source, and fixed operating point. & Prevents post-hoc threshold selection on the test set. \\
+Metric uncertainty & Report bootstrap intervals when prediction files and resampling logs are present in the artifact package. & Distinguishes stable effects from small numerical differences. \\
+Risk metrics & Always report FMR and HNFMR with same-work F1. & Prevents a high F1 score from hiding unsafe hard-negative merges. \\
+Ablation claims & Claim component causality only when no-risk-gate, no-ANI, and single-space variants are present. & Separates mechanism-consistent evidence from complete causal ablation evidence. \\
+Artifact audit & Tie each numerical table to predictions, configs, logs, checksums, and commit identifiers. & Makes result-level reproduction possible without committing raw data. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Baselines}
 
 The completed actual-model baselines include rule-based matching, SPECTER2 adapter cosine, SciNCL cosine, RoBERTa-style pair classification, and single-space union baselines. The repository also provides an LLM pair-judge interface, but LLM rows are not treated as primary evidence unless the API-backed execution mode is present. Baselines are evaluated through the same pair contract so that same-work F1 and hard-negative false-merge rate can be compared without mixing label strengths.
