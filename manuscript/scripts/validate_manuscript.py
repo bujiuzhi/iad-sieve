@@ -28,6 +28,7 @@ REQUIRED_FILES = [
     ROOT / "scripts" / "validate_manuscript.py",
     ROOT / "scripts" / "verify_fixture_rebuild.py",
     ROOT / "scripts" / "build_submission_package.py",
+    ROOT / "scripts" / "validate_submission_package.py",
     ROOT / "scripts" / "build_latex_pdf.sh",
     ROOT / "build" / "iad-risk-manuscript-latex.pdf",
     ROOT / "build" / "iad-risk-supplementary-material.pdf",

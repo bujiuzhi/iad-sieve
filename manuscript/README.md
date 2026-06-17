@@ -19,6 +19,7 @@ manuscript/
     validate_manuscript.py
     verify_fixture_rebuild.py
     build_submission_package.py
+    validate_submission_package.py
     build_latex_pdf.sh
   build/
     iad-risk-manuscript-latex.pdf
@@ -53,6 +54,7 @@ Submission package build:
 
 ```bash
 python manuscript/scripts/build_submission_package.py
+python manuscript/scripts/validate_submission_package.py
 ```
 
 ## Submission Boundary

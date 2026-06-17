@@ -1,0 +1,357 @@
+"""Validate the self-contained manuscript submission package.
+
+The validator checks the generated package directory and zip archive before the
+files are sent to a journal system. It verifies exact file membership, manifest
+roles, checksums, and exclusion of local data, outputs, cache files, and secrets.
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import logging
+import zipfile
+from pathlib import Path
+
+
+LOGGER = logging.getLogger(__name__)
+MANUSCRIPT_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_PACKAGE_DIR = MANUSCRIPT_ROOT / "build" / "submission_package"
+DEFAULT_ZIP_PATH = MANUSCRIPT_ROOT / "build" / "iad-risk-submission-package.zip"
+PACKAGE_ROOT_NAME = "submission_package"
+EXPECTED_FILES = {
+    "main.tex",
+    "supplementary_material.tex",
+    "references.bib",
+    "cover_letter.md",
+    "highlights.md",
+    "keywords.md",
+    "iad-risk-manuscript-latex.pdf",
+    "iad-risk-supplementary-material.pdf",
+    "submission_manifest.json",
+    "checksums.sha256",
+}
+EXPECTED_MANIFEST_ROLES = {
+    "main_latex_source",
+    "supplementary_latex_source",
+    "bibliography",
+    "cover_letter",
+    "submission_highlights",
+    "submission_keywords",
+    "main_pdf",
+    "supplementary_pdf",
+}
+FORBIDDEN_ZIP_PARTS = {
+    "data",
+    "outputs",
+    "__pycache__",
+    ".pytest_cache",
+    ".git",
+}
+FORBIDDEN_NAME_FRAGMENTS = [
+    ".env",
+    ".secret",
+    "remote_connection",
+    "api_key",
+]
+
+
+def parse_arguments() -> argparse.Namespace:
+    """Parse command-line arguments.
+
+    参数:
+        无。
+
+    返回:
+        argparse.Namespace: Parsed command-line arguments.
+    """
+    parser = argparse.ArgumentParser(description="Validate a generated journal submission package.")
+    parser.add_argument("--package-dir", default=str(DEFAULT_PACKAGE_DIR), help="Generated package directory.")
+    parser.add_argument("--zip-path", default=str(DEFAULT_ZIP_PATH), help="Generated package zip path.")
+    parser.add_argument("--log-level", default="INFO", help="Logging level.")
+    return parser.parse_args()
+
+
+def sha256_bytes(content: bytes) -> str:
+    """Compute a SHA256 checksum for bytes.
+
+    参数:
+        content: File bytes.
+
+    返回:
+        str: Hexadecimal SHA256 digest.
+    """
+    return hashlib.sha256(content).hexdigest()
+
+
+def sha256_file(path: Path) -> str:
+    """Compute a SHA256 checksum for a file.
+
+    参数:
+        path: File path.
+
+    返回:
+        str: Hexadecimal SHA256 digest.
+    """
+    return sha256_bytes(path.read_bytes())
+
+
+def parse_checksums(text: str) -> dict[str, str]:
+    """Parse a checksums.sha256 text file.
+
+    参数:
+        text: Checksum file content.
+
+    返回:
+        dict[str, str]: Mapping from file name to SHA256 digest.
+
+    异常:
+        ValueError: Raised when a checksum line is malformed.
+    """
+    checksums: dict[str, str] = {}
+    for line_number, line in enumerate(text.splitlines(), start=1):
+        if not line.strip():
+            continue
+        parts = line.split(maxsplit=1)
+        if len(parts) != 2:
+            raise ValueError(f"malformed checksum line {line_number}: {line}")
+        digest, file_name = parts
+        if len(digest.strip()) != 64:
+            raise ValueError(f"malformed SHA256 digest on line {line_number}: {digest}")
+        checksums[file_name.strip()] = digest.strip()
+    return checksums
+
+
+def check_manifest_text(manifest_text: str) -> list[str]:
+    """Check submission manifest structure and roles.
+
+    参数:
+        manifest_text: JSON manifest content.
+
+    返回:
+        list[str]: Error messages.
+    """
+    errors: list[str] = []
+    try:
+        manifest = json.loads(manifest_text)
+    except json.JSONDecodeError as exc:
+        return [f"submission_manifest.json is invalid JSON: {exc}"]
+    file_rows = manifest.get("files")
+    if not isinstance(file_rows, list):
+        return ["submission_manifest.json missing files list"]
+    roles = {row.get("role") for row in file_rows if isinstance(row, dict)}
+    missing_roles = EXPECTED_MANIFEST_ROLES - roles
+    extra_roles = roles - EXPECTED_MANIFEST_ROLES
+    if missing_roles:
+        errors.append(f"submission_manifest.json missing roles: {sorted(missing_roles)}")
+    if extra_roles:
+        errors.append(f"submission_manifest.json has unexpected roles: {sorted(extra_roles)}")
+    for row in file_rows:
+        if not isinstance(row, dict):
+            errors.append("submission_manifest.json contains a non-object file row")
+            continue
+        package_path = row.get("package_path")
+        if package_path not in EXPECTED_FILES:
+            errors.append(f"submission_manifest.json has unexpected package_path: {package_path}")
+    return errors
+
+
+def check_file_membership(file_names: set[str], location: str) -> list[str]:
+    """Check exact package file membership.
+
+    参数:
+        file_names: File names found in a package location.
+        location: Human-readable location label.
+
+    返回:
+        list[str]: Error messages.
+    """
+    missing_files = EXPECTED_FILES - file_names
+    extra_files = file_names - EXPECTED_FILES
+    errors: list[str] = []
+    if missing_files:
+        errors.append(f"{location} missing files: {sorted(missing_files)}")
+    if extra_files:
+        errors.append(f"{location} has unexpected files: {sorted(extra_files)}")
+    return errors
+
+
+def check_forbidden_path_name(path_name: str, location: str) -> list[str]:
+    """Check whether a path name contains forbidden paths or fragments.
+
+    参数:
+        path_name: Package path or zip member name.
+        location: Human-readable location label.
+
+    返回:
+        list[str]: Error messages.
+    """
+    path_parts = set(Path(path_name).parts)
+    errors: list[str] = []
+    forbidden_parts = FORBIDDEN_ZIP_PARTS & path_parts
+    if forbidden_parts:
+        errors.append(f"{location} contains forbidden path part {sorted(forbidden_parts)}: {path_name}")
+    lowered_name = path_name.lower()
+    for fragment in FORBIDDEN_NAME_FRAGMENTS:
+        if fragment in lowered_name:
+            errors.append(f"{location} contains forbidden name fragment {fragment}: {path_name}")
+    return errors
+
+
+def validate_package_directory(package_dir: Path) -> list[str]:
+    """Validate the generated package directory.
+
+    参数:
+        package_dir: Generated package directory.
+
+    返回:
+        list[str]: Error messages.
+    """
+    if not package_dir.exists():
+        return [f"package directory does not exist: {package_dir}"]
+    if not package_dir.is_dir():
+        return [f"package path is not a directory: {package_dir}"]
+    entries = list(package_dir.iterdir())
+    files = [path for path in entries if path.is_file()]
+    directories = [path for path in entries if path.is_dir()]
+    errors = check_file_membership({path.name for path in files}, str(package_dir))
+    if directories:
+        errors.append(f"{package_dir} has unexpected directories: {sorted(path.name for path in directories)}")
+    for path in entries:
+        errors.extend(check_forbidden_path_name(path.name, str(package_dir)))
+    checksums_path = package_dir / "checksums.sha256"
+    manifest_path = package_dir / "submission_manifest.json"
+    if manifest_path.exists():
+        errors.extend(check_manifest_text(manifest_path.read_text(encoding="utf-8")))
+    if checksums_path.exists():
+        try:
+            checksums = parse_checksums(checksums_path.read_text(encoding="utf-8"))
+        except ValueError as exc:
+            errors.append(f"checksums.sha256 is invalid: {exc}")
+            checksums = {}
+        expected_checksum_files = EXPECTED_FILES - {"checksums.sha256"}
+        if "checksums.sha256" in checksums:
+            errors.append("checksums.sha256 must not include itself")
+        missing_checksum_entries = expected_checksum_files - set(checksums)
+        extra_checksum_entries = set(checksums) - expected_checksum_files
+        if missing_checksum_entries:
+            errors.append(f"checksums.sha256 missing entries: {sorted(missing_checksum_entries)}")
+        if extra_checksum_entries:
+            errors.append(f"checksums.sha256 has unexpected entries: {sorted(extra_checksum_entries)}")
+        for file_name in expected_checksum_files & set(checksums):
+            file_path = package_dir / file_name
+            if file_path.exists() and sha256_file(file_path) != checksums[file_name]:
+                errors.append(f"checksum mismatch for package file: {file_name}")
+    return errors
+
+
+def validate_zip_archive(zip_path: Path) -> list[str]:
+    """Validate the generated package zip archive.
+
+    参数:
+        zip_path: Zip archive path.
+
+    返回:
+        list[str]: Error messages.
+    """
+    if not zip_path.exists():
+        return [f"zip archive does not exist: {zip_path}"]
+    errors: list[str] = []
+    try:
+        with zipfile.ZipFile(zip_path) as archive:
+            member_names = archive.namelist()
+            for member_name in member_names:
+                errors.extend(check_forbidden_path_name(member_name, "zip archive"))
+            expected_prefix = f"{PACKAGE_ROOT_NAME}/"
+            expected_member_names = {f"{expected_prefix}{file_name}" for file_name in EXPECTED_FILES}
+            file_member_names = {member_name for member_name in member_names if not member_name.endswith("/")}
+            directory_member_names = {member_name for member_name in member_names if member_name.endswith("/")}
+            missing_member_names = expected_member_names - file_member_names
+            unexpected_member_names = file_member_names - expected_member_names
+            unexpected_directory_names = directory_member_names - {expected_prefix}
+            if missing_member_names:
+                errors.append(f"zip archive missing members: {sorted(missing_member_names)}")
+            if unexpected_member_names:
+                errors.append(f"zip archive has unexpected members: {sorted(unexpected_member_names)}")
+            if unexpected_directory_names:
+                errors.append(f"zip archive has unexpected directories: {sorted(unexpected_directory_names)}")
+            package_file_names = {
+                member_name.removeprefix(expected_prefix)
+                for member_name in member_names
+                if member_name.startswith(expected_prefix) and not member_name.endswith("/")
+            }
+            errors.extend(check_file_membership(package_file_names, str(zip_path)))
+            try:
+                manifest_text = archive.read(f"{PACKAGE_ROOT_NAME}/submission_manifest.json").decode("utf-8")
+                checksums_text = archive.read(f"{PACKAGE_ROOT_NAME}/checksums.sha256").decode("utf-8")
+            except KeyError as exc:
+                return errors + [f"zip archive missing required metadata file: {exc}"]
+            errors.extend(check_manifest_text(manifest_text))
+            try:
+                checksums = parse_checksums(checksums_text)
+            except ValueError as exc:
+                errors.append(f"zip checksums.sha256 is invalid: {exc}")
+                checksums = {}
+            expected_checksum_files = EXPECTED_FILES - {"checksums.sha256"}
+            if "checksums.sha256" in checksums:
+                errors.append("zip checksums.sha256 must not include itself")
+            missing_checksum_entries = expected_checksum_files - set(checksums)
+            extra_checksum_entries = set(checksums) - expected_checksum_files
+            if missing_checksum_entries:
+                errors.append(f"zip checksums.sha256 missing entries: {sorted(missing_checksum_entries)}")
+            if extra_checksum_entries:
+                errors.append(f"zip checksums.sha256 has unexpected entries: {sorted(extra_checksum_entries)}")
+            for file_name in expected_checksum_files & set(checksums):
+                member_path = f"{PACKAGE_ROOT_NAME}/{file_name}"
+                try:
+                    member_content = archive.read(member_path)
+                except KeyError:
+                    errors.append(f"zip archive missing checksummed file: {member_path}")
+                    continue
+                if sha256_bytes(member_content) != checksums[file_name]:
+                    errors.append(f"zip checksum mismatch for package file: {file_name}")
+    except zipfile.BadZipFile as exc:
+        errors.append(f"zip archive is invalid: {exc}")
+    return errors
+
+
+def validate_submission_package(package_dir: Path, zip_path: Path) -> list[str]:
+    """Validate the package directory and zip archive.
+
+    参数:
+        package_dir: Generated package directory.
+        zip_path: Generated zip archive path.
+
+    返回:
+        list[str]: Error messages.
+    """
+    return validate_package_directory(package_dir) + validate_zip_archive(zip_path)
+
+
+def main() -> int:
+    """Run submission package validation.
+
+    参数:
+        无。
+
+    返回:
+        int: Process exit code.
+    """
+    args = parse_arguments()
+    logging.basicConfig(level=getattr(logging, args.log_level.upper(), logging.INFO), format="%(levelname)s %(message)s")
+    try:
+        errors = validate_submission_package(Path(args.package_dir).resolve(), Path(args.zip_path).resolve())
+    except Exception as exc:  # noqa: BLE001
+        LOGGER.error("submission package validation failed: %s", exc)
+        return 1
+    if errors:
+        for error in errors:
+            LOGGER.error(error)
+        return 1
+    LOGGER.info("submission package validation passed")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
