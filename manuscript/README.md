@@ -17,6 +17,7 @@ manuscript/
   MANIFEST.md
   scripts/
     validate_manuscript.py
+    verify_fixture_rebuild.py
     build_latex_pdf.sh
   build/
     iad-risk-manuscript-latex.pdf
@@ -39,6 +40,12 @@ Manuscript validation:
 
 ```bash
 python manuscript/scripts/validate_manuscript.py
+```
+
+No-network fixture rebuild verification:
+
+```bash
+python manuscript/scripts/verify_fixture_rebuild.py
 ```
 
 ## Submission Boundary

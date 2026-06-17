@@ -74,6 +74,16 @@ python -m iad_sieve.cli build-iad-bench \
 \end{verbatim}
 \normalsize
 
+The manuscript package includes a verification wrapper for the same no-network path:
+
+\small
+\begin{verbatim}
+python manuscript/scripts/verify_fixture_rebuild.py
+\end{verbatim}
+\normalsize
+
+The wrapper runs the four fixture commands in a temporary directory and checks that each source adapter writes \texttt{eval\_documents.jsonl}, \texttt{eval\_pairs.jsonl}, and \texttt{dataset\_summary.jsonl}, and that the assembled IAD-Bench package writes pair, document, split, summary, provenance, and dataset-card files.
+
 \section{Public-Source Rebuild}
 
 For full data reconstruction, raw public files should be obtained from their original sources and placed under local \texttt{data/raw/} directories. These directories are intentionally excluded from Git. The project keeps conversion commands and schema contracts under version control, while source licenses and access conditions remain governed by the original providers.
