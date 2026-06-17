@@ -144,6 +144,32 @@ def check_forbidden_claims(manuscript_text: str) -> list[str]:
     return errors
 
 
+def check_abstract_quantitative_evidence(manuscript_text: str) -> list[str]:
+    """Check whether the abstract reports bounded quantitative evidence.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing abstract evidence markers.
+    """
+    begin_marker = r"\begin{abstract}"
+    end_marker = r"\end{abstract}"
+    if begin_marker not in manuscript_text or end_marker not in manuscript_text:
+        return ["abstract evidence check could not locate abstract environment"]
+    abstract_text = manuscript_text.split(begin_marker, 1)[1].split(end_marker, 1)[0]
+    required_markers = [
+        "Open-v2 evidence snapshot",
+        "single-space scientific representation baselines",
+        "HNFMR 0.790--0.999",
+        "full pair scope",
+        "same-work F1=0.980",
+        "HNFMR=0.000",
+        "held-out test scope",
+    ]
+    return [f"abstract missing bounded quantitative evidence marker: {marker}" for marker in required_markers if marker not in abstract_text]
+
+
 def check_bibliography_depth(bibliography_text: str) -> list[str]:
     """Check whether the bibliography has enough source coverage.
 
@@ -481,6 +507,7 @@ def main() -> int:
     errors.extend(check_forbidden_claims(highlights_text))
     errors.extend(check_forbidden_claims(keywords_text))
     errors.extend(check_forbidden_claims(cover_letter_text))
+    errors.extend(check_abstract_quantitative_evidence(manuscript_text))
     errors.extend(check_method_feature_contract(manuscript_text))
     errors.extend(check_related_work_positioning(manuscript_text))
     errors.extend(check_error_taxonomy(manuscript_text))
