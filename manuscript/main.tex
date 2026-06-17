@@ -5,12 +5,14 @@
 \usepackage{float}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{array}
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{tikz}
 \usepackage[hidelinks]{hyperref}
 \usepackage[numbers,sort&compress]{natbib}
 \usetikzlibrary{arrows.meta,positioning}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 
 \title{IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication}
 \author{Anonymous Authors}
@@ -192,6 +194,27 @@ All reported systems are evaluated through the same pair-level schema, split fie
 
 The repository separates executable code from large data artifacts: raw third-party data remain outside Git, while processing scripts, fixture tests, schema contracts, and artifact-release rules remain version controlled. Reproduction starts from public sources, rebuilds IAD-Bench pair files through the documented CLI, and checks generated outputs with manifests and checksums. This organization is intended to make the main evidence reproducible without redistributing restricted or large source files.
 
+\subsection{Artifact Reproduction Protocol}
+
+Because the repository does not redistribute large third-party data, reproducibility is divided into code-level reproduction and result-level artifact reproduction. Table~\ref{tab:reproduction-levels} defines what each level proves. The key principle is that small fixtures verify the processing contracts, while the full reported tables require either independently obtained public source files or a released artifact package with manifests and checksums.
+
+\begin{table}[H]
+\caption{Reproduction levels for auditing the repository and the reported evidence.}
+\label{tab:reproduction-levels}
+\centering
+\small
+\begin{tabular}{L{0.12\linewidth}L{0.38\linewidth}L{0.40\linewidth}}
+\toprule
+Level & Required input & Audit target \\
+\midrule
+L0 code check & Source tree, package environment, and manuscript scripts & Verify that the CLI, tests, public-release scan, and LaTeX build run in a clean environment. \\
+L1 fixture rebuild & Public miniature fixtures under \texttt{tests/fixtures} & Verify that DeepMatcher, SciRepEval-style, OpenAlex-style, and IAD-Bench adapters produce the documented pair schema. \\
+L2 public-source rebuild & Independently obtained public raw files from the cited sources & Rebuild derived IAD-Bench files with the documented data-processing commands and inspect label provenance. \\
+L3 result audit & Released tables, predictions, logs, manifests, and checksums & Verify the numerical results reported in the manuscript against immutable artifact files. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Main Open-v2 Results}
 
 \begin{table}[H]
@@ -237,7 +260,9 @@ IAD-Risk addresses a specific failure mode in scholarly entity matching: the ten
 
 \section*{Data and Code Availability}
 
-The source code, benchmark construction scripts, public-release checks, and manuscript build scripts are organized in the project repository. Raw third-party data are not redistributed in the repository because the original sources have their own access conditions and licenses. The repository instead provides data-processing commands, schema contracts, fixture tests, and artifact-release guidance so that independent readers can reproduce the benchmark construction from public sources and verify generated artifacts through manifests and checksums.
+The source code, benchmark construction scripts, public-release checks, and manuscript build scripts are organized in the project repository. After installation, the reproducibility entry points include CLI commands for DeepMatcher conversion, SciRepEval-style proximity conversion, OpenAlex and OpenCitations weak-label construction, IAD-Bench assembly, stratification checks, source-bias diagnostics, baseline execution, IAD-Risk training, bootstrap analysis, and manuscript PDF generation.
+
+Raw third-party data are not redistributed in the repository because the original sources have their own access conditions and licenses. The repository instead provides data-processing commands, schema contracts, fixture tests, and artifact-release guidance so that independent readers can reproduce the benchmark construction from public sources and verify generated artifacts through manifests, checksums, command logs, and fixed commit identifiers.
 
 \section*{Competing Interests}
 
