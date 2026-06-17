@@ -127,7 +127,31 @@ def write_manifest(output_dir: Path, records: list[dict]) -> Path:
     """
     manifest = {
         "package_name": "iad-risk-submission-package",
+        "package_type": "journal_submission",
+        "submission_stage": "template_independent_anonymous_pre_submission",
         "description": "Template-independent manuscript submission package.",
+        "anonymization": {
+            "author_status": "anonymous_placeholder",
+            "author_metadata_required_before_final_upload": True,
+        },
+        "journal_template": {
+            "target_journal_bound": False,
+            "final_upload_requirements": [
+                "target journal document class",
+                "journal-specific reference style",
+                "author metadata",
+            ],
+        },
+        "reproducibility_level": {
+            "code_and_fixture_rebuild": "covered by repository scripts",
+            "raw_data_distribution": "excluded",
+            "full_numeric_audit": "requires separate L2/L3 artifact package",
+        },
+        "claim_boundary": {
+            "no_broad_method_ranking": True,
+            "no_human_gold_claim_for_silver_labels": True,
+            "manual_validation_required_for_stronger_label_precision": True,
+        },
         "files": records,
         "excluded": [
             "raw third-party data",

@@ -105,6 +105,13 @@ def test_build_submission_package_writes_manifest_checksums_and_zip(tmp_path) ->
         zip_names = archive.namelist()
 
     assert summary["file_count"] == 10
+    assert manifest["package_type"] == "journal_submission"
+    assert manifest["submission_stage"] == "template_independent_anonymous_pre_submission"
+    assert manifest["anonymization"]["author_status"] == "anonymous_placeholder"
+    assert manifest["journal_template"]["target_journal_bound"] is False
+    assert "target journal document class" in manifest["journal_template"]["final_upload_requirements"]
+    assert manifest["reproducibility_level"]["raw_data_distribution"] == "excluded"
+    assert manifest["claim_boundary"]["no_broad_method_ranking"] is True
     assert len(manifest["files"]) == 8
     assert any(row["role"] == "main_pdf" for row in manifest["files"])
     assert any("submission_manifest.json" in line for line in checksum_lines)
@@ -145,6 +152,26 @@ def test_validate_submission_package_rejects_forbidden_zip_member(tmp_path) -> N
     errors = validator.validate_zip_archive(zip_path)
 
     assert any("forbidden path part" in error for error in errors)
+
+
+def test_validate_submission_package_rejects_incomplete_manifest_metadata(tmp_path) -> None:
+    """验证投稿包校验器拒绝缺少正式投稿元数据的 manifest。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    builder.build_submission_package(manuscript_root, output_dir, zip_path)
+    manifest_path = output_dir / "submission_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest.pop("claim_boundary")
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False), encoding="utf-8")
+
+    errors = validator.validate_package_directory(output_dir)
+
+    assert any("missing top-level fields" in error for error in errors)
 
 
 def test_validate_submission_package_rejects_extra_package_directory(tmp_path) -> None:

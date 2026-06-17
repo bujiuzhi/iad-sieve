@@ -42,6 +42,18 @@ EXPECTED_MANIFEST_ROLES = {
     "main_pdf",
     "supplementary_pdf",
 }
+EXPECTED_MANIFEST_TOP_LEVEL_FIELDS = {
+    "package_name",
+    "package_type",
+    "submission_stage",
+    "description",
+    "anonymization",
+    "journal_template",
+    "reproducibility_level",
+    "claim_boundary",
+    "files",
+    "excluded",
+}
 FORBIDDEN_ZIP_PARTS = {
     "data",
     "outputs",
@@ -137,6 +149,27 @@ def check_manifest_text(manifest_text: str) -> list[str]:
         manifest = json.loads(manifest_text)
     except json.JSONDecodeError as exc:
         return [f"submission_manifest.json is invalid JSON: {exc}"]
+    missing_fields = EXPECTED_MANIFEST_TOP_LEVEL_FIELDS - set(manifest)
+    if missing_fields:
+        errors.append(f"submission_manifest.json missing top-level fields: {sorted(missing_fields)}")
+    if manifest.get("package_type") != "journal_submission":
+        errors.append("submission_manifest.json package_type must be journal_submission")
+    if manifest.get("submission_stage") != "template_independent_anonymous_pre_submission":
+        errors.append("submission_manifest.json submission_stage must describe anonymous template-independent pre-submission")
+    anonymization = manifest.get("anonymization")
+    if not isinstance(anonymization, dict) or anonymization.get("author_status") != "anonymous_placeholder":
+        errors.append("submission_manifest.json must record anonymous author placeholder status")
+    journal_template = manifest.get("journal_template")
+    if not isinstance(journal_template, dict) or journal_template.get("target_journal_bound") is not False:
+        errors.append("submission_manifest.json must record that no target journal template is bound")
+    elif "target journal document class" not in journal_template.get("final_upload_requirements", []):
+        errors.append("submission_manifest.json missing target journal document class final-upload requirement")
+    reproducibility_level = manifest.get("reproducibility_level")
+    if not isinstance(reproducibility_level, dict) or reproducibility_level.get("raw_data_distribution") != "excluded":
+        errors.append("submission_manifest.json must record that raw data distribution is excluded")
+    claim_boundary = manifest.get("claim_boundary")
+    if not isinstance(claim_boundary, dict) or claim_boundary.get("no_broad_method_ranking") is not True:
+        errors.append("submission_manifest.json must record the no broad method-ranking claim boundary")
     file_rows = manifest.get("files")
     if not isinstance(file_rows, list):
         return ["submission_manifest.json missing files list"]
