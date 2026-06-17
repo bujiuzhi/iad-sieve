@@ -24,6 +24,7 @@ REQUIRED_FILES = [
     ROOT / "MANIFEST.md",
     ROOT / "cover_letter.md",
     ROOT / "highlights.md",
+    ROOT / "keywords.md",
     ROOT / "scripts" / "validate_manuscript.py",
     ROOT / "scripts" / "build_latex_pdf.sh",
     ROOT / "build" / "iad-risk-manuscript-latex.pdf",
@@ -169,6 +170,28 @@ def check_highlights(highlights_text: str) -> list[str]:
     return errors
 
 
+def check_keywords(keywords_text: str) -> list[str]:
+    """Check submission keyword count and format.
+
+    参数:
+        keywords_text: Keywords Markdown text.
+
+    返回:
+        list[str]: Error messages for invalid keywords.
+    """
+    keyword_lines = [line.strip() for line in keywords_text.splitlines() if line.strip() and not line.startswith("#")]
+    keyword_text = " ".join(keyword_lines)
+    keywords = [keyword.strip() for keyword in keyword_text.split(";") if keyword.strip()]
+    errors: list[str] = []
+    if not 4 <= len(keywords) <= 8:
+        errors.append(f"keywords has {len(keywords)} entries; expected 4 to 8")
+    for keyword in keywords:
+        word_count = len(keyword.split())
+        if word_count > 5:
+            errors.append(f"keyword is too long ({word_count} words): {keyword}")
+    return errors
+
+
 def extract_first_page_text(pdf_path: Path) -> tuple[str, list[str]]:
     """Extract text from the first page of a PDF.
 
@@ -288,11 +311,15 @@ def main() -> int:
     supplementary_text = supplementary_path.read_text(encoding="utf-8") if supplementary_path.exists() else ""
     highlights_path = ROOT / "highlights.md"
     highlights_text = highlights_path.read_text(encoding="utf-8") if highlights_path.exists() else ""
+    keywords_path = ROOT / "keywords.md"
+    keywords_text = keywords_path.read_text(encoding="utf-8") if keywords_path.exists() else ""
     errors.extend(check_sections(supplementary_text, REQUIRED_SUPPLEMENT_SECTIONS, "supplementary material"))
     errors.extend(check_forbidden_claims(manuscript_text))
     errors.extend(check_forbidden_claims(supplementary_text))
     errors.extend(check_forbidden_claims(highlights_text))
+    errors.extend(check_forbidden_claims(keywords_text))
     errors.extend(check_highlights(highlights_text))
+    errors.extend(check_keywords(keywords_text))
     errors.extend(check_bibliography_depth(bibliography_text))
     latex_pdf_path = ROOT / "build" / "iad-risk-manuscript-latex.pdf"
     supplementary_pdf_path = ROOT / "build" / "iad-risk-supplementary-material.pdf"

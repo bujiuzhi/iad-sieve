@@ -9,6 +9,7 @@
 | `references.bib` | Bibliography entries |
 | `cover_letter.md` | Cover letter source |
 | `highlights.md` | Submission highlights |
+| `keywords.md` | Submission keywords |
 | `scripts/validate_manuscript.py` | Manuscript package validation |
 | `scripts/build_latex_pdf.sh` | Formal LaTeX PDF build script |
 | `build/iad-risk-manuscript-latex.pdf` | Formal compiled PDF |

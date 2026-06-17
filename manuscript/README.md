@@ -13,6 +13,7 @@ manuscript/
   references.bib
   cover_letter.md
   highlights.md
+  keywords.md
   MANIFEST.md
   scripts/
     validate_manuscript.py

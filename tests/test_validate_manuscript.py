@@ -70,3 +70,44 @@ def test_check_highlights_rejects_long_bullet() -> None:
     errors = module.check_highlights(long_bullet)
 
     assert any("highlight is too long" in error for error in errors)
+
+
+def test_check_keywords_accepts_semicolon_separated_terms() -> None:
+    """验证 4 到 8 个分号分隔关键词可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    keywords_text = (
+        "# Keywords\n\n"
+        "scholarly entity matching; work deduplication; identity-agenda disentanglement; "
+        "false-merge risk; provenance-aware evaluation; scientific document representation"
+    )
+
+    errors = module.check_keywords(keywords_text)
+
+    assert errors == []
+
+
+def test_check_keywords_rejects_too_few_terms() -> None:
+    """验证关键词数量不足会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    keywords_text = "# Keywords\n\nwork deduplication; false-merge risk"
+
+    errors = module.check_keywords(keywords_text)
+
+    assert any("expected 4 to 8" in error for error in errors)
+
+
+def test_check_keywords_rejects_long_keyword() -> None:
+    """验证过长关键词会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    keywords_text = (
+        "# Keywords\n\n"
+        "scholarly entity matching; work deduplication; identity agenda disentanglement for scholarly records; "
+        "false-merge risk; provenance-aware evaluation"
+    )
+
+    errors = module.check_keywords(keywords_text)
+
+    assert any("keyword is too long" in error for error in errors)
