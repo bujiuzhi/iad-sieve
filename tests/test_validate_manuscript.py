@@ -188,6 +188,40 @@ def test_check_contribution_evidence_summary_rejects_missing_boundary() -> None:
     assert any("not a broad method-ranking claim" in error for error in errors)
 
 
+def test_check_openv2_benchmark_composition_accepts_complete_composition() -> None:
+    """验证 Open-v2 组成表包含数量、用途和边界时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\label{tab:openv2-composition}",
+            "Open-v2 benchmark composition",
+            "The table reports 415 gold pairs, 10,000 silver hard negatives, and 10,415 total pairs.",
+            "The combined scope covers 1,737 documents.",
+            "DeepMatcher gold identity Measures same-work matching ability.",
+            "OpenAlex and OpenCitations silver hard negatives Stresses agenda-level false-merge behavior.",
+            "The silver hard negatives are not human non-identity gold.",
+            "The boundary states broader source-heldout claims require additional artifacts.",
+        ]
+    )
+
+    errors = module.check_openv2_benchmark_composition(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_openv2_benchmark_composition_rejects_missing_counts() -> None:
+    """验证 Open-v2 组成表缺少关键数量和证据边界时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\label{tab:openv2-composition}"
+
+    errors = module.check_openv2_benchmark_composition(manuscript_text)
+
+    assert any("10,000" in error for error in errors)
+    assert any("not human non-identity gold" in error for error in errors)
+
+
 def test_check_method_feature_contract_accepts_complete_contract() -> None:
     """验证方法特征契约完整时可通过检查。"""
 

@@ -147,6 +147,23 @@ Manual validation & Independent human review & External validation target \\
 
 The Open-v2 benchmark variant used in the core evidence combines 415 DeepMatcher gold pairs with 10,000 OpenAlex-derived silver hard negatives, producing 10,415 pair records over 1,737 documents. The DeepMatcher component provides same-work gold labels, while the OpenAlex component stresses same-agenda non-identity behavior. This design is intentionally conservative: OpenAlex and OpenCitations are used to expose false-merge risk, not to replace human gold.
 
+\begin{table}[H]
+\caption{Open-v2 benchmark composition used in the current evidence snapshot. The table separates identity evidence from hard-negative stress evidence before any metric is reported.}
+\label{tab:openv2-composition}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.22\linewidth}L{0.10\linewidth}L{0.30\linewidth}L{0.28\linewidth}}
+\toprule
+Evidence stratum & Pair count & Evaluation role & Claim boundary \\
+\midrule
+DeepMatcher gold identity & 415 & Measures same-work matching ability. & Supports identity evaluation within the imported gold benchmark pairs. \\
+OpenAlex and OpenCitations silver hard negatives & 10,000 & Stresses agenda-level false-merge behavior. & Supports hard-negative safety analysis, not human non-identity gold. \\
+Open-v2 combined pair scope & 10,415 & Provides the shared pair contract for the reported evidence snapshot over 1,737 documents. & Supports the Open-v2 mechanism demonstration; broader source-heldout claims require additional artifacts. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Method}
 
 \subsection{Overview}

@@ -229,6 +229,36 @@ def check_contribution_evidence_summary(manuscript_text: str) -> list[str]:
     ]
 
 
+def check_openv2_benchmark_composition(manuscript_text: str) -> list[str]:
+    """Check whether the manuscript states Open-v2 evidence composition and boundaries.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing Open-v2 composition markers.
+    """
+    required_markers = [
+        r"\label{tab:openv2-composition}",
+        "Open-v2 benchmark composition",
+        "415",
+        "10,000",
+        "10,415",
+        "1,737 documents",
+        "DeepMatcher gold identity",
+        "OpenAlex and OpenCitations silver hard negatives",
+        "Measures same-work matching ability",
+        "Stresses agenda-level false-merge behavior",
+        "not human non-identity gold",
+        "broader source-heldout claims require additional artifacts",
+    ]
+    return [
+        f"Open-v2 benchmark composition missing marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
+
+
 def check_bibliography_depth(bibliography_text: str) -> list[str]:
     """Check whether the bibliography has enough source coverage.
 
@@ -818,6 +848,7 @@ def main() -> int:
     )
     errors.extend(check_abstract_quantitative_evidence(manuscript_text))
     errors.extend(check_contribution_evidence_summary(manuscript_text))
+    errors.extend(check_openv2_benchmark_composition(manuscript_text))
     errors.extend(check_method_feature_contract(manuscript_text))
     errors.extend(check_related_work_positioning(manuscript_text))
     errors.extend(check_error_taxonomy(manuscript_text))
