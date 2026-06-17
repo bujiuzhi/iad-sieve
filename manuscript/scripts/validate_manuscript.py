@@ -85,6 +85,13 @@ FORBIDDEN_PHRASES = [
     "Universal method superiority",
     "all scholarly domains",
 ]
+AUXILIARY_MODEL_EVIDENCE_PHRASES = [
+    "LLM",
+    "GPT",
+    "OpenAI",
+    "ChatGPT",
+    "pair-judge",
+]
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -146,6 +153,24 @@ def check_forbidden_claims(manuscript_text: str) -> list[str]:
     for phrase in FORBIDDEN_PHRASES:
         if phrase.lower() in lowered_text:
             errors.append(f"forbidden or unsafe claim phrase found: {phrase}")
+    return errors
+
+
+def check_auxiliary_model_evidence_absent(document_texts: dict[str, str]) -> list[str]:
+    """Check whether formal submission materials exclude unsupported auxiliary model evidence.
+
+    参数:
+        document_texts: Mapping from document name to formal submission text.
+
+    返回:
+        list[str]: Error messages for auxiliary model evidence phrases.
+    """
+    errors: list[str] = []
+    for document_name, document_text in document_texts.items():
+        lowered_text = document_text.lower()
+        for phrase in AUXILIARY_MODEL_EVIDENCE_PHRASES:
+            if phrase.lower() in lowered_text:
+                errors.append(f"{document_name} contains unsupported auxiliary model evidence phrase: {phrase}")
     return errors
 
 
@@ -662,6 +687,17 @@ def main() -> int:
     errors.extend(check_forbidden_claims(highlights_text))
     errors.extend(check_forbidden_claims(keywords_text))
     errors.extend(check_forbidden_claims(cover_letter_text))
+    errors.extend(
+        check_auxiliary_model_evidence_absent(
+            {
+                "main manuscript": manuscript_text,
+                "supplementary material": supplementary_text,
+                "highlights": highlights_text,
+                "keywords": keywords_text,
+                "cover letter": cover_letter_text,
+            }
+        )
+    )
     errors.extend(check_abstract_quantitative_evidence(manuscript_text))
     errors.extend(check_method_feature_contract(manuscript_text))
     errors.extend(check_related_work_positioning(manuscript_text))

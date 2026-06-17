@@ -255,6 +255,35 @@ def test_check_cover_letter_rejects_missing_submission_statements() -> None:
     assert any("no competing interests" in error for error in errors)
 
 
+def test_check_auxiliary_model_evidence_absent_accepts_submission_materials() -> None:
+    """验证正式投稿材料未包含辅助模型证据词时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    document_texts = {
+        "main manuscript": "Gold, proxy, and silver label strata are reported separately.",
+        "supplementary material": "Artifact releases include manifests and checksums.",
+    }
+
+    errors = module.check_auxiliary_model_evidence_absent(document_texts)
+
+    assert errors == []
+
+
+def test_check_auxiliary_model_evidence_absent_rejects_unsupported_model_phrases() -> None:
+    """验证正式投稿材料出现辅助模型证据词时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    document_texts = {
+        "main manuscript": "The table includes an LLM pair-judge row.",
+        "cover letter": "An OpenAI GPT baseline is included.",
+    }
+
+    errors = module.check_auxiliary_model_evidence_absent(document_texts)
+
+    assert any("main manuscript" in error and "LLM" in error for error in errors)
+    assert any("cover letter" in error and "GPT" in error for error in errors)
+
+
 def test_check_final_upload_metadata_rejects_placeholders() -> None:
     """验证 final-upload 门禁会拒绝未填写的投稿元数据。"""
 

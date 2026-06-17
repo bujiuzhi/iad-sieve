@@ -36,7 +36,7 @@ We formulate this failure mode as identity-agenda confusion. Identity refers to 
 
 We propose IAD-Risk, a risk-aware identity-agenda disentanglement framework for scholarly work deduplication. IAD-Risk learns separate relation signals for same-work identity, same-agenda relatedness, and agenda-non-identity hard negatives, then derives a false-merge risk score from these signals. A pair is eligible for automatic merging only when identity evidence is sufficiently strong and agenda-non-identity risk remains below a merge threshold. This selective decision rule turns deduplication from a high-recall similarity problem into a risk-calibrated safety problem.
 
-The paper makes three contributions. First, it defines identity-agenda confusion as a targeted failure mode in scholarly entity matching and introduces hard-negative false-merge rate as a safety metric. Second, it presents IAD-Bench, a provenance-aware benchmark contract that keeps gold, proxy, silver, LLM-silver, and human-reviewed labels separate. Third, it evaluates IAD-Risk under the same pair contract used by representation and entity-matching baselines, while keeping additional LLM and clustering interfaces as reproducible extensions rather than unsupported primary evidence. The current evidence supports targeted false-merge suppression under stratified evaluation; it does not support a broad method-ranking claim or a claim that silver labels replace human gold.
+The paper makes three contributions. First, it defines identity-agenda confusion as a targeted failure mode in scholarly entity matching and introduces hard-negative false-merge rate as a safety metric. Second, it presents IAD-Bench, a provenance-aware benchmark contract that keeps gold, proxy, silver, and human-reviewed labels separate. Third, it evaluates IAD-Risk under the same pair contract used by representation and entity-matching baselines, while keeping clustering and artifact-audit interfaces as reproducible extensions rather than unsupported primary evidence. The current evidence supports targeted false-merge suppression under stratified evaluation; it does not support a broad method-ranking claim or a claim that silver labels replace human gold.
 
 \section{Related Work}
 
@@ -102,7 +102,7 @@ $p_{\mathrm{agenda}}$ & Predicted agenda-relatedness probability. & Relatedness 
 $p_{\mathrm{ani}}$ & Predicted agenda-non-identity probability. & Direct risk evidence against automatic merging. \\
 $p_{\mathrm{risk}}$ & Derived false-merge risk score. & Gate for rejecting or deferring risky pairs. \\
 $\hat{m}_{ij}$ & Automatic merge decision. & Determines FMR and HNFMR. \\
-label strength & Gold, proxy, silver, LLM-silver, or manual validation layer. & Controls how a row can be used in training, evaluation, and claims. \\
+label strength & Gold, proxy, silver, or manual validation layer. & Controls how a row can be used in training, evaluation, and claims. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -123,7 +123,6 @@ Layer & Source & Use in this paper \\
 Gold & DeepMatcher / py\_entitymatching & Same-work identity evaluation \\
 Proxy & SciRepEval / SciDocs-style proximity & Same-agenda analysis \\
 Silver & OpenAlex / OpenCitations & Agenda-non-identity hard negatives \\
-LLM-silver & LLM pair judgments & Auxiliary analysis and baseline \\
 Manual validation & Independent human review & External validation target \\
 \bottomrule
 \end{tabular}
@@ -211,7 +210,7 @@ Topically close papers receive high semantic similarity. & Separate agenda evide
 Silver metadata is treated as if it were human gold. & Preserve label strength and provenance, and mask supervision by valid label source. & Silver labels support stress testing, not exhaustive truth claims. \\
 Pairwise errors contaminate clusters through transitivity. & Apply risk gating before constrained union-find and respect cannot-link evidence. & Cluster-level guarantees require complete cannot-link coverage. \\
 Thresholds turn a classifier into an unsafe automatic merger. & Expose work, ANI, and risk thresholds and evaluate held-out merge decisions. & Threshold transfer should be rechecked under new source distributions. \\
-Auxiliary LLM or proxy labels are over-interpreted. & Keep auxiliary rows separate unless traceable execution logs and artifact records exist. & LLM rows remain non-human evidence even when reproducible. \\
+Proxy labels are over-interpreted. & Keep proxy rows separate unless the label source supports the relation being evaluated. & Proxy rows remain non-human evidence even when reproducible. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -339,14 +338,13 @@ Row family & Decision field & Operating point source & Audit requirement \\
 Representation cosine baselines & Cosine score threshold on scientific document embeddings. & Fixed baseline metric summary; threshold chosen before final test reporting. & Score file, metric summary, and threshold entry. \\
 RoBERTa pair classifier & Pair match probability threshold. & Fixed pair-classifier metric summary under the same pair schema. & Prediction file, metric summary, and model log. \\
 IAD-Risk transformer variants & $p_{\mathrm{work}}$, $p_{\mathrm{ani}}$, and $p_{\mathrm{risk}}$ under the risk gate. & Model configuration; default $\tau_w=\tau_a=\tau_r=0.5$ unless the artifact config records an override. & Prediction file, model JSON, thresholds, and checksums. \\
-Auxiliary LLM rows & LLM same-work probability or pair judgment. & Not primary evidence unless API-backed execution logs exist. & Model name, prompt version, output file, and checksum. \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \subsection{Baselines}
 
-The completed actual-model baselines include rule-based matching, SPECTER2 adapter cosine, SciNCL cosine, RoBERTa-style pair classification, and single-space union baselines. The repository also provides an LLM pair-judge interface, but LLM rows are not treated as primary evidence unless the API-backed execution mode is present. Baselines are evaluated through the same pair contract so that same-work F1 and hard-negative false-merge rate can be compared without mixing label strengths.
+The completed actual-model baselines include rule-based matching, SPECTER2 adapter cosine, SciNCL cosine, RoBERTa-style pair classification, and single-space union baselines. Baselines are evaluated through the same pair contract so that same-work F1 and hard-negative false-merge rate can be compared without mixing label strengths.
 
 \subsection{Implementation and Reproducibility}
 

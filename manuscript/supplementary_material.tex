@@ -160,7 +160,6 @@ Identity-agenda confusion is a practical false-merge risk. & Open-v2 hard-negati
 IAD-Risk suppresses hard-negative false merges under the reported setting. & IAD-Risk prediction files, metric summaries, split identifiers, thresholds, and checksums. & Supports targeted false-merge suppression; does not establish broad method superiority. \\
 IAD-Bench is provenance-aware. & Pair schema, label strength, label source, provenance fields, and fixture rebuild commands. & Supports a benchmark contract; does not turn silver or proxy labels into human gold. \\
 Repository-level reproduction is possible without committing raw data. & L0/L1 fixture rebuild, public-release scan, unit tests, and documented public-source commands. & Verifies code and schema behavior; full numerical reproduction requires L2/L3 source files or artifacts. \\
-LLM pair-judge evidence is auxiliary unless executed with traceable logs. & API-backed execution summary, model name, prompt version, output file, and checksum. & Does not replace human annotation and should not be merged with human-gold labels. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -173,6 +172,6 @@ Mechanism claims should be tied to explicit ablation outputs. The repository pro
 
 \section{Claim Boundary}
 
-The main manuscript treats DeepMatcher-style labels as gold identity evidence. It treats SciRepEval and SciDocs-style proximity as same-agenda proxy evidence. It treats OpenAlex and OpenCitations-derived pairs as silver hard-negative evidence. OpenAlex and OpenCitations signals are not human gold labels. LLM-derived rows, when present, are auxiliary unless an API-backed execution log and artifact record are available. Broad method-ranking claims require stronger source-heldout evidence and manual validation beyond the current manuscript package.
+The main manuscript treats DeepMatcher-style labels as gold identity evidence. It treats SciRepEval and SciDocs-style proximity as same-agenda proxy evidence. It treats OpenAlex and OpenCitations-derived pairs as silver hard-negative evidence. OpenAlex and OpenCitations signals are not human gold labels. Broad method-ranking claims require stronger source-heldout evidence and manual validation beyond the current manuscript package.
 
 \end{document}
