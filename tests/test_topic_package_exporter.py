@@ -43,17 +43,19 @@ def test_export_topic_package_copies_docs_reports_models_and_manifest(tmp_path) 
     workspace = tmp_path / "workspace"
     output_dir = tmp_path / "topic_package"
     _write_text(workspace / "README.md", "# iad-sieve\n")
+    _write_text(workspace / "docs" / "README.md", "# Docs\n")
+    _write_text(workspace / "docs" / "project-structure.md", "# Project Structure\n")
+    _write_text(workspace / "docs" / "naming-convention.md", "# Naming\n")
     _write_text(workspace / "docs" / "GOAL.md", "# Goal\n")
     _write_text(workspace / "docs" / "method-design.md", "# Method\n")
     _write_text(workspace / "docs" / "experiment-plan.md", "# Experiment\n")
-    _write_text(workspace / "docs" / "restructured-topic-plan.md", "# Restructured Topic Plan\n")
     _write_text(workspace / "docs" / "paper-outline.md", "# Paper\n")
-    _write_text(workspace / "docs" / "current-work-summary.md", "# Summary\n")
     _write_text(workspace / "docs" / "iad-bench-contract.md", "# IAD-Bench Contract\n")
     _write_text(workspace / "docs" / "annotation-requirements.md", "# Annotation\n")
+    _write_text(workspace / "docs" / "data-and-artifact-release.md", "# Data and Artifact Release\n")
+    _write_text(workspace / "docs" / "public-release-checklist.md", "# Public Release Checklist\n")
+    _write_text(workspace / "docs" / "current-work-summary.md", "# Summary\n")
     _write_text(workspace / "docs" / "remote-dev-setup.md", "# Remote Dev Setup\n")
-    _write_text(workspace / "docs" / "prior-art-audit-2026-06-12.md", "# Prior Art Audit\n")
-    _write_text(workspace / "docs" / "reviewer-literature-audit-2026-06-13.md", "# Reviewer Literature Audit\n")
     _write_text(workspace / "docs" / "superpowers" / "specs" / "2026-06-12-iad-risk-redesign.md", "# IAD-Risk\n")
     _write_text(workspace / "docs" / "superpowers" / "specs" / "2026-06-12-iad-evidence-bootstrap-design.md", "# IAD Evidence Bootstrap\n")
     _write_text(workspace / "docs" / "superpowers" / "specs" / "2026-06-13-iad-risk-open-v3-redesign.md", "# IAD-Risk Open-v3\n")
@@ -431,14 +433,16 @@ def test_export_topic_package_copies_docs_reports_models_and_manifest(tmp_path) 
     manifest_rows = read_records(output_dir / "manifest.jsonl")
 
     assert manifest
+    assert (output_dir / "docs" / "README.md").exists()
+    assert (output_dir / "docs" / "project-structure.md").exists()
+    assert (output_dir / "docs" / "naming-convention.md").exists()
     assert (output_dir / "docs" / "GOAL.md").exists()
-    assert (output_dir / "docs" / "current-work-summary.md").exists()
-    assert (output_dir / "docs" / "restructured-topic-plan.md").exists()
     assert (output_dir / "docs" / "iad-bench-contract.md").exists()
     assert (output_dir / "docs" / "annotation-requirements.md").exists()
-    assert (output_dir / "docs" / "remote-dev-setup.md").exists()
-    assert (output_dir / "docs" / "prior-art-audit-2026-06-12.md").exists()
-    assert (output_dir / "docs" / "reviewer-literature-audit-2026-06-13.md").exists()
+    assert (output_dir / "docs" / "data-and-artifact-release.md").exists()
+    assert (output_dir / "docs" / "public-release-checklist.md").exists()
+    assert not (output_dir / "docs" / "current-work-summary.md").exists()
+    assert not (output_dir / "docs" / "remote-dev-setup.md").exists()
     assert not (output_dir / "docs" / "2026-06-12-iad-risk-redesign.md").exists()
     assert not (output_dir / "docs" / "2026-06-12-iad-evidence-bootstrap-design.md").exists()
     assert not (output_dir / "docs" / "2026-06-13-iad-risk-open-v3-redesign.md").exists()
@@ -739,10 +743,11 @@ def test_export_topic_package_marks_missing_optional_sources(tmp_path) -> None:
 
 
 def test_export_topic_package_excludes_historical_superpowers_docs_and_cleans_stale_docs(tmp_path) -> None:
-    """验证最终课题包不导出历史 superpowers 计划并清理旧 docs 残留。"""
+    """验证最终课题包不导出历史过程文档并清理旧 docs 残留。"""
     workspace = tmp_path / "workspace"
     output_dir = tmp_path / "topic_package"
     _write_text(workspace / "README.md", "# iad-sieve\n")
+    _write_text(workspace / "docs" / "method-design.md", "# Method\n")
     _write_text(workspace / "docs" / "current-work-summary.md", "当前主轨道只需补齐 remote_host 等连接字段。\n")
     _write_text(
         workspace / "docs" / "superpowers" / "plans" / "2026-06-13-q2b-remote-execution-closure.md",
@@ -760,7 +765,8 @@ def test_export_topic_package_excludes_historical_superpowers_docs_and_cleans_st
     assert not (output_dir / "docs" / "2026-06-13-iad-risk-no-annotation-q2b-upgrade.md").exists()
     assert not any(row["artifact_name"] == "q2b_remote_execution_closure_plan" and row["status"] == "copied" for row in manifest)
     assert not any(row["artifact_name"] == "iad_risk_no_annotation_q2b_upgrade" and row["status"] == "copied" for row in manifest)
-    assert (output_dir / "docs" / "current-work-summary.md").exists()
+    assert not (output_dir / "docs" / "current-work-summary.md").exists()
+    assert (output_dir / "docs" / "method-design.md").exists()
 
 
 def test_export_topic_package_cli_writes_package(tmp_path) -> None:

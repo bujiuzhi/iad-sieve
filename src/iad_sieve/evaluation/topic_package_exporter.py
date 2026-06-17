@@ -12,18 +12,17 @@ from iad_sieve.utils.io_utils import ensure_directory, write_records
 LOGGER = logging.getLogger(__name__)
 CORE_DOCS = [
     ("README.md", "overview"),
+    ("docs/README.md", "docs_index"),
+    ("docs/project-structure.md", "project_structure"),
+    ("docs/naming-convention.md", "naming_convention"),
     ("docs/GOAL.md", "research_goal"),
     ("docs/method-design.md", "method_design"),
     ("docs/experiment-plan.md", "experiment_plan"),
-    ("docs/restructured-topic-plan.md", "restructured_topic_plan"),
-    ("docs/paper-outline.md", "paper_outline"),
-    ("docs/iad-sieve-codex-goal.md", "implementation_goal"),
-    ("docs/current-work-summary.md", "current_work_summary"),
     ("docs/iad-bench-contract.md", "iad_bench_contract"),
     ("docs/annotation-requirements.md", "annotation_requirements"),
-    ("docs/remote-dev-setup.md", "remote_dev_setup"),
-    ("docs/prior-art-audit-2026-06-12.md", "prior_art_audit"),
-    ("docs/reviewer-literature-audit-2026-06-13.md", "reviewer_literature_audit"),
+    ("docs/paper-outline.md", "paper_outline"),
+    ("docs/data-and-artifact-release.md", "data_artifact_release"),
+    ("docs/public-release-checklist.md", "public_release_checklist"),
 ]
 REPORT_FILE_NAMES = [
     "rq_summary.jsonl",
@@ -526,7 +525,7 @@ def _write_package_readme(output_dir: Path, manifest_rows: list[dict]) -> None:
         "",
         "## 内容",
         "",
-        "- `docs/`：课题目标、方法设计、实验计划、论文大纲、IAD-Bench 契约、prior-art 审计和当前工作总结。",
+        "- `docs/`：课题目标、方法设计、实验计划、IAD-Bench 契约、标注规范、论文大纲、数据发布和公开发布边界。",
         "- `reports/`：RQ 汇总、readiness 门禁、投稿门禁审计、稿件证据矩阵、安全论文草稿骨架、期刊升级优化计划、高级模型证据矩阵、机制性错误证据、实验队列/preflight/依赖图/执行交接包、远程交接与输出验收清单、论文主张审计、研究深度审计、IAD-Bench provenance、强 baseline 执行摘要、IAD-Risk 模型证据、审稿回应矩阵、消融报告等实验写作材料。",
         "- `models/`：IAD 轻量分类器 JSON 模型和训练摘要。",
         "- `manifest.jsonl`：课题包文件索引。",
