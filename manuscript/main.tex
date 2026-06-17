@@ -99,7 +99,7 @@ IAD-Risk converts scholarly deduplication into selective risk-aware matching. Gi
 ]
 \node[box] (pair) {Candidate\\record pair};
 \node[box, right=of pair] (evidence) {Identity and\\agenda evidence};
-\node[box, right=of evidence] (heads) {Work, agenda,\\ANI, risk heads};
+\node[box, right=of evidence] (heads) {Work, agenda,\\ANI heads};
 \node[box, right=of heads] (gate) {Risk-aware\\merge gate};
 \node[box, right=of gate] (output) {Merge, block,\\or defer};
 \draw[arrow] (pair) -- (evidence);
@@ -107,7 +107,7 @@ IAD-Risk converts scholarly deduplication into selective risk-aware matching. Gi
 \draw[arrow] (heads) -- (gate);
 \draw[arrow] (gate) -- (output);
 \end{tikzpicture}
-\caption{IAD-Risk pipeline. The framework first separates identity evidence from agenda evidence, then predicts relation and risk signals before applying a conservative merge gate.}
+\caption{IAD-Risk pipeline. The framework first separates identity evidence from agenda evidence, then predicts relation signals and derives a false-merge risk score before applying a conservative merge gate.}
 \label{fig:iad-risk-pipeline}
 \end{figure}
 
@@ -115,21 +115,24 @@ IAD-Risk converts scholarly deduplication into selective risk-aware matching. Gi
 
 IAD-Risk separates the representation space into identity-oriented and agenda-oriented evidence. Identity evidence includes strong identifiers, near-duplicate titles, author overlap, year and venue agreement, and work-level metadata. Agenda evidence includes shared research topics, similar abstracts, citation neighborhoods, shared references, and scientific representation similarity. The separation is necessary because the same feature can have different meanings: high embedding similarity may indicate same work, but it may also indicate two different papers in the same research area.
 
-\subsection{Multi-Task Risk Heads}
+\subsection{Multi-Task Relation Heads}
 
-The model predicts four pair-level quantities: $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, $p_{\mathrm{ani}}$, and $p_{\mathrm{risk}}$. The same-work head estimates identity. The same-agenda head estimates topical relatedness. The agenda-non-identity head detects pairs that are related but should not be merged. The false-merge risk head converts these signals into a safety constraint. A full IAD-Risk model therefore has a direct mechanism for representing the case that ordinary semantic similarity hides.
+The model predicts three pair-level relation quantities: $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, and $p_{\mathrm{ani}}$. The same-work head estimates identity. The same-agenda head estimates topical relatedness. The agenda-non-identity head detects pairs that are related but should not be merged. The false-merge risk score is then derived from these heads:
+\[
+p_{\mathrm{risk}}=\max\{p_{\mathrm{ani}},\ p_{\mathrm{agenda}}(1-p_{\mathrm{work}})\}.
+\]
+This construction makes the safety signal high when a pair is explicitly predicted as agenda-non-identity, or when it is agenda-related but lacks strong identity evidence.
 
 \subsection{Training Objective}
 
-The learning objective combines identity, agenda, agenda-non-identity, and risk supervision without treating every source as the same label type. For a pair $(i,j)$, the model minimizes
+The learning objective combines identity, agenda, and agenda-non-identity supervision without treating every source as the same label type; the false-merge risk score is derived after the relation heads are estimated. For a pair $(i,j)$, the model minimizes
 \[
 \mathcal{L}_{ij} =
 \lambda_w \mathrm{CE}(y^I_{ij}, p_{\mathrm{work}})
 + \lambda_a \mathrm{CE}(y^A_{ij}, p_{\mathrm{agenda}})
-+ \lambda_n \mathrm{CE}(y^{ANI}_{ij}, p_{\mathrm{ani}})
-+ \lambda_r \mathrm{CE}(y^R_{ij}, p_{\mathrm{risk}}),
++ \lambda_n \mathrm{CE}(y^{ANI}_{ij}, p_{\mathrm{ani}}),
 \]
-where $\mathrm{CE}$ is binary cross-entropy and $\lambda_w,\lambda_a,\lambda_n,\lambda_r$ control the contribution of each supervision channel. The key design choice is provenance-aware masking: a pair contributes only to the heads for which its label source is valid. For example, DeepMatcher pairs supervise same-work identity, whereas OpenAlex/OpenCitations silver hard negatives supervise agenda-non-identity risk without being promoted to human gold identity labels.
+where $\mathrm{CE}$ is binary cross-entropy and $\lambda_w,\lambda_a,\lambda_n$ control the contribution of each supervision channel. The key design choice is provenance-aware masking: a pair contributes only to the heads for which its label source is valid. For example, DeepMatcher pairs supervise same-work identity, whereas OpenAlex/OpenCitations silver hard negatives supervise agenda-non-identity risk without being promoted to human gold identity labels.
 
 \subsection{Risk-Aware Merge Decision}
 
@@ -204,7 +207,7 @@ IAD-Risk transformer (SPECTER2) & 1042 test & 0.980 & 0.001 & 0.000 \\
 \end{tabular}
 \end{table}
 
-The Open-v2 evidence shows why identity-agenda disentanglement is necessary. Single-space scientific representation baselines preserve topical relatedness, but their merge threshold can produce high false-merge rates on OpenAlex silver hard negatives. IAD-Risk transformer variants keep high same-work F1 on the held-out Open-v2 test split while suppressing hard-negative false merges. RoBERTa pair classification is a strong baseline and narrows the gap substantially; therefore the paper does not make broad superiority claims. Instead, the main result is that explicit risk heads provide a transparent and controllable mechanism for false-merge suppression.
+The Open-v2 evidence shows why identity-agenda disentanglement is necessary. Single-space scientific representation baselines preserve topical relatedness, but their merge threshold can produce high false-merge rates on OpenAlex silver hard negatives. IAD-Risk transformer variants keep high same-work F1 on the held-out Open-v2 test split while suppressing hard-negative false merges. RoBERTa pair classification is a strong baseline and narrows the gap substantially; therefore the paper does not make broad superiority claims. Instead, the main result is that relation heads plus an explicit risk score provide a transparent and controllable mechanism for false-merge suppression.
 
 \subsection{Extended Evidence and Boundaries}
 
