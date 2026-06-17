@@ -35,7 +35,7 @@ REQUIRED_SECTIONS = [
     r"\section{IAD-Bench}",
     r"\section{Method}",
     r"\section{Experiments}",
-    r"\section{Ablation and Reviewer-Facing Analysis}",
+    r"\section{Ablation and Error Analysis}",
     r"\section{Limitations}",
     r"\section{Conclusion}",
 ]

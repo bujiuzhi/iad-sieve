@@ -2,7 +2,7 @@
 
 ## Problem Decomposition
 
-The manuscript must satisfy four reviewer-facing conditions before submission: the contribution must be clear, the evidence must support the claims, the evaluation must separate label strengths, and the PDF package must be buildable from source.
+The manuscript must satisfy four quality-gate conditions before submission: the contribution must be clear, the evidence must support the claims, the evaluation must separate label strengths, and the PDF package must be buildable from source.
 
 ## Key Conclusion
 
