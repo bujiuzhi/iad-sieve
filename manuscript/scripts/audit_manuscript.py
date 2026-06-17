@@ -34,6 +34,8 @@ REQUIRED_SECTIONS = [
     r"\section{Problem Formulation}",
     r"\section{IAD-Bench}",
     r"\section{Method}",
+    r"\subsection{Training Objective}",
+    r"\subsection{Implementation and Reproducibility}",
     r"\section{Experiments}",
     r"\section{Ablation and Error Analysis}",
     r"\section{Limitations}",

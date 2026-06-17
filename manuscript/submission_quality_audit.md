@@ -14,6 +14,7 @@ The package is suitable for Q2/B-class submission preparation under a conservati
 | --- | --- | --- |
 | Scholarly entity matching can confuse agenda similarity with work identity. | `manuscript/main.tex`, Introduction and Problem Formulation | Supported as the core problem statement |
 | IAD-Risk separates identity, agenda, agenda-non-identity, and false-merge risk signals. | `manuscript/main.tex`, Method | Supported as the method contribution |
+| IAD-Risk uses provenance-aware multi-task supervision. | `manuscript/main.tex`, Training Objective | Supported as the training design |
 | IAD-Bench separates gold, proxy, silver, LLM-silver, and human-audit evidence. | `manuscript/main.tex`, IAD-Bench; `docs/iad-bench-contract.md` | Supported by the benchmark contract |
 | Open-v2 evidence supports targeted hard-negative false-merge suppression. | `manuscript/main.tex`, Experiments table and discussion | Supported within the Open-v2 boundary |
 | The method is broadly superior across scholarly domains. | Not supported by current evidence | Excluded from the manuscript |

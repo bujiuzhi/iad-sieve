@@ -7,8 +7,10 @@
 \usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{xcolor}
-\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage[hidelinks]{hyperref}
 \usepackage[numbers,sort&compress]{natbib}
+\usetikzlibrary{arrows.meta,positioning}
 
 \title{IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication}
 \author{Anonymous Authors}
@@ -82,7 +84,29 @@ The Open-v2 benchmark variant used in the core evidence combines 415 DeepMatcher
 
 \subsection{Overview}
 
-IAD-Risk converts scholarly deduplication into selective risk-aware matching. Given a candidate pair, the model estimates identity, agenda, agenda-non-identity, and false-merge risk signals. The final merge decision is made only when identity evidence exceeds a same-work threshold and risk evidence remains below blocking thresholds.
+IAD-Risk converts scholarly deduplication into selective risk-aware matching. Given a candidate pair, the model estimates identity, agenda, agenda-non-identity, and false-merge risk signals. The final merge decision is made only when identity evidence exceeds a same-work threshold and risk evidence remains below blocking thresholds. Figure~\ref{fig:iad-risk-pipeline} summarizes the workflow.
+
+\begin{figure}[H]
+\centering
+\small
+\begin{tikzpicture}[
+  node distance=0.45cm,
+  box/.style={draw, rounded corners, align=center, minimum height=0.8cm, text width=2.35cm},
+  arrow/.style={-Latex, thick}
+]
+\node[box] (pair) {Candidate\\record pair};
+\node[box, right=of pair] (evidence) {Identity and\\agenda evidence};
+\node[box, right=of evidence] (heads) {Work, agenda,\\ANI, risk heads};
+\node[box, right=of heads] (gate) {Risk-aware\\merge gate};
+\node[box, right=of gate] (output) {Merge, block,\\or defer};
+\draw[arrow] (pair) -- (evidence);
+\draw[arrow] (evidence) -- (heads);
+\draw[arrow] (heads) -- (gate);
+\draw[arrow] (gate) -- (output);
+\end{tikzpicture}
+\caption{IAD-Risk pipeline. The framework first separates identity evidence from agenda evidence, then predicts relation and risk signals before applying a conservative merge gate.}
+\label{fig:iad-risk-pipeline}
+\end{figure}
 
 \subsection{Identity and Agenda Signals}
 
@@ -91,6 +115,18 @@ IAD-Risk separates the representation space into identity-oriented and agenda-or
 \subsection{Multi-Task Risk Heads}
 
 The model predicts four pair-level quantities: $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, $p_{\mathrm{ani}}$, and $p_{\mathrm{risk}}$. The same-work head estimates identity. The same-agenda head estimates topical relatedness. The agenda-non-identity head detects pairs that are related but should not be merged. The false-merge risk head converts these signals into a safety constraint. A full IAD-Risk model therefore has a direct mechanism for representing the case that ordinary semantic similarity hides.
+
+\subsection{Training Objective}
+
+The learning objective combines identity, agenda, agenda-non-identity, and risk supervision without treating every source as the same label type. For a pair $(i,j)$, the model minimizes
+\[
+\mathcal{L}_{ij} =
+\lambda_w \mathrm{CE}(y^I_{ij}, p_{\mathrm{work}})
++ \lambda_a \mathrm{CE}(y^A_{ij}, p_{\mathrm{agenda}})
++ \lambda_n \mathrm{CE}(y^{ANI}_{ij}, p_{\mathrm{ani}})
++ \lambda_r \mathrm{CE}(y^R_{ij}, p_{\mathrm{risk}}),
+\]
+where $\mathrm{CE}$ is binary cross-entropy and $\lambda_w,\lambda_a,\lambda_n,\lambda_r$ control the contribution of each supervision channel. The key design choice is provenance-aware masking: a pair contributes only to the heads for which its label source is valid. For example, DeepMatcher pairs supervise same-work identity, whereas OpenAlex/OpenCitations silver hard negatives supervise agenda-non-identity risk without being promoted to human gold identity labels.
 
 \subsection{Risk-Aware Merge Decision}
 
@@ -129,6 +165,10 @@ RQ4 & Gold/proxy/silver strata & Split metrics & Provenance-aware robustness \\
 \subsection{Baselines}
 
 We compare with rule-based matching, SPECTER2 adapter cosine, SciNCL cosine, RoBERTa-style pair classification, LLM pair judge outputs, and single-space union baselines. Baselines are evaluated through the same pair contract so that same-work F1 and hard-negative false-merge rate can be compared without mixing label strengths.
+
+\subsection{Implementation and Reproducibility}
+
+All reported systems are evaluated through the same pair-level schema, split field, and metric implementation. Threshold-sensitive baselines select merge thresholds on validation evidence and are then evaluated on the held-out split. The repository separates executable code from large data artifacts: raw third-party data remain outside Git, while processing scripts, fixture tests, schema contracts, and artifact-release rules remain version controlled. This organization is intended to make the main evidence reproducible without redistributing restricted or large source files.
 
 \subsection{Main Open-v2 Results}
 
