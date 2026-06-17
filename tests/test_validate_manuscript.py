@@ -262,6 +262,44 @@ def test_check_baseline_scope_alignment_rejects_unreported_primary_baselines() -
     assert any("single-space union baselines" in error for error in errors)
 
 
+def test_check_extended_protocol_boundary_accepts_follow_up_protocol_scope() -> None:
+    """验证 Open-v3/source-heldout 作为后续协议边界时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Extended Protocols and Boundaries}",
+            "Open-v3 and source-heldout protocols are retained as follow-up evaluation paths.",
+            "They are not as additional result evidence in the current manuscript package.",
+            "The manuscript treats Open-v2 as the core mechanism demonstration.",
+            "It reserves Open-v3/source-heldout conclusions for a released artifact package.",
+            "That package needs matched prediction scopes, threshold logs, checksums, and manual-validation evidence.",
+        ]
+    )
+
+    errors = module.check_extended_protocol_boundary(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_extended_protocol_boundary_rejects_unreported_extended_results() -> None:
+    """验证未报告结果不得写成当前扩展验证证据。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Extended Evidence and Boundaries}",
+            "Open-v3 and source-heldout experiments provide additional stress tests.",
+            "The manuscript therefore treats Open-v3 as extended validation.",
+        ]
+    )
+
+    errors = module.check_extended_protocol_boundary(manuscript_text)
+
+    assert any("additional stress tests" in error for error in errors)
+    assert any("extended validation" in error for error in errors)
+
+
 def test_check_cover_letter_accepts_required_submission_statements() -> None:
     """验证 cover letter 含正式投稿声明时可通过检查。"""
 

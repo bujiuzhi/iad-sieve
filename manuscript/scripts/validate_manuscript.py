@@ -381,6 +381,36 @@ def check_scope_compatibility(manuscript_text: str) -> list[str]:
     return [f"Open-v2 scope compatibility missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
 
 
+def check_extended_protocol_boundary(manuscript_text: str) -> list[str]:
+    """Check whether extended protocols are not overstated as current evidence.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for overstated extended protocol evidence.
+    """
+    required_markers = [
+        r"\subsection{Extended Protocols and Boundaries}",
+        "follow-up evaluation paths",
+        "not as additional result evidence in the current manuscript package",
+        "Open-v2 as the core mechanism demonstration",
+        "reserves Open-v3/source-heldout conclusions for a released artifact package",
+        "matched prediction scopes, threshold logs, checksums, and manual-validation evidence",
+    ]
+    errors = [f"extended protocol boundary missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+    unsupported_phrases = [
+        "Open-v3 and source-heldout experiments provide additional stress tests",
+        "Open-v3 as extended validation",
+    ]
+    errors.extend(
+        f"extended protocol boundary overstates unreported evidence: {phrase}"
+        for phrase in unsupported_phrases
+        if phrase in manuscript_text
+    )
+    return errors
+
+
 def check_related_work_positioning(manuscript_text: str) -> list[str]:
     """Check whether related work includes closest-work positioning.
 
@@ -740,6 +770,7 @@ def main() -> int:
     errors.extend(check_baseline_scope_alignment(manuscript_text))
     errors.extend(check_split_leakage_controls(manuscript_text))
     errors.extend(check_scope_compatibility(manuscript_text))
+    errors.extend(check_extended_protocol_boundary(manuscript_text))
     errors.extend(check_result_claim_boundary(manuscript_text, supplementary_text))
     errors.extend(check_highlights(highlights_text))
     errors.extend(check_keywords(keywords_text))
