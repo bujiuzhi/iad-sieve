@@ -10,6 +10,7 @@
 | `cover_letter.md` | 投稿信 |
 | `highlights.md` | 亮点说明 |
 | `keywords.md` | 关键词 |
+| `submission_metadata.yml` | 投稿系统元数据字段 |
 | `scripts/validate_manuscript.py` | 稿件材料校验 |
 | `scripts/verify_fixture_rebuild.py` | 无网络 fixture 重建校验 |
 | `scripts/build_submission_package.py` | 投稿包构建脚本 |

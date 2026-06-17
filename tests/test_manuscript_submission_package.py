@@ -18,6 +18,7 @@ REQUIRED_TEXT_FILES = [
     "cover_letter.md",
     "highlights.md",
     "keywords.md",
+    "submission_metadata.yml",
 ]
 
 
@@ -104,7 +105,7 @@ def test_build_submission_package_writes_manifest_checksums_and_zip(tmp_path) ->
     with zipfile.ZipFile(zip_path) as archive:
         zip_names = archive.namelist()
 
-    assert summary["file_count"] == 10
+    assert summary["file_count"] == 11
     assert manifest["package_type"] == "journal_submission"
     assert manifest["submission_stage"] == "template_independent_anonymous_pre_submission"
     assert manifest["anonymization"]["author_status"] == "anonymous_placeholder"
@@ -112,11 +113,13 @@ def test_build_submission_package_writes_manifest_checksums_and_zip(tmp_path) ->
     assert "target journal document class" in manifest["journal_template"]["final_upload_requirements"]
     assert manifest["reproducibility_level"]["raw_data_distribution"] == "excluded"
     assert manifest["claim_boundary"]["no_broad_method_ranking"] is True
-    assert len(manifest["files"]) == 8
+    assert len(manifest["files"]) == 9
     assert any(row["role"] == "main_pdf" for row in manifest["files"])
+    assert any(row["role"] == "submission_metadata" for row in manifest["files"])
     assert any("submission_manifest.json" in line for line in checksum_lines)
     assert all("data/" not in name for name in zip_names)
     assert "submission_package/main.tex" in zip_names
+    assert "submission_package/submission_metadata.yml" in zip_names
     assert "submission_package/checksums.sha256" in zip_names
 
 

@@ -14,6 +14,7 @@ manuscript/
   cover_letter.md
   highlights.md
   keywords.md
+  submission_metadata.yml
   MANIFEST.md
   scripts/
     validate_manuscript.py

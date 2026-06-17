@@ -25,6 +25,7 @@ REQUIRED_FILES = [
     ROOT / "cover_letter.md",
     ROOT / "highlights.md",
     ROOT / "keywords.md",
+    ROOT / "submission_metadata.yml",
     ROOT / "scripts" / "validate_manuscript.py",
     ROOT / "scripts" / "verify_fixture_rebuild.py",
     ROOT / "scripts" / "build_submission_package.py",
@@ -484,6 +485,31 @@ def check_submission_material_quantitative_summary(highlights_text: str, cover_l
     return errors
 
 
+def check_submission_metadata(metadata_text: str) -> list[str]:
+    """Check structured submission metadata required before journal upload.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages for missing metadata markers.
+    """
+    required_markers = [
+        "article_type: \"research_article\"",
+        "review_mode: \"anonymous_review\"",
+        "target_journal_template_bound: false",
+        "author_metadata_required_before_final_upload: true",
+        "corresponding_author:",
+        "competing_interests:",
+        "data_code_availability:",
+        "raw_third_party_data_included: false",
+        "full_numeric_audit_requires_external_artifact: true",
+        "broad_method_ranking_claimed: false",
+        "silver_labels_claimed_as_human_gold: false",
+    ]
+    return [f"submission metadata missing marker: {marker}" for marker in required_markers if marker not in metadata_text]
+
+
 def extract_first_page_text(pdf_path: Path) -> tuple[str, list[str]]:
     """Extract text from the first page of a PDF.
 
@@ -607,6 +633,8 @@ def main() -> int:
     keywords_text = keywords_path.read_text(encoding="utf-8") if keywords_path.exists() else ""
     cover_letter_path = ROOT / "cover_letter.md"
     cover_letter_text = cover_letter_path.read_text(encoding="utf-8") if cover_letter_path.exists() else ""
+    submission_metadata_path = ROOT / "submission_metadata.yml"
+    submission_metadata_text = submission_metadata_path.read_text(encoding="utf-8") if submission_metadata_path.exists() else ""
     errors.extend(check_sections(supplementary_text, REQUIRED_SUPPLEMENT_SECTIONS, "supplementary material"))
     errors.extend(check_forbidden_claims(manuscript_text))
     errors.extend(check_forbidden_claims(supplementary_text))
@@ -626,6 +654,7 @@ def main() -> int:
     errors.extend(check_keywords(keywords_text))
     errors.extend(check_cover_letter(cover_letter_text))
     errors.extend(check_submission_material_quantitative_summary(highlights_text, cover_letter_text))
+    errors.extend(check_submission_metadata(submission_metadata_text))
     errors.extend(check_bibliography_depth(bibliography_text))
     latex_pdf_path = ROOT / "build" / "iad-risk-manuscript-latex.pdf"
     supplementary_pdf_path = ROOT / "build" / "iad-risk-supplementary-material.pdf"

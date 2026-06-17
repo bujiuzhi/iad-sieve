@@ -27,6 +27,7 @@ EXPECTED_FILES = {
     "cover_letter.md",
     "highlights.md",
     "keywords.md",
+    "submission_metadata.yml",
     "iad-risk-manuscript-latex.pdf",
     "iad-risk-supplementary-material.pdf",
     "submission_manifest.json",
@@ -39,6 +40,7 @@ EXPECTED_MANIFEST_ROLES = {
     "cover_letter",
     "submission_highlights",
     "submission_keywords",
+    "submission_metadata",
     "main_pdf",
     "supplementary_pdf",
 }

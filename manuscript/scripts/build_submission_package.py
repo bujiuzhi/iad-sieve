@@ -28,6 +28,7 @@ SUBMISSION_FILES = [
     ("cover_letter.md", "cover_letter"),
     ("highlights.md", "submission_highlights"),
     ("keywords.md", "submission_keywords"),
+    ("submission_metadata.yml", "submission_metadata"),
     ("build/iad-risk-manuscript-latex.pdf", "main_pdf"),
     ("build/iad-risk-supplementary-material.pdf", "supplementary_pdf"),
 ]
