@@ -44,30 +44,23 @@ def test_export_topic_package_copies_docs_reports_models_and_manifest(tmp_path) 
     output_dir = tmp_path / "topic_package"
     _write_text(workspace / "README.md", "# iad-sieve\n")
     _write_text(workspace / "docs" / "README.md", "# Docs\n")
-    _write_text(workspace / "docs" / "project-structure.md", "# Project Structure\n")
-    _write_text(workspace / "docs" / "naming-convention.md", "# Naming\n")
-    _write_text(workspace / "docs" / "GOAL.md", "# Goal\n")
     _write_text(workspace / "docs" / "method-design.md", "# Method\n")
-    _write_text(workspace / "docs" / "experiment-plan.md", "# Experiment\n")
-    _write_text(workspace / "docs" / "paper-outline.md", "# Paper\n")
     _write_text(workspace / "docs" / "iad-bench-contract.md", "# IAD-Bench Contract\n")
     _write_text(workspace / "docs" / "data-processing-pipeline.md", "# Data Processing Pipeline\n")
     _write_text(workspace / "docs" / "annotation-requirements.md", "# Annotation\n")
     _write_text(workspace / "docs" / "data-and-artifact-release.md", "# Data and Artifact Release\n")
-    _write_text(workspace / "docs" / "public-release-checklist.md", "# Public Release Checklist\n")
-    _write_text(workspace / "docs" / "current-work-summary.md", "# Summary\n")
-    _write_text(workspace / "docs" / "remote-dev-setup.md", "# Remote Dev Setup\n")
-    _write_text(workspace / "docs" / "superpowers" / "specs" / "2026-06-12-iad-risk-redesign.md", "# IAD-Risk\n")
-    _write_text(workspace / "docs" / "superpowers" / "specs" / "2026-06-12-iad-evidence-bootstrap-design.md", "# IAD Evidence Bootstrap\n")
-    _write_text(workspace / "docs" / "superpowers" / "specs" / "2026-06-13-iad-risk-open-v3-redesign.md", "# IAD-Risk Open-v3\n")
-    _write_text(workspace / "docs" / "superpowers" / "specs" / "2026-06-13-iad-risk-no-annotation-q2b-upgrade.md", "# IAD-Risk No Annotation Q2/B Upgrade\n")
-    _write_text(workspace / "docs" / "superpowers" / "plans" / "2026-06-13-iad-risk-open-v3-implementation.md", "# IAD-Risk Open-v3 Implementation Plan\n")
-    _write_text(workspace / "docs" / "superpowers" / "plans" / "2026-06-13-iad-source-candidate-registry.md", "# IAD Source Candidate Registry Implementation Plan\n")
-    _write_text(workspace / "docs" / "superpowers" / "plans" / "2026-06-13-iad-risk-no-annotation-q2b-upgrade-implementation.md", "# IAD-Risk No Annotation Q2/B Upgrade Implementation Plan\n")
-    _write_text(workspace / "docs" / "superpowers" / "plans" / "2026-06-13-q2b-remote-execution-closure.md", "# Q2B Remote Execution Closure Implementation Plan\n")
-    _write_text(workspace / "docs" / "superpowers" / "plans" / "2026-06-13-q2b-experiment-optimizer.md", "# Q2/B Experiment Optimizer Implementation Plan\n")
+    _write_text(workspace / "docs" / "local-notes.md", "# Local Notes\n")
+    _write_text(workspace / "docs" / "local-remote-setup.md", "# Local Remote Setup\n")
+    _write_text(workspace / "docs" / "internal" / "specs" / "2026-06-12-iad-risk-redesign.md", "# IAD-Risk\n")
+    _write_text(workspace / "docs" / "internal" / "specs" / "2026-06-12-iad-evidence-bootstrap-design.md", "# IAD Evidence Bootstrap\n")
+    _write_text(workspace / "docs" / "internal" / "specs" / "2026-06-13-iad-risk-open-v3-redesign.md", "# IAD-Risk Open-v3\n")
+    _write_text(workspace / "docs" / "internal" / "specs" / "2026-06-13-iad-risk-source-upgrade.md", "# IAD-Risk Source Upgrade\n")
+    _write_text(workspace / "docs" / "internal" / "plans" / "2026-06-13-iad-risk-open-v3-implementation.md", "# IAD-Risk Open-v3 Implementation\n")
+    _write_text(workspace / "docs" / "internal" / "plans" / "2026-06-13-iad-source-candidate-registry.md", "# IAD Source Candidate Registry\n")
+    _write_text(workspace / "docs" / "internal" / "plans" / "2026-06-13-iad-risk-source-upgrade-implementation.md", "# IAD-Risk Source Upgrade Implementation\n")
+    _write_text(workspace / "docs" / "internal" / "plans" / "2026-06-13-remote-execution-closure.md", "# Remote Execution Closure\n")
+    _write_text(workspace / "docs" / "internal" / "plans" / "2026-06-13-experiment-optimizer.md", "# Experiment Optimizer\n")
     _write_text(workspace / "outputs" / "iad_paper_report_fixture" / "paper_report.md", "# IAD-Sieve Paper Report\n")
-    _write_text(workspace / "outputs" / "reviewer_audit_fixture" / "reviewer_audit.md", "# Reviewer Audit Matrix\n")
     _write_jsonl(workspace / "outputs" / "experiment_preflight_fixture" / "experiment_preflight.jsonl", [{"status": "blocked_remote_required"}])
     _write_text(workspace / "outputs" / "experiment_preflight_fixture" / "experiment_preflight.csv", "task_id,status\n")
     _write_text(workspace / "outputs" / "experiment_preflight_fixture" / "experiment_preflight.md", "# Experiment Preflight\n")
@@ -163,21 +156,6 @@ def test_export_topic_package_copies_docs_reports_models_and_manifest(tmp_path) 
     _write_text(workspace / "outputs" / "manuscript_evidence_matrix_fixture" / "manuscript_evidence_matrix.csv", "claim_id,writing_action\n")
     _write_text(workspace / "outputs" / "manuscript_evidence_matrix_fixture" / "manuscript_evidence_matrix.md", "# Manuscript Evidence Matrix\n")
     _write_jsonl(workspace / "outputs" / "manuscript_evidence_matrix_fixture" / "manuscript_evidence_summary.jsonl", [{"do_not_write_count": 1}])
-    _write_jsonl(workspace / "outputs" / "reviewer_response_matrix_fixture" / "reviewer_response_matrix.jsonl", [{"concern_id": "innovation_depth"}])
-    _write_text(workspace / "outputs" / "reviewer_response_matrix_fixture" / "reviewer_response_matrix.csv", "concern_id,response_status\n")
-    _write_text(workspace / "outputs" / "reviewer_response_matrix_fixture" / "reviewer_response_matrix.md", "# Reviewer Response Matrix\n")
-    _write_jsonl(workspace / "outputs" / "reviewer_response_matrix_fixture" / "reviewer_response_summary.jsonl", [{"ready_to_answer_count": 1}])
-    _write_jsonl(workspace / "outputs" / "reviewer_iteration_audit_fixture" / "reviewer_iteration_audit.jsonl", [{"iteration_id": "r0_remote_reproducibility"}])
-    _write_text(workspace / "outputs" / "reviewer_iteration_audit_fixture" / "reviewer_iteration_audit.csv", "iteration_id,status\n")
-    _write_text(workspace / "outputs" / "reviewer_iteration_audit_fixture" / "reviewer_iteration_audit.md", "# Reviewer Iteration Audit\n")
-    _write_jsonl(workspace / "outputs" / "reviewer_iteration_audit_fixture" / "reviewer_iteration_audit_summary.jsonl", [{"q2_b_ready_from_reviewer_view": False}])
-    _write_jsonl(workspace / "outputs" / "reviewer_threat_model_fixture" / "reviewer_threat_model.jsonl", [{"threat_id": "threat_remote_reproducibility_acceptance"}])
-    _write_text(workspace / "outputs" / "reviewer_threat_model_fixture" / "reviewer_threat_model.csv", "threat_id,severity\n")
-    _write_text(workspace / "outputs" / "reviewer_threat_model_fixture" / "reviewer_threat_model.md", "# Reviewer Threat Model\n")
-    _write_jsonl(workspace / "outputs" / "reviewer_threat_model_fixture" / "reviewer_threat_model_summary.jsonl", [{"q2b_reviewer_threats_closed": False}])
-    _write_jsonl(workspace / "outputs" / "manuscript_draft_skeleton_fixture" / "manuscript_draft_skeleton.jsonl", [{"section_id": "abstract"}])
-    _write_text(workspace / "outputs" / "manuscript_draft_skeleton_fixture" / "manuscript_draft_skeleton.md", "# Manuscript Draft Skeleton\n")
-    _write_jsonl(workspace / "outputs" / "manuscript_draft_skeleton_fixture" / "manuscript_draft_skeleton_summary.jsonl", [{"restricted_section_count": 2}])
     _write_jsonl(workspace / "outputs" / "journal_upgrade_plan_fixture" / "journal_upgrade_plan.jsonl", [{"requirement_id": "remote_gpu_connection"}])
     _write_text(workspace / "outputs" / "journal_upgrade_plan_fixture" / "journal_upgrade_plan.csv", "requirement_id,status\n")
     _write_text(workspace / "outputs" / "journal_upgrade_plan_fixture" / "journal_upgrade_plan.md", "# Journal Upgrade Plan\n")
@@ -362,7 +340,6 @@ def test_export_topic_package_copies_docs_reports_models_and_manifest(tmp_path) 
         output_dir=output_dir,
         report_dirs=[
             workspace / "outputs" / "iad_paper_report_fixture",
-            workspace / "outputs" / "reviewer_audit_fixture",
             workspace / "outputs" / "experiment_preflight_fixture",
             workspace / "outputs" / "experiment_dependency_fixture",
                 workspace / "outputs" / "experiment_execution_pack_fixture",
@@ -384,10 +361,6 @@ def test_export_topic_package_copies_docs_reports_models_and_manifest(tmp_path) 
             workspace / "outputs" / "research_depth_audit_fixture",
             workspace / "outputs" / "submission_gate_audit_fixture",
             workspace / "outputs" / "manuscript_evidence_matrix_fixture",
-            workspace / "outputs" / "reviewer_response_matrix_fixture",
-            workspace / "outputs" / "reviewer_iteration_audit_fixture",
-            workspace / "outputs" / "reviewer_threat_model_fixture",
-            workspace / "outputs" / "manuscript_draft_skeleton_fixture",
             workspace / "outputs" / "journal_upgrade_plan_fixture",
             workspace / "outputs" / "advanced_model_evidence_fixture",
             workspace / "outputs" / "model_innovation_blueprint_fixture",
@@ -435,25 +408,22 @@ def test_export_topic_package_copies_docs_reports_models_and_manifest(tmp_path) 
 
     assert manifest
     assert (output_dir / "docs" / "README.md").exists()
-    assert (output_dir / "docs" / "project-structure.md").exists()
-    assert (output_dir / "docs" / "naming-convention.md").exists()
-    assert (output_dir / "docs" / "GOAL.md").exists()
+    assert (output_dir / "docs" / "method-design.md").exists()
     assert (output_dir / "docs" / "iad-bench-contract.md").exists()
     assert (output_dir / "docs" / "data-processing-pipeline.md").exists()
     assert (output_dir / "docs" / "annotation-requirements.md").exists()
     assert (output_dir / "docs" / "data-and-artifact-release.md").exists()
-    assert (output_dir / "docs" / "public-release-checklist.md").exists()
-    assert not (output_dir / "docs" / "current-work-summary.md").exists()
-    assert not (output_dir / "docs" / "remote-dev-setup.md").exists()
+    assert not (output_dir / "docs" / "local-notes.md").exists()
+    assert not (output_dir / "docs" / "local-remote-setup.md").exists()
     assert not (output_dir / "docs" / "2026-06-12-iad-risk-redesign.md").exists()
     assert not (output_dir / "docs" / "2026-06-12-iad-evidence-bootstrap-design.md").exists()
     assert not (output_dir / "docs" / "2026-06-13-iad-risk-open-v3-redesign.md").exists()
-    assert not (output_dir / "docs" / "2026-06-13-iad-risk-no-annotation-q2b-upgrade.md").exists()
+    assert not (output_dir / "docs" / "2026-06-13-iad-risk-source-upgrade.md").exists()
     assert not (output_dir / "docs" / "2026-06-13-iad-risk-open-v3-implementation.md").exists()
-    assert not (output_dir / "docs" / "2026-06-13-iad-risk-no-annotation-q2b-upgrade-implementation.md").exists()
+    assert not (output_dir / "docs" / "2026-06-13-iad-risk-source-upgrade-implementation.md").exists()
     assert not (output_dir / "docs" / "2026-06-13-iad-source-candidate-registry.md").exists()
-    assert not (output_dir / "docs" / "2026-06-13-q2b-remote-execution-closure.md").exists()
-    assert not (output_dir / "docs" / "2026-06-13-q2b-experiment-optimizer.md").exists()
+    assert not (output_dir / "docs" / "2026-06-13-remote-execution-closure.md").exists()
+    assert not (output_dir / "docs" / "2026-06-13-experiment-optimizer.md").exists()
     assert (output_dir / "reports" / "iad_paper_report_fixture" / "paper_report.md").exists()
     assert (output_dir / "reports" / "experiment_preflight_fixture" / "experiment_preflight.jsonl").exists()
     assert (output_dir / "reports" / "experiment_preflight_fixture" / "experiment_preflight.csv").exists()
@@ -547,21 +517,6 @@ def test_export_topic_package_copies_docs_reports_models_and_manifest(tmp_path) 
     assert (output_dir / "reports" / "manuscript_evidence_matrix_fixture" / "manuscript_evidence_matrix.csv").exists()
     assert (output_dir / "reports" / "manuscript_evidence_matrix_fixture" / "manuscript_evidence_matrix.md").exists()
     assert (output_dir / "reports" / "manuscript_evidence_matrix_fixture" / "manuscript_evidence_summary.jsonl").exists()
-    assert (output_dir / "reports" / "reviewer_response_matrix_fixture" / "reviewer_response_matrix.jsonl").exists()
-    assert (output_dir / "reports" / "reviewer_response_matrix_fixture" / "reviewer_response_matrix.csv").exists()
-    assert (output_dir / "reports" / "reviewer_response_matrix_fixture" / "reviewer_response_matrix.md").exists()
-    assert (output_dir / "reports" / "reviewer_response_matrix_fixture" / "reviewer_response_summary.jsonl").exists()
-    assert (output_dir / "reports" / "reviewer_iteration_audit_fixture" / "reviewer_iteration_audit.jsonl").exists()
-    assert (output_dir / "reports" / "reviewer_iteration_audit_fixture" / "reviewer_iteration_audit.csv").exists()
-    assert (output_dir / "reports" / "reviewer_iteration_audit_fixture" / "reviewer_iteration_audit.md").exists()
-    assert (output_dir / "reports" / "reviewer_iteration_audit_fixture" / "reviewer_iteration_audit_summary.jsonl").exists()
-    assert (output_dir / "reports" / "reviewer_threat_model_fixture" / "reviewer_threat_model.jsonl").exists()
-    assert (output_dir / "reports" / "reviewer_threat_model_fixture" / "reviewer_threat_model.csv").exists()
-    assert (output_dir / "reports" / "reviewer_threat_model_fixture" / "reviewer_threat_model.md").exists()
-    assert (output_dir / "reports" / "reviewer_threat_model_fixture" / "reviewer_threat_model_summary.jsonl").exists()
-    assert (output_dir / "reports" / "manuscript_draft_skeleton_fixture" / "manuscript_draft_skeleton.jsonl").exists()
-    assert (output_dir / "reports" / "manuscript_draft_skeleton_fixture" / "manuscript_draft_skeleton.md").exists()
-    assert (output_dir / "reports" / "manuscript_draft_skeleton_fixture" / "manuscript_draft_skeleton_summary.jsonl").exists()
     assert (output_dir / "reports" / "journal_upgrade_plan_fixture" / "journal_upgrade_plan.jsonl").exists()
     assert (output_dir / "reports" / "journal_upgrade_plan_fixture" / "journal_upgrade_plan.csv").exists()
     assert (output_dir / "reports" / "journal_upgrade_plan_fixture" / "journal_upgrade_plan.md").exists()
@@ -744,30 +699,30 @@ def test_export_topic_package_marks_missing_optional_sources(tmp_path) -> None:
     assert (output_dir / "manifest.jsonl").exists()
 
 
-def test_export_topic_package_excludes_historical_superpowers_docs_and_cleans_stale_docs(tmp_path) -> None:
-    """验证最终课题包不导出历史过程文档并清理旧 docs 残留。"""
+def test_export_topic_package_excludes_process_docs_and_cleans_stale_docs(tmp_path) -> None:
+    """验证最终课题包不导出内部过程文档并清理旧 docs 残留。"""
     workspace = tmp_path / "workspace"
     output_dir = tmp_path / "topic_package"
     _write_text(workspace / "README.md", "# iad-sieve\n")
     _write_text(workspace / "docs" / "method-design.md", "# Method\n")
-    _write_text(workspace / "docs" / "current-work-summary.md", "当前主轨道只需补齐 remote_host 等连接字段。\n")
+    _write_text(workspace / "docs" / "local-notes.md", "本地运行环境待补齐连接字段。\n")
     _write_text(
-        workspace / "docs" / "superpowers" / "plans" / "2026-06-13-q2b-remote-execution-closure.md",
-        "补齐远程连接字段和 OPENAI_API_KEY 的远程安全配置确认\n",
+        workspace / "docs" / "internal" / "plans" / "2026-06-13-remote-execution-closure.md",
+        "补齐远程连接字段并确认安全配置\n",
     )
     _write_text(
-        workspace / "docs" / "superpowers" / "specs" / "2026-06-13-iad-risk-no-annotation-q2b-upgrade.md",
-        "OPENAI_API_KEY 已在远程安全配置的确认\n",
+        workspace / "docs" / "internal" / "specs" / "2026-06-13-iad-risk-source-upgrade.md",
+        "确认数据来源扩展规则\n",
     )
-    _write_text(output_dir / "docs" / "2026-06-13-q2b-remote-execution-closure.md", "旧导出残留\n")
+    _write_text(output_dir / "docs" / "2026-06-13-remote-execution-closure.md", "旧导出残留\n")
 
     manifest = export_topic_package(workspace_dir=workspace, output_dir=output_dir, report_dirs=[], model_dir=None)
 
-    assert not (output_dir / "docs" / "2026-06-13-q2b-remote-execution-closure.md").exists()
-    assert not (output_dir / "docs" / "2026-06-13-iad-risk-no-annotation-q2b-upgrade.md").exists()
-    assert not any(row["artifact_name"] == "q2b_remote_execution_closure_plan" and row["status"] == "copied" for row in manifest)
-    assert not any(row["artifact_name"] == "iad_risk_no_annotation_q2b_upgrade" and row["status"] == "copied" for row in manifest)
-    assert not (output_dir / "docs" / "current-work-summary.md").exists()
+    assert not (output_dir / "docs" / "2026-06-13-remote-execution-closure.md").exists()
+    assert not (output_dir / "docs" / "2026-06-13-iad-risk-source-upgrade.md").exists()
+    assert not any(row["artifact_name"] == "remote_execution_closure_plan" and row["status"] == "copied" for row in manifest)
+    assert not any(row["artifact_name"] == "iad_risk_source_upgrade" and row["status"] == "copied" for row in manifest)
+    assert not (output_dir / "docs" / "local-notes.md").exists()
     assert (output_dir / "docs" / "method-design.md").exists()
 
 
@@ -776,7 +731,7 @@ def test_export_topic_package_cli_writes_package(tmp_path) -> None:
     workspace = tmp_path / "workspace"
     output_dir = tmp_path / "topic_package"
     _write_text(workspace / "README.md", "# iad-sieve\n")
-    _write_text(workspace / "docs" / "GOAL.md", "# Goal\n")
+    _write_text(workspace / "docs" / "method-design.md", "# Method\n")
 
     command_export_topic_package(
         Namespace(
@@ -804,11 +759,11 @@ def test_cli_includes_export_topic_package_command() -> None:
             "outputs/topic_package_final",
             "--report-dirs",
             "outputs/iad_paper_report_fixture",
-            "outputs/reviewer_audit_fixture",
+            "outputs/iad_bench_fixture",
             "--model-dir",
             "outputs/iad_classifier_fixture",
         ]
     )
 
     assert args.command == "export-topic-package"
-    assert args.report_dirs == ["outputs/iad_paper_report_fixture", "outputs/reviewer_audit_fixture"]
+    assert args.report_dirs == ["outputs/iad_paper_report_fixture", "outputs/iad_bench_fixture"]

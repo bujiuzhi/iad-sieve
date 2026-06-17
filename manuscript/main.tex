@@ -31,7 +31,7 @@ The central challenge is that topical similarity is not identity evidence. Two p
 
 We formulate this failure mode as identity-agenda confusion. Identity refers to whether two records denote the same scholarly work. Agenda refers to whether two records discuss the same research problem, benchmark, method family, or citation community. Existing entity matching methods \citep{fellegi1969record,mudgal2018deep,li2020ditto} typically optimize pair classification, while scholarly document representation methods optimize semantic relatedness. Neither objective alone forces the model to learn that same-agenda pairs can be high-risk non-identities.
 
-We propose IAD-Risk, a risk-aware identity-agenda disentanglement framework for scholarly work deduplication. IAD-Risk learns separate signals for same-work identity, same-agenda relatedness, agenda-non-identity hard negatives, and false-merge risk. A pair is eligible for automatic merging only when identity evidence is sufficiently strong and agenda-non-identity risk remains below a merge threshold. This selective decision rule turns deduplication from a high-recall similarity problem into a risk-calibrated safety problem.
+We propose IAD-Risk, a risk-aware identity-agenda disentanglement framework for scholarly work deduplication. IAD-Risk learns separate relation signals for same-work identity, same-agenda relatedness, and agenda-non-identity hard negatives, then derives a false-merge risk score from these signals. A pair is eligible for automatic merging only when identity evidence is sufficiently strong and agenda-non-identity risk remains below a merge threshold. This selective decision rule turns deduplication from a high-recall similarity problem into a risk-calibrated safety problem.
 
 The paper makes three contributions. First, it defines identity-agenda confusion as a targeted failure mode in scholarly entity matching and introduces hard-negative false-merge rate as a safety metric. Second, it presents IAD-Bench, a provenance-aware benchmark contract that keeps gold, proxy, silver, LLM-silver, and human-reviewed labels separate. Third, it evaluates IAD-Risk under the same pair contract used by representation and entity-matching baselines, while keeping additional LLM and clustering interfaces as reproducible extensions rather than unsupported primary evidence. The current evidence supports targeted false-merge suppression under stratified evaluation; it does not support a broad method-ranking claim or a claim that silver labels replace human gold.
 
@@ -87,7 +87,7 @@ The Open-v2 benchmark variant used in the core evidence combines 415 DeepMatcher
 
 \subsection{Overview}
 
-IAD-Risk converts scholarly deduplication into selective risk-aware matching. Given a candidate pair, the model estimates identity, agenda, agenda-non-identity, and false-merge risk signals. The final merge decision is made only when identity evidence exceeds a same-work threshold and risk evidence remains below blocking thresholds. Figure~\ref{fig:iad-risk-pipeline} summarizes the workflow.
+IAD-Risk converts scholarly deduplication into selective risk-aware matching. Given a candidate pair, the model estimates identity, agenda, and agenda-non-identity signals, then derives a false-merge risk score. The final merge decision is made only when identity evidence exceeds a same-work threshold and risk evidence remains below blocking thresholds. Figure~\ref{fig:iad-risk-pipeline} summarizes the workflow.
 
 \begin{figure}[H]
 \centering
@@ -145,6 +145,10 @@ p_{\mathrm{risk}}<\tau_r,\quad
 \mathrm{cannot\_link}_{ij}=0.
 \]
 This rule is deliberately selective. It can reject or defer high-risk pairs instead of forcing every semantically related pair into a binary match decision. The same decision interface also supports constrained union-find clustering, where cannot-link evidence prevents transitive false merges.
+
+\subsection{Implementation Details}
+
+The reported transformer variants use frozen scientific document encoders rather than end-to-end fine-tuning. For each candidate pair, the implementation builds three feature groups: identity features combine transformer distances with identifiers, author overlap, venue, and year signals; agenda features combine semantic similarity with topic and citation overlap; agenda-non-identity features add conflict indicators such as different identifiers and year conflict. The three relation heads are trained on the training split, and the merge policy exposes $\tau_w$, $\tau_a$, and $\tau_r$ as configurable thresholds. Unless a validation protocol overrides them, the implementation uses 0.5 for all three thresholds.
 
 \section{Experiments}
 
@@ -215,7 +219,7 @@ Open-v3 and source-heldout experiments provide additional stress tests, but thei
 
 \section{Mechanism and Error Analysis}
 
-The central mechanism question is whether false-merge control depends on explicit agenda-non-identity and risk signals. A full ablation would remove agenda-non-identity supervision or false-merge risk gating and measure the resulting change in hard-negative false-merge rate. The current manuscript therefore treats HNFMR as the primary mechanism metric and reports the supported Open-v2 comparison conservatively rather than claiming a complete ablation study.
+The central mechanism question is whether false-merge control depends on explicit agenda-non-identity supervision and the derived risk score. A full ablation would remove agenda-non-identity supervision or false-merge risk gating and measure the resulting change in hard-negative false-merge rate. The current manuscript therefore treats HNFMR as the primary mechanism metric and reports the supported Open-v2 comparison conservatively rather than claiming a complete ablation study.
 
 The error analysis emphasizes claim discipline. The current evidence supports identity-agenda risk modeling, stratified benchmark construction, and targeted false-merge suppression. It does not support claims that OpenAlex labels are human gold, that the system has broad domain superiority, or that manual annotation has already been completed.
 

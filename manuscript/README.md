@@ -2,7 +2,7 @@
 
 ## Scope
 
-This directory is the single workspace for journal submission materials. It keeps the manuscript source, bibliography, build scripts, and generated PDFs separate from project documentation and experiment outputs.
+This directory contains the journal manuscript source, bibliography, build scripts, and compiled PDF. It is separate from project documentation and experiment outputs.
 
 ## Files
 
@@ -35,6 +35,6 @@ Manuscript validation:
 python manuscript/scripts/validate_manuscript.py
 ```
 
-## Submission Status
+## Submission Boundary
 
-The draft is prepared as a journal manuscript and has a formal LaTeX PDF. It is still target-template pending: before journal submission, replace the generic `article` class with the selected journal template if required. The current evidence supports a conservative claim: IAD-Risk models identity-agenda confusion and reduces false-merge risk under stratified gold/proxy/silver evaluation. The draft must not claim broad method superiority or completed human gold annotation.
+The manuscript uses a template-independent LaTeX source. Before journal upload, adapt `main.tex` to the selected journal class file if required and replace anonymous placeholders with the target journal's required author metadata. The evidence supports a conservative claim: IAD-Risk models identity-agenda confusion and reduces false-merge risk under stratified gold/proxy/silver evaluation. The manuscript must not claim broad method superiority or completed human gold annotation.

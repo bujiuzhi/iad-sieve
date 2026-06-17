@@ -19,7 +19,7 @@ IAD-Risk 是一个风险学习框架：
 identity_space 学 same_work
 agenda_space 学 same_agenda
 agenda_non_identity 学 hard negative
-false_merge_risk 控制合并
+false_merge_risk 由关系信号派生并控制合并
 ```
 
 IAD-Sieve 保留为 rule-only baseline，其字段与合并器继续服务于工程兼容。
@@ -93,15 +93,18 @@ same benchmark or method family
 high SPECTER2 / SciNCL similarity
 ```
 
-## 3. Pair 关系头
+## 3. Pair 关系信号
 
-模型输出四个分数：
+模型训练三个关系头，并由这些关系信号派生合并风险：
 
 ```text
 p_same_work
 p_same_agenda
 p_agenda_non_identity
-p_false_merge_risk
+p_false_merge_risk = max(
+  p_agenda_non_identity,
+  p_same_agenda * (1 - p_same_work)
+)
 ```
 
 ### p_same_work
@@ -200,15 +203,14 @@ low title and abstract similarity
 no shared author / reference / keyword
 ```
 
-## 5. 损失函数
+## 5. 训练目标
 
-总损失：
+训练损失覆盖三个监督关系：
 
 ```text
 L = L_same_work
   + L_same_agenda
   + L_agenda_non_identity
-  + L_false_merge_risk
   + L_consistency
 ```
 
@@ -304,28 +306,8 @@ calibration_error
 在 same_work F1 不明显下降的情况下，hard_negative_false_merge_rate 是否降低。
 ```
 
-## 10. 分阶段设计
+## 10. 实现边界
 
-### P0
+Lightweight dual-space model 使用 identity、agenda、risk 三组特征训练 `same_work`、`same_agenda`、`agenda_non_identity` 三个 head，并由派生的 `p_false_merge_risk` 控制 `merge_prediction`。
 
-定义研究主线、IAD-Bench 契约、导出包和证据矩阵。
-
-### P1
-
-IAD-Bench 构造器输出统一文档、pair、split、summary、provenance summary 和 dataset card。该阶段解决标签来源追踪问题，但不等同于完成大规模实验证据。
-
-### P2
-
-强 baseline 执行框架需要让 representation baseline 生成统一 pair score；外部 baseline 评估器保留 `baseline_family` 与 `execution_mode`，证据矩阵只接受真实执行证据。
-
-该阶段仍必须实际覆盖 SPECTER2/SciNCL、Ditto/RoBERTa、LLM pair judge 和 single-space union-find。`execution_mode=fallback` 只能作为工程接口验证。
-
-### P3
-
-Lightweight dual-space model 使用 identity、agenda、risk 三组特征训练 `same_work`、`same_agenda`、`agenda_non_identity` 三个 head，并由 `p_false_merge_risk` 控制 `merge_prediction`。
-
-Transformer-based model 属于后续扩展方向。lightweight 实现能支撑模型结构证据，但期刊主实验仍需要更强表示模型和大规模验证。
-
-### P4
-
-接入人工复核集，形成期刊投稿级证据。
+Transformer-based model 使用冻结科学文档编码器与同一组关系头，适合在固定表示条件下验证身份证据、议题证据和 hard negative 风险之间的分离效果。
