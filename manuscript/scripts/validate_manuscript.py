@@ -378,6 +378,38 @@ def check_cover_letter(cover_letter_text: str) -> list[str]:
     return [f"cover letter missing required statement: {marker}" for marker in required_markers if marker not in cover_letter_text]
 
 
+def check_submission_material_quantitative_summary(highlights_text: str, cover_letter_text: str) -> list[str]:
+    """Check whether submission materials match the manuscript evidence scope.
+
+    参数:
+        highlights_text: Highlights Markdown text.
+        cover_letter_text: Cover letter Markdown text.
+
+    返回:
+        list[str]: Error messages for missing quantitative submission markers.
+    """
+    required_markers = [
+        "HNFMR 0.790--0.999",
+        "HNFMR=0.000",
+    ]
+    errors: list[str] = []
+    for marker in required_markers:
+        if marker not in highlights_text:
+            errors.append(f"highlights missing quantitative evidence marker: {marker}")
+        if marker not in cover_letter_text:
+            errors.append(f"cover letter missing quantitative evidence marker: {marker}")
+    cover_letter_scope_markers = [
+        "Open-v2 evidence snapshot",
+        "full pair scope",
+        "same-work F1=0.980",
+        "held-out test scope",
+    ]
+    for marker in cover_letter_scope_markers:
+        if marker not in cover_letter_text:
+            errors.append(f"cover letter missing bounded evidence scope marker: {marker}")
+    return errors
+
+
 def extract_first_page_text(pdf_path: Path) -> tuple[str, list[str]]:
     """Extract text from the first page of a PDF.
 
@@ -516,6 +548,7 @@ def main() -> int:
     errors.extend(check_highlights(highlights_text))
     errors.extend(check_keywords(keywords_text))
     errors.extend(check_cover_letter(cover_letter_text))
+    errors.extend(check_submission_material_quantitative_summary(highlights_text, cover_letter_text))
     errors.extend(check_bibliography_depth(bibliography_text))
     latex_pdf_path = ROOT / "build" / "iad-risk-manuscript-latex.pdf"
     supplementary_pdf_path = ROOT / "build" / "iad-risk-supplementary-material.pdf"
