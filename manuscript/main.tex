@@ -33,7 +33,7 @@ We formulate this failure mode as identity-agenda confusion. Identity refers to 
 
 We propose IAD-Risk, a risk-aware identity-agenda disentanglement framework for scholarly work deduplication. IAD-Risk learns separate signals for same-work identity, same-agenda relatedness, agenda-non-identity hard negatives, and false-merge risk. A pair is eligible for automatic merging only when identity evidence is sufficiently strong and agenda-non-identity risk remains below a merge threshold. This selective decision rule turns deduplication from a high-recall similarity problem into a risk-calibrated safety problem.
 
-The paper makes three contributions. First, it defines identity-agenda confusion as a targeted failure mode in scholarly entity matching and introduces hard-negative false-merge rate as a safety metric. Second, it presents IAD-Bench, a provenance-aware benchmark contract that keeps gold, proxy, silver, LLM-silver, and human-reviewed labels separate. Third, it evaluates IAD-Risk against representation, entity matching, LLM judge, and single-space union baselines under the same pair contract. The current evidence supports targeted false-merge suppression under stratified evaluation; it does not support a broad method-ranking claim or a claim that silver labels replace human gold.
+The paper makes three contributions. First, it defines identity-agenda confusion as a targeted failure mode in scholarly entity matching and introduces hard-negative false-merge rate as a safety metric. Second, it presents IAD-Bench, a provenance-aware benchmark contract that keeps gold, proxy, silver, LLM-silver, and human-reviewed labels separate. Third, it evaluates IAD-Risk under the same pair contract used by representation and entity-matching baselines, while keeping additional LLM and clustering interfaces as reproducible extensions rather than unsupported primary evidence. The current evidence supports targeted false-merge suppression under stratified evaluation; it does not support a broad method-ranking claim or a claim that silver labels replace human gold.
 
 \section{Related Work}
 
@@ -145,6 +145,12 @@ This rule is deliberately selective. It can reject or defer high-risk pairs inst
 
 \section{Experiments}
 
+\subsection{Dataset Construction and Evidence Strength}
+
+Open-v2 is built by converting public scholarly metadata into a unified pair schema. DeepMatcher/py\_entitymatching records provide the same-work gold layer, while OpenAlex topics and OpenCitations-style citation signals provide agenda-level silver hard negatives. Each pair keeps its label strength, provenance, split, and hard-negative flag so that a gold identity result is never averaged with a silver stress-test result without being identified as such.
+
+The benchmark therefore has two roles. The gold layer measures ordinary duplicate matching ability, and the silver hard-negative layer measures whether a system over-merges topically close but distinct papers. This separation is important for interpreting the results: a representation baseline can look useful for scientific retrieval while still being unsafe for automatic work identity merging.
+
 \subsection{Experimental Questions}
 
 The experiments ask four questions. RQ1 tests whether IAD-Risk preserves same-work matching performance on gold labels. RQ2 tests whether it reduces false merges on agenda-level hard negatives. RQ3 examines whether the observed behavior is consistent with the proposed risk mechanism. RQ4 tests whether results remain interpretable under gold, proxy, and silver label strata.
@@ -167,16 +173,18 @@ RQ4 & Gold/proxy/silver strata & Split metrics & Provenance-aware robustness \\
 
 \subsection{Baselines}
 
-We compare with rule-based matching, SPECTER2 adapter cosine, SciNCL cosine, RoBERTa-style pair classification, LLM pair judge outputs, and single-space union baselines. Baselines are evaluated through the same pair contract so that same-work F1 and hard-negative false-merge rate can be compared without mixing label strengths.
+We compare with rule-based matching, SPECTER2 adapter cosine, SciNCL cosine, RoBERTa-style pair classification, and single-space union baselines when completed actual-model outputs are available. The repository also provides an LLM pair-judge interface, but LLM rows are not treated as primary evidence unless the API-backed execution mode is present. Baselines are evaluated through the same pair contract so that same-work F1 and hard-negative false-merge rate can be compared without mixing label strengths.
 
 \subsection{Implementation and Reproducibility}
 
-All reported systems are evaluated through the same pair-level schema, split field, and metric implementation. Threshold-sensitive baselines select merge thresholds on validation evidence and are then evaluated on the held-out split. The repository separates executable code from large data artifacts: raw third-party data remain outside Git, while processing scripts, fixture tests, schema contracts, and artifact-release rules remain version controlled. This organization is intended to make the main evidence reproducible without redistributing restricted or large source files.
+All reported systems are evaluated through the same pair-level schema, split field, and metric implementation. Threshold-sensitive baselines select merge thresholds on validation evidence and are then evaluated on held-out evidence. The main metrics are same-work F1 on gold identity pairs, ordinary false-merge rate, and HNFMR on agenda-level hard negatives. Rows with different pair counts in Table~\ref{tab:openv2-results} should therefore be read as evidence for the same mechanism under different available result scopes, not as a single leaderboard.
+
+The repository separates executable code from large data artifacts: raw third-party data remain outside Git, while processing scripts, fixture tests, schema contracts, and artifact-release rules remain version controlled. Reproduction starts from public sources, rebuilds IAD-Bench pair files through the documented CLI, and checks generated outputs with manifests and checksums. This organization is intended to make the main evidence reproducible without redistributing restricted or large source files.
 
 \subsection{Main Open-v2 Results}
 
 \begin{table}[H]
-\caption{Open-v2 evidence snapshot. Lower false-merge rate is better. The table reports conservative rows supported by current output summaries.}
+\caption{Open-v2 evidence snapshot. Lower false-merge rate is better. Rows are reported only when supported by current output summaries; different pair counts indicate different available result scopes.}
 \label{tab:openv2-results}
 \centering
 \begin{tabular}{lrrrr}
