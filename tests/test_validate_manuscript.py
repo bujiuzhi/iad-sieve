@@ -151,3 +151,37 @@ def test_check_result_claim_boundary_rejects_result_table_without_audit_trail() 
 
     assert any("Result Audit Trail" in error for error in errors)
     assert any("Artifact Package Requirements" in error for error in errors)
+
+
+def test_check_method_feature_contract_accepts_complete_contract() -> None:
+    """验证方法特征契约完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Feature and Head Specification}",
+            r"\label{tab:feature-head-specification}",
+            "Transformer distances and title similarity are used with author overlap.",
+            "DOI/arXiv/OpenAlex identifier agreement is treated as identity evidence.",
+            "The agenda head uses topic overlap and reference Jaccard similarity.",
+            "The ANI risk head uses different-identifier conflicts.",
+            "The relation heads use provenance-aware masking.",
+            "Audit metadata is retained, but it is not a training feature.",
+        ]
+    )
+
+    errors = module.check_method_feature_contract(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_method_feature_contract_rejects_missing_feature_boundary() -> None:
+    """验证方法特征契约缺少关键字段时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\subsection{Feature and Head Specification}"
+
+    errors = module.check_method_feature_contract(manuscript_text)
+
+    assert any("feature-head-specification" in error for error in errors)
+    assert any("different-identifier conflicts" in error for error in errors)

@@ -202,6 +202,29 @@ Auxiliary LLM or proxy labels are over-interpreted. & Keep auxiliary rows separa
 
 The reported transformer variants use frozen scientific document encoders rather than end-to-end fine-tuning. For each candidate pair, the implementation builds three feature groups: identity features combine transformer distances with identifiers, author overlap, venue, and year signals; agenda features combine semantic similarity with topic and citation overlap; agenda-non-identity features add conflict indicators such as different identifiers and year conflict. The three relation heads are trained on the training split, and the merge policy exposes $\tau_w$, $\tau_a$, and $\tau_r$ as configurable thresholds. Unless a validation protocol overrides them, the implementation uses 0.5 for all three thresholds.
 
+\subsection{Feature and Head Specification}
+
+The implementation uses label provenance for supervision control, not as a predictive shortcut. Pair metadata such as label source, label strength, provenance, split, and hard-negative level are copied to prediction outputs for auditing, but they are excluded from the identity, agenda, and risk feature groups used by the relation heads. Table~\ref{tab:feature-head-specification} gives the implementation-level contract used by the reported transformer variants.
+
+\begin{table}[H]
+\caption{Feature and head specification for IAD-Risk transformer variants. Metadata fields are retained for auditing but are not used as model features.}
+\label{tab:feature-head-specification}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.18\linewidth}L{0.27\linewidth}L{0.26\linewidth}L{0.19\linewidth}}
+\toprule
+Head or stage & Main input fields & Supervision or calculation & Output role \\
+\midrule
+Identity head & Transformer distances, title similarity, author overlap, first-author match, venue similarity, year match, DOI/arXiv/OpenAlex identifier agreement. & Same-work labels from valid identity evidence, with provenance-aware masking. & Estimates $p_{\mathrm{work}}$ as positive merge evidence. \\
+Agenda head & Transformer cosine, title and venue similarity, OpenAlex-style topic overlap, reference Jaccard similarity, year-distance score. & Same-agenda proxy or silver evidence when the source supports agenda relatedness. & Estimates $p_{\mathrm{agenda}}$ as relatedness evidence, not direct merge evidence. \\
+ANI risk head & Transformer distances, title and author signals, topic overlap, reference overlap, year conflict, identifier agreement, and different-identifier conflicts. & Agenda-non-identity hard negatives from valid hard-negative sources. & Estimates $p_{\mathrm{ani}}$ as direct blocking evidence. \\
+Risk gate & $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, $p_{\mathrm{ani}}$, $\tau_w$, $\tau_a$, $\tau_r$, and cannot-link flags. & Computes $p_{\mathrm{risk}}=\max\{p_{\mathrm{ani}},p_{\mathrm{agenda}}(1-p_{\mathrm{work}})\}$. & Emits merge, block, or defer decisions. \\
+Audit metadata & Pair ID, source pair ID, label strength, label source, provenance, split, and hard-negative level. & Copied from pair records and result artifacts. & Supports artifact review; it is not a training feature. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Experiments}
 
 \subsection{Dataset Construction and Evidence Strength}

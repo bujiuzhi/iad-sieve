@@ -43,6 +43,8 @@ REQUIRED_SECTIONS = [
     r"\section{Method}",
     r"\subsection{Training Objective}",
     r"\subsection{Failure-Control Rationale}",
+    r"\subsection{Implementation Details}",
+    r"\subsection{Feature and Head Specification}",
     r"\subsection{Implementation and Reproducibility}",
     r"\section{Experiments}",
     r"\subsection{Threshold Selection and Uncertainty Reporting}",
@@ -191,6 +193,31 @@ def check_result_claim_boundary(manuscript_text: str, supplementary_text: str) -
         if marker not in supplementary_text:
             errors.append(f"Open-v2 result table missing supplementary artifact boundary marker: {marker}")
     return errors
+
+
+def check_method_feature_contract(manuscript_text: str) -> list[str]:
+    """Check whether the method states implementation-level feature boundaries.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing method-contract markers.
+    """
+    required_markers = [
+        r"\subsection{Feature and Head Specification}",
+        r"\label{tab:feature-head-specification}",
+        "Transformer distances",
+        "title similarity",
+        "author overlap",
+        "DOI/arXiv/OpenAlex identifier agreement",
+        "topic overlap",
+        "reference Jaccard similarity",
+        "different-identifier conflicts",
+        "provenance-aware masking",
+        "it is not a training feature",
+    ]
+    return [f"method feature contract missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
 
 
 def check_highlights(highlights_text: str) -> list[str]:
@@ -361,6 +388,7 @@ def main() -> int:
     errors.extend(check_forbidden_claims(supplementary_text))
     errors.extend(check_forbidden_claims(highlights_text))
     errors.extend(check_forbidden_claims(keywords_text))
+    errors.extend(check_method_feature_contract(manuscript_text))
     errors.extend(check_result_claim_boundary(manuscript_text, supplementary_text))
     errors.extend(check_highlights(highlights_text))
     errors.extend(check_keywords(keywords_text))
