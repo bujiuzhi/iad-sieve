@@ -61,6 +61,33 @@ We evaluate merge safety with hard-negative false-merge rate:
 \]
 where $\hat{m}_{ij}$ is the automatic merge decision. The goal is not only to maximize same-work F1, but also to control HNFMR under explicit evidence provenance.
 
+\subsection{Notation and Relation Semantics}
+
+Table~\ref{tab:notation} summarizes the notation used throughout the paper. The key distinction is that identity variables describe whether two records denote the same work, while agenda variables describe topical or citation-level relatedness. This distinction prevents a high relatedness score from being interpreted as direct merge evidence.
+
+\begin{table}[H]
+\caption{Notation and relation semantics. The paper uses separate symbols for identity, agenda relatedness, agenda-non-identity risk, and merge decisions.}
+\label{tab:notation}
+\centering
+\small
+\begin{tabular}{L{0.18\linewidth}L{0.34\linewidth}L{0.38\linewidth}}
+\toprule
+Symbol or field & Meaning & Role in evaluation \\
+\midrule
+$d_i,d_j$ & Two scholarly records. & Input pair for scoring and merge decisions. \\
+$y^I_{ij}$ & Identity label: the records describe the same work. & Gold identity evidence when supported by the label source. \\
+$y^A_{ij}$ & Agenda label: the records share a research agenda. & Proxy or silver relatedness evidence, not sufficient for merging. \\
+$y^{ANI}_{ij}$ & Agenda-non-identity label. & Hard-negative supervision for pairs that are related but should not merge. \\
+$p_{\mathrm{work}}$ & Predicted same-work probability. & Positive merge evidence. \\
+$p_{\mathrm{agenda}}$ & Predicted agenda-relatedness probability. & Relatedness evidence that can increase risk when identity is weak. \\
+$p_{\mathrm{ani}}$ & Predicted agenda-non-identity probability. & Direct risk evidence against automatic merging. \\
+$p_{\mathrm{risk}}$ & Derived false-merge risk score. & Gate for rejecting or deferring risky pairs. \\
+$\hat{m}_{ij}$ & Automatic merge decision. & Determines FMR and HNFMR. \\
+label strength & Gold, proxy, silver, LLM-silver, or manual validation layer. & Controls how a row can be used in training, evaluation, and claims. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{IAD-Bench}
 
 IAD-Bench is a benchmark contract for organizing scholarly pair evidence. It is not a claim that every label has the same evidential status. Each pair stores relation labels, expected identity labels, expected agenda labels, label source, label strength, provenance, split, and hard-negative level.

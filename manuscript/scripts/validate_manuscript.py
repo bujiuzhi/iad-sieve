@@ -33,6 +33,7 @@ REQUIRED_SECTIONS = [
     r"\section{Introduction}",
     r"\section{Related Work}",
     r"\section{Problem Formulation}",
+    r"\subsection{Notation and Relation Semantics}",
     r"\section{IAD-Bench}",
     r"\section{Method}",
     r"\subsection{Training Objective}",
