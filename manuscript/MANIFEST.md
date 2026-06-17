@@ -22,4 +22,4 @@ cd manuscript && ./scripts/build_latex_pdf.sh
 
 ## Submission Boundary
 
-This package is template-independent. Before journal upload, adapt `main.tex` to the selected journal class file if required and replace anonymous placeholders with the target journal's required author metadata.
+This package is template-independent. Before journal upload, adapt `main.tex` to the selected journal class file if required and set the author metadata according to the target journal's submission rules.

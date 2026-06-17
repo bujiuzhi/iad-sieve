@@ -50,6 +50,20 @@ DEFAULT_INCLUDED_SUFFIXES = {
     ".yml",
 }
 
+DOCUMENTATION_SUFFIXES = {
+    ".md",
+    ".rst",
+    ".tex",
+    ".txt",
+}
+
+DOCUMENTATION_PATH_PARTS = {
+    "data",
+    "docs",
+    "manuscript",
+    "outputs",
+}
+
 LOCAL_ONLY_PATHS = (
     "data",
     "outputs",
@@ -132,6 +146,29 @@ HIGH_RISK_PATTERNS: tuple[RiskPattern, ...] = (
             r"(?i)\b(?:password|passwd|token|api[_-]?key|secret)\s*[:=]\s*['\"]?[A-Za-z0-9_./:+\-]{16,}"
         ),
         message="疑似明文凭据赋值",
+    ),
+)
+
+DOCUMENT_TRACE_PATTERNS: tuple[RiskPattern, ...] = (
+    RiskPattern(
+        name="document_ai_trace_tool",
+        regex=re.compile(r"(?i)\b(?:codex|chatgpt|claude)\b"),
+        message="公开文档包含 AI 工具或辅助生成痕迹",
+    ),
+    RiskPattern(
+        name="document_ai_trace_process",
+        regex=re.compile(r"(?i)(?:AI\s*辅助|AI\s*生成|AI-assisted|AI-generated|generated\s+by\s+AI)"),
+        message="公开文档包含 AI 生成或辅助说明",
+    ),
+    RiskPattern(
+        name="document_work_record",
+        regex=re.compile(r"(?:已修改|修改记录|工作记录|工作总结|本次修改|本轮修改|处理记录|变更记录)"),
+        message="公开文档包含过程性修改或工作记录",
+    ),
+    RiskPattern(
+        name="document_editorial_marker",
+        regex=re.compile(r"(?i)\b(?:TODO|FIXME)\b|(?:待补|占位)"),
+        message="公开文档包含未清理的编辑标记",
     ),
 )
 
@@ -257,6 +294,46 @@ def iter_candidate_files(project_root: Path) -> Iterable[Path]:
                 yield path
 
 
+def is_documentation_file(path: Path, project_root: Path) -> bool:
+    """判断文件是否属于公开文档痕迹扫描范围。
+
+    参数:
+        path: 候选文件路径。
+        project_root: 项目根目录。
+
+    返回:
+        属于公开文档时返回 True，否则返回 False。
+    """
+
+    if has_excluded_path_parts(path, project_root):
+        return False
+    if path.suffix not in DOCUMENTATION_SUFFIXES:
+        return False
+    relative_parts = normalize_relative_path(path, project_root).split("/")
+    if len(relative_parts) == 1:
+        return path.name.upper() in {"README.MD", "LICENSE", "NOTICE"}
+    return relative_parts[0] in DOCUMENTATION_PATH_PARTS
+
+
+def iter_documentation_files(project_root: Path) -> Iterable[Path]:
+    """遍历公开文档文件。
+
+    参数:
+        project_root: 项目根目录。
+
+    返回:
+        公开文档文件路径迭代器。
+    """
+
+    for current_root_text, dirnames, filenames in os.walk(project_root):
+        current_root = Path(current_root_text)
+        dirnames[:] = [dirname for dirname in dirnames if not is_excluded_directory(current_root / dirname)]
+        for filename in filenames:
+            path = current_root / filename
+            if is_documentation_file(path, project_root):
+                yield path
+
+
 def safe_read_lines(path: Path) -> list[str]:
     """安全读取文本文件。
 
@@ -277,11 +354,11 @@ def safe_read_lines(path: Path) -> list[str]:
     return []
 
 
-def scan_sensitive_patterns(project_root: Path, patterns: Sequence[RiskPattern]) -> list[Finding]:
-    """扫描敏感信息和本机路径。
+def scan_patterns_in_files(files: Iterable[Path], patterns: Sequence[RiskPattern]) -> list[Finding]:
+    """扫描指定文件中的风险模式。
 
     参数:
-        project_root: 项目根目录。
+        files: 待扫描文件路径。
         patterns: 风险正则列表。
 
     返回:
@@ -289,7 +366,7 @@ def scan_sensitive_patterns(project_root: Path, patterns: Sequence[RiskPattern])
     """
 
     findings: list[Finding] = []
-    for path in iter_candidate_files(project_root):
+    for path in files:
         for line_number, line in enumerate(safe_read_lines(path), start=1):
             for pattern in patterns:
                 match = pattern.regex.search(line)
@@ -304,6 +381,69 @@ def scan_sensitive_patterns(project_root: Path, patterns: Sequence[RiskPattern])
                         snippet=match.group(0),
                     )
                 )
+    return findings
+
+
+def scan_sensitive_patterns(project_root: Path, patterns: Sequence[RiskPattern]) -> list[Finding]:
+    """扫描敏感信息和本机路径。
+
+    参数:
+        project_root: 项目根目录。
+        patterns: 风险正则列表。
+
+    返回:
+        风险发现项列表。
+    """
+
+    return scan_patterns_in_files(iter_candidate_files(project_root), patterns)
+
+
+def scan_document_traces(project_root: Path, patterns: Sequence[RiskPattern]) -> list[Finding]:
+    """扫描公开文档中的 AI 痕迹和过程性记录。
+
+    参数:
+        project_root: 项目根目录。
+        patterns: 文档痕迹正则列表。
+
+    返回:
+        风险发现项列表。
+    """
+
+    return scan_patterns_in_files(iter_documentation_files(project_root), patterns)
+
+
+def check_required_documentation(project_root: Path) -> list[Finding]:
+    """检查公开文档目录是否保留必要说明文件。
+
+    参数:
+        project_root: 项目根目录。
+
+    返回:
+        缺失文档发现项列表。
+    """
+
+    required_paths = (
+        "README.md",
+        "data/README.md",
+        "docs/README.md",
+        "outputs/README.md",
+        "manuscript/README.md",
+        "manuscript/MANIFEST.md",
+    )
+    findings: list[Finding] = []
+    for relative_path in required_paths:
+        path = project_root / relative_path
+        if path.exists():
+            continue
+        findings.append(
+            Finding(
+                path=path,
+                line_number=0,
+                category="missing_required_document",
+                message="缺少公开仓库必要说明文档",
+                snippet=relative_path,
+            )
+        )
     return findings
 
 
@@ -392,8 +532,10 @@ def run_public_release_check(project_root: Path, max_size_mb: float) -> int:
 
     LOGGER.info("扫描项目: %s", resolved_root)
     sensitive_findings = scan_sensitive_patterns(resolved_root, HIGH_RISK_PATTERNS)
+    document_trace_findings = scan_document_traces(resolved_root, DOCUMENT_TRACE_PATTERNS)
+    missing_document_findings = check_required_documentation(resolved_root)
     large_file_findings = find_large_files(resolved_root, max_size_mb)
-    high_risk_findings = sensitive_findings + large_file_findings
+    high_risk_findings = sensitive_findings + document_trace_findings + missing_document_findings + large_file_findings
 
     local_only_paths = find_local_only_paths(resolved_root)
     if local_only_paths:

@@ -42,6 +42,9 @@ REQUIRED_SECTIONS = [
     r"\section{Limitations}",
     r"\section{Threats to Validity}",
     r"\section{Conclusion}",
+    r"\section*{Data and Code Availability}",
+    r"\section*{Ethics Statement}",
+    r"\section*{Competing Interests}",
 ]
 MIN_BIB_ENTRIES = 10
 FORBIDDEN_PHRASES = [
@@ -246,10 +249,12 @@ def main() -> int:
     bibliography_path = ROOT / "references.bib"
     bibliography_text = bibliography_path.read_text(encoding="utf-8") if bibliography_path.exists() else ""
     errors.extend(check_sections(manuscript_text))
+    supplementary_path = ROOT / "supplementary_material.tex"
+    supplementary_text = supplementary_path.read_text(encoding="utf-8") if supplementary_path.exists() else ""
     errors.extend(check_forbidden_claims(manuscript_text))
+    errors.extend(check_forbidden_claims(supplementary_text))
     errors.extend(check_bibliography_depth(bibliography_text))
     latex_pdf_path = ROOT / "build" / "iad-risk-manuscript-latex.pdf"
-    supplementary_path = ROOT / "supplementary_material.tex"
     supplementary_pdf_path = ROOT / "build" / "iad-risk-supplementary-material.pdf"
     errors.extend(check_pdf(latex_pdf_path))
     errors.extend(check_pdf_freshness(latex_pdf_path, manuscript_path))

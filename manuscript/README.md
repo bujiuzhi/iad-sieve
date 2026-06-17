@@ -41,4 +41,4 @@ python manuscript/scripts/validate_manuscript.py
 
 ## Submission Boundary
 
-The manuscript uses a template-independent LaTeX source. Before journal upload, adapt `main.tex` to the selected journal class file if required and replace anonymous placeholders with the target journal's required author metadata. The evidence supports a conservative claim: IAD-Risk models identity-agenda confusion and reduces false-merge risk under stratified gold/proxy/silver evaluation. The manuscript must not claim broad method superiority or completed human gold annotation.
+The manuscript uses a template-independent LaTeX source. Before journal upload, adapt `main.tex` to the selected journal class file if required and set the author metadata according to the journal's submission rules. The evidence supports a conservative claim: IAD-Risk models identity-agenda confusion and reduces false-merge risk under stratified gold/proxy/silver evaluation. The manuscript must not claim broad method superiority or completed human gold annotation.
