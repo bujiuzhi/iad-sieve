@@ -262,6 +262,27 @@ def check_keywords(keywords_text: str) -> list[str]:
     return errors
 
 
+def check_cover_letter(cover_letter_text: str) -> list[str]:
+    """Check cover letter completeness for journal submission.
+
+    参数:
+        cover_letter_text: Cover letter Markdown text.
+
+    返回:
+        list[str]: Error messages for missing cover letter statements.
+    """
+    required_markers = [
+        "Dear Editor",
+        "IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication",
+        "not under consideration elsewhere",
+        "All listed authors have approved",
+        "no competing interests",
+        "raw third-party data",
+        "manifests and checksums",
+    ]
+    return [f"cover letter missing required statement: {marker}" for marker in required_markers if marker not in cover_letter_text]
+
+
 def extract_first_page_text(pdf_path: Path) -> tuple[str, list[str]]:
     """Extract text from the first page of a PDF.
 
@@ -383,15 +404,19 @@ def main() -> int:
     highlights_text = highlights_path.read_text(encoding="utf-8") if highlights_path.exists() else ""
     keywords_path = ROOT / "keywords.md"
     keywords_text = keywords_path.read_text(encoding="utf-8") if keywords_path.exists() else ""
+    cover_letter_path = ROOT / "cover_letter.md"
+    cover_letter_text = cover_letter_path.read_text(encoding="utf-8") if cover_letter_path.exists() else ""
     errors.extend(check_sections(supplementary_text, REQUIRED_SUPPLEMENT_SECTIONS, "supplementary material"))
     errors.extend(check_forbidden_claims(manuscript_text))
     errors.extend(check_forbidden_claims(supplementary_text))
     errors.extend(check_forbidden_claims(highlights_text))
     errors.extend(check_forbidden_claims(keywords_text))
+    errors.extend(check_forbidden_claims(cover_letter_text))
     errors.extend(check_method_feature_contract(manuscript_text))
     errors.extend(check_result_claim_boundary(manuscript_text, supplementary_text))
     errors.extend(check_highlights(highlights_text))
     errors.extend(check_keywords(keywords_text))
+    errors.extend(check_cover_letter(cover_letter_text))
     errors.extend(check_bibliography_depth(bibliography_text))
     latex_pdf_path = ROOT / "build" / "iad-risk-manuscript-latex.pdf"
     supplementary_pdf_path = ROOT / "build" / "iad-risk-supplementary-material.pdf"

@@ -185,3 +185,36 @@ def test_check_method_feature_contract_rejects_missing_feature_boundary() -> Non
 
     assert any("feature-head-specification" in error for error in errors)
     assert any("different-identifier conflicts" in error for error in errors)
+
+
+def test_check_cover_letter_accepts_required_submission_statements() -> None:
+    """验证 cover letter 含正式投稿声明时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    cover_letter_text = "\n".join(
+        [
+            "Dear Editor,",
+            "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication.",
+            "The manuscript is not under consideration elsewhere.",
+            "All listed authors have approved the submitted version.",
+            "The authors declare no competing interests.",
+            "The repository does not redistribute raw third-party data.",
+            "Released artifacts should include manifests and checksums.",
+        ]
+    )
+
+    errors = module.check_cover_letter(cover_letter_text)
+
+    assert errors == []
+
+
+def test_check_cover_letter_rejects_missing_submission_statements() -> None:
+    """验证 cover letter 缺少正式投稿声明时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    cover_letter_text = "Dear Editor,\nWe submit the manuscript."
+
+    errors = module.check_cover_letter(cover_letter_text)
+
+    assert any("not under consideration elsewhere" in error for error in errors)
+    assert any("no competing interests" in error for error in errors)
