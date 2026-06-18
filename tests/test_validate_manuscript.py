@@ -3842,8 +3842,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 28.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
+            "Completed audit cycles: 29.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -4079,6 +4079,12 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "Open-v2 row-level audit columns",
             "prediction JSONL fields",
             "claim-dependent artifact requirements",
+            "## Audit Cycle 29: Final-Upload Artifact-Dir Required Gate",
+            "missing artifact-directory rejection",
+            "finalized artifact release directory",
+            "omit `--artifact-dir`",
+            "local checksum, manifest, row-schema, prediction-schema, and package-artifact commit checks",
+            "cannot bypass the external release directory",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -4097,7 +4103,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 28",
+        "Completed audit cycles: 29",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -4108,7 +4114,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 28" in error for error in errors)
+    assert any("Completed audit cycles: 29" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -4486,6 +4492,28 @@ def test_check_reviewer_readiness_audit_rejects_missing_integrated_artifact_vali
     assert any("Final-Upload Artifact Release Validation Gate" in error for error in errors)
     assert any("integrated artifact-release validation coverage" in error for error in errors)
     assert any("required artifact IDs" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_artifact_dir_required_gate() -> None:
+    """验证审稿准备度审计必须覆盖正式上传 artifact-dir 必传门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Audit Cycle 29: Final-Upload Artifact-Dir Required Gate",
+        "missing artifact-directory rejection",
+        "finalized artifact release directory",
+        "omit `--artifact-dir`",
+        "local checksum, manifest, row-schema, prediction-schema, and package-artifact commit checks",
+        "cannot bypass the external release directory",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Final-Upload Artifact-Dir Required Gate" in error for error in errors)
+    assert any("missing artifact-directory rejection" in error for error in errors)
+    assert any("cannot bypass the external release directory" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_final_upload_source_control_package_gate() -> None:

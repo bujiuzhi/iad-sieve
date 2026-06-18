@@ -895,10 +895,15 @@ def validate_submission_package(
     返回:
         list[str]: Error messages.
     """
+    errors: list[str] = []
+    if final_upload and artifact_dir is None:
+        errors.append("final-upload validation requires --artifact-dir pointing to the finalized artifact release")
     artifact_manifest, artifact_errors = (
-        load_validated_artifact_manifest(artifact_dir, artifact_manifest_template_path) if final_upload else (None, [])
+        load_validated_artifact_manifest(artifact_dir, artifact_manifest_template_path)
+        if final_upload and artifact_dir is not None
+        else (None, [])
     )
-    errors = list(artifact_errors)
+    errors.extend(artifact_errors)
     errors.extend(validate_package_directory(package_dir, final_upload, dke_preflight, artifact_manifest))
     errors.extend(validate_zip_archive(
         zip_path,

@@ -827,10 +827,12 @@ def test_build_submission_package_autofills_final_upload_repository_reference(tm
     manuscript_root = tmp_path / "manuscript"
     output_dir = tmp_path / "submission_package"
     zip_path = tmp_path / "submission_package.zip"
+    artifact_dir = tmp_path / "artifact_release"
     _write_required_manuscript_files(manuscript_root)
     _write_final_upload_metadata(manuscript_root)
     _blank_final_upload_repository_reference(manuscript_root)
     _write_final_upload_cover_letter(manuscript_root)
+    _write_artifact_release_manifest(artifact_dir)
     monkeypatch.setattr(module, "collect_source_control_state", lambda _: _clean_source_control_state())
     monkeypatch.setattr(module, "collect_repository_url", lambda _: "https://example.org/iad-sieve.git")
 
@@ -844,7 +846,7 @@ def test_build_submission_package_autofills_final_upload_repository_reference(tm
     assert 'repository_commit: "abcdef1234567890"' in package_metadata_text
     assert 'repository_branch: "main"' in package_metadata_text
     assert "https://example.org/iad-sieve.git commit abcdef1234567890" in package_metadata_text
-    assert validator.validate_submission_package(output_dir, zip_path, final_upload=True) == []
+    assert validator.validate_submission_package(output_dir, zip_path, final_upload=True, artifact_dir=artifact_dir) == []
 
 
 def test_normalize_repository_url_converts_github_ssh_remote() -> None:
@@ -1124,8 +1126,28 @@ def test_validate_submission_package_rejects_final_upload_with_unresolved_metada
     assert any("artifact release checklist item is incomplete" in error for error in errors)
 
 
-def test_validate_submission_package_accepts_final_upload_with_filled_metadata(tmp_path) -> None:
-    """验证投稿包校验器接受完整正式上传元数据。"""
+def test_validate_submission_package_accepts_final_upload_with_valid_artifact_release(tmp_path) -> None:
+    """验证投稿包校验器接受完整正式上传元数据和有效 artifact release。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    artifact_dir = tmp_path / "artifact_release"
+    _write_required_manuscript_files(manuscript_root)
+    _write_final_upload_metadata(manuscript_root)
+    _write_final_upload_cover_letter(manuscript_root)
+    _write_artifact_release_manifest(artifact_dir)
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
+    errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True, artifact_dir=artifact_dir)
+
+    assert errors == []
+
+
+def test_validate_submission_package_rejects_final_upload_without_artifact_dir(tmp_path) -> None:
+    """验证正式上传包校验必须提供外部 artifact release 目录。"""
 
     builder = _load_submission_package_module()
     validator = _load_submission_validator_module()
@@ -1139,7 +1161,7 @@ def test_validate_submission_package_accepts_final_upload_with_filled_metadata(t
     builder.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
     errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True)
 
-    assert errors == []
+    assert any("final-upload validation requires --artifact-dir" in error for error in errors)
 
 
 def test_validate_submission_package_accepts_matching_final_upload_artifact_manifest(tmp_path) -> None:
