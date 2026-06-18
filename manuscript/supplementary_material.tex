@@ -141,6 +141,29 @@ python -m iad_sieve.cli build-iad-bench \
 \end{verbatim}
 \normalsize
 
+\section{Data Processing Traceability}
+
+Table~\ref{tab:data-processing-traceability} gives the reviewer-facing trace from public source files to derived evaluation artifacts. The repository commits the processing commands and schema checks, but keeps the raw source files and large derived outputs outside Git. This separation allows an independent reader to rebuild the same artifact classes from obtained public sources while respecting source licenses and keeping the public repository small.
+
+\begin{table}[H]
+\caption{Traceability from public data sources to derived IAD-Bench artifacts. Git contains commands, schemas, tests, and manifests; full-size inputs and outputs are verified through external artifact checksums.}
+\label{tab:data-processing-traceability}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{2pt}
+\begin{tabular}{L{0.15\linewidth}L{0.24\linewidth}L{0.20\linewidth}L{0.22\linewidth}L{0.11\linewidth}}
+\toprule
+Stage & Local input boundary & Processing entry point & Expected output & Git boundary \\
+\midrule
+DeepMatcher gold & Raw benchmark tables and pair labels. & \texttt{prepare-deepmatcher}. & Eval documents, eval pairs, and dataset summary. & Raw tables excluded; fixtures tested. \\
+SciRepEval proxy & Public metadata and citation-pair files. & \texttt{prepare-scirepeval-\allowbreak proximity}. & Proxy agenda pairs and source summaries. & Full metadata excluded; schema retained. \\
+OpenAlex weak labels & OpenAlex works and OpenCitations COCI files. & \texttt{prepare-openalex-\allowbreak weak-labels}. & Silver hard negatives with provenance. & Large sources excluded; rules retained. \\
+IAD-Bench assembly & Processed source directories from previous stages. & \texttt{build-iad-bench}. & Unified documents, pairs, splits, provenance, and dataset card. & Full package released as L2/L3 artifact. \\
+Result audit & Prediction, score, threshold, log, and metric files. & Artifact finalization and validation scripts. & Manifest, checksums, tables, predictions, and command logs. & External artifact required. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Artifact Package Requirements}
 
 Full numerical result reproduction should use a released artifact package rather than raw Git-tracked files. A complete artifact package should contain a manifest, checksums, tables, predictions, configuration files, logs, and the commit identifier used to generate the results.
