@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 56.
+Completed audit cycles: 57.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -545,6 +545,14 @@ Outcome: pass for selective-decision coverage table-density reduction; blocked f
 This gate checks whether the selective-decision coverage table is needed in the main manuscript. The main manuscript now states the operational boundary in prose: low FMR or HNFMR with high deferral is a conservative triage result, and automatic merge coverage, block rate, defer rate, review load, capacity-normalized review load, same prediction files, and a predeclared manual-review capacity and deferral budget are required before operational automation claims are made. The supplementary material preserves the full selective-decision coverage boundary table with the required artifact sources and interpretation boundaries.
 
 The reviewer-facing boundary is selective-decision coverage clarity without main-text table overload. The edit keeps the experiments section focused on reported false-merge evidence while the validator still requires the supplementary selective-decision coverage boundary, including automatic merge coverage, block rate, defer rate, review load, capacity-normalized review load, and the explicit rule that the paper does not claim throughput reduction or all-pair automatic resolution.
+
+## Audit Cycle 57: Threshold Sensitivity Evidence Status Density Gate
+
+Outcome: pass for threshold-sensitivity table-density reduction; blocked for threshold-stability claims until a released threshold grid reports predefined ranges, selected operating points, per-threshold metrics, command logs, manifests, and checksums from the same prediction files.
+
+This gate checks whether the threshold-sensitivity evidence table is needed in the main manuscript. The main manuscript now states the threshold boundary in prose: the current results use fixed operating points, the threshold grid is not reported as primary evidence, and metric stability requires the same prediction files, predefined threshold ranges, per-threshold F1, FMR, HNFMR, pair counts, random seeds, command logs, a manifest, and checksums. The supplementary material preserves the full threshold-sensitivity evidence status table with each audit item, current manuscript status, and required artifact before stronger claims.
+
+The reviewer-facing boundary is threshold-sensitivity clarity without main-text table overload. The edit keeps the experiments section focused on the Open-v2 evidence snapshot while the validator still requires the supplementary threshold-sensitivity evidence boundary, including fixed operating points, threshold grid requirements, metric stability requirements, artifact manifest requirements, and the explicit rule that the paper does not claim threshold-stable ranking across all operating points.
 
 ## Minimum Gate Before Final Upload
 

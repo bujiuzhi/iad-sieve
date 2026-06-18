@@ -564,6 +564,29 @@ Model ranking & Restricted to mechanism interpretation rather than a universal r
 \end{tabular}
 \end{table}
 
+\section{Threshold Sensitivity Evidence Status}
+
+The main manuscript summarizes the threshold-sensitivity evidence status in prose. Table~\ref{tab:threshold-sensitivity-status} preserves the audit items required before fixed-threshold results can be upgraded to threshold-stability claims.
+
+\begin{table}[H]
+\caption{Threshold sensitivity evidence status. The table separates the current fixed-threshold claim from the additional artifact evidence required for threshold-stability claims.}
+\label{tab:threshold-sensitivity-status}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.24\linewidth}L{0.33\linewidth}L{0.33\linewidth}}
+\toprule
+Audit item & Current manuscript status & Required artifact before stronger claim \\
+\midrule
+Fixed operating point & Reported through the operating-point disclosure table and tied to validation or default thresholds. & Configuration file recording $\tau_w$, $\tau_a$, $\tau_r$, baseline thresholds, and selection source. \\
+Threshold grid & The threshold grid is not reported as primary evidence in the current manuscript. & Sensitivity table generated from the same prediction files over predefined threshold ranges. \\
+Metric stability & Interpreted only for the reported operating points. & Per-threshold F1, FMR, HNFMR, pair counts, random seeds, and command logs. \\
+Artifact manifest & Required for numerical audit but not included in Git. & Manifest and checksums that bind prediction files, summaries, thresholds, and code commit. \\
+Interpretation boundary & Supports fixed-threshold false-merge control, not threshold-stable ranking across all operating points. & Stronger threshold-stability wording only after the released artifact contains the grid evidence. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Validity Threats Boundary}
 
 The main manuscript summarizes validity threats in prose. Table~\ref{tab:validity-threats} preserves the full validity-threats matrix for audit. The table is intentionally conservative: a mitigation reduces a specific validity risk, but it does not turn proxy or silver evidence into human-adjudicated truth.

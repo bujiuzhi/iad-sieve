@@ -2347,39 +2347,74 @@ def test_check_metric_formula_boundary_rejects_missing_denominators() -> None:
     assert any("missing labels" in error for error in errors)
 
 
-def test_check_threshold_sensitivity_status_accepts_bounded_claim() -> None:
-    """验证阈值敏感性边界完整时可通过检查。"""
+def test_check_threshold_sensitivity_status_accepts_supplementary_table() -> None:
+    """验证阈值敏感性状态表迁入补充材料后可通过检查。"""
 
     module = _load_validate_manuscript_module()
     manuscript_text = "\n".join(
         [
             r"\subsection{Threshold Sensitivity Evidence Status}",
-            r"\label{tab:threshold-sensitivity-status}",
+            "The full threshold-sensitivity evidence status table is reported in the supplementary material.",
             "Threshold stability is treated as an audit requirement.",
             "It is not as an unsupported robustness claim.",
             "A stronger claim requires the same prediction files.",
             "It also requires predefined threshold ranges.",
             "The threshold grid is not reported as primary evidence.",
-            "The package needs Per-threshold F1, FMR, HNFMR.",
+            "The package needs per-threshold F1, FMR, HNFMR.",
+            "The package needs random seeds.",
+            "The package needs command logs.",
+            "The package needs a manifest.",
+            "The package needs checksums.",
             "The manuscript supports fixed-threshold control, not threshold-stable ranking across all operating points.",
         ]
     )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Threshold Sensitivity Evidence Status}",
+            r"\label{tab:threshold-sensitivity-status}",
+            "Threshold sensitivity evidence status.",
+            "Audit item",
+            "Current manuscript status",
+            "Required artifact before stronger claim",
+            "Fixed operating point",
+            "Threshold grid",
+            "Metric stability",
+            "Artifact manifest",
+            "Interpretation boundary",
+        ]
+    )
 
-    errors = module.check_threshold_sensitivity_status(manuscript_text)
+    errors = module.check_threshold_sensitivity_status(manuscript_text, supplementary_text)
 
     assert errors == []
 
 
-def test_check_threshold_sensitivity_status_rejects_unbounded_claim() -> None:
-    """验证缺少阈值敏感性 artifact 边界时会被拒绝。"""
+def test_check_threshold_sensitivity_status_rejects_missing_supplementary_table() -> None:
+    """验证缺少补充材料完整阈值敏感性表时会被拒绝。"""
 
     module = _load_validate_manuscript_module()
-    manuscript_text = r"\subsection{Threshold Sensitivity Evidence Status}"
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Threshold Sensitivity Evidence Status}",
+            "The full threshold-sensitivity evidence status table is reported in the supplementary material.",
+            "Threshold stability is treated as an audit requirement.",
+            "It is not as an unsupported robustness claim.",
+            "A stronger claim requires the same prediction files.",
+            "It also requires predefined threshold ranges.",
+            "The threshold grid is not reported as primary evidence.",
+            "The package needs per-threshold F1, FMR, HNFMR.",
+            "The package needs random seeds.",
+            "The package needs command logs.",
+            "The package needs a manifest.",
+            "The package needs checksums.",
+            "The manuscript supports fixed-threshold control, not threshold-stable ranking across all operating points.",
+        ]
+    )
 
-    errors = module.check_threshold_sensitivity_status(manuscript_text)
+    errors = module.check_threshold_sensitivity_status(manuscript_text, "")
 
-    assert any("same prediction files" in error for error in errors)
-    assert any("not threshold-stable ranking" in error for error in errors)
+    assert any("tab:threshold-sensitivity-status" in error for error in errors)
+    assert any("Threshold Sensitivity Evidence Status" in error for error in errors)
 
 
 def test_check_threshold_uncertainty_reporting_accepts_complete_boundary() -> None:
@@ -4801,7 +4836,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 56.",
+            "Completed audit cycles: 57.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -5243,6 +5278,15 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "capacity-normalized review load",
             "selective-decision coverage clarity without main-text table overload",
             "supplementary selective-decision coverage boundary",
+            "## Audit Cycle 57: Threshold Sensitivity Evidence Status Density Gate",
+            "threshold-sensitivity table-density reduction",
+            "full threshold-sensitivity evidence status table",
+            "fixed operating points",
+            "threshold grid",
+            "per-threshold F1",
+            "threshold-stable ranking",
+            "threshold-sensitivity clarity without main-text table overload",
+            "supplementary threshold-sensitivity evidence boundary",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -5261,7 +5305,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 56",
+        "Completed audit cycles: 57",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -5272,7 +5316,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 56" in error for error in errors)
+    assert any("Completed audit cycles: 57" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

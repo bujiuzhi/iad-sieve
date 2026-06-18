@@ -1695,31 +1695,56 @@ def check_metric_formula_boundary(manuscript_text: str) -> list[str]:
     ]
 
 
-def check_threshold_sensitivity_status(manuscript_text: str) -> list[str]:
+def check_threshold_sensitivity_status(manuscript_text: str, supplementary_text: str = "") -> list[str]:
     """Check whether threshold sensitivity claims are bounded by artifact evidence.
 
     参数:
         manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
 
     返回:
         list[str]: Error messages for missing threshold-sensitivity markers.
     """
-    required_markers = [
+    required_main_markers = [
         r"\subsection{Threshold Sensitivity Evidence Status}",
-        r"\label{tab:threshold-sensitivity-status}",
+        "full threshold-sensitivity evidence status table is reported in the supplementary material",
         "Threshold stability is treated as an audit requirement",
         "not as an unsupported robustness claim",
         "same prediction files",
         "predefined threshold ranges",
         "not reported as primary evidence",
-        "Per-threshold F1, FMR, HNFMR",
+        "per-threshold F1, FMR, HNFMR",
+        "random seeds",
+        "command logs",
+        "a manifest",
+        "checksums",
         "not threshold-stable ranking across all operating points",
     ]
-    return [
-        f"threshold sensitivity evidence status missing marker: {marker}"
-        for marker in required_markers
+    required_supplement_markers = [
+        r"\section{Threshold Sensitivity Evidence Status}",
+        r"\label{tab:threshold-sensitivity-status}",
+        "Threshold sensitivity evidence status",
+        "Audit item",
+        "Current manuscript status",
+        "Required artifact before stronger claim",
+        "Fixed operating point",
+        "Threshold grid",
+        "Metric stability",
+        "Artifact manifest",
+        "Interpretation boundary",
+    ]
+    errors = [
+        f"threshold sensitivity evidence status missing manuscript marker: {marker}"
+        for marker in required_main_markers
         if marker not in manuscript_text
     ]
+    evidence_text = supplementary_text or manuscript_text
+    errors.extend(
+        f"threshold sensitivity evidence status missing supplementary marker: {marker}"
+        for marker in required_supplement_markers
+        if marker not in evidence_text
+    )
+    return errors
 
 
 def check_threshold_uncertainty_reporting(manuscript_text: str) -> list[str]:
@@ -3099,7 +3124,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 56",
+        "Completed audit cycles: 57",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3213,6 +3238,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 54: Mechanism Evidence Boundary Density Gate",
         "Audit Cycle 55: Pair-to-Cluster Evidence Boundary Density Gate",
         "Audit Cycle 56: Selective Decision Coverage Boundary Density Gate",
+        "Audit Cycle 57: Threshold Sensitivity Evidence Status Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
         "method-writing clarity",
@@ -3387,6 +3413,14 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "capacity-normalized review load",
         "selective-decision coverage clarity without main-text table overload",
         "supplementary selective-decision coverage boundary",
+        "threshold-sensitivity table-density reduction",
+        "full threshold-sensitivity evidence status table",
+        "fixed operating points",
+        "threshold grid",
+        "per-threshold F1",
+        "threshold-stable ranking",
+        "threshold-sensitivity clarity without main-text table overload",
+        "supplementary threshold-sensitivity evidence boundary",
         "remote reproducibility",
         "strong model matrix",
         "model superiority",
@@ -4653,7 +4687,7 @@ def main() -> int:
     errors.extend(check_metric_formula_boundary(manuscript_text))
     errors.extend(check_threshold_uncertainty_reporting(manuscript_text))
     errors.extend(check_statistical_interpretation_boundary(manuscript_text))
-    errors.extend(check_threshold_sensitivity_status(manuscript_text))
+    errors.extend(check_threshold_sensitivity_status(manuscript_text, supplementary_text))
     errors.extend(check_baseline_scope_alignment(manuscript_text))
     errors.extend(check_baseline_inclusion_rationale(manuscript_text))
     errors.extend(check_baseline_fairness_controls(manuscript_text))

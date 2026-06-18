@@ -579,26 +579,7 @@ The reported pair-level metrics do not by themselves prove cluster-level dedupli
 
 \subsection{Threshold Sensitivity Evidence Status}
 
-Threshold stability is treated as an audit requirement, not as an unsupported robustness claim. The current Open-v2 table reports fixed operating points and therefore supports the mechanism interpretation under those operating points. A stronger statement that the method is stable across thresholds would require a threshold grid computed from the same prediction files, predefined threshold ranges, metric summaries for each setting, and checksums in the released artifact manifest.
-
-\begin{table}[H]
-\caption{Threshold sensitivity evidence status. The table separates the current fixed-threshold claim from the additional artifact evidence required for threshold-stability claims.}
-\label{tab:threshold-sensitivity-status}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{L{0.24\linewidth}L{0.33\linewidth}L{0.33\linewidth}}
-\toprule
-Audit item & Current manuscript status & Required artifact before stronger claim \\
-\midrule
-Fixed operating point & Reported through the operating-point disclosure table and tied to validation or default thresholds. & Configuration file recording $\tau_w$, $\tau_a$, $\tau_r$, baseline thresholds, and selection source. \\
-Threshold grid & The threshold grid is not reported as primary evidence in the current manuscript. & Sensitivity table generated from the same prediction files over predefined threshold ranges. \\
-Metric stability & Interpreted only for the reported operating points. & Per-threshold F1, FMR, HNFMR, pair counts, random seeds, and command logs. \\
-Artifact manifest & Required for numerical audit but not included in Git. & Manifest and checksums that bind prediction files, summaries, thresholds, and code commit. \\
-Interpretation boundary & Supports fixed-threshold false-merge control, not threshold-stable ranking across all operating points. & Stronger threshold-stability wording only after the released artifact contains the grid evidence. \\
-\bottomrule
-\end{tabular}
-\end{table}
+Threshold stability is treated as an audit requirement, not as an unsupported robustness claim. The current Open-v2 table reports fixed operating points and therefore supports the mechanism interpretation under those operating points. The full threshold-sensitivity evidence status table is reported in the supplementary material. The main text keeps the threshold boundary as a prose rule: the current manuscript reports fixed operating points, the threshold grid is not reported as primary evidence, and metric stability requires the same prediction files, predefined threshold ranges, per-threshold F1, FMR, HNFMR, pair counts, random seeds, command logs, a manifest, and checksums. The current result therefore supports fixed-threshold false-merge control, not threshold-stable ranking across all operating points.
 
 \subsection{Baselines}
 
