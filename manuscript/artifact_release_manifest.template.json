@@ -116,13 +116,13 @@
       "artifact_id": "cluster_metric_summary",
       "required": false,
       "expected_location": "reports/cluster_metric_summary.csv",
-      "claim_support": "Cluster-level quality claims only if cited by the final manuscript."
+      "claim_support": "Cluster-level quality claims only if cited by the final manuscript. The CSV must include system, cluster_run_id, merge_policy_id, prediction_artifact_id, prediction_file_sha256, threshold_source, work_threshold, agenda_block_threshold, risk_threshold, cluster_assignment_file, pair_to_cluster_trace_file, cluster_id, cluster_size, accepted_link_count, cannot_link_conflict_count, unresolved_conflict_count, cluster_contamination_rate, singleton_rate, merge_coverage, random_seed, and command_line, with exactly one cluster_run_id, exactly one merge_policy_id, prediction_artifact_id, and prediction_file_sha256."
     },
     {
       "artifact_id": "cannot_link_audit",
       "required": false,
       "expected_location": "reports/cannot_link_audit.csv",
-      "claim_support": "Cannot-link and transitive-merge safety claims only if cited by the final manuscript."
+      "claim_support": "Cannot-link and transitive-merge safety claims only if cited by the final manuscript. The CSV must include system, cluster_run_id, merge_policy_id, prediction_artifact_id, prediction_file_sha256, threshold_source, work_threshold, agenda_block_threshold, risk_threshold, cannot_link_rule_id, conflict_type, source_document_id, target_document_id, cannot_link_flag, accepted_merge_blocked, violation_detected, unresolved_conflict, cannot_link_coverage_rate, identifier_conflict_rule, pair_to_cluster_trace_file, random_seed, and command_line, with exactly one cluster_run_id, exactly one merge_policy_id, prediction_artifact_id, and prediction_file_sha256."
     }
   ],
   "checksum_policy": {

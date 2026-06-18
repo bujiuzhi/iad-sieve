@@ -170,6 +170,79 @@ THRESHOLD_SENSITIVITY_COUNT_FIELDS = {
     "block_count",
     "defer_count",
 }
+CLUSTER_METRIC_SUMMARY_REQUIRED_COLUMNS = {
+    "system",
+    "cluster_run_id",
+    "merge_policy_id",
+    "prediction_artifact_id",
+    "prediction_file_sha256",
+    "threshold_source",
+    "work_threshold",
+    "agenda_block_threshold",
+    "risk_threshold",
+    "cluster_assignment_file",
+    "pair_to_cluster_trace_file",
+    "cluster_id",
+    "cluster_size",
+    "accepted_link_count",
+    "cannot_link_conflict_count",
+    "unresolved_conflict_count",
+    "cluster_contamination_rate",
+    "singleton_rate",
+    "merge_coverage",
+    "random_seed",
+    "command_line",
+}
+CLUSTER_METRIC_RATIO_FIELDS = {
+    "work_threshold",
+    "agenda_block_threshold",
+    "risk_threshold",
+    "cluster_contamination_rate",
+    "singleton_rate",
+    "merge_coverage",
+}
+CLUSTER_METRIC_COUNT_FIELDS = {
+    "cluster_size",
+    "accepted_link_count",
+    "cannot_link_conflict_count",
+    "unresolved_conflict_count",
+}
+CANNOT_LINK_AUDIT_REQUIRED_COLUMNS = {
+    "system",
+    "cluster_run_id",
+    "merge_policy_id",
+    "prediction_artifact_id",
+    "prediction_file_sha256",
+    "threshold_source",
+    "work_threshold",
+    "agenda_block_threshold",
+    "risk_threshold",
+    "cannot_link_rule_id",
+    "conflict_type",
+    "source_document_id",
+    "target_document_id",
+    "cannot_link_flag",
+    "accepted_merge_blocked",
+    "violation_detected",
+    "unresolved_conflict",
+    "cannot_link_coverage_rate",
+    "identifier_conflict_rule",
+    "pair_to_cluster_trace_file",
+    "random_seed",
+    "command_line",
+}
+CANNOT_LINK_RATIO_FIELDS = {
+    "work_threshold",
+    "agenda_block_threshold",
+    "risk_threshold",
+    "cannot_link_coverage_rate",
+}
+CANNOT_LINK_BOOLEAN_FIELDS = {
+    "cannot_link_flag",
+    "accepted_merge_blocked",
+    "violation_detected",
+    "unresolved_conflict",
+}
 JSONL_REQUIRED_FIELDS_BY_ARTIFACT = {
     "iad_risk_predictions": {
         "system",
@@ -937,6 +1010,190 @@ def check_threshold_sensitivity_grid_schema(csv_path: Path) -> list[str]:
     return errors
 
 
+def _check_single_prediction_binding(rows: list[dict[str, Any]], artifact_id: str) -> list[str]:
+    """Check that rows bind to exactly one prediction artifact and checksum.
+
+    参数:
+        rows: Parsed CSV rows.
+        artifact_id: Artifact identifier for diagnostics.
+
+    返回:
+        list[str]: Error messages for invalid binding fields.
+    """
+    errors: list[str] = []
+    prediction_artifact_ids = {str(row.get("prediction_artifact_id", "")).strip() for row in rows if str(row.get("prediction_artifact_id", "")).strip()}
+    prediction_checksums = {str(row.get("prediction_file_sha256", "")).strip().lower() for row in rows if str(row.get("prediction_file_sha256", "")).strip()}
+    for line_number, row in enumerate(rows, start=2):
+        prediction_checksum = str(row.get("prediction_file_sha256", "")).strip().lower()
+        if prediction_checksum and not SHA256_PATTERN.fullmatch(prediction_checksum):
+            errors.append(f"{artifact_id} CSV line {line_number} has invalid prediction_file_sha256")
+    if len(prediction_artifact_ids) != 1:
+        errors.append(f"{artifact_id} CSV must be generated from exactly one prediction_artifact_id")
+    if len(prediction_checksums) != 1:
+        errors.append(f"{artifact_id} CSV must be generated from exactly one prediction_file_sha256")
+    return errors
+
+
+def check_cluster_metric_summary_schema(csv_path: Path) -> list[str]:
+    """Check cluster-level metric artifact columns and row-level audit fields.
+
+    参数:
+        csv_path: Path to reports/cluster_metric_summary.csv.
+
+    返回:
+        list[str]: Error messages for missing cluster-level audit evidence.
+    """
+    try:
+        with csv_path.open("r", encoding="utf-8", newline="") as file_handle:
+            reader = csv.DictReader(file_handle)
+            header = [column.strip() for column in (reader.fieldnames or []) if column and column.strip()]
+            rows = [{str(key).strip(): value for key, value in raw_row.items() if key is not None} for raw_row in reader]
+    except OSError as exc:
+        return [f"cluster_metric_summary CSV cannot be read: {exc}"]
+    if not header:
+        return ["cluster_metric_summary CSV is empty or missing a header row"]
+
+    errors: list[str] = []
+    actual_columns = set(header)
+    missing_columns = CLUSTER_METRIC_SUMMARY_REQUIRED_COLUMNS - actual_columns
+    for column in sorted(missing_columns):
+        errors.append(f"cluster_metric_summary CSV missing cluster audit column: {column}")
+    if missing_columns:
+        return errors
+    if not rows:
+        return ["cluster_metric_summary CSV has no data rows"]
+
+    required_text_fields = [
+        "system",
+        "cluster_run_id",
+        "merge_policy_id",
+        "prediction_artifact_id",
+        "prediction_file_sha256",
+        "threshold_source",
+        "cluster_assignment_file",
+        "pair_to_cluster_trace_file",
+        "cluster_id",
+        "command_line",
+    ]
+    cluster_run_ids: set[str] = set()
+    merge_policy_ids: set[str] = set()
+    for line_number, row in enumerate(rows, start=2):
+        for field in required_text_fields:
+            if not str(row.get(field, "")).strip():
+                errors.append(f"cluster_metric_summary CSV line {line_number} missing required value: {field}")
+        cluster_run_id = str(row.get("cluster_run_id", "")).strip()
+        merge_policy_id = str(row.get("merge_policy_id", "")).strip()
+        if cluster_run_id:
+            cluster_run_ids.add(cluster_run_id)
+        if merge_policy_id:
+            merge_policy_ids.add(merge_policy_id)
+        for field in sorted(CLUSTER_METRIC_RATIO_FIELDS):
+            parsed_value = _parse_float(row.get(field))
+            if parsed_value is None or not 0.0 <= parsed_value <= 1.0:
+                errors.append(f"cluster_metric_summary CSV line {line_number} must set {field} between 0 and 1")
+        for field in sorted(CLUSTER_METRIC_COUNT_FIELDS):
+            parsed_value = _parse_int(row.get(field))
+            minimum_value = 1 if field == "cluster_size" else 0
+            if parsed_value is None or parsed_value < minimum_value:
+                errors.append(f"cluster_metric_summary CSV line {line_number} must set {field} to an integer >= {minimum_value}")
+        random_seed = _parse_int(row.get("random_seed"))
+        if random_seed is None:
+            errors.append(f"cluster_metric_summary CSV line {line_number} must set random_seed to an integer")
+        if len(errors) >= 30:
+            errors.append("cluster_metric_summary CSV schema check stopped after 30 errors")
+            return errors
+    if len(cluster_run_ids) != 1:
+        errors.append("cluster_metric_summary CSV must describe exactly one cluster_run_id")
+    if len(merge_policy_ids) != 1:
+        errors.append("cluster_metric_summary CSV must describe exactly one merge_policy_id")
+    errors.extend(_check_single_prediction_binding(rows, "cluster_metric_summary"))
+    return errors
+
+
+def check_cannot_link_audit_schema(csv_path: Path) -> list[str]:
+    """Check cannot-link audit artifact columns and row-level evidence fields.
+
+    参数:
+        csv_path: Path to reports/cannot_link_audit.csv.
+
+    返回:
+        list[str]: Error messages for missing cannot-link audit evidence.
+    """
+    try:
+        with csv_path.open("r", encoding="utf-8", newline="") as file_handle:
+            reader = csv.DictReader(file_handle)
+            header = [column.strip() for column in (reader.fieldnames or []) if column and column.strip()]
+            rows = [{str(key).strip(): value for key, value in raw_row.items() if key is not None} for raw_row in reader]
+    except OSError as exc:
+        return [f"cannot_link_audit CSV cannot be read: {exc}"]
+    if not header:
+        return ["cannot_link_audit CSV is empty or missing a header row"]
+
+    errors: list[str] = []
+    actual_columns = set(header)
+    missing_columns = CANNOT_LINK_AUDIT_REQUIRED_COLUMNS - actual_columns
+    for column in sorted(missing_columns):
+        errors.append(f"cannot_link_audit CSV missing cannot-link audit column: {column}")
+    if missing_columns:
+        return errors
+    if not rows:
+        return ["cannot_link_audit CSV has no data rows"]
+
+    required_text_fields = [
+        "system",
+        "cluster_run_id",
+        "merge_policy_id",
+        "prediction_artifact_id",
+        "prediction_file_sha256",
+        "threshold_source",
+        "cannot_link_rule_id",
+        "conflict_type",
+        "source_document_id",
+        "target_document_id",
+        "identifier_conflict_rule",
+        "pair_to_cluster_trace_file",
+        "command_line",
+    ]
+    cluster_run_ids: set[str] = set()
+    merge_policy_ids: set[str] = set()
+    conflict_types: set[str] = set()
+    for line_number, row in enumerate(rows, start=2):
+        for field in required_text_fields:
+            if not str(row.get(field, "")).strip():
+                errors.append(f"cannot_link_audit CSV line {line_number} missing required value: {field}")
+        cluster_run_id = str(row.get("cluster_run_id", "")).strip()
+        merge_policy_id = str(row.get("merge_policy_id", "")).strip()
+        conflict_type = str(row.get("conflict_type", "")).strip()
+        if cluster_run_id:
+            cluster_run_ids.add(cluster_run_id)
+        if merge_policy_id:
+            merge_policy_ids.add(merge_policy_id)
+        if conflict_type:
+            conflict_types.add(conflict_type)
+        for field in sorted(CANNOT_LINK_RATIO_FIELDS):
+            parsed_value = _parse_float(row.get(field))
+            if parsed_value is None or not 0.0 <= parsed_value <= 1.0:
+                errors.append(f"cannot_link_audit CSV line {line_number} must set {field} between 0 and 1")
+        for field in sorted(CANNOT_LINK_BOOLEAN_FIELDS):
+            value = str(row.get(field, "")).strip().casefold()
+            if value not in {"0", "1", "false", "true", "no", "yes", "n", "y"}:
+                errors.append(f"cannot_link_audit CSV line {line_number} must set {field} to a boolean value")
+        random_seed = _parse_int(row.get("random_seed"))
+        if random_seed is None:
+            errors.append(f"cannot_link_audit CSV line {line_number} must set random_seed to an integer")
+        if len(errors) >= 30:
+            errors.append("cannot_link_audit CSV schema check stopped after 30 errors")
+            return errors
+    if len(cluster_run_ids) != 1:
+        errors.append("cannot_link_audit CSV must describe exactly one cluster_run_id")
+    if len(merge_policy_ids) != 1:
+        errors.append("cannot_link_audit CSV must describe exactly one merge_policy_id")
+    if not conflict_types:
+        errors.append("cannot_link_audit CSV must include at least one conflict_type")
+    errors.extend(_check_single_prediction_binding(rows, "cannot_link_audit"))
+    return errors
+
+
 def _missing_jsonl_required_fields(row: dict[str, Any], required_fields: set[str]) -> list[str]:
     """Return required JSONL fields that are absent or empty.
 
@@ -1122,6 +1379,30 @@ def check_manifest_artifacts(
             and (artifact_dir / threshold_grid_location).is_file()
         ):
             errors.extend(check_threshold_sensitivity_grid_schema(artifact_dir / threshold_grid_location))
+
+    cluster_metric_row = artifact_rows.get("cluster_metric_summary")
+    if isinstance(cluster_metric_row, dict):
+        cluster_metric_location = str(cluster_metric_row.get("expected_location", "")).strip()
+        cluster_metric_location_path = Path(cluster_metric_location)
+        if (
+            cluster_metric_location
+            and not cluster_metric_location_path.is_absolute()
+            and ".." not in cluster_metric_location_path.parts
+            and (artifact_dir / cluster_metric_location).is_file()
+        ):
+            errors.extend(check_cluster_metric_summary_schema(artifact_dir / cluster_metric_location))
+
+    cannot_link_row = artifact_rows.get("cannot_link_audit")
+    if isinstance(cannot_link_row, dict):
+        cannot_link_location = str(cannot_link_row.get("expected_location", "")).strip()
+        cannot_link_location_path = Path(cannot_link_location)
+        if (
+            cannot_link_location
+            and not cannot_link_location_path.is_absolute()
+            and ".." not in cannot_link_location_path.parts
+            and (artifact_dir / cannot_link_location).is_file()
+        ):
+            errors.extend(check_cannot_link_audit_schema(artifact_dir / cannot_link_location))
 
     claim_boundaries = manifest.get("claim_boundaries")
     if isinstance(claim_boundaries, dict):

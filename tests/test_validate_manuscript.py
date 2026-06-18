@@ -4106,8 +4106,31 @@ def test_check_artifact_release_manifest_template_accepts_complete_template() ->
                         "random_seed, command_line, and separate selection and evaluation splits."
                     ),
                 },
-                {"artifact_id": "cluster_metric_summary"},
-                {"artifact_id": "cannot_link_audit"},
+                {
+                    "artifact_id": "cluster_metric_summary",
+                    "claim_support": (
+                        "Cluster-level quality claims only if cited by the final manuscript. The CSV must include "
+                        "system, cluster_run_id, merge_policy_id, prediction_artifact_id, prediction_file_sha256, "
+                        "threshold_source, work_threshold, agenda_block_threshold, risk_threshold, "
+                        "cluster_assignment_file, pair_to_cluster_trace_file, cluster_id, cluster_size, "
+                        "accepted_link_count, cannot_link_conflict_count, unresolved_conflict_count, "
+                        "cluster_contamination_rate, singleton_rate, merge_coverage, random_seed, and command_line, "
+                        "with exactly one cluster_run_id, exactly one merge_policy_id, prediction_artifact_id, and prediction_file_sha256."
+                    ),
+                },
+                {
+                    "artifact_id": "cannot_link_audit",
+                    "claim_support": (
+                        "Cannot-link and transitive-merge safety claims only if cited by the final manuscript. "
+                        "The CSV must include system, cluster_run_id, merge_policy_id, prediction_artifact_id, "
+                        "prediction_file_sha256, threshold_source, work_threshold, agenda_block_threshold, "
+                        "risk_threshold, cannot_link_rule_id, conflict_type, source_document_id, target_document_id, "
+                        "cannot_link_flag, accepted_merge_blocked, violation_detected, unresolved_conflict, "
+                        "cannot_link_coverage_rate, identifier_conflict_rule, pair_to_cluster_trace_file, "
+                        "random_seed, and command_line, with exactly one cluster_run_id, exactly one merge_policy_id, "
+                        "prediction_artifact_id, and prediction_file_sha256."
+                    ),
+                },
             ],
             "minimum_validation_commands": [
                 "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts --preflight-only",
@@ -4480,6 +4503,27 @@ def test_check_artifact_release_readme_template_accepts_complete_template() -> N
             "separate selection and evaluation splits",
             "cluster_metric_summary",
             "cannot_link_audit",
+            "cluster_run_id",
+            "merge_policy_id",
+            "cluster_assignment_file",
+            "pair_to_cluster_trace_file",
+            "cluster_id",
+            "cluster_size",
+            "accepted_link_count",
+            "cannot_link_conflict_count",
+            "unresolved_conflict_count",
+            "cluster_contamination_rate",
+            "singleton_rate",
+            "merge_coverage",
+            "cannot_link_rule_id",
+            "conflict_type",
+            "cannot_link_flag",
+            "accepted_merge_blocked",
+            "violation_detected",
+            "cannot_link_coverage_rate",
+            "identifier_conflict_rule",
+            "exactly one cluster_run_id",
+            "exactly one merge_policy_id",
             "## Conditional Claim Artifacts",
             "confidence_intervals_claimed requires bootstrap_intervals.",
             "component_causality_claimed requires ablation_suite.",
@@ -5508,7 +5552,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 80.",
+            "Completed audit cycles: 81.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -6158,6 +6202,18 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "selection/evaluation split leakage",
             "mixed prediction-file checksums",
             "fixed-threshold false-merge control",
+            "## Audit Cycle 81: Cluster-Level Artifact Release Schema Gate",
+            "cluster-level artifact release schema validation",
+            "`cluster_level_quality_claimed`",
+            "reports/cluster_metric_summary.csv",
+            "reports/cannot_link_audit.csv",
+            "cluster assignment and pair-to-cluster trace file references",
+            "cannot-link rule IDs",
+            "blocked-merge indicators",
+            "coverage rate",
+            "mixed cluster runs or merge policies",
+            "unparseable cannot-link booleans",
+            "pair-level FMR and HNFMR support false-merge control",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -6176,7 +6232,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 80",
+        "Completed audit cycles: 81",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -6187,7 +6243,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 80" in error for error in errors)
+    assert any("Completed audit cycles: 81" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

@@ -477,6 +477,180 @@ def _add_threshold_sensitivity_grid_artifact(
     _refresh_checksums(artifact_dir)
 
 
+def _complete_cluster_metric_summary_csv(mixed_cluster_run: bool = False, invalid_ratio: bool = False) -> str:
+    """生成满足 cluster_metric_summary schema 的 CSV 内容。
+
+    参数:
+        mixed_cluster_run: 是否故意混用 cluster_run_id。
+        invalid_ratio: 是否故意写入非法比例值。
+
+    返回:
+        str: cluster_metric_summary CSV 内容。
+    """
+    header = [
+        "system",
+        "cluster_run_id",
+        "merge_policy_id",
+        "prediction_artifact_id",
+        "prediction_file_sha256",
+        "threshold_source",
+        "work_threshold",
+        "agenda_block_threshold",
+        "risk_threshold",
+        "cluster_assignment_file",
+        "pair_to_cluster_trace_file",
+        "cluster_id",
+        "cluster_size",
+        "accepted_link_count",
+        "cannot_link_conflict_count",
+        "unresolved_conflict_count",
+        "cluster_contamination_rate",
+        "singleton_rate",
+        "merge_coverage",
+        "random_seed",
+        "command_line",
+    ]
+    rows = []
+    for index in range(2):
+        rows.append(
+            [
+                "iad_risk_transformer",
+                "cluster-run-b" if mixed_cluster_run and index == 1 else "cluster-run-a",
+                "fixed-risk-gate",
+                "iad_risk_predictions",
+                "3" * 64,
+                "threshold_selection_logs",
+                "0.50",
+                "0.50",
+                "0.45",
+                "reports/cluster_assignments.csv",
+                "reports/pair_to_cluster_trace.csv",
+                f"cluster-{index}",
+                str(index + 1),
+                str(index),
+                str(index),
+                "0",
+                "1.2" if invalid_ratio and index == 0 else "0.00",
+                "0.50",
+                "0.40",
+                "42",
+                "python -m iad_sieve.cli build-cluster-audit",
+            ]
+        )
+    return "\n".join([",".join(header), *[",".join(row) for row in rows]]) + "\n"
+
+
+def _complete_cannot_link_audit_csv(mixed_prediction_checksums: bool = False, invalid_boolean: bool = False) -> str:
+    """生成满足 cannot_link_audit schema 的 CSV 内容。
+
+    参数:
+        mixed_prediction_checksums: 是否故意混用预测文件校验和。
+        invalid_boolean: 是否故意写入非法布尔值。
+
+    返回:
+        str: cannot_link_audit CSV 内容。
+    """
+    header = [
+        "system",
+        "cluster_run_id",
+        "merge_policy_id",
+        "prediction_artifact_id",
+        "prediction_file_sha256",
+        "threshold_source",
+        "work_threshold",
+        "agenda_block_threshold",
+        "risk_threshold",
+        "cannot_link_rule_id",
+        "conflict_type",
+        "source_document_id",
+        "target_document_id",
+        "cannot_link_flag",
+        "accepted_merge_blocked",
+        "violation_detected",
+        "unresolved_conflict",
+        "cannot_link_coverage_rate",
+        "identifier_conflict_rule",
+        "pair_to_cluster_trace_file",
+        "random_seed",
+        "command_line",
+    ]
+    rows = []
+    for index, conflict_type in enumerate(["doi_conflict", "version_boundary"]):
+        rows.append(
+            [
+                "iad_risk_transformer",
+                "cluster-run-a",
+                "fixed-risk-gate",
+                "iad_risk_predictions",
+                "4" * 64 if mixed_prediction_checksums and index == 1 else "3" * 64,
+                "threshold_selection_logs",
+                "0.50",
+                "0.50",
+                "0.45",
+                f"cannot-link-{index}",
+                conflict_type,
+                f"source-{index}",
+                f"target-{index}",
+                "maybe" if invalid_boolean and index == 0 else "true",
+                "true",
+                "false",
+                "false",
+                "0.95",
+                "documented_identifier_conflict_blocks_merge",
+                "reports/pair_to_cluster_trace.csv",
+                "42",
+                "python -m iad_sieve.cli build-cluster-audit",
+            ]
+        )
+    return "\n".join([",".join(header), *[",".join(row) for row in rows]]) + "\n"
+
+
+def _add_cluster_quality_artifacts(
+    artifact_dir: Path,
+    cluster_csv_content: str | None = None,
+    cannot_link_csv_content: str | None = None,
+    cluster_claimed: bool = True,
+) -> None:
+    """向测试 release 添加 cluster-level quality artifacts。
+
+    参数:
+        artifact_dir: Release 目录。
+        cluster_csv_content: 可选 cluster_metric_summary CSV 内容。
+        cannot_link_csv_content: 可选 cannot_link_audit CSV 内容。
+        cluster_claimed: 是否打开 cluster_level_quality_claimed。
+
+    返回:
+        无。
+    """
+    cluster_path = artifact_dir / "reports" / "cluster_metric_summary.csv"
+    cannot_link_path = artifact_dir / "reports" / "cannot_link_audit.csv"
+    _write_file(cluster_path, cluster_csv_content or _complete_cluster_metric_summary_csv())
+    _write_file(cannot_link_path, cannot_link_csv_content or _complete_cannot_link_audit_csv())
+    manifest_path = artifact_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["claim_boundaries"]["cluster_level_quality_claimed"] = cluster_claimed
+    manifest["required_artifacts"].extend(
+        [
+            {
+                "artifact_id": "cluster_metric_summary",
+                "required": cluster_claimed,
+                "expected_location": "reports/cluster_metric_summary.csv",
+                "sha256": _sha256_file(cluster_path),
+                "claim_support": "Cluster metric artifact with assignment and trace file bindings.",
+            },
+            {
+                "artifact_id": "cannot_link_audit",
+                "required": cluster_claimed,
+                "expected_location": "reports/cannot_link_audit.csv",
+                "sha256": _sha256_file(cannot_link_path),
+                "claim_support": "Cannot-link audit artifact with coverage, violation, and conflict-rule fields.",
+            },
+        ]
+    )
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    _refresh_checksums(artifact_dir)
+
+
 def _complete_readme_text() -> str:
     """生成包含必需复现说明的测试 README。
 
@@ -836,6 +1010,85 @@ def test_validate_artifact_release_rejects_claimed_cluster_quality_without_clust
     assert any("cluster_level_quality_claimed" in error for error in errors)
     assert any("cluster_metric_summary" in error for error in errors)
     assert any("cannot_link_audit" in error for error in errors)
+
+
+def test_validate_artifact_release_accepts_claimed_cluster_quality_with_protocol_artifacts(tmp_path) -> None:
+    """验证 cluster-level quality claim 只有在 cluster artifacts 字段完整时通过。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    _add_cluster_quality_artifacts(artifact_dir)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert errors == []
+
+
+def test_validate_artifact_release_rejects_cluster_metric_summary_without_trace_file(tmp_path) -> None:
+    """验证 cluster_metric_summary 缺少 pair-to-cluster trace 时会被拒绝。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    invalid_csv = _complete_cluster_metric_summary_csv().replace("reports/pair_to_cluster_trace.csv", "", 1)
+    _add_cluster_quality_artifacts(artifact_dir, cluster_csv_content=invalid_csv)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("cluster_metric_summary CSV line 2 missing required value: pair_to_cluster_trace_file" in error for error in errors)
+
+
+def test_validate_artifact_release_rejects_cluster_metric_summary_mixed_cluster_run(tmp_path) -> None:
+    """验证 cluster_metric_summary 不得混用多个 cluster_run_id。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    _add_cluster_quality_artifacts(artifact_dir, cluster_csv_content=_complete_cluster_metric_summary_csv(mixed_cluster_run=True))
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("cluster_metric_summary CSV must describe exactly one cluster_run_id" in error for error in errors)
+
+
+def test_validate_artifact_release_rejects_cluster_metric_summary_invalid_ratio(tmp_path) -> None:
+    """验证 cluster_metric_summary 的比例字段必须在 0 到 1 之间。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    _add_cluster_quality_artifacts(artifact_dir, cluster_csv_content=_complete_cluster_metric_summary_csv(invalid_ratio=True))
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("cluster_contamination_rate between 0 and 1" in error for error in errors)
+
+
+def test_validate_artifact_release_rejects_cannot_link_audit_mixed_prediction_files(tmp_path) -> None:
+    """验证 cannot_link_audit 必须绑定同一个预测文件校验和。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    _add_cluster_quality_artifacts(artifact_dir, cannot_link_csv_content=_complete_cannot_link_audit_csv(mixed_prediction_checksums=True))
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("cannot_link_audit CSV must be generated from exactly one prediction_file_sha256" in error for error in errors)
+
+
+def test_validate_artifact_release_rejects_cannot_link_audit_invalid_boolean(tmp_path) -> None:
+    """验证 cannot_link_audit 的布尔字段必须可解析。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    _add_cluster_quality_artifacts(artifact_dir, cannot_link_csv_content=_complete_cannot_link_audit_csv(invalid_boolean=True))
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("cannot_link_audit CSV line 2 must set cannot_link_flag to a boolean value" in error for error in errors)
 
 
 def test_validate_artifact_release_accepts_claimed_component_causality_with_protocol_ablation_suite(tmp_path) -> None:
