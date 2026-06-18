@@ -2615,6 +2615,67 @@ def test_check_manual_validation_boundary_rejects_missing_human_gold_boundary() 
     assert any("not human-gold non-identity labels" in error for error in errors)
 
 
+def test_check_scope_compatibility_accepts_main_boundary_and_supplementary_matrix() -> None:
+    """验证主文范围边界和补充材料范围矩阵完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Scope Compatibility of the Open-v2 Table}",
+            "The full scope compatibility matrix is reported in the supplementary material.",
+            "The Open-v2 table is a scope-bounded evidence table.",
+            "It is not a single comparative ranking.",
+            "Full pair-scope representation baselines test hard-negative risk.",
+            "Held-out IAD-Risk rows test risk-gated decisions.",
+            "A stronger ranking requires the same released prediction scope.",
+            "It also requires a manual-validation slice.",
+            "A claim that this stronger comparison has already been completed is outside the evidence.",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Claim-Evidence Matrix}",
+            r"\label{tab:scope-compatibility}",
+            "Scope compatibility for interpreting the Open-v2 evidence snapshot.",
+            "Representation baselines use Full available Open-v2 pair scope.",
+            "RoBERTa pair classifier is reported as a supervised comparator.",
+            "IAD-Risk transformer variants use Held-out Open-v2 test scope.",
+            "Future stronger comparison requires Same released prediction scope plus manual-validation slice.",
+            "A claim that this stronger comparison has already been completed is not supported.",
+        ]
+    )
+
+    errors = module.check_scope_compatibility(manuscript_text, supplementary_text)
+
+    assert errors == []
+
+
+def test_check_scope_compatibility_rejects_missing_supplementary_matrix() -> None:
+    """验证缺少补充材料范围矩阵时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Scope Compatibility of the Open-v2 Table}",
+            "The full scope compatibility matrix is reported in the supplementary material.",
+            "The Open-v2 table is a scope-bounded evidence table.",
+            "It is not a single comparative ranking.",
+            "Full pair-scope representation baselines test hard-negative risk.",
+            "Held-out IAD-Risk rows test risk-gated decisions.",
+            "A stronger ranking requires the same released prediction scope.",
+            "It also requires a manual-validation slice.",
+            "A claim that this stronger comparison has already been completed is outside the evidence.",
+        ]
+    )
+    supplementary_text = r"\section{Claim-Evidence Matrix}"
+
+    errors = module.check_scope_compatibility(manuscript_text, supplementary_text)
+
+    assert any("scope-compatibility" in error for error in errors)
+    assert any("Representation baselines" in error for error in errors)
+    assert any("Held-out Open-v2 test scope" in error for error in errors)
+
+
 def test_check_extended_protocol_boundary_accepts_follow_up_protocol_scope() -> None:
     """验证 Open-v3/source-heldout 作为后续协议边界时可通过检查。"""
 
@@ -4425,7 +4486,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 46.",
+            "Completed audit cycles: 47.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -4776,6 +4837,13 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "full manual validation protocol table",
             "label-evidence clarity without main-text table overload",
             "human-gold wording limits",
+            "## Audit Cycle 47: Scope Compatibility Matrix Density Gate",
+            "mixed-scope comparison table-density reduction",
+            "broad ranking claims",
+            "full scope compatibility matrix",
+            "row-family scopes",
+            "mixed-scope interpretation clarity without main-text table overload",
+            "explicit stronger-comparison boundary",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -4794,7 +4862,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 46",
+        "Completed audit cycles: 47",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -4805,7 +4873,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 46" in error for error in errors)
+    assert any("Completed audit cycles: 47" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

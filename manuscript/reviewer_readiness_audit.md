@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 46.
+Completed audit cycles: 47.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -465,6 +465,14 @@ Outcome: pass for manual-validation table-density reduction; blocked for final l
 This gate checks whether the manual-validation boundary matrix is needed in the main result section. The main manuscript now states that manual validation is not completed, that silver hard negatives are stress-test evidence rather than human-gold non-identity labels, and that stronger label-precision claims require a 500--1,000 pair reviewed slice with blinded independent review and adjudication artifacts. The supplementary material preserves the full manual validation boundary table and the full manual validation protocol table.
 
 The reviewer-facing boundary is label-evidence clarity without main-text table overload. The edit keeps the Open-v2 result section focused on the reported evidence snapshot while the validator still requires the supplementary manual-validation boundary, protocol, reviewer process, adjudication artifacts, and human-gold wording limits.
+
+## Audit Cycle 47: Scope Compatibility Matrix Density Gate
+
+Outcome: pass for mixed-scope comparison table-density reduction; blocked for broad ranking claims until all row families share released prediction scopes, threshold logs, checksums, interval estimates, and a manual-validation slice.
+
+This gate checks whether the Open-v2 scope compatibility matrix belongs in the main result section. The main manuscript now states that the Open-v2 table is a scope-bounded evidence table, not a single comparative ranking, and that full pair-scope representation baselines and held-out IAD-Risk rows support a mechanistic comparison rather than a broad ranking. The supplementary material preserves the full scope compatibility matrix with row-family scopes, supported interpretations, and unsupported stronger comparisons.
+
+The reviewer-facing boundary is mixed-scope interpretation clarity without main-text table overload. The edit keeps the main result section focused on the conservative false-merge-control claim while the validator still requires the supplementary scope compatibility matrix and the explicit stronger-comparison boundary.
 
 ## Minimum Gate Before Final Upload
 

@@ -2036,18 +2036,19 @@ def check_split_leakage_controls(manuscript_text: str) -> list[str]:
     return [f"split and leakage controls missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
 
 
-def check_scope_compatibility(manuscript_text: str) -> list[str]:
+def check_scope_compatibility(manuscript_text: str, supplementary_text: str) -> list[str]:
     """Check whether mixed-scope Open-v2 rows have a clear interpretation boundary.
 
     参数:
         manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
 
     返回:
         list[str]: Error messages for missing scope-compatibility markers.
     """
-    required_markers = [
+    required_main_markers = [
         r"\subsection{Scope Compatibility of the Open-v2 Table}",
-        r"\label{tab:scope-compatibility}",
+        "full scope compatibility matrix is reported in the supplementary material",
         "scope-bounded evidence table",
         "not a single comparative ranking",
         "Full pair-scope representation baselines",
@@ -2056,7 +2057,30 @@ def check_scope_compatibility(manuscript_text: str) -> list[str]:
         "manual-validation slice",
         "A claim that this stronger comparison has already been completed",
     ]
-    return [f"Open-v2 scope compatibility missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+    required_supplementary_markers = [
+        r"\section{Claim-Evidence Matrix}",
+        r"\label{tab:scope-compatibility}",
+        "Scope compatibility for interpreting the Open-v2 evidence snapshot",
+        "Representation baselines",
+        "Full available Open-v2 pair scope",
+        "RoBERTa pair classifier",
+        "IAD-Risk transformer variants",
+        "Held-out Open-v2 test scope",
+        "Future stronger comparison",
+        "Same released prediction scope plus manual-validation slice",
+        "A claim that this stronger comparison has already been completed",
+    ]
+    errors = [
+        f"Open-v2 scope compatibility missing manuscript marker: {marker}"
+        for marker in required_main_markers
+        if marker not in manuscript_text
+    ]
+    errors.extend(
+        f"Open-v2 scope compatibility missing supplementary marker: {marker}"
+        for marker in required_supplementary_markers
+        if marker not in supplementary_text
+    )
+    return errors
 
 
 def check_extended_protocol_boundary(manuscript_text: str) -> list[str]:
@@ -2975,7 +2999,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 46",
+        "Completed audit cycles: 47",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3079,6 +3103,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 44: Experiment Reporting Boundary Density Gate",
         "Audit Cycle 45: Result Artifact Crosswalk Density Gate",
         "Audit Cycle 46: Manual Validation Boundary Density Gate",
+        "Audit Cycle 47: Scope Compatibility Matrix Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
         "method-writing clarity",
@@ -3174,6 +3199,12 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "full manual validation protocol table",
         "label-evidence clarity without main-text table overload",
         "human-gold wording limits",
+        "mixed-scope comparison table-density reduction",
+        "broad ranking claims",
+        "full scope compatibility matrix",
+        "row-family scopes",
+        "mixed-scope interpretation clarity without main-text table overload",
+        "explicit stronger-comparison boundary",
         "remote reproducibility",
         "strong model matrix",
         "model superiority",
@@ -4330,7 +4361,7 @@ def main() -> int:
     errors.extend(check_openv2_result_table_scope_labels(manuscript_text))
     errors.extend(check_manual_validation_boundary(manuscript_text))
     errors.extend(check_split_leakage_controls(manuscript_text))
-    errors.extend(check_scope_compatibility(manuscript_text))
+    errors.extend(check_scope_compatibility(manuscript_text, supplementary_text))
     errors.extend(check_extended_protocol_boundary(manuscript_text))
     errors.extend(check_environment_setup(supplementary_text))
     errors.extend(check_public_source_rebuild_audit_boundary(supplementary_text))

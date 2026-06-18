@@ -426,6 +426,24 @@ Cluster-level quality is claimed only after pair-to-cluster audit. & \path{clust
 \end{tabular}
 \end{table}
 
+\begin{table}[H]
+\caption{Scope compatibility for interpreting the Open-v2 evidence snapshot. The table states what each row family supports and which stronger comparison remains outside the current evidence.}
+\label{tab:scope-compatibility}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.22\linewidth}L{0.20\linewidth}L{0.26\linewidth}L{0.22\linewidth}}
+\toprule
+Row family & Pair scope & Supported interpretation & Not supported \\
+\midrule
+Representation baselines & Full available Open-v2 pair scope. & Tests whether one-space scientific relatedness creates hard-negative merge risk. & A tuned neural pair-classifier ranking under the same held-out prediction file. \\
+RoBERTa pair classifier & Full available Open-v2 pair scope. & Shows that a strong supervised pair classifier can suppress most hard-negative merges. & A component-level explanation of identity-agenda risk control. \\
+IAD-Risk transformer variants & Held-out Open-v2 test scope. & Tests whether explicit identity, agenda, and ANI heads support risk-gated held-out decisions. & A general ranking over every baseline before all rows share the same released prediction scope. \\
+Future stronger comparison & Same released prediction scope plus manual-validation slice. & Would support a stricter comparative ranking and stronger label-precision claims. & A claim that this stronger comparison has already been completed by the current evidence snapshot. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Uncertainty and Ablation Requirements}
 
 \begin{table}[H]
