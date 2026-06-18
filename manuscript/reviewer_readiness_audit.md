@@ -10,9 +10,9 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 36.
+Completed audit cycles: 37.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.
 
@@ -385,6 +385,14 @@ Outcome: pass for tracked metadata declaration placeholders; blocked for final u
 This gate checks whether the tracked source metadata prematurely records final author declarations. In the anonymous preflight source, `statements.originality`, `statements.author_approval`, and `statements.competing_interests` remain empty because the author list and corresponding author are not yet confirmed. The manuscript validator rejects those fields when they are filled while the package remains in preflight state.
 
 The reviewer-facing boundary is structured metadata integrity. The tracked metadata file remains useful for package construction and final-upload gating, but it does not assert unconfirmed author declarations before the final journal route and live submission metadata are available.
+
+## Audit Cycle 37: Preflight Manuscript Declaration Boundary Gate
+
+Outcome: pass for anonymous preflight manuscript declaration boundary; blocked for final upload until the listed authors confirm the competing-interest status and the final statement is synchronized with `submission_metadata.yml` and the live submission system.
+
+This gate checks whether the main manuscript prematurely asserts a final competing-interest declaration. In the anonymous preflight manuscript, the Competing Interests section now states that the competing-interest declaration is not finalized and must be confirmed by the listed authors before final upload. This keeps the manuscript source aligned with the blank preflight declaration fields in `submission_metadata.yml`.
+
+The reviewer-facing boundary is declaration authority. The current source package can support scientific review and template preparation, but it must not be treated as an author-approved final declaration package until the selected journal route, author list, competing-interest status, metadata file, and live submission-system fields are synchronized.
 
 ## Minimum Gate Before Final Upload
 

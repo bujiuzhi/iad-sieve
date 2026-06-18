@@ -42,7 +42,9 @@ def test_check_declaration_statements_accepts_complete_declarations() -> None:
             "This study uses public scholarly metadata and does not involve human participants,",
             "clinical records, private user behavior, or sensitive personal information.",
             r"\section*{Competing Interests}",
-            "The authors declare no competing interests.",
+            "The competing-interest declaration is not finalized in this anonymous preflight manuscript.",
+            "Before final upload, the listed authors must confirm the competing-interest status",
+            r"and synchronize the final statement with \path{submission_metadata.yml} and the live submission system.",
         ]
     )
 
@@ -70,7 +72,8 @@ def test_check_declaration_statements_rejects_vague_declarations() -> None:
 
     assert any("artifact-release" in error for error in errors)
     assert any("human participants" in error for error in errors)
-    assert any("no competing interests" in error for error in errors)
+    assert any("not finalized in this anonymous preflight manuscript" in error for error in errors)
+    assert any("live submission system" in error for error in errors)
 
 
 def test_check_final_upload_information_request_rejects_missing_required_fields() -> None:
@@ -4037,8 +4040,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 36.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
+            "Completed audit cycles: 37.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -4148,6 +4151,13 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "statements.author_approval",
             "statements.competing_interests",
             "structured metadata integrity",
+            "## Audit Cycle 37: Preflight Manuscript Declaration Boundary Gate",
+            "anonymous preflight manuscript declaration boundary",
+            "competing-interest declaration is not finalized",
+            "listed authors confirm the competing-interest status",
+            "submission_metadata.yml",
+            "live submission system",
+            "declaration authority",
             "## Audit Cycle 10: Final Template Binding and System Metadata Gate",
             "target_journal_template_bound",
             "target_journal_template_applied",
@@ -4346,7 +4356,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 36",
+        "Completed audit cycles: 37",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -4357,7 +4367,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 36" in error for error in errors)
+    assert any("Completed audit cycles: 37" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
