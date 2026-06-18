@@ -1306,6 +1306,37 @@ def extract_first_page_text(pdf_path: Path) -> tuple[str, list[str]]:
         return "", [f"pdftotext failed with exit code {exc.returncode}: {exc.stderr.strip()}"]
 
 
+def extract_pdf_text(pdf_path: Path) -> tuple[str, list[str]]:
+    """Extract text from all pages of a PDF.
+
+    参数:
+        pdf_path: PDF file path.
+
+    返回:
+        tuple[str, list[str]]: Extracted full text and extraction errors.
+    """
+    try:
+        from pypdf import PdfReader
+
+        reader = PdfReader(str(pdf_path))
+        if len(reader.pages) < 1:
+            return "", ["PDF has no pages"]
+        return "\n".join(page.extract_text() or "" for page in reader.pages), []
+    except ModuleNotFoundError:
+        LOGGER.info("pypdf is not installed; falling back to pdftotext for full PDF text: %s", pdf_path.name)
+    except Exception as exc:  # noqa: BLE001
+        LOGGER.warning("pypdf failed for full PDF text %s; falling back to pdftotext: %s", pdf_path.name, exc)
+
+    pdftotext = shutil.which("pdftotext")
+    if not pdftotext:
+        return "", ["pypdf is not installed and pdftotext is not available"]
+    try:
+        result = subprocess.run([pdftotext, str(pdf_path), "-"], check=True, capture_output=True, text=True)
+        return result.stdout, []
+    except subprocess.CalledProcessError as exc:
+        return "", [f"pdftotext failed with exit code {exc.returncode}: {exc.stderr.strip()}"]
+
+
 def check_pdf_first_page_markers(pdf_name: str, first_page_text: str, required_texts: list[str]) -> list[str]:
     """Check required text markers in extracted PDF first-page text.
 
@@ -1325,6 +1356,26 @@ def check_pdf_first_page_markers(pdf_name: str, first_page_text: str, required_t
     for marker in unresolved_markers:
         if marker in first_page_text:
             errors.append(f"{pdf_name} may contain unresolved marker on first page: {marker}")
+    return errors
+
+
+def check_pdf_full_text_markers(pdf_path: Path, required_texts: list[str]) -> list[str]:
+    """Check required text markers in extracted full PDF text.
+
+    参数:
+        pdf_path: PDF file path.
+        required_texts: Text markers expected somewhere in the PDF.
+
+    返回:
+        list[str]: Error messages for full-text extraction or missing markers.
+    """
+    full_text, extraction_errors = extract_pdf_text(pdf_path)
+    errors = [f"{pdf_path.name} full text is not readable: {error}" for error in extraction_errors]
+    if extraction_errors:
+        return errors
+    for required_text in required_texts:
+        if required_text not in full_text:
+            errors.append(f"{pdf_path.name} full text does not contain required text: {required_text}")
     return errors
 
 
@@ -1528,14 +1579,39 @@ def main() -> int:
         "HNFMR=0.000",
     ]
     errors.extend(check_pdf(latex_pdf_path, main_pdf_markers))
+    main_full_text_markers = [
+        "Related Work",
+        "Problem Formulation",
+        "Experiments",
+        "Mechanism and Error Analysis",
+        "Threats to Validity",
+        "Conclusion",
+        "Data and Code Availability",
+        "Ethics Statement",
+        "Competing Interests",
+        "References",
+    ]
+    errors.extend(check_pdf_full_text_markers(latex_pdf_path, main_full_text_markers))
     errors.extend(check_pdf_freshness(latex_pdf_path, manuscript_path))
     errors.extend(check_pdf(elsevier_pdf_path, main_pdf_markers + ["Keywords:", "Data & Knowledge Engineering"]))
+    errors.extend(check_pdf_full_text_markers(elsevier_pdf_path, main_full_text_markers))
     errors.extend(check_pdf_freshness(elsevier_pdf_path, manuscript_path))
     errors.extend(check_pdf_freshness(elsevier_pdf_path, keywords_path))
     errors.extend(
         check_pdf(
             supplementary_pdf_path,
             ["Supplementary Material for IAD-Risk", "Anonymous Authors", "Scope", "Reproduction Levels"],
+        )
+    )
+    errors.extend(
+        check_pdf_full_text_markers(
+            supplementary_pdf_path,
+            [
+                "Artifact Package Requirements",
+                "Claim-Evidence Matrix",
+                "Manual Validation Protocol",
+                "Claim Boundary",
+            ],
         )
     )
     errors.extend(check_pdf_freshness(supplementary_pdf_path, supplementary_path))

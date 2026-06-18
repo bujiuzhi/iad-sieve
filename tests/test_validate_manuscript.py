@@ -1196,3 +1196,39 @@ def test_check_pdf_first_page_markers_rejects_missing_and_unresolved_text() -> N
     assert any("Scholarly Work Deduplication" in error for error in errors)
     assert any("HNFMR=0.000" in error for error in errors)
     assert any("unresolved marker" in error and "??" in error for error in errors)
+
+
+def test_check_pdf_full_text_markers_rejects_missing_marker(monkeypatch, tmp_path) -> None:
+    """验证 PDF 全文缺少关键章节 marker 时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    pdf_path = tmp_path / "main.pdf"
+    pdf_path.write_bytes(b"%PDF-1.5 fixture\n")
+
+    def fake_extract_pdf_text(path):
+        """返回测试用 PDF 文本。"""
+        return "Abstract\nIntroduction\nConclusion\nReferences\n", []
+
+    monkeypatch.setattr(module, "extract_pdf_text", fake_extract_pdf_text)
+
+    errors = module.check_pdf_full_text_markers(pdf_path, ["Conclusion", "Data and Code Availability"])
+
+    assert any("Data and Code Availability" in error for error in errors)
+
+
+def test_check_pdf_full_text_markers_reports_extraction_errors(monkeypatch, tmp_path) -> None:
+    """验证 PDF 全文抽取失败会被报告。"""
+
+    module = _load_validate_manuscript_module()
+    pdf_path = tmp_path / "broken.pdf"
+    pdf_path.write_bytes(b"broken")
+
+    def fake_extract_pdf_text(path):
+        """返回测试用抽取错误。"""
+        return "", ["cannot extract text"]
+
+    monkeypatch.setattr(module, "extract_pdf_text", fake_extract_pdf_text)
+
+    errors = module.check_pdf_full_text_markers(pdf_path, ["Conclusion"])
+
+    assert any("full text is not readable" in error for error in errors)
