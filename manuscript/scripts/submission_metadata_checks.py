@@ -402,6 +402,17 @@ def check_final_upload_cover_letter_text(cover_letter_text: str, metadata_text: 
     lowered_text = cover_letter_text.lower()
     if "artifact release" not in lowered_text and "artifact url" not in lowered_text and "artifact doi" not in lowered_text:
         errors.append("final upload cover letter unresolved: cover letter missing artifact release boundary")
+    artifact_row = parse_mapping_section(metadata_text, "artifact_boundary")
+    artifact_values = [
+        value
+        for value in (
+            artifact_row.get("artifact_release_url", ""),
+            artifact_row.get("artifact_release_doi", ""),
+        )
+        if value
+    ]
+    if artifact_values and not any(value in cover_letter_text for value in artifact_values):
+        errors.append("final upload cover letter unresolved: cover letter missing artifact release URL or DOI value")
     return errors
 
 
