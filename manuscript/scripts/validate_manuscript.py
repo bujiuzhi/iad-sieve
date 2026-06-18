@@ -450,6 +450,11 @@ def check_data_code_availability_boundary(manuscript_text: str) -> list[str]:
     required_markers = [
         r"\section*{Data and Code Availability}",
         r"\label{tab:data-code-availability-boundary}",
+        r"\path{src/iad_sieve}",
+        r"\path{pyproject.toml}",
+        r"\texttt{iad-sieve = iad\_sieve.cli:main}",
+        r"\texttt{python -m iad\_sieve.cli --help}",
+        "verifies command discovery",
         "Source code and CLI entry points",
         "Small public fixtures and schema contracts",
         "Raw third-party source files",
@@ -471,6 +476,45 @@ def check_data_code_availability_boundary(manuscript_text: str) -> list[str]:
         for marker in required_markers
         if marker.lower() not in lowered_text
     ]
+
+
+def check_cli_entrypoint_contract(pyproject_text: str, cli_text: str) -> list[str]:
+    """Check whether the installable CLI entry point is auditable from source.
+
+    参数:
+        pyproject_text: Project pyproject.toml content.
+        cli_text: src/iad_sieve/cli.py content.
+
+    返回:
+        list[str]: Error messages for missing package or CLI entry-point markers.
+    """
+    required_markers_by_source = {
+        "pyproject.toml": [
+            "[project.scripts]",
+            'iad-sieve = "iad_sieve.cli:main"',
+            "[tool.setuptools.packages.find]",
+            'where = ["src"]',
+        ],
+        "src/iad_sieve/cli.py": [
+            "import argparse",
+            "def build_parser() -> argparse.ArgumentParser:",
+            'prog="python -m iad_sieve.cli"',
+            "def main(argv: list[str] | None = None) -> int:",
+            "parser.parse_args(argv)",
+            "args.func(args)",
+        ],
+    }
+    source_text_by_name = {
+        "pyproject.toml": pyproject_text,
+        "src/iad_sieve/cli.py": cli_text,
+    }
+    errors: list[str] = []
+    for source_name, required_markers in required_markers_by_source.items():
+        source_text = source_text_by_name[source_name]
+        for marker in required_markers:
+            if marker not in source_text:
+                errors.append(f"CLI entrypoint contract missing marker in {source_name}: {marker}")
+    return errors
 
 
 def check_forbidden_claims(manuscript_text: str) -> list[str]:
@@ -3901,6 +3945,10 @@ def main() -> int:
     cover_letter_text = cover_letter_path.read_text(encoding="utf-8") if cover_letter_path.exists() else ""
     submission_metadata_path = ROOT / "submission_metadata.yml"
     submission_metadata_text = submission_metadata_path.read_text(encoding="utf-8") if submission_metadata_path.exists() else ""
+    pyproject_path = PROJECT_ROOT / "pyproject.toml"
+    pyproject_text = pyproject_path.read_text(encoding="utf-8") if pyproject_path.exists() else ""
+    cli_entrypoint_path = PROJECT_ROOT / "src" / "iad_sieve" / "cli.py"
+    cli_entrypoint_text = cli_entrypoint_path.read_text(encoding="utf-8") if cli_entrypoint_path.exists() else ""
     elsevier_draft_source_path = ROOT / "build" / "iad-risk-manuscript-elsevier.tex"
     elsevier_draft_source_text = (
         elsevier_draft_source_path.read_text(encoding="utf-8") if elsevier_draft_source_path.exists() else ""
@@ -3974,6 +4022,7 @@ def main() -> int:
     errors.extend(check_claim_interpretation_boundary(manuscript_text))
     errors.extend(check_declaration_statements(manuscript_text))
     errors.extend(check_data_code_availability_boundary(manuscript_text))
+    errors.extend(check_cli_entrypoint_contract(pyproject_text, cli_entrypoint_text))
     errors.extend(check_operating_point_disclosure(manuscript_text))
     errors.extend(check_selective_decision_coverage_boundary(manuscript_text))
     errors.extend(check_pair_cluster_evidence_boundary(manuscript_text))

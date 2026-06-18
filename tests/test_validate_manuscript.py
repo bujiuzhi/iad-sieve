@@ -268,6 +268,11 @@ def test_check_data_code_availability_boundary_accepts_complete_boundary() -> No
         [
             r"\section*{Data and Code Availability}",
             r"\label{tab:data-code-availability-boundary}",
+            r"The source lives under \path{src/iad_sieve}.",
+            r"The package is configured in \path{pyproject.toml}.",
+            r"The package exposes \texttt{iad-sieve = iad\_sieve.cli:main}.",
+            r"Reviewers can run \texttt{python -m iad\_sieve.cli --help}.",
+            "The help command verifies command discovery.",
             "The repository includes Source code and CLI entry points.",
             "The repository includes Small public fixtures and schema contracts.",
             "The repository excludes Raw third-party source files.",
@@ -289,6 +294,48 @@ def test_check_data_code_availability_boundary_accepts_complete_boundary() -> No
     assert errors == []
 
 
+def test_check_cli_entrypoint_contract_accepts_source_contract() -> None:
+    """验证可安装 CLI 入口在 pyproject 和源码中一致时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    pyproject_text = "\n".join(
+        [
+            "[project.scripts]",
+            'iad-sieve = "iad_sieve.cli:main"',
+            "[tool.setuptools.packages.find]",
+            'where = ["src"]',
+        ]
+    )
+    cli_text = "\n".join(
+        [
+            "import argparse",
+            "def build_parser() -> argparse.ArgumentParser:",
+            '    return argparse.ArgumentParser(prog="python -m iad_sieve.cli")',
+            "def main(argv: list[str] | None = None) -> int:",
+            "    args = parser.parse_args(argv)",
+            "    args.func(args)",
+        ]
+    )
+
+    errors = module.check_cli_entrypoint_contract(pyproject_text, cli_text)
+
+    assert errors == []
+
+
+def test_check_cli_entrypoint_contract_rejects_missing_console_script() -> None:
+    """验证缺少 console script 或 CLI main 入口时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    pyproject_text = "[tool.setuptools.packages.find]\n"
+    cli_text = "import argparse\n"
+
+    errors = module.check_cli_entrypoint_contract(pyproject_text, cli_text)
+
+    assert any("[project.scripts]" in error for error in errors)
+    assert any("iad-sieve" in error for error in errors)
+    assert any("def main" in error for error in errors)
+
+
 def test_check_data_code_availability_boundary_rejects_missing_artifact_boundary() -> None:
     """验证数据可用性声明缺少 artifact 边界时会被拒绝。"""
 
@@ -298,6 +345,7 @@ def test_check_data_code_availability_boundary_rejects_missing_artifact_boundary
     errors = module.check_data_code_availability_boundary(manuscript_text)
 
     assert any("data-code-availability-boundary" in error for error in errors)
+    assert any("pyproject.toml" in error for error in errors)
     assert any("Full prediction files and model checkpoints" in error for error in errors)
 
 
