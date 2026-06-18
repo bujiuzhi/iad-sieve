@@ -66,6 +66,7 @@ REQUIRED_SECTIONS = [
     r"\section{Experiments}",
     r"\subsection{Split and Leakage Controls}",
     r"\subsection{Threshold Selection and Uncertainty Reporting}",
+    r"\subsection{Statistical Interpretation Boundary}",
     r"\subsection{Operating Point Disclosure}",
     r"\subsection{Threshold Sensitivity Evidence Status}",
     r"\subsection{Claim-Evidence Boundary for Result Interpretation}",
@@ -800,6 +801,35 @@ def check_threshold_sensitivity_status(manuscript_text: str) -> list[str]:
     ]
 
 
+def check_statistical_interpretation_boundary(manuscript_text: str) -> list[str]:
+    """Check whether point estimates are separated from interval and significance claims.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing statistical interpretation boundaries.
+    """
+    required_markers = [
+        r"\subsection{Statistical Interpretation Boundary}",
+        r"\label{tab:statistical-interpretation-boundary}",
+        "point estimates for a fixed evidence snapshot",
+        "not statistical superiority estimates",
+        "Confidence intervals, significance tests, and model-ranking statements are intentionally withheld",
+        "exact prediction files, resampling logs, random seeds, and checksums",
+        "no hard-negative false merge was observed",
+        "not be read as proof of zero risk",
+        r"\path{bootstrap_intervals}",
+        "Predefined tests, multiplicity handling, input artifacts, and reproducible analysis logs",
+        "Same-scope predictions, interval estimates, ablations, and manual-validation slice",
+    ]
+    return [
+        f"statistical interpretation boundary missing marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
+
+
 def check_baseline_scope_alignment(manuscript_text: str) -> list[str]:
     """Check whether the baseline section matches the reported result table.
 
@@ -1196,6 +1226,10 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Method design soundness",
         "Silver hard negatives may not be true non-identity labels",
         "Threshold results may be sensitive",
+        "Confidence intervals and statistical significance may be overread",
+        "point estimates",
+        "bootstrap intervals",
+        "statistical significance",
         "Reproducibility depends on files outside Git",
         "python manuscript/scripts/validate_submission_package.py --final-upload",
     ]
@@ -1784,6 +1818,7 @@ def main() -> int:
     errors.extend(check_validity_threats(manuscript_text))
     errors.extend(check_declaration_statements(manuscript_text))
     errors.extend(check_operating_point_disclosure(manuscript_text))
+    errors.extend(check_statistical_interpretation_boundary(manuscript_text))
     errors.extend(check_threshold_sensitivity_status(manuscript_text))
     errors.extend(check_baseline_scope_alignment(manuscript_text))
     errors.extend(check_split_leakage_controls(manuscript_text))

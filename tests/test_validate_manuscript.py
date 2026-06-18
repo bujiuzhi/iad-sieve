@@ -703,6 +703,44 @@ def test_check_threshold_sensitivity_status_rejects_unbounded_claim() -> None:
     assert any("not threshold-stable ranking" in error for error in errors)
 
 
+def test_check_statistical_interpretation_boundary_accepts_bounded_point_estimates() -> None:
+    """验证统计解释边界完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Statistical Interpretation Boundary}",
+            r"\label{tab:statistical-interpretation-boundary}",
+            "The reported numbers are point estimates for a fixed evidence snapshot.",
+            "They are not statistical superiority estimates.",
+            "Confidence intervals, significance tests, and model-ranking statements are intentionally withheld.",
+            "The stronger claim needs exact prediction files, resampling logs, random seeds, and checksums.",
+            "An HNFMR value states no hard-negative false merge was observed.",
+            "It should not be read as proof of zero risk.",
+            r"\path{bootstrap_intervals}",
+            "Predefined tests, multiplicity handling, input artifacts, and reproducible analysis logs are required.",
+            "Same-scope predictions, interval estimates, ablations, and manual-validation slice are required.",
+        ]
+    )
+
+    errors = module.check_statistical_interpretation_boundary(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_statistical_interpretation_boundary_rejects_missing_significance_boundary() -> None:
+    """验证缺少置信区间和显著性边界时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\subsection{Statistical Interpretation Boundary}"
+
+    errors = module.check_statistical_interpretation_boundary(manuscript_text)
+
+    assert any("statistical superiority estimates" in error for error in errors)
+    assert any("bootstrap_intervals" in error for error in errors)
+    assert any("zero risk" in error for error in errors)
+
+
 def test_check_baseline_scope_alignment_accepts_reported_result_scope() -> None:
     """验证 baseline 描述与主结果表范围一致时可通过检查。"""
 
@@ -1147,6 +1185,9 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "## Reviewer Risk Register",
             "Silver hard negatives may not be true non-identity labels.",
             "Threshold results may be sensitive.",
+            "Confidence intervals and statistical significance may be overread.",
+            "The current manuscript reports point estimates and reserves bootstrap intervals.",
+            "No statistical significance claim is made.",
             "Reproducibility depends on files outside Git.",
             "## Claim-Evidence Check",
             "## Adversarial Self-Review Matrix",

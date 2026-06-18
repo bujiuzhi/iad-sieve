@@ -26,6 +26,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 | Silver hard negatives may not be true non-identity labels. | Medium | The manuscript separates gold, proxy, silver, and future manual-validation layers. | Complete or release a manual-validation slice before claiming stronger label precision. |
 | Result rows use different pair scopes. | Medium | The Open-v2 table is framed as a scope-bounded evidence snapshot, not a leaderboard. | Release matched prediction scopes before any stricter ranking claim. |
 | Threshold results may be sensitive. | Medium | Fixed operating points and threshold-sensitivity evidence status are documented. | Release threshold grid files before claiming threshold stability. |
+| Confidence intervals and statistical significance may be overread. | Medium | The manuscript reports point estimates and adds a statistical interpretation boundary that reserves bootstrap intervals, significance tests, and model-ranking claims for artifact-backed evidence. | Release bootstrap intervals, predefined tests, resampling logs, random seeds, and checksums before claiming interval-supported superiority. |
 | Reproducibility depends on files outside Git. | Medium | Fixture rebuild, public-source commands, artifact manifest template, and checksums policy are documented. | Publish the L3 artifact release and link it in submission metadata. |
 | Final upload may mismatch journal system fields. | High | A submission-system checklist records file, metadata, PDF, and artifact checks. | Confirm target journal, author metadata, template, and live system fields. |
 
@@ -38,6 +39,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 | IAD-Bench is a provenance-aware benchmark contract. | Supported by schema, label-stratum separation, fixture rebuild, and documentation. | Accept as a benchmark-contract contribution, not as human gold. |
 | The method is broadly superior to all baselines. | Not claimed. | Keep absent unless all baselines share released prediction scope and stronger evidence. |
 | The method is threshold-stable. | Not claimed. | Add only after threshold-grid artifact evidence exists. |
+| The result has statistical significance or interval-supported superiority. | Not claimed. | Add only after bootstrap intervals, predefined tests, and checksum-fixed resampling logs exist. |
 | Human validation is complete. | Not claimed. | Add only after reviewed slice, adjudication log, and agreement report exist. |
 
 ## Adversarial Self-Review Matrix
@@ -62,6 +64,7 @@ This matrix anticipates likely reviewer questions and maps each answer to manusc
 | Why are silver hard negatives acceptable without complete human gold labels? | Use them as stress-test evidence and keep them separate from DeepMatcher gold identity labels. | IAD-Bench label layers, Open-v2 composition, limitations, and supplementary manual-validation protocol. | Do not call OpenAlex or OpenCitations labels human gold. |
 | Are the result rows comparable if pair scopes differ? | Interpret the table as a scope-bounded evidence snapshot rather than a single leaderboard. | Scope compatibility table, operating-point disclosure, and result audit trail. | Do not claim broad method ranking until same released prediction scope is available. |
 | Does the method beat strong supervised baselines? | Present RoBERTa as a strong baseline and keep the main claim at transparent false-merge control. | Main Open-v2 results, baseline section, and claim-evidence boundary. | Do not claim SOTA or universal superiority. |
+| Are the reported differences statistically significant? | Treat the Open-v2 values as point estimates for a fixed evidence snapshot. | Statistical interpretation boundary and supplementary uncertainty requirements. | Do not claim confidence intervals, significance, or interval-supported ranking until bootstrap and test artifacts are released. |
 | Is the mechanism causal without full ablation output? | State that current evidence is mechanism-consistent and that causal ablation claims require artifacts. | Mechanism evidence table and supplementary uncertainty and ablation requirements. | Do not claim completed component causality before no-gate, no-ANI, and single-space variants are released. |
 | Can readers reproduce the reported numbers without raw data in Git? | Separate fixture-level code reproduction from L2/L3 result-level artifact reproduction. | Data and Code Availability, supplementary reproduction levels, artifact manifest template, and checksums policy. | Do not imply full numerical audit without external artifact release. |
 
