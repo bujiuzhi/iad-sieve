@@ -36,7 +36,7 @@ statements:
   author_approval: "All listed authors have approved the submitted version."
   competing_interests: "The authors declare no competing interests."
   ethics: "This study uses public scholarly metadata and benchmark-style record linkage data; it does not involve human participants, clinical records, private user behavior, or sensitive personal information."
-  data_code_availability: "The repository provides source code, small public fixtures, schema contracts, build scripts, and artifact-release instructions. Raw third-party data and full experimental outputs are not redistributed in Git."
+  data_code_availability: "The repository provides source code, small public fixtures, schema contracts, build scripts, and artifact-release instructions. Raw third-party data and full experimental outputs are not redistributed in Git. Git-only review supports installation checks, fixture rebuild validation, public-release boundary checks, and manuscript builds; full numerical audit of the Open-v2 table requires the L2/L3 public-source rebuild or a released external artifact package."
   research_data_statement: ""
 
 funding:

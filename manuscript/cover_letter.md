@@ -10,7 +10,7 @@ The manuscript contributes a provenance-aware evaluation contract, IAD-Bench, an
 
 The paper addresses scholarly data integration, entity matching, scientific document representation, and reliable literature intelligence systems.
 
-The manuscript is original, has not been published previously, and is not under consideration elsewhere. All listed authors have approved the submitted version. The authors declare no competing interests. The repository provides source code, small public fixtures, schema contracts, build scripts, and artifact-release instructions; raw third-party data and full experimental outputs are not redistributed in Git and should be obtained from their original sources or from a separate artifact release with manifests and checksums.
+The manuscript is original, has not been published previously, and is not under consideration elsewhere. All listed authors have approved the submitted version. The authors declare no competing interests. The repository provides source code, small public fixtures, schema contracts, build scripts, and artifact-release instructions; raw third-party data and full experimental outputs are not redistributed in Git and should be obtained from their original sources or from a separate artifact release with manifests and checksums. For a Git-only review, the repository supports installation checks, fixture rebuild validation, public-release boundary checks, and manuscript builds; full numerical audit of the Open-v2 table requires the L2/L3 public-source rebuild or a released external artifact package.
 
 Sincerely,
 
