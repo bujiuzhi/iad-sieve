@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 74.
+Completed audit cycles: 75.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.
 
@@ -690,6 +690,14 @@ Outcome: pass for final-upload author identity material traceability gate implem
 This gate checks whether `author_biographies_and_photos_ready` alone is enough for a DKE or DKE-like final upload. It is not. The final-upload metadata validator now requires `author_identity_materials.biography_files`, `author_identity_materials.photograph_files`, and `author_identity_materials.author_identity_materials_verified` when the selected route is Data & Knowledge Engineering or when author biography and photograph materials are explicitly marked as required. This prevents a final-upload package from passing only because a boolean checklist item was set to true.
 
 The reviewer-facing boundary is author-material traceability, not scientific evidence strengthening. A passing author identity material gate shows that required external biography and photograph records exist for the final author-visible upload route; it does not place those identity-bearing files into the anonymous DKE/Elsevier preflight package and does not remove the need for author confirmation, live submission-system verification, or artifact release validation.
+
+## Audit Cycle 75: Closest-Work Decision-Semantics Gate
+
+Outcome: pass for Related Work decision-semantics clarification; blocked for stronger novelty claims until same-scope artifacts and manual validation support broader comparisons.
+
+This gate checks whether the Related Work section makes the novelty boundary visible without relying on a citation list alone. The main manuscript now states that end-to-end entity resolution, neural matching, scientific representation learning, and open metadata benchmarks assign different decision roles to relatedness. IAD-Risk is positioned more narrowly: relatedness is interpreted only after the pair schema records whether the signal is identity evidence, agenda evidence, or agenda-non-identity stress evidence.
+
+The reviewer-facing boundary is contribution clarity, not a stronger empirical claim. The edit explains why the paper is not merely a new encoder or a new threshold over existing embeddings: the merge gate treats high relatedness as an auditable input whose role can be positive, negative, or deferred, not as a direct merge decision. This connects IAD-Bench to HNFMR while preserving the existing limits on broad method ranking, same-scope superiority, and human-gold label claims.
 
 ## Minimum Gate Before Final Upload
 

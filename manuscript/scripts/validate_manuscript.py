@@ -3561,7 +3561,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 74",
+        "Completed audit cycles: 75",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3707,6 +3707,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 72: Live System Final Package Verification Gate",
         "Audit Cycle 73: Author Guide and Template Requirement Confirmation Gate",
         "Audit Cycle 74: Author Identity Material Traceability Gate",
+        "Audit Cycle 75: Closest-Work Decision-Semantics Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
         "scoring-algorithm table-density reduction",
@@ -4242,6 +4243,10 @@ def check_related_work_positioning(manuscript_text: str, supplementary_text: str
         "not a comparative ranking over all neural matching methods",
         "does not claim that OpenAlex/OpenCitations silver evidence is human gold",
         "merge-safety framing",
+        "decision semantics assigned to relatedness",
+        "positive, negative, or deferred",
+        "not as a direct merge decision",
+        "connects IAD-Bench to HNFMR",
     ]
     required_supplement_markers = [
         r"\section{Closest-Work Positioning}",

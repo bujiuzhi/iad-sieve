@@ -4489,6 +4489,10 @@ def test_check_related_work_positioning_accepts_main_text_and_supplementary_matr
             "It is not a comparative ranking over all neural matching methods.",
             "It does not claim that OpenAlex/OpenCitations silver evidence is human gold.",
             "The evidence supports the merge-safety framing.",
+            "It clarifies the decision semantics assigned to relatedness.",
+            "The score can be positive, negative, or deferred.",
+            "It is not as a direct merge decision.",
+            "The boundary connects IAD-Bench to HNFMR.",
         ]
     )
     supplementary_text = "\n".join(
@@ -5344,7 +5348,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 74.",
+            "Completed audit cycles: 75.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -5948,6 +5952,13 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "`author_identity_materials.author_identity_materials_verified`",
             "boolean checklist item was set to true",
             "anonymous DKE/Elsevier preflight package",
+            "## Audit Cycle 75: Closest-Work Decision-Semantics Gate",
+            "Related Work decision-semantics clarification",
+            "different decision roles to relatedness",
+            "identity evidence, agenda evidence, or agenda-non-identity stress evidence",
+            "not merely a new encoder or a new threshold over existing embeddings",
+            "positive, negative, or deferred",
+            "connects IAD-Bench to HNFMR",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -5966,7 +5977,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 74",
+        "Completed audit cycles: 75",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -5977,7 +5988,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 74" in error for error in errors)
+    assert any("Completed audit cycles: 75" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
