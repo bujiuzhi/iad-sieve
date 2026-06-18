@@ -2172,7 +2172,20 @@ def check_validity_threats(manuscript_text: str) -> list[str]:
         "not turn proxy or silver evidence into human-adjudicated truth",
         "Full numeric audit requires L2/L3 artifacts",
     ]
-    return [f"validity threats missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+    required_limitation_markers = [
+        "This study has five limitations",
+        "pair-level metrics do not by themselves establish cluster-level deployment quality",
+        "cluster assignments",
+        "cannot-link coverage",
+        "cluster contamination rate",
+    ]
+    errors = [f"validity threats missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+    errors.extend(
+        f"Limitations missing cluster-level boundary marker: {marker}"
+        for marker in required_limitation_markers
+        if marker not in manuscript_text
+    )
+    return errors
 
 
 def check_claim_interpretation_boundary(manuscript_text: str) -> list[str]:

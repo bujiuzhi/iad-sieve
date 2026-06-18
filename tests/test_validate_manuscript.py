@@ -1199,6 +1199,34 @@ def test_check_pair_cluster_evidence_boundary_rejects_missing_cluster_audit() ->
     assert any("cannot_link_audit" in error for error in errors)
 
 
+def test_check_validity_threats_rejects_limitations_without_cluster_boundary() -> None:
+    """验证 Limitations 段落必须声明 pair-level 到 cluster-level 的证据限制。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\section{Limitations}",
+            "This study has four limitations.",
+            r"\label{tab:validity-threats}",
+            "Threats to validity and claim boundaries",
+            "Construct validity",
+            "Internal validity",
+            "External validity",
+            "Conclusion validity",
+            "Reproducibility",
+            "Operational validity",
+            "not turn proxy or silver evidence into human-adjudicated truth",
+            "Full numeric audit requires L2/L3 artifacts",
+        ]
+    )
+
+    errors = module.check_validity_threats(manuscript_text)
+
+    assert any("Limitations" in error for error in errors)
+    assert any("pair-level metrics" in error for error in errors)
+    assert any("cluster-level deployment quality" in error for error in errors)
+
+
 def test_check_decision_metric_mapping_accepts_complete_mapping() -> None:
     """验证选择性决策到评价指标的映射完整时可通过检查。"""
 
