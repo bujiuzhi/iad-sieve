@@ -2023,6 +2023,10 @@ def test_check_target_journal_shortlist_accepts_complete_shortlist() -> None:
             "## Data & Knowledge Engineering Preflight",
             "## Source-to-Decision Audit",
             "Official guide rechecked: 2026-06-18",
+            "Official source snapshot date: 2026-06-18",
+            "DKE guide verified: 2026-06-18",
+            "Information Systems guide verified: 2026-06-18",
+            "Scientometrics guide verified: 2026-06-18",
             "Status: provisional preparation only.",
             "The current anonymous author placeholder is compatible with single anonymized review preparation.",
             "The current abstract is checked against a 250-word limit.",
@@ -2030,6 +2034,8 @@ def test_check_target_journal_shortlist_accepts_complete_shortlist() -> None:
             "highlights.md currently contains 3--5 highlights and is checked against the 85-character limit.",
             "Convert to Elsevier `elsarticle` only after confirmation.",
             "Add the real artifact URL or DOI before final upload.",
+            "Information Systems data statement is required.",
+            "CRediT author contribution statement.",
             "Metrics are screening signals, not ranking proof.",
             "Review model and author metadata rules determine anonymization.",
             "Data statement and artifact link requirements determine final-upload blockers.",
@@ -2052,6 +2058,44 @@ def test_check_target_journal_shortlist_rejects_missing_boundary() -> None:
 
     assert any("Rank-sensitive labels" in error for error in errors)
     assert any("must be reconfirmed" in error for error in errors)
+
+
+def test_check_target_journal_shortlist_rejects_missing_current_source_snapshot() -> None:
+    """验证目标期刊候选清单必须记录官方来源快照日期。"""
+
+    module = _load_validate_manuscript_module()
+    shortlist_text = "\n".join(
+        [
+            "# Target Journal Shortlist",
+            "This is not a final submission record.",
+            "Rank-sensitive labels must be reconfirmed before final upload.",
+            "Primary practical target: Data & Knowledge Engineering.",
+            "Stretch target: Information Systems.",
+            "Domain backup: Scientometrics.",
+            "## Candidate Matrix",
+            "## Template and File Implications",
+            "## Data & Knowledge Engineering Preflight",
+            "## Source-to-Decision Audit",
+            "Official guide rechecked: 2026-06-18",
+            "Status: provisional preparation only.",
+            "The current anonymous author placeholder is compatible with single anonymized review preparation.",
+            "The current abstract is checked against a 250-word limit.",
+            "keywords.md currently contains 1--7 semicolon-separated keywords.",
+            "highlights.md currently contains 3--5 highlights and is checked against the 85-character limit.",
+            "Convert to Elsevier `elsarticle` only after confirmation.",
+            "Add the real artifact URL or DOI before final upload.",
+            "Metrics are screening signals, not ranking proof.",
+            "Review model and author metadata rules determine anonymization.",
+            "Data statement and artifact link requirements determine final-upload blockers.",
+            "Recheck publisher pages on submission day.",
+        ]
+    )
+
+    errors = module.check_target_journal_shortlist(shortlist_text)
+
+    assert any("Official source snapshot date: 2026-06-18" in error for error in errors)
+    assert any("Information Systems data statement is required" in error for error in errors)
+    assert any("CRediT author contribution statement" in error for error in errors)
 
 
 def test_check_target_journal_shortlist_rejects_missing_dke_preflight() -> None:
