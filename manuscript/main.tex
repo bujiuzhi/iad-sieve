@@ -71,14 +71,14 @@ Scientific language resources and open scholarly metadata make reproducible benc
 \centering
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\begin{tabular}{L{0.19\linewidth}L{0.25\linewidth}L{0.28\linewidth}L{0.20\linewidth}}
+\begin{tabular}{L{0.18\linewidth}L{0.24\linewidth}L{0.26\linewidth}L{0.24\linewidth}}
 \toprule
 Line of work & Primary optimization target & Limitation for scholarly deduplication & IAD-Risk distinction \\
 \midrule
-End-to-end entity resolution systems & Complete workflows for blocking, matching, labeling, and deployment. & The workflow abstraction does not by itself separate topical relatedness from work identity. & Adds identity-agenda semantics and false-merge risk gates inside the matching decision. \\
-Neural entity matching & Pair-level same-entity classification from learned tuple or text representations. & Strong text similarity can still correspond to different papers in the same research agenda. & Trains separate same-work, same-agenda, and agenda-non-identity heads with provenance-aware masking. \\
-Scientific document representations & Citation-informed or contrastive embeddings for scientific relatedness. & Relatedness embeddings are useful for retrieval but unsafe as automatic merge evidence. & Uses representation similarity as candidate and agenda evidence, then blocks risky merges. \\
-Open scholarly metadata benchmarks & Public metadata, citation, and topic signals for scalable evaluation. & Topic or citation proximity is silver evidence and cannot be treated as human identity gold. & Reports gold, proxy, and silver strata separately and ties claims to label strength. \\
+End-to-end entity resolution systems & Blocking, matching, labeling, and deployment workflows. & Workflow abstractions do not separate topical relatedness from work identity. & Adds identity-agenda semantics and false-merge risk gates inside matching. \\
+Neural entity matching & Pair-level same-entity classification from tuple or text encoders. & Strong text similarity can still link different papers in one agenda. & Trains same-work, same-agenda, and agenda-non-identity heads with provenance-aware masking. \\
+Scientific document representations & Citation-informed or contrastive scientific relatedness embeddings. & Relatedness embeddings support retrieval but are unsafe as direct merge evidence. & Uses representation similarity as candidate and agenda evidence, then blocks risky merges. \\
+Open scholarly metadata benchmarks & Public metadata, citation, and topic signals for scalable evaluation. & Topic or citation proximity is silver evidence, not human identity gold. & Reports gold, proxy, and silver strata separately and ties claims to label strength. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -564,16 +564,16 @@ Table~\ref{tab:validity-threats} summarizes the main validity risks and the safe
 \centering
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\begin{tabular}{L{0.20\linewidth}L{0.27\linewidth}L{0.25\linewidth}L{0.18\linewidth}}
+\begin{tabular}{L{0.18\linewidth}L{0.24\linewidth}L{0.26\linewidth}L{0.22\linewidth}}
 \toprule
 Validity dimension & Main risk & Current mitigation & Remaining boundary \\
 \midrule
-Construct validity & Silver hard negatives may include metadata-derived noise. & Label strength is preserved, and silver rows are reported as stress-test evidence. & Not a replacement for manual non-identity gold. \\
-Internal validity & Threshold choice or split leakage can inflate held-out metrics. & Validation-based operating points, split fields, and pair-leakage audits are required. & Numerical claims need released predictions and logs. \\
-External validity & Open-v2 may not cover every scholarly source, topic, or version policy. & Claims are tied to Open-v2 and source-heldout evidence boundaries. & Broad deployment requires domain-diverse validation. \\
-Conclusion validity & Mechanism-consistent HNFMR evidence may be mistaken for full causality. & Ablation requirements are stated before component-level causal claims. & Complete causality requires no-gate, no-ANI, and single-space variants. \\
-Reproducibility & Raw third-party data and large predictions are not stored in Git. & Public-source commands, fixtures, manifests, checksums, and artifact rules are provided. & Full numeric audit requires L2/L3 artifacts. \\
-Operational validity & Cluster-level errors can propagate through transitive merges. & Risk gating and cannot-link-aware clustering are described. & Cluster guarantees need complete cannot-link coverage. \\
+Construct validity & Silver hard negatives may contain metadata noise. & Label strength is preserved; silver rows remain stress-test evidence. & Not a replacement for manual non-identity gold. \\
+Internal validity & Threshold choice or split leakage can inflate metrics. & Operating points, split fields, and pair-leakage audits are required. & Numerical claims need released predictions and logs. \\
+External validity & Open-v2 may not cover every source, topic, or version policy. & Claims are tied to Open-v2 and source-heldout evidence boundaries. & Broad deployment requires domain-diverse validation. \\
+Conclusion validity & HNFMR evidence may be mistaken for full causality. & Ablation requirements precede component-level causal claims. & Complete causality requires no-gate, no-ANI, and single-space variants. \\
+Reproducibility & Raw data and large predictions are not stored in Git. & Public commands, fixtures, manifests, checksums, and artifact rules are provided. & Full numeric audit requires L2/L3 artifacts. \\
+Operational validity & Pair errors can propagate through transitive merges. & Risk gating and cannot-link-aware clustering are described. & Cluster guarantees need complete cannot-link coverage. \\
 \bottomrule
 \end{tabular}
 \end{table}
