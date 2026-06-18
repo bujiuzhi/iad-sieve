@@ -80,6 +80,8 @@ Artifact release 的 `repository.commit` 必须是 7 到 40 位十六进制 Git 
 
 `submission_manifest.json` 会记录 `source_control` 字段，包括 `repository_commit`、`repository_branch`、`worktree_dirty` 和 `tracked_state`。正式上传校验会在 source-control 信息可用时要求 manifest 提交号与 `submission_metadata.yml` 中的 `repository_commit` 一致，并要求 `worktree_dirty: false`。
 
+为避免 tracked source 文件包含自引用 Git 提交号，`scripts/build_submission_package.py --final-upload` 会从 `git remote origin`、`git rev-parse HEAD` 和当前分支读取仓库信息，并写入生成包内的 `submission_metadata.yml` 副本。源文件中的 `repository_reference` 可在最终上传前保持空值；正式上传包副本必须与 `submission_manifest.json` 的 `source_control.repository_commit` 一致。
+
 ## 正式上传检查项
 
 `submission_metadata.yml` 中的 `final_upload_checklist` 记录正式上传前必须完成的项目。当前预投稿包保持匿名预投稿状态；正式上传前应至少完成目标期刊选择、期刊模板套用、作者信息、通讯作者信息、经费声明文本、作者贡献声明、第三方材料许可声明、模板后 PDF 重建、投稿系统文件核对和 artifact release 链接。`scripts/submission_metadata_checks.py` 对最终上传元数据执行结构检查，包括作者邮箱、ORCID、经费声明文本、作者贡献声明、permissions statement 和 artifact release URL/DOI。

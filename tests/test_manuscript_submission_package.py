@@ -259,6 +259,27 @@ def _write_final_upload_metadata(manuscript_root: Path) -> None:
     )
 
 
+def _blank_final_upload_repository_reference(manuscript_root: Path) -> None:
+    """清空正式上传元数据中的仓库引用字段。
+
+    参数:
+        manuscript_root: 临时稿件目录。
+
+    返回:
+        无。
+    """
+    metadata_path = manuscript_root / "submission_metadata.yml"
+    metadata_text = metadata_path.read_text(encoding="utf-8")
+    metadata_text = metadata_text.replace('  repository_url: "https://example.org/iad-sieve.git"', '  repository_url: ""')
+    metadata_text = metadata_text.replace('  repository_commit: "abcdef1234567890"', '  repository_commit: ""')
+    metadata_text = metadata_text.replace('  repository_branch: "main"', '  repository_branch: ""')
+    metadata_text = metadata_text.replace(
+        '  data_code_availability: "Source code and fixtures are available at https://example.org/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
+        '  data_code_availability: "The repository provides source code, small public fixtures, schema contracts, build scripts, and artifact-release instructions. Raw third-party data and full experimental outputs are not redistributed in Git."',
+    )
+    metadata_path.write_text(metadata_text, encoding="utf-8")
+
+
 def _write_final_upload_cover_letter(manuscript_root: Path) -> None:
     """写入满足正式上传门禁的投稿信。
 
@@ -546,6 +567,43 @@ def test_build_submission_package_accepts_final_upload_with_filled_metadata(tmp_
     assert manifest["anonymization"]["author_status"] == "provided_for_final_upload"
     assert manifest["journal_template"]["target_journal_bound"] is True
     assert "artifact release linked" in manifest["journal_template"]["final_upload_requirements"]
+
+
+def test_build_submission_package_autofills_final_upload_repository_reference(tmp_path, monkeypatch) -> None:
+    """验证正式上传包会自动写入 Git 仓库 URL、提交号和分支。"""
+
+    module = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_final_upload_metadata(manuscript_root)
+    _blank_final_upload_repository_reference(manuscript_root)
+    _write_final_upload_cover_letter(manuscript_root)
+    monkeypatch.setattr(module, "collect_source_control_state", lambda _: _clean_source_control_state())
+    monkeypatch.setattr(module, "collect_repository_url", lambda _: "https://example.org/iad-sieve.git")
+
+    module.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
+
+    source_metadata_text = (manuscript_root / "submission_metadata.yml").read_text(encoding="utf-8")
+    package_metadata_text = (output_dir / "submission_metadata.yml").read_text(encoding="utf-8")
+    assert 'repository_url: ""' in source_metadata_text
+    assert 'repository_commit: ""' in source_metadata_text
+    assert 'repository_url: "https://example.org/iad-sieve.git"' in package_metadata_text
+    assert 'repository_commit: "abcdef1234567890"' in package_metadata_text
+    assert 'repository_branch: "main"' in package_metadata_text
+    assert "https://example.org/iad-sieve.git commit abcdef1234567890" in package_metadata_text
+    assert validator.validate_submission_package(output_dir, zip_path, final_upload=True) == []
+
+
+def test_normalize_repository_url_converts_github_ssh_remote() -> None:
+    """验证 GitHub SSH remote 会转成投稿元数据可用的 HTTPS URL。"""
+
+    module = _load_submission_package_module()
+
+    assert module.normalize_repository_url("git@github.com:bujiuzhi/iad-sieve.git") == "https://github.com/bujiuzhi/iad-sieve.git"
+    assert module.normalize_repository_url("ssh://git@github.com/bujiuzhi/iad-sieve.git") == "https://github.com/bujiuzhi/iad-sieve.git"
 
 
 def test_build_submission_package_records_clean_source_control_state(tmp_path, monkeypatch) -> None:

@@ -10,9 +10,9 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 16.
+Completed audit cycles: 17.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, artifact release README completeness, artifact release commit validity, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, source-control commit binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, artifact release README completeness, artifact release commit validity, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.
 
@@ -222,6 +222,14 @@ Outcome: pass for README validator coverage; blocked for final upload until the 
 This cycle checks whether the release README preserves the minimum instructions a reviewer needs before auditing external results. The artifact release validator now requires `README.md` to retain the data policy, `manifest.json`, `checksums.sha256`, the checksum command, the `validate_artifact_release.py` command, the repository commit field, reproduction levels, and claim boundaries. The same gate keeps raw third-party data exclusions visible in the release package rather than only in repository-side documentation.
 
 The reviewer-facing boundary is procedural. A complete README improves auditability, but it does not replace artifact checksums, result files, threshold logs, command logs, or the final artifact URL or DOI. It only ensures that the external release cannot pass validation after its reproduction instructions have been reduced to an uninformative file.
+
+## Audit Cycle 17: Final-Upload Source-Control Package Binding Gate
+
+Outcome: pass for package-builder coverage; blocked for final upload until target-journal metadata, author metadata, declarations, and artifact URL or DOI are complete.
+
+This cycle closes a source-control binding edge case in the final-upload workflow. A tracked `submission_metadata.yml` file cannot reliably contain the Git commit of the commit that contains itself, because changing the file changes the commit hash. The final-upload package builder therefore keeps the source metadata eligible for anonymous pre-submission, reads `git remote origin`, `git rev-parse HEAD`, and the current branch during `--final-upload`, and writes `repository_url`, `repository_commit`, `repository_branch`, and the matching data/code availability statement into the package copy of `submission_metadata.yml`.
+
+The reviewer-facing boundary is traceability rather than new evidence. This gate ensures that the final package metadata and `submission_manifest.json` agree on the committed source revision used for upload. It does not solve the remaining external blockers: the package still needs confirmed author metadata, target-journal template binding, funding and contribution declarations, permissions wording, live submission-system verification, and an artifact release URL or DOI before final upload can pass.
 
 ## Minimum Gate Before Final Upload
 

@@ -6,6 +6,8 @@ This file records external information that must be provided by the authors befo
 
 After the authors complete this form, copy the confirmed values into `submission_metadata.yml`, `cover_letter.md`, and the live submission system before running `python manuscript/scripts/validate_submission_package.py --final-upload`.
 
+Repository URL and commit binding: keep the source `repository_reference` fields blank until final upload unless the target journal explicitly requires them in the source metadata. The final-upload package builder reads `git remote origin`, `git rev-parse HEAD`, and the current branch, then writes `repository_url`, `repository_commit`, `repository_branch`, and the matching data/code availability wording into the package copy of `submission_metadata.yml`. This avoids a self-referential Git commit value in the tracked source file while keeping the final package manifest and package metadata aligned.
+
 | Request section | Primary `submission_metadata.yml` target | Additional file or system target |
 | --- | --- | --- |
 | Target journal | `submission`, `target_preparation`, `target_journal_template_bound`, `final_upload_checklist.target_journal_selected`, `final_upload_checklist.article_type_confirmed`, `final_upload_checklist.review_mode_confirmed`, `final_upload_checklist.target_journal_template_applied` | Target-journal template source and live submission system |
@@ -91,6 +93,7 @@ For each author, select the applicable CRediT roles and then draft the final aut
 - Repository URL:
 - Repository commit:
 - Repository branch:
+- Repository URL and commit will be injected into the final-upload package copy from `git remote origin` and `git rev-parse HEAD`:
 - Repository commit matches artifact release manifest:
 - Data boundary:
 - Artifact boundary:

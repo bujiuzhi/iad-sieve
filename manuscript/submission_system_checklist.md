@@ -81,6 +81,16 @@ Before upload, verify:
 4. The source archive excludes build caches and generated zip files.
 5. The source archive is rebuilt after template conversion, author metadata insertion, cover-letter customization, and artifact-link insertion.
 
+## Source-Control Binding Checks
+
+Before upload, verify:
+
+1. The tracked source `submission_metadata.yml` can keep `repository_reference` blank before final upload.
+2. `python manuscript/scripts/build_submission_package.py --final-upload` writes `repository_url`, `repository_commit`, and `repository_branch` into the package copy of `submission_metadata.yml`.
+3. The package copy is bound to `git remote origin`, `git rev-parse HEAD`, and the current branch.
+4. `submission_manifest.json` records the same `repository_commit` as the package copy of `submission_metadata.yml`.
+5. `python manuscript/scripts/validate_submission_package.py --final-upload` passes after the package is built.
+
 ## Final Metadata Checks
 
 Before upload, verify:

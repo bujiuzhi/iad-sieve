@@ -12,6 +12,7 @@ import argparse
 import hashlib
 import json
 import logging
+import re
 import subprocess
 import shutil
 import sys
@@ -28,6 +29,7 @@ from submission_metadata_checks import (
     DKE_ELSEVIER_FILE_REQUIREMENT_ERROR,
     check_final_upload_cover_letter_text,
     check_final_upload_metadata_text,
+    scalar_value,
     target_journal_requires_elsevier_files,
 )
 
@@ -116,13 +118,19 @@ def get_submission_files(dke_preflight: bool = False) -> list[tuple[str, str]]:
     return files
 
 
-def copy_submission_files(manuscript_root: Path, output_dir: Path, dke_preflight: bool = False) -> list[dict]:
+def copy_submission_files(
+    manuscript_root: Path,
+    output_dir: Path,
+    dke_preflight: bool = False,
+    file_text_overrides: dict[str, str] | None = None,
+) -> list[dict]:
     """Copy required submission files into the package directory.
 
     参数:
         manuscript_root: Manuscript package root.
         output_dir: Package output directory.
         dke_preflight: Whether to include DKE/Elsevier provisional files.
+        file_text_overrides: Optional package-path text overrides applied after copy.
 
     返回:
         list[dict]: Manifest file records.
@@ -132,12 +140,15 @@ def copy_submission_files(manuscript_root: Path, output_dir: Path, dke_preflight
     """
     output_dir.mkdir(parents=True, exist_ok=True)
     records: list[dict] = []
+    overrides = file_text_overrides or {}
     for relative_path, role in get_submission_files(dke_preflight):
         source_path = manuscript_root / relative_path
         if not source_path.exists():
             raise FileNotFoundError(f"missing required submission file: {source_path}")
         destination_path = output_dir / source_path.name
         shutil.copy2(source_path, destination_path)
+        if source_path.name in overrides:
+            destination_path.write_text(overrides[source_path.name], encoding="utf-8")
         records.append(
             {
                 "role": role,
@@ -178,6 +189,41 @@ def run_git_command(repository_root: Path, arguments: list[str]) -> str | None:
     return result.stdout.strip()
 
 
+def normalize_repository_url(remote_url: str) -> str:
+    """Normalize a Git remote URL for final-upload metadata.
+
+    参数:
+        remote_url: Raw Git remote URL from local repository configuration.
+
+    返回:
+        str: HTTPS URL when the remote can be normalized, otherwise the trimmed input.
+    """
+    value = remote_url.strip()
+    if value.startswith("git@") and ":" in value:
+        host, repository_path = value[4:].split(":", maxsplit=1)
+        return f"https://{host}/{repository_path}"
+    if value.startswith("ssh://git@"):
+        without_prefix = value[len("ssh://git@") :]
+        if "/" in without_prefix:
+            host, repository_path = without_prefix.split("/", maxsplit=1)
+            return f"https://{host}/{repository_path}"
+    return value
+
+
+def collect_repository_url(manuscript_root: Path) -> str:
+    """Collect the repository URL used for final-upload metadata.
+
+    参数:
+        manuscript_root: Manuscript root directory.
+
+    返回:
+        str: Normalized repository URL, or an empty string when unavailable.
+    """
+    repository_root = manuscript_root.parent
+    remote_url = run_git_command(repository_root, ["config", "--get", "remote.origin.url"])
+    return normalize_repository_url(remote_url) if remote_url else ""
+
+
 def collect_source_control_state(manuscript_root: Path) -> dict:
     """Collect Git source-control state for the generated package manifest.
 
@@ -209,42 +255,144 @@ def collect_source_control_state(manuscript_root: Path) -> dict:
     }
 
 
-def check_final_upload_metadata(manuscript_root: Path, dke_preflight: bool = False) -> list[str]:
-    """Check whether submission metadata is ready for final journal upload.
+def yaml_double_quote(value: str) -> str:
+    """Quote a scalar value for the simple YAML files used by this package.
+
+    参数:
+        value: Scalar value to quote.
+
+    返回:
+        str: Double-quoted YAML scalar.
+    """
+    escaped = value.replace("\\", "\\\\").replace('"', '\\"')
+    return f'"{escaped}"'
+
+
+def replace_yaml_scalar(text: str, key: str, value: str) -> str:
+    """Replace a simple YAML scalar line by key.
+
+    参数:
+        text: YAML text.
+        key: Scalar key to replace.
+        value: New scalar value.
+
+    返回:
+        str: Updated YAML text.
+    """
+    pattern = re.compile(rf"(?m)^(\s*{re.escape(key)}:\s*).*$")
+    return pattern.sub(lambda match: f"{match.group(1)}{yaml_double_quote(value)}", text, count=1)
+
+
+def final_upload_data_code_availability_statement(metadata_text: str, source_control: dict, repository_url: str) -> str:
+    """Build the final-upload data/code availability statement with Git binding.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+        source_control: Git source-control metadata.
+        repository_url: Public repository URL.
+
+    返回:
+        str: Data/code availability statement containing repository and artifact references.
+    """
+    repository_commit = str(source_control.get("repository_commit", "")).strip()
+    repository_branch = str(source_control.get("repository_branch", "")).strip()
+    artifact_value = scalar_value(metadata_text, "artifact_release_url") or scalar_value(metadata_text, "artifact_release_doi")
+    statement = (
+        "Source code, small public fixtures, schema contracts, build scripts, and artifact-release "
+        f"instructions are available at {repository_url} commit {repository_commit} on branch "
+        f"{repository_branch}. Raw third-party data and full experimental outputs are not redistributed in Git."
+    )
+    if artifact_value:
+        statement += f" Full result artifacts are available at {artifact_value}."
+    return statement
+
+
+def bind_final_upload_repository_metadata(metadata_text: str, source_control: dict, repository_url: str) -> str:
+    """Inject Git repository references into final-upload metadata text.
+
+    参数:
+        metadata_text: Source submission metadata text.
+        source_control: Git source-control metadata collected for the package.
+        repository_url: Repository URL collected from Git remote configuration.
+
+    返回:
+        str: Metadata text with repository URL, commit, branch, and availability statement bound.
+    """
+    if source_control.get("available") is not True or not repository_url:
+        return metadata_text
+    bound_text = metadata_text
+    bound_text = replace_yaml_scalar(bound_text, "repository_url", repository_url)
+    bound_text = replace_yaml_scalar(bound_text, "repository_commit", str(source_control.get("repository_commit", "")))
+    bound_text = replace_yaml_scalar(bound_text, "repository_branch", str(source_control.get("repository_branch", "")))
+    data_code_statement = final_upload_data_code_availability_statement(bound_text, source_control, repository_url)
+    return replace_yaml_scalar(bound_text, "data_code_availability", data_code_statement)
+
+
+def has_final_upload_repository_reference(metadata_text: str) -> bool:
+    """Return whether metadata already records repository URL, commit, and branch.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        bool: True when repository reference fields are already filled.
+    """
+    return all(
+        scalar_value(metadata_text, key)
+        for key in ("repository_url", "repository_commit", "repository_branch")
+    )
+
+
+def read_final_upload_metadata(manuscript_root: Path, source_control: dict) -> tuple[str, list[str]]:
+    """Read and bind final-upload metadata for validation and packaging.
 
     参数:
         manuscript_root: Manuscript root directory.
+        source_control: Git source-control metadata collected for the package.
+
+    返回:
+        tuple[str, list[str]]: Effective metadata text and metadata-binding errors.
+    """
+    metadata_path = manuscript_root / "submission_metadata.yml"
+    if not metadata_path.exists():
+        return "", ["missing submission_metadata.yml for final upload"]
+    metadata_text = metadata_path.read_text(encoding="utf-8")
+    if has_final_upload_repository_reference(metadata_text):
+        return metadata_text, []
+    repository_url = collect_repository_url(manuscript_root)
+    bound_metadata_text = bind_final_upload_repository_metadata(metadata_text, source_control, repository_url)
+    return bound_metadata_text, []
+
+
+def check_final_upload_metadata_text_for_package(metadata_text: str, dke_preflight: bool = False) -> list[str]:
+    """Check whether effective submission metadata is ready for final journal upload.
+
+    参数:
+        metadata_text: Effective submission metadata text.
         dke_preflight: Whether the package includes DKE/Elsevier source and PDF files.
 
     返回:
         list[str]: Error messages for unresolved final-upload metadata.
     """
-    metadata_path = manuscript_root / "submission_metadata.yml"
-    if not metadata_path.exists():
-        return ["missing submission_metadata.yml for final upload"]
-    metadata_text = metadata_path.read_text(encoding="utf-8")
     errors = check_final_upload_metadata_text(metadata_text)
     if target_journal_requires_elsevier_files(metadata_text) and not dke_preflight:
         errors.append(DKE_ELSEVIER_FILE_REQUIREMENT_ERROR)
     return errors
 
 
-def check_final_upload_cover_letter(manuscript_root: Path) -> list[str]:
+def check_final_upload_cover_letter(manuscript_root: Path, metadata_text: str) -> list[str]:
     """Check whether the cover letter is ready for final journal upload.
 
     参数:
         manuscript_root: Manuscript root directory.
+        metadata_text: Effective submission metadata text.
 
     返回:
         list[str]: Error messages for unresolved final-upload cover letter fields.
     """
-    metadata_path = manuscript_root / "submission_metadata.yml"
     cover_letter_path = manuscript_root / "cover_letter.md"
-    if not metadata_path.exists():
-        return ["missing submission_metadata.yml for final-upload cover letter check"]
     if not cover_letter_path.exists():
         return ["missing cover_letter.md for final upload"]
-    metadata_text = metadata_path.read_text(encoding="utf-8")
     cover_letter_text = cover_letter_path.read_text(encoding="utf-8")
     return check_final_upload_cover_letter_text(cover_letter_text, metadata_text)
 
@@ -407,14 +555,18 @@ def build_submission_package(
     异常:
         ValueError: Raised when final-upload metadata is unresolved.
     """
+    source_control = collect_source_control_state(manuscript_root)
+    file_text_overrides: dict[str, str] = {}
     if final_upload:
-        final_upload_errors = check_final_upload_metadata(manuscript_root, dke_preflight)
-        final_upload_errors.extend(check_final_upload_cover_letter(manuscript_root))
+        effective_metadata_text, metadata_binding_errors = read_final_upload_metadata(manuscript_root, source_control)
+        final_upload_errors = metadata_binding_errors
+        final_upload_errors.extend(check_final_upload_metadata_text_for_package(effective_metadata_text, dke_preflight))
+        final_upload_errors.extend(check_final_upload_cover_letter(manuscript_root, effective_metadata_text))
         if final_upload_errors:
             raise ValueError("; ".join(final_upload_errors))
+        file_text_overrides["submission_metadata.yml"] = effective_metadata_text
     remove_existing_output(output_dir, zip_path)
-    records = copy_submission_files(manuscript_root, output_dir, dke_preflight)
-    source_control = collect_source_control_state(manuscript_root)
+    records = copy_submission_files(manuscript_root, output_dir, dke_preflight, file_text_overrides)
     manifest_path = write_manifest(output_dir, records, dke_preflight, final_upload, source_control)
     checksum_path = write_checksums(output_dir)
     archive_path = create_zip_archive(output_dir, zip_path) if zip_path else None
