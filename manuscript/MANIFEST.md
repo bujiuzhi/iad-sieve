@@ -17,6 +17,7 @@
 | `reviewer_readiness_audit.md` | 审稿准备度与拒稿风险审计 |
 | `submission_metadata.yml` | 投稿系统元数据字段 |
 | `scripts/validate_manuscript.py` | 稿件材料校验 |
+| `scripts/submission_metadata_checks.py` | 正式上传元数据结构校验 |
 | `scripts/verify_fixture_rebuild.py` | 无网络 fixture 重建校验 |
 | `scripts/build_submission_package.py` | 投稿包构建脚本 |
 | `scripts/validate_submission_package.py` | 投稿包完整性校验 |
@@ -70,4 +71,4 @@ python manuscript/scripts/validate_submission_package.py --dke-preflight
 
 ## 正式上传检查项
 
-`submission_metadata.yml` 中的 `final_upload_checklist` 记录正式上传前必须完成的项目。当前预投稿包保持匿名预投稿状态；正式上传前应至少完成目标期刊选择、期刊模板套用、作者信息、通讯作者信息、模板后 PDF 重建、投稿系统文件核对和 artifact release 链接。
+`submission_metadata.yml` 中的 `final_upload_checklist` 记录正式上传前必须完成的项目。当前预投稿包保持匿名预投稿状态；正式上传前应至少完成目标期刊选择、期刊模板套用、作者信息、通讯作者信息、模板后 PDF 重建、投稿系统文件核对和 artifact release 链接。`scripts/submission_metadata_checks.py` 对最终上传元数据执行结构检查，包括作者邮箱、ORCID 和 artifact release URL/DOI。

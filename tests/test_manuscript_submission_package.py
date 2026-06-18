@@ -185,6 +185,59 @@ def _write_final_upload_metadata(manuscript_root: Path) -> None:
                 "  full_numeric_audit_requires_external_artifact: true",
                 "  broad_method_ranking_claimed: false",
                 "  silver_labels_claimed_as_human_gold: false",
+                '  artifact_release_url: "https://doi.org/10.0000/example"',
+                '  artifact_release_doi: "10.0000/example"',
+                "",
+                "final_upload_checklist:",
+                "  target_journal_selected: true",
+                "  target_journal_template_applied: true",
+                "  author_metadata_completed: true",
+                "  corresponding_author_completed: true",
+                "  manuscript_pdf_rebuilt_after_template: true",
+                "  supplementary_pdf_rebuilt_after_template: true",
+                "  submission_system_files_verified: true",
+                "  artifact_release_prepared_or_linked: true",
+            ]
+        )
+        + "\n",
+    )
+
+
+def _write_malformed_final_upload_metadata(manuscript_root: Path) -> None:
+    """写入结构不完整的正式上传元数据。
+
+    参数:
+        manuscript_root: 临时稿件目录。
+
+    返回:
+        无。
+    """
+    _write_file(
+        manuscript_root / "submission_metadata.yml",
+        "\n".join(
+            [
+                "submission:",
+                '  title: "IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication"',
+                '  target_journal: "Journal of Scholarly Data"',
+                "  target_journal_template_bound: true",
+                "",
+                "authors:",
+                '  - name: "Example Author"',
+                '    affiliation: "Example University"',
+                "",
+                "corresponding_author:",
+                '  name: "Example Author"',
+                '  affiliation: "Example University"',
+                '  email: "not-an-email"',
+                '  orcid: "bad-orcid"',
+                "",
+                "artifact_boundary:",
+                "  raw_third_party_data_included: false",
+                "  full_numeric_audit_requires_external_artifact: true",
+                "  broad_method_ranking_claimed: false",
+                "  silver_labels_claimed_as_human_gold: false",
+                '  artifact_release_url: ""',
+                '  artifact_release_doi: ""',
                 "",
                 "final_upload_checklist:",
                 "  target_journal_selected: true",
@@ -267,6 +320,25 @@ def test_build_submission_package_accepts_final_upload_with_filled_metadata(tmp_
     summary = module.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
 
     assert summary["file_count"] == 11
+
+
+def test_build_submission_package_rejects_malformed_final_upload_metadata(tmp_path) -> None:
+    """验证投稿包生成器拒绝结构不完整的正式上传元数据。"""
+
+    module = _load_submission_package_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_malformed_final_upload_metadata(manuscript_root)
+
+    with pytest.raises(ValueError) as exc_info:
+        module.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
+
+    message = str(exc_info.value)
+    assert "author row 1 email is missing" in message
+    assert "corresponding author email is invalid" in message
+    assert "artifact release URL or DOI is required" in message
 
 
 def test_build_submission_package_writes_dke_preflight_package(tmp_path) -> None:
@@ -434,6 +506,25 @@ def test_validate_submission_package_accepts_final_upload_with_filled_metadata(t
     errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True)
 
     assert errors == []
+
+
+def test_validate_submission_package_rejects_malformed_final_upload_metadata(tmp_path) -> None:
+    """验证投稿包校验器拒绝结构不完整的正式上传元数据。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_malformed_final_upload_metadata(manuscript_root)
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path)
+    errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True)
+
+    assert any("author row 1 email is missing" in error for error in errors)
+    assert any("corresponding author ORCID is invalid" in error for error in errors)
+    assert any("artifact release URL or DOI is required" in error for error in errors)
 
 
 def test_validate_submission_package_rejects_forbidden_zip_member(tmp_path) -> None:

@@ -12,12 +12,18 @@ import hashlib
 import json
 import logging
 import re
+import sys
 import zipfile
 from pathlib import Path
 
 
 LOGGER = logging.getLogger(__name__)
 MANUSCRIPT_ROOT = Path(__file__).resolve().parents[1]
+SCRIPT_ROOT = Path(__file__).resolve().parent
+if str(SCRIPT_ROOT) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_ROOT))
+from submission_metadata_checks import check_final_upload_metadata_text as check_structured_final_upload_metadata_text
+
 DEFAULT_PACKAGE_DIR = MANUSCRIPT_ROOT / "build" / "submission_package"
 DEFAULT_ZIP_PATH = MANUSCRIPT_ROOT / "build" / "iad-risk-submission-package.zip"
 DEFAULT_DKE_PREFLIGHT_PACKAGE_DIR = MANUSCRIPT_ROOT / "build" / "dke_preflight_package"
@@ -108,24 +114,6 @@ ANONYMOUS_ONLY_FORBIDDEN_CONTENT_PATTERNS = [
     (re.compile(r"\bgithub\.com/bujiuzhi\b", re.IGNORECASE), "personal repository URL in anonymous package"),
     (re.compile(r"\bbujiuzhi\b", re.IGNORECASE), "personal account name in anonymous package"),
 ]
-FINAL_UPLOAD_BLOCKED_MARKERS = {
-    'target_journal: ""': "target journal is empty",
-    "target_journal_template_bound: false": "target journal template is not bound",
-    "authors: []": "author list is empty",
-    'name: ""': "corresponding author name is empty",
-    'affiliation: ""': "corresponding author affiliation is empty",
-    'email: ""': "corresponding author email is empty",
-    "target_journal_selected: false": "target journal checklist item is incomplete",
-    "target_journal_template_applied: false": "target journal template checklist item is incomplete",
-    "author_metadata_completed: false": "author metadata checklist item is incomplete",
-    "corresponding_author_completed: false": "corresponding author checklist item is incomplete",
-    "manuscript_pdf_rebuilt_after_template: false": "manuscript PDF rebuild checklist item is incomplete",
-    "supplementary_pdf_rebuilt_after_template: false": "supplementary PDF rebuild checklist item is incomplete",
-    "submission_system_files_verified: false": "submission system file checklist item is incomplete",
-    "artifact_release_prepared_or_linked: false": "artifact release checklist item is incomplete",
-}
-
-
 def parse_arguments() -> argparse.Namespace:
     """Parse command-line arguments.
 
@@ -315,11 +303,7 @@ def check_final_upload_metadata_text(metadata_text: str) -> list[str]:
     返回:
         list[str]: Error messages for unresolved final-upload metadata.
     """
-    return [
-        f"final upload metadata unresolved: {message}"
-        for marker, message in FINAL_UPLOAD_BLOCKED_MARKERS.items()
-        if marker in metadata_text
-    ]
+    return check_structured_final_upload_metadata_text(metadata_text)
 
 
 def is_text_hygiene_file(file_name: str) -> bool:

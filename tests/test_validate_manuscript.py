@@ -1802,10 +1802,15 @@ def test_check_final_upload_metadata_accepts_filled_metadata() -> None:
             '  - name: "Example Author"',
             '    affiliation: "Example University"',
             '    email: "author@example.edu"',
+            '    orcid: "0000-0000-0000-0000"',
             "corresponding_author:",
             '  name: "Example Author"',
             '  affiliation: "Example University"',
             '  email: "author@example.edu"',
+            '  orcid: "0000-0000-0000-0000"',
+            "artifact_boundary:",
+            '  artifact_release_url: "https://doi.org/10.0000/example"',
+            '  artifact_release_doi: "10.0000/example"',
             "final_upload_checklist:",
             "  target_journal_selected: true",
             "  target_journal_template_applied: true",
@@ -1821,6 +1826,75 @@ def test_check_final_upload_metadata_accepts_filled_metadata() -> None:
     errors = module.check_final_upload_metadata(metadata_text)
 
     assert errors == []
+
+
+def test_check_final_upload_metadata_rejects_malformed_author_and_artifact_fields() -> None:
+    """验证 final-upload 门禁拒绝结构不完整的作者和 artifact 字段。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = "\n".join(
+        [
+            'target_journal: "Journal of Scholarly Data"',
+            "target_journal_template_bound: true",
+            "authors:",
+            '  - name: "Example Author"',
+            '    affiliation: "Example University"',
+            "corresponding_author:",
+            '  name: "Example Author"',
+            '  affiliation: "Example University"',
+            '  email: "not-an-email"',
+            '  orcid: "bad-orcid"',
+            "artifact_boundary:",
+            '  artifact_release_url: ""',
+            '  artifact_release_doi: ""',
+            "final_upload_checklist:",
+            "  target_journal_selected: true",
+            "  target_journal_template_applied: true",
+            "  author_metadata_completed: true",
+            "  corresponding_author_completed: true",
+            "  manuscript_pdf_rebuilt_after_template: true",
+            "  supplementary_pdf_rebuilt_after_template: true",
+            "  submission_system_files_verified: true",
+            "  artifact_release_prepared_or_linked: true",
+        ]
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any("author row 1 email is missing" in error for error in errors)
+    assert any("corresponding author email is invalid" in error for error in errors)
+    assert any("corresponding author ORCID is invalid" in error for error in errors)
+    assert any("artifact release URL or DOI is required" in error for error in errors)
+
+
+def test_check_final_upload_metadata_rejects_missing_template_and_checklist_fields() -> None:
+    """验证 final-upload 门禁拒绝缺失的模板绑定和清单布尔字段。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = "\n".join(
+        [
+            'target_journal: "Journal of Scholarly Data"',
+            "authors:",
+            '  - name: "Example Author"',
+            '    affiliation: "Example University"',
+            '    email: "author@example.edu"',
+            "corresponding_author:",
+            '  name: "Example Author"',
+            '  affiliation: "Example University"',
+            '  email: "author@example.edu"',
+            "artifact_boundary:",
+            '  artifact_release_url: "https://doi.org/10.0000/example"',
+            "final_upload_checklist:",
+            "  target_journal_selected: true",
+        ]
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any("target journal template is not bound" in error for error in errors)
+    assert any("target journal template checklist item is incomplete" in error for error in errors)
+    assert any("author metadata checklist item is incomplete" in error for error in errors)
+    assert any("artifact release checklist item is incomplete" in error for error in errors)
 
 
 def test_check_pdf_first_page_markers_accepts_expected_text() -> None:

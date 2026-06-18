@@ -23,11 +23,14 @@ manuscript/
   MANIFEST.md
   scripts/
     validate_manuscript.py
+    submission_metadata_checks.py
     verify_fixture_rebuild.py
     build_submission_package.py
     validate_submission_package.py
     validate_artifact_release.py
     build_artifact_release_skeleton.py
+    populate_artifact_release.py
+    finalize_artifact_release.py
     build_elsevier_draft.py
     check_latex_warnings.py
     check_pdf_rendering.py
@@ -107,4 +110,4 @@ python manuscript/scripts/validate_submission_package.py --dke-preflight
 
 `reviewer_readiness_audit.md` 记录投稿前的审稿准备度、主要拒稿风险、证据边界和最终上传门槛。该文件用于质量控制，不作为最终投稿附件。
 
-`submission_metadata.yml` 中的 `final_upload_checklist` 是正式上传门禁。只有目标期刊、期刊模板、作者元数据、通讯作者元数据、模板后 PDF 重建、投稿系统文件核对和 artifact release 信息均完成后，才应使用 `--final-upload` 生成或校验最终投稿包。
+`submission_metadata.yml` 中的 `final_upload_checklist` 是正式上传门禁。只有目标期刊、期刊模板、作者元数据、通讯作者元数据、模板后 PDF 重建、投稿系统文件核对和 artifact release 信息均完成后，才应使用 `--final-upload` 生成或校验最终投稿包。`scripts/submission_metadata_checks.py` 会同时检查作者邮箱、ORCID 和 artifact release URL/DOI 的基本结构。
