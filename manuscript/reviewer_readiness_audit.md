@@ -10,9 +10,9 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 30.
+Completed audit cycles: 31.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, manuscript artifact-validation text drift, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, manuscript artifact-validation text drift, zero-observed HNFMR overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.
 
@@ -26,7 +26,7 @@ Next revision trigger: repeat the editorial desk check after target-journal temp
 | --- | --- | --- | --- |
 | Contribution | Pass with bounded claims | The manuscript defines identity-agenda confusion, IAD-Bench, HNFMR, and risk-aware merge gating. | Keep the contribution framed as false-merge control, not broad method superiority. |
 | Writing clarity | Pass for template-independent draft | The manuscript contains explicit problem formulation, notation, method details, result boundaries, limitations, and threats to validity. | Recheck section length and formatting after journal-template conversion. |
-| Experimental strength | Conditional | Open-v2 evidence reports baseline HNFMR 0.790--0.999 and IAD-Risk HNFMR=0.000 on the reported held-out scope. | Release same-scope prediction files, threshold logs, checksums, and result tables before relying on full numerical audit. |
+| Experimental strength | Conditional | Open-v2 evidence reports baseline HNFMR 0.790--0.999 and zero observed IAD-Risk HNFMR on the reported held-out scope. | Release same-scope prediction files, threshold logs, checksums, and result tables before relying on full numerical audit. |
 | Evaluation completeness | Conditional | The paper reports gold/proxy/silver strata, FMR, HNFMR, operating-point disclosure, scope compatibility, and claim-evidence boundaries. | Add full artifact-backed threshold grid, ablation suite, and manual-validation slice before stronger robustness or component-causality claims. |
 | Method design soundness | Pass with stated boundaries | The method separates identity, agenda, and agenda-non-identity signals and exposes risk thresholds and cannot-link behavior. | Recheck threshold transfer and source-heldout behavior under the selected target journal's evidence expectations. |
 
@@ -67,7 +67,7 @@ This matrix records the current reviewer-facing answer to the five required self
 | --- | --- | --- | --- | --- |
 | Contribution self-review | What new knowledge does the paper give beyond ordinary entity matching or scientific representation scoring? | pass | The manuscript defines identity-agenda confusion, HNFMR, IAD-Bench label-strength separation, and risk-aware merge gating. | Keep the novelty framed as false-merge control and benchmark contract design, not broad model superiority. |
 | Writing clarity self-review | Can a knowledgeable reader reproduce the method and understand each module's motivation? | pass | The method section defines identity, agenda, ANI, risk score, thresholds, feature groups, and provenance-aware masking. | Recheck length, figure placement, and title-page formatting after target-journal template conversion. |
-| Experimental strength self-review | Are the reported gains meaningful against strong baselines under a fair interpretation? | needs new experiment | Open-v2 evidence reports representation baseline HNFMR 0.790--0.999, RoBERTa FMR 0.001/HNFMR 0.0001, and IAD-Risk HNFMR=0.000 on the reported held-out scope. | Release same-scope prediction files, threshold logs, checksums, and bootstrap intervals before claiming stronger comparative advantage. |
+| Experimental strength self-review | Are the reported gains meaningful against strong baselines under a fair interpretation? | needs new experiment | Open-v2 evidence reports representation baseline HNFMR 0.790--0.999, RoBERTa FMR 0.001/HNFMR 0.0001, and zero observed IAD-Risk HNFMR on the reported held-out scope. | Release same-scope prediction files, threshold logs, checksums, and bootstrap intervals before claiming stronger comparative advantage. |
 | Evaluation completeness self-review | Are ablations, metrics, datasets, and label strata sufficient for the claimed scope? | needs new experiment | The manuscript reports F1, FMR, HNFMR, label strata, scope compatibility, threshold-status boundaries, and manual-validation requirements. | Add artifact-backed ablations, threshold grid, manual-validation slice, and source-heldout package before stronger robustness or component-causality claims. |
 | Method design soundness self-review | Does the method have realistic assumptions and a positive net benefit despite added complexity? | pass | The method exposes thresholds, cannot-link behavior, audit metadata, and explicit boundaries for silver labels and source transfer. | Reassess threshold transfer and deployment complexity after the selected journal route and external artifact are fixed. |
 
@@ -337,6 +337,14 @@ Outcome: pass for manuscript-level reproducibility wording; blocked for final up
 This cycle moves the artifact validation requirement into the main manuscript's Data and Code Availability section. The text now states that an external result release supports the Open-v2 numerical table only after `validate_artifact_release.py --artifact-dir /path/to/release` passes and the final manuscript package also passes `validate_submission_package.py --final-upload --artifact-dir /path/to/release`. The paragraph names the release manifest, checksums, result identifiers, row-level schemas, prediction schemas, claim-boundary flags, raw-data exclusions, source-control commit, submission metadata, and artifact manifest as the binding checks.
 
 The reviewer-facing boundary is claim-evidence alignment. The manuscript no longer relies only on supplemental instructions or repository scripts to describe result-level auditability; the main text tells reviewers that a failed artifact or package-binding validation means the external release should not be used to support the Open-v2 numerical table or stronger claims.
+
+## Audit Cycle 31: Zero-Observed HNFMR Wording Gate
+
+Outcome: pass for first-screen zero-risk overread control; blocked for stronger risk claims until broader source-heldout and manual-validation evidence are released.
+
+This cycle revises the abstract, contribution-evidence summary, result interpretation paragraph, cover letter, and highlights so that the IAD-Risk held-out result is described as zero observed HNFMR rather than as wording that can be read as absolute zero risk. The numerical result table still reports the measured HNFMR value, but the first-screen prose now keeps the observational scope visible.
+
+The reviewer-facing boundary is statistical interpretation. The current evidence means no hard-negative false merge was observed under the reported Open-v2 held-out scope and operating point; it does not prove zero risk under all scholarly sources, thresholds, version policies, or cluster-level merge workflows.
 
 ## Minimum Gate Before Final Upload
 

@@ -581,7 +581,7 @@ def check_abstract_quantitative_evidence(manuscript_text: str) -> list[str]:
         "HNFMR 0.790--0.999",
         "full pair scope",
         "same-work F1=0.980",
-        "HNFMR=0.000",
+        "zero observed HNFMR",
         "held-out test scope",
     ]
     return [f"abstract missing bounded quantitative evidence marker: {marker}" for marker in required_markers if marker not in abstract_text]
@@ -654,7 +654,7 @@ def check_contribution_evidence_summary(manuscript_text: str) -> list[str]:
         "hard-negative false-merge rate",
         "Gold, proxy, silver, and manual-validation layers",
         "same-work F1=0.980",
-        "HNFMR=0.000",
+        "zero observed HNFMR",
         "not a broad method-ranking claim",
     ]
     return [
@@ -2610,7 +2610,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 30",
+        "Completed audit cycles: 31",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -2619,6 +2619,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "artifact release validation bypass",
         "final-upload artifact-dir omission bypass",
         "manuscript artifact-validation text drift",
+        "zero-observed HNFMR overread",
         "artifact release README completeness",
         "artifact release commit validity",
         "artifact README/manifest commit mismatch",
@@ -2698,6 +2699,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 28: Final-Upload Artifact Release Validation Gate",
         "Audit Cycle 29: Final-Upload Artifact-Dir Required Gate",
         "Audit Cycle 30: Main-Manuscript Artifact Validation Text Gate",
+        "Audit Cycle 31: Zero-Observed HNFMR Wording Gate",
         "method-writing clarity",
         "training and inference trace",
         "schema loading",
@@ -2748,6 +2750,11 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "source-control commit",
         "main text tells reviewers",
         "should not be used to support the Open-v2 numerical table",
+        "first-screen zero-risk overread control",
+        "zero observed HNFMR rather than as wording that can be read as absolute zero risk",
+        "first-screen prose",
+        "no hard-negative false merge was observed",
+        "does not prove zero risk under all scholarly sources",
         "remote reproducibility",
         "strong model matrix",
         "model superiority",
@@ -3199,7 +3206,7 @@ def check_submission_material_quantitative_summary(highlights_text: str, cover_l
     """
     highlight_required_markers = [
         "Open-v2 scope-bounded evidence",
-        "IAD-Risk HNFMR=0.000",
+        "zero observed IAD-Risk HNFMR",
     ]
     errors: list[str] = []
     for marker in highlight_required_markers:
@@ -3207,7 +3214,7 @@ def check_submission_material_quantitative_summary(highlights_text: str, cover_l
             errors.append(f"highlights missing scoped quantitative evidence marker: {marker}")
     cover_letter_quantitative_markers = [
         "HNFMR 0.790--0.999",
-        "HNFMR=0.000",
+        "zero observed HNFMR",
     ]
     for marker in cover_letter_quantitative_markers:
         if marker not in cover_letter_text:
@@ -3277,7 +3284,7 @@ def check_editorial_claim_alignment(
                 "scope-bounded mechanism evidence",
                 "same-scope comparative ranking",
                 "HNFMR 0.790--0.999",
-                "HNFMR=0.000",
+                "zero observed HNFMR",
                 "pair-level conclusion",
                 "cluster artifacts",
                 "broad method-ranking claims",
@@ -3304,7 +3311,7 @@ def check_editorial_claim_alignment(
                 "IAD-Bench",
                 "Open-v2 evidence snapshot",
                 "HNFMR 0.790--0.999",
-                "HNFMR=0.000",
+                "zero observed HNFMR",
                 "does not claim broad method superiority",
                 "raw third-party data and full experimental outputs are not redistributed in Git",
             ],
@@ -3316,7 +3323,7 @@ def check_editorial_claim_alignment(
                 "IAD-Risk",
                 "IAD-Bench",
                 "Open-v2 scope-bounded evidence",
-                "IAD-Risk HNFMR=0.000",
+                "zero observed IAD-Risk HNFMR",
                 "artifact-backed audits",
             ],
         ),
@@ -3864,7 +3871,7 @@ def main() -> int:
         "Abstract",
         "Open-v2 evidence snapshot",
         "same-work F1=0.980",
-        "HNFMR=0.000",
+        "zero observed HNFMR",
     ]
     errors.extend(check_pdf(latex_pdf_path, main_pdf_markers))
     main_full_text_markers = [

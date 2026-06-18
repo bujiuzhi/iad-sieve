@@ -305,7 +305,7 @@ def test_check_highlights_accepts_five_concise_bullets() -> None:
             "- Identity-agenda confusion causes risky scholarly work merges.",
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
-            "- Open-v2 scope-bounded evidence reports IAD-Risk HNFMR=0.000.",
+            "- Open-v2 scope-bounded evidence reports zero observed IAD-Risk HNFMR.",
             "- Cluster-level claims require artifact-backed audits.",
         ]
     )
@@ -375,7 +375,7 @@ def test_check_highlights_rejects_missing_cluster_artifact_boundary() -> None:
             "- Identity-agenda confusion causes risky scholarly work merges.",
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
-            "- Open-v2 scope-bounded evidence reports IAD-Risk HNFMR=0.000.",
+            "- Open-v2 scope-bounded evidence reports zero observed IAD-Risk HNFMR.",
             "- Fixtures and artifact rules support reproducible review.",
         ]
     )
@@ -968,7 +968,7 @@ def test_check_contribution_evidence_summary_accepts_complete_summary() -> None:
             "IAD-Risk as a risk-aware merge mechanism.",
             "The paper reports hard-negative false-merge rate.",
             "Gold, proxy, silver, and manual-validation layers are separated.",
-            "The result includes same-work F1=0.980 and HNFMR=0.000.",
+            "The result includes same-work F1=0.980 and zero observed HNFMR.",
             "The manuscript makes not a broad method-ranking claim.",
         ]
     )
@@ -3928,8 +3928,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 30.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, manuscript artifact-validation text drift, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
+            "Completed audit cycles: 31.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, manuscript artifact-validation text drift, zero-observed HNFMR overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -4179,6 +4179,12 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "source-control commit",
             "main text tells reviewers",
             "should not be used to support the Open-v2 numerical table",
+            "## Audit Cycle 31: Zero-Observed HNFMR Wording Gate",
+            "first-screen zero-risk overread control",
+            "zero observed HNFMR rather than as wording that can be read as absolute zero risk",
+            "first-screen prose",
+            "no hard-negative false merge was observed",
+            "does not prove zero risk under all scholarly sources",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -4197,7 +4203,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 30",
+        "Completed audit cycles: 31",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -4208,7 +4214,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 30" in error for error in errors)
+    assert any("Completed audit cycles: 31" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -4632,6 +4638,28 @@ def test_check_reviewer_readiness_audit_rejects_missing_main_manuscript_artifact
     assert any("Main-Manuscript Artifact Validation Text Gate" in error for error in errors)
     assert any("manuscript-level reproducibility wording" in error for error in errors)
     assert any("should not be used to support the Open-v2 numerical table" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_zero_observed_hnfmr_gate() -> None:
+    """验证审稿准备度审计必须覆盖 zero observed HNFMR 首屏措辞门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Audit Cycle 31: Zero-Observed HNFMR Wording Gate",
+        "first-screen zero-risk overread control",
+        "zero observed HNFMR rather than as wording that can be read as absolute zero risk",
+        "first-screen prose",
+        "no hard-negative false merge was observed",
+        "does not prove zero risk under all scholarly sources",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Zero-Observed HNFMR Wording Gate" in error for error in errors)
+    assert any("first-screen zero-risk overread control" in error for error in errors)
+    assert any("does not prove zero risk under all scholarly sources" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_final_upload_source_control_package_gate() -> None:
@@ -5096,7 +5124,7 @@ def test_check_submission_material_quantitative_summary_accepts_scoped_highlight
             "- Identity-agenda confusion causes risky scholarly work merges.",
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
-            "- Open-v2 scope-bounded evidence reports IAD-Risk HNFMR=0.000.",
+            "- Open-v2 scope-bounded evidence reports zero observed IAD-Risk HNFMR.",
             "- Cluster-level claims require artifact-backed audits.",
         ]
     )
@@ -5105,7 +5133,7 @@ def test_check_submission_material_quantitative_summary_accepts_scoped_highlight
             "The manuscript reports an Open-v2 evidence snapshot.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
             "Single-space scientific representation baselines show HNFMR 0.790--0.999 on the full pair scope.",
-            "IAD-Risk reports same-work F1=0.980 and HNFMR=0.000 on the held-out test scope.",
+            "IAD-Risk reports same-work F1=0.980 and zero observed HNFMR on the held-out test scope.",
         ]
     )
 
@@ -5124,7 +5152,7 @@ def test_check_submission_material_quantitative_summary_rejects_unscoped_highlig
             "The manuscript reports an Open-v2 evidence snapshot.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
             "Single-space scientific representation baselines show HNFMR 0.790--0.999 on the full pair scope.",
-            "IAD-Risk reports same-work F1=0.980 and HNFMR=0.000 on the held-out test scope.",
+            "IAD-Risk reports same-work F1=0.980 and zero observed HNFMR on the held-out test scope.",
         ]
     )
 
@@ -5143,7 +5171,7 @@ def test_check_submission_material_quantitative_summary_rejects_cover_letter_wit
             "- Identity-agenda confusion causes risky scholarly work merges.",
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
-            "- Open-v2 scope-bounded evidence reports IAD-Risk HNFMR=0.000.",
+            "- Open-v2 scope-bounded evidence reports zero observed IAD-Risk HNFMR.",
             "- Cluster-level claims require artifact-backed audits.",
         ]
     )
@@ -5151,7 +5179,7 @@ def test_check_submission_material_quantitative_summary_rejects_cover_letter_wit
         [
             "The manuscript reports an Open-v2 evidence snapshot.",
             "Single-space scientific representation baselines show HNFMR 0.790--0.999 on the full pair scope.",
-            "IAD-Risk reports same-work F1=0.980 and HNFMR=0.000 on the held-out test scope.",
+            "IAD-Risk reports same-work F1=0.980 and zero observed HNFMR on the held-out test scope.",
         ]
     )
 
@@ -5173,7 +5201,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
             "This paper studies identity-agenda confusion and proposes IAD-Risk.",
             "It evaluates IAD-Bench under an Open-v2 evidence snapshot.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
-            "The results include HNFMR 0.790--0.999 and HNFMR=0.000.",
+            "The results include HNFMR 0.790--0.999 and zero observed HNFMR.",
             "The results support a conservative pair-level conclusion.",
             "Cluster-level quality claims require cluster artifacts before broad method-ranking claims.",
             r"\end{abstract}",
@@ -5190,7 +5218,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
             title,
             "The paper studies identity-agenda confusion and proposes IAD-Risk.",
             "The manuscript contributes IAD-Bench and reports an Open-v2 evidence snapshot.",
-            "The result includes HNFMR 0.790--0.999 and HNFMR=0.000.",
+            "The result includes HNFMR 0.790--0.999 and zero observed HNFMR.",
             "The manuscript does not claim broad method superiority.",
             "raw third-party data and full experimental outputs are not redistributed in Git.",
         ]
@@ -5200,7 +5228,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
             "- Identity-agenda confusion causes risky scholarly work merges.",
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
-            "- Open-v2 scope-bounded evidence reports IAD-Risk HNFMR=0.000.",
+            "- Open-v2 scope-bounded evidence reports zero observed IAD-Risk HNFMR.",
             "- Cluster-level claims require artifact-backed audits.",
         ]
     )
@@ -5239,7 +5267,7 @@ def test_check_editorial_claim_alignment_rejects_abstract_without_scope_ranking_
             r"\begin{abstract}",
             "This paper studies identity-agenda confusion and proposes IAD-Risk.",
             "It evaluates IAD-Bench under an Open-v2 evidence snapshot.",
-            "The results include HNFMR 0.790--0.999 and HNFMR=0.000.",
+            "The results include HNFMR 0.790--0.999 and zero observed HNFMR.",
             "The results support a conservative pair-level conclusion.",
             "Cluster-level quality claims require cluster artifacts before broad method-ranking claims.",
             r"\end{abstract}",
@@ -5256,12 +5284,12 @@ def test_check_editorial_claim_alignment_rejects_abstract_without_scope_ranking_
             title,
             "The paper studies identity-agenda confusion and proposes IAD-Risk.",
             "The manuscript contributes IAD-Bench and reports an Open-v2 evidence snapshot.",
-            "The result includes HNFMR 0.790--0.999 and HNFMR=0.000.",
+            "The result includes HNFMR 0.790--0.999 and zero observed HNFMR.",
             "The manuscript does not claim broad method superiority.",
             "raw third-party data and full experimental outputs are not redistributed in Git.",
         ]
     )
-    highlights_text = "- Open-v2 scope-bounded evidence reports IAD-Risk HNFMR=0.000."
+    highlights_text = "- Open-v2 scope-bounded evidence reports zero observed IAD-Risk HNFMR."
     keywords_text = "scholarly entity matching; false-merge risk"
     metadata_text = "\n".join(
         [
@@ -5295,7 +5323,7 @@ def test_check_editorial_claim_alignment_rejects_abstract_without_pair_cluster_b
             r"\begin{abstract}",
             "This paper studies identity-agenda confusion and proposes IAD-Risk.",
             "It evaluates IAD-Bench under an Open-v2 evidence snapshot.",
-            "The results include HNFMR 0.790--0.999 and HNFMR=0.000.",
+            "The results include HNFMR 0.790--0.999 and zero observed HNFMR.",
             "The paper avoids broad method-ranking claims.",
             r"\end{abstract}",
             r"\section{Conclusion}",
@@ -5311,7 +5339,7 @@ def test_check_editorial_claim_alignment_rejects_abstract_without_pair_cluster_b
             title,
             "The paper studies identity-agenda confusion and proposes IAD-Risk.",
             "The manuscript contributes IAD-Bench and reports an Open-v2 evidence snapshot.",
-            "The result includes HNFMR 0.790--0.999 and HNFMR=0.000.",
+            "The result includes HNFMR 0.790--0.999 and zero observed HNFMR.",
             "The manuscript does not claim broad method superiority.",
             "raw third-party data and full experimental outputs are not redistributed in Git.",
         ]
@@ -5321,7 +5349,7 @@ def test_check_editorial_claim_alignment_rejects_abstract_without_pair_cluster_b
             "- Identity-agenda confusion causes risky scholarly work merges.",
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
-            "- Open-v2 scope-bounded evidence reports IAD-Risk HNFMR=0.000.",
+            "- Open-v2 scope-bounded evidence reports zero observed IAD-Risk HNFMR.",
             "- Cluster-level claims require artifact-backed audits.",
         ]
     )
@@ -5362,7 +5390,7 @@ def test_check_editorial_claim_alignment_rejects_conclusion_without_cluster_boun
             r"\begin{abstract}",
             "This paper studies identity-agenda confusion and proposes IAD-Risk.",
             "It evaluates IAD-Bench under an Open-v2 evidence snapshot.",
-            "The results include HNFMR 0.790--0.999 and HNFMR=0.000.",
+            "The results include HNFMR 0.790--0.999 and zero observed HNFMR.",
             "The paper avoids broad method-ranking claims.",
             r"\end{abstract}",
             r"\section{Conclusion}",
@@ -5377,7 +5405,7 @@ def test_check_editorial_claim_alignment_rejects_conclusion_without_cluster_boun
             title,
             "The paper studies identity-agenda confusion and proposes IAD-Risk.",
             "The manuscript contributes IAD-Bench and reports an Open-v2 evidence snapshot.",
-            "The result includes HNFMR 0.790--0.999 and HNFMR=0.000.",
+            "The result includes HNFMR 0.790--0.999 and zero observed HNFMR.",
             "The manuscript does not claim broad method superiority.",
             "raw third-party data and full experimental outputs are not redistributed in Git.",
         ]
@@ -5387,7 +5415,7 @@ def test_check_editorial_claim_alignment_rejects_conclusion_without_cluster_boun
             "- Identity-agenda confusion causes risky scholarly work merges.",
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
-            "- Open-v2 scope-bounded evidence reports IAD-Risk HNFMR=0.000.",
+            "- Open-v2 scope-bounded evidence reports zero observed IAD-Risk HNFMR.",
             "- Cluster-level claims require artifact-backed audits.",
         ]
     )
@@ -7418,14 +7446,14 @@ def test_check_pdf_first_page_markers_accepts_expected_text() -> None:
             "Anonymous Authors",
             "Abstract",
             "Open-v2 evidence snapshot",
-            "same-work F1=0.980 and HNFMR=0.000",
+            "same-work F1=0.980 and zero observed HNFMR",
         ]
     )
 
     errors = module.check_pdf_first_page_markers(
         "main.pdf",
         first_page_text,
-        ["IAD-Risk: Risk-Aware", "Scholarly Work Deduplication", "HNFMR=0.000"],
+        ["IAD-Risk: Risk-Aware", "Scholarly Work Deduplication", "zero observed HNFMR"],
     )
 
     assert errors == []
@@ -7440,7 +7468,7 @@ def test_check_pdf_first_page_markers_accepts_wrapped_marker_text() -> None:
             "IAD-Risk: Risk-Aware Identity-Agenda",
             "single-space baselines show HNFMR 0.790-0.999.",
             "IAD-Risk variants report same-",
-            "work F1=0.980 and HNFMR=0.000.",
+            "work F1=0.980 and zero observed HNFMR.",
             "A later extraction may also contain same-work",
             "F1=0.980 on a new line.",
         ]
@@ -7449,7 +7477,7 @@ def test_check_pdf_first_page_markers_accepts_wrapped_marker_text() -> None:
     errors = module.check_pdf_first_page_markers(
         "main.pdf",
         first_page_text,
-        ["same-work F1=0.980", "HNFMR=0.000"],
+        ["same-work F1=0.980", "zero observed HNFMR"],
     )
 
     assert errors == []
@@ -7464,11 +7492,11 @@ def test_check_pdf_first_page_markers_rejects_missing_and_unresolved_text() -> N
     errors = module.check_pdf_first_page_markers(
         "main.pdf",
         first_page_text,
-        ["Scholarly Work Deduplication", "HNFMR=0.000"],
+        ["Scholarly Work Deduplication", "zero observed HNFMR"],
     )
 
     assert any("Scholarly Work Deduplication" in error for error in errors)
-    assert any("HNFMR=0.000" in error for error in errors)
+    assert any("zero observed HNFMR" in error for error in errors)
     assert any("unresolved marker" in error and "??" in error for error in errors)
 
 
