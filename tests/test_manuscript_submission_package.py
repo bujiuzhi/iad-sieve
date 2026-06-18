@@ -161,6 +161,7 @@ def _write_unresolved_submission_metadata(manuscript_root: Path) -> None:
                 "  manuscript_pdf_rebuilt_after_template: false",
                 "  supplementary_pdf_rebuilt_after_template: false",
                 "  submission_system_files_verified: false",
+                "  first_screen_claim_lockdown_confirmed: false",
                 "  artifact_release_prepared_or_linked: false",
             ]
         )
@@ -263,6 +264,7 @@ def _write_final_upload_metadata(manuscript_root: Path) -> None:
                 "  manuscript_pdf_rebuilt_after_template: true",
                 "  supplementary_pdf_rebuilt_after_template: true",
                 "  submission_system_files_verified: true",
+                "  first_screen_claim_lockdown_confirmed: true",
                 "  artifact_release_prepared_or_linked: true",
             ]
         )
@@ -416,6 +418,7 @@ def _write_dke_final_upload_metadata(manuscript_root: Path) -> None:
                 "  manuscript_pdf_rebuilt_after_template: true",
                 "  supplementary_pdf_rebuilt_after_template: true",
                 "  submission_system_files_verified: true",
+                "  first_screen_claim_lockdown_confirmed: true",
                 "  artifact_release_prepared_or_linked: true",
             ]
         )
@@ -503,6 +506,7 @@ def _write_malformed_final_upload_metadata(manuscript_root: Path) -> None:
                 "  manuscript_pdf_rebuilt_after_template: true",
                 "  supplementary_pdf_rebuilt_after_template: true",
                 "  submission_system_files_verified: true",
+                "  first_screen_claim_lockdown_confirmed: true",
                 "  artifact_release_prepared_or_linked: true",
             ]
         )

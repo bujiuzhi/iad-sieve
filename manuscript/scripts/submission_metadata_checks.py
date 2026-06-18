@@ -27,6 +27,7 @@ FINAL_UPLOAD_BLOCKED_MARKERS = {
     "manuscript_pdf_rebuilt_after_template: false": "manuscript PDF rebuild checklist item is incomplete",
     "supplementary_pdf_rebuilt_after_template: false": "supplementary PDF rebuild checklist item is incomplete",
     "submission_system_files_verified: false": "submission system file checklist item is incomplete",
+    "first_screen_claim_lockdown_confirmed: false": "first-screen claim lockdown checklist item is incomplete",
     "artifact_release_prepared_or_linked: false": "artifact release checklist item is incomplete",
 }
 EMAIL_PATTERN = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
@@ -88,6 +89,7 @@ FINAL_UPLOAD_TRUE_FIELDS = {
     "manuscript_pdf_rebuilt_after_template": "manuscript PDF rebuild checklist item is incomplete",
     "supplementary_pdf_rebuilt_after_template": "supplementary PDF rebuild checklist item is incomplete",
     "submission_system_files_verified": "submission system file checklist item is incomplete",
+    "first_screen_claim_lockdown_confirmed": "first-screen claim lockdown checklist item is incomplete",
     "artifact_release_prepared_or_linked": "artifact release checklist item is incomplete",
 }
 ARTICLE_TYPE_COVER_LETTER_MARKERS = {

@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 23.
+Completed audit cycles: 24.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release README completeness, artifact release commit validity, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -246,7 +246,7 @@ The reviewer-facing boundary is auditability rather than new empirical strength.
 
 Outcome: pass for checklist and metadata validator coverage; blocked for final upload until the selected journal's live declaration wording is completed.
 
-This cycle separates publisher-required AI-tool disclosure from removable process notes. Formal manuscript files, cover-letter text, highlights, keywords, and submission packages must not contain development logs, assistant work summaries, or unexplained process traces. At the same time, the final upload workflow must record the actual AI-tool use status required by the selected publisher, confirm author review and responsibility, confirm that AI tools are not listed as authors, and confirm whether machine-generated figures, images, or artwork are included.
+This cycle separates publisher-required AI-tool disclosure from removable process notes. Formal manuscript files, cover-letter text, highlights, keywords, and submission packages must not contain development logs, development work summaries, or unexplained process traces. At the same time, the final upload workflow must record the actual AI-tool use status required by the selected publisher, confirm author review and responsibility, confirm that AI tools are not listed as authors, and confirm whether machine-generated figures, images, or artwork are included.
 
 The reviewer-facing boundary is compliance rather than scientific evidence. A completed generative AI declaration does not strengthen the method or experiments, but a missing or inconsistent declaration can trigger desk-check or production-stage issues. The declaration must therefore match `submission_metadata.yml`, `final_upload_information_request.md`, the manuscript declaration section if required by the target journal, and the live submission-system field before `generative_ai_declaration_complete` can be set to true.
 
@@ -281,6 +281,14 @@ Outcome: pass for final-upload checklist coverage; blocked for final upload unti
 This cycle checks the materials that editors and submission systems see before a reviewer reads the PDF. The submission checklist now requires `cover_letter.md`, `highlights.md`, `keywords.md`, the abstract, and the conclusion to describe the same problem, method, Open-v2 evidence snapshot, and claim boundary. It also blocks first-screen upgrades to broad method superiority, SOTA ranking, statistical superiority, threshold stability, human-gold validation, Q2/B completion, final-upload readiness, or cluster-level deployment quality.
 
 The reviewer-facing boundary is practical. A consistent first screen reduces desk-check and scope-drift risk, but it does not add empirical evidence. Artifact URL or DOI insertion must remain a traceability update unless the released artifact validates the optional evidence needed for stronger claims, such as bootstrap intervals, threshold grids, ablations, manual-validation slice, or cluster artifacts.
+
+## Audit Cycle 24: Final-Upload Claim-Lock Metadata Gate
+
+Outcome: pass for metadata-validator coverage; blocked for final upload until `first_screen_claim_lockdown_confirmed` is true after live system preview.
+
+This cycle turns the first-screen claim lockdown from a checklist instruction into a final-upload metadata gate. The tracked `submission_metadata.yml` now keeps `final_upload_checklist.first_screen_claim_lockdown_confirmed` false by default, and the final-upload metadata validator requires it to be true before upload. The final-upload information request also asks authors to confirm that the cover letter, highlights, keywords, abstract, and conclusion preserve the same Open-v2 evidence boundary and avoid unsupported first-screen upgrades.
+
+The reviewer-facing boundary remains conservative. Setting this field to true confirms text consistency and claim discipline; it does not confirm target-journal acceptance, Q2/B completion, artifact evidence, or stronger empirical claims.
 
 ## Minimum Gate Before Final Upload
 

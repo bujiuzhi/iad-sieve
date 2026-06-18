@@ -192,6 +192,7 @@ def test_check_final_upload_information_request_rejects_legacy_checklist_names()
     request_text = request_text.replace("manuscript_pdf_rebuilt_after_template", "manuscript_pdf_rebuilt_after_metadata")
     request_text = request_text.replace("supplementary_pdf_rebuilt_after_template", "supplementary_pdf_rebuilt_after_metadata")
     request_text = request_text.replace("submission_system_files_verified", "submission_system_fields_reviewed")
+    request_text = request_text.replace("first_screen_claim_lockdown_confirmed", "first_screen_claims_reviewed")
     request_text = request_text.replace("artifact_release_prepared_or_linked", "artifact_release_public")
 
     errors = module.check_final_upload_information_request(request_text)
@@ -201,6 +202,7 @@ def test_check_final_upload_information_request_rejects_legacy_checklist_names()
     assert any("corresponding_author_completed" in error for error in errors)
     assert any("manuscript_pdf_rebuilt_after_template" in error for error in errors)
     assert any("submission_system_files_verified" in error for error in errors)
+    assert any("first_screen_claim_lockdown_confirmed" in error for error in errors)
     assert any("artifact_release_prepared_or_linked" in error for error in errors)
 
 
@@ -3803,7 +3805,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 23.",
+            "Completed audit cycles: 24.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release README completeness, artifact release commit validity, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -4012,6 +4014,10 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "statistical superiority",
             "human-gold validation",
             "Q2/B completion",
+            "## Audit Cycle 24: Final-Upload Claim-Lock Metadata Gate",
+            "first_screen_claim_lockdown_confirmed",
+            "metadata-validator coverage",
+            "live system preview",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload",
@@ -4030,7 +4036,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 23",
+        "Completed audit cycles: 24",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -4041,7 +4047,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 23" in error for error in errors)
+    assert any("Completed audit cycles: 24" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -5393,6 +5399,7 @@ def _build_filled_final_upload_metadata_text(
         "  manuscript_pdf_rebuilt_after_template: true",
         "  supplementary_pdf_rebuilt_after_template: true",
         "  submission_system_files_verified: true",
+        "  first_screen_claim_lockdown_confirmed: true",
         "  artifact_release_prepared_or_linked: true",
     ]
     return "\n".join(metadata_lines)
@@ -5510,6 +5517,7 @@ def test_check_final_upload_metadata_accepts_filled_metadata() -> None:
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -5623,6 +5631,7 @@ def test_check_final_upload_metadata_rejects_missing_repository_reference() -> N
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -5702,6 +5711,7 @@ def test_check_final_upload_metadata_rejects_data_code_statement_without_release
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -5749,6 +5759,7 @@ def test_check_final_upload_metadata_rejects_corresponding_author_outside_author
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -5793,6 +5804,7 @@ def test_check_final_upload_metadata_rejects_missing_funding_statement() -> None
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -5867,6 +5879,7 @@ def test_check_final_upload_metadata_rejects_no_external_funding_without_stateme
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -5915,6 +5928,7 @@ def test_check_final_upload_metadata_rejects_missing_submission_statements() -> 
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -5993,6 +6007,7 @@ def test_check_final_upload_metadata_rejects_missing_research_data_statement_for
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -6064,6 +6079,7 @@ def test_check_final_upload_metadata_rejects_missing_research_data_statement_for
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -6136,6 +6152,7 @@ def test_check_final_upload_metadata_rejects_research_data_statement_without_art
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -6219,6 +6236,7 @@ def test_check_final_upload_metadata_accepts_dke_research_data_statement_with_ar
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -6271,6 +6289,7 @@ def test_check_final_upload_metadata_rejects_missing_author_contribution_stateme
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -6340,6 +6359,7 @@ def test_check_final_upload_metadata_rejects_missing_credit_roles_when_required(
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -6415,6 +6435,7 @@ def test_check_final_upload_metadata_rejects_empty_credit_roles_by_default() -> 
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -6495,6 +6516,7 @@ def test_check_final_upload_metadata_rejects_missing_credit_roles_for_each_autho
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -6553,6 +6575,7 @@ def test_check_final_upload_metadata_rejects_missing_permissions_statement() -> 
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -6631,6 +6654,7 @@ def test_check_final_upload_metadata_rejects_no_permission_without_statement_tex
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -6676,6 +6700,7 @@ def test_check_final_upload_metadata_rejects_duplicate_author_orcid() -> None:
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -6721,6 +6746,7 @@ def test_check_final_upload_metadata_rejects_duplicate_author_email() -> None:
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -6760,6 +6786,7 @@ def test_check_final_upload_metadata_rejects_malformed_author_and_artifact_field
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -6804,6 +6831,7 @@ def test_check_final_upload_metadata_rejects_mismatched_artifact_doi_url() -> No
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -6845,6 +6873,7 @@ def test_check_final_upload_metadata_rejects_orcid_checksum_error() -> None:
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -6888,6 +6917,7 @@ def test_check_final_upload_metadata_rejects_anonymous_review_for_dke() -> None:
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -6929,6 +6959,7 @@ def test_check_final_upload_metadata_rejects_missing_review_mode_for_dke() -> No
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
+            "  first_screen_claim_lockdown_confirmed: true",
             "  artifact_release_prepared_or_linked: true",
         ]
     )
@@ -6967,6 +6998,7 @@ def test_check_final_upload_metadata_rejects_missing_template_and_checklist_fiel
     assert any("target journal template is not bound" in error for error in errors)
     assert any("target journal template checklist item is incomplete" in error for error in errors)
     assert any("author metadata checklist item is incomplete" in error for error in errors)
+    assert any("first-screen claim lockdown checklist item is incomplete" in error for error in errors)
     assert any("artifact release checklist item is incomplete" in error for error in errors)
 
 
