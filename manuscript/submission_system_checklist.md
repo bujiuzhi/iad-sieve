@@ -59,6 +59,17 @@ Before upload, verify:
 4. Permission files are listed when third-party permission is required.
 5. The data availability statement matches artifact release status, including whether the release has a real URL or DOI.
 
+## Cover Letter Customization Checks
+
+Before upload, verify:
+
+1. The cover letter names the selected target journal.
+2. The cover letter states the final article type.
+3. The corresponding author name appears in the cover letter.
+4. The artifact URL or DOI appears in the cover letter when available.
+5. The cover letter no longer uses the generic Dear Editor greeting.
+6. The cover letter no longer uses an anonymous author signature.
+
 ## Final Metadata Checks
 
 Before upload, verify:
