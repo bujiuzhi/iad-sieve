@@ -862,6 +862,27 @@ The source code, benchmark construction scripts, public-release checks, and manu
 
 Raw third-party data are not redistributed in the repository because the original sources have their own access conditions and licenses. The repository instead provides data-processing commands, schema contracts, fixture tests, and artifact-release guidance so that independent readers can reproduce the benchmark construction from public sources and verify generated artifacts through manifests, checksums, command logs, and fixed commit identifiers.
 
+\begin{table}[H]
+\caption{Data and code availability boundary. The table separates what is version-controlled in Git from what must be obtained from public sources or a released artifact package.}
+\label{tab:data-code-availability-boundary}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.25\linewidth}L{0.30\linewidth}L{0.35\linewidth}}
+\toprule
+Availability class & Included location & Reviewer use \\
+\midrule
+Source code and CLI entry points & Project repository. & Supports installation, schema checks, fixture rebuilds, baseline execution, model training entry points, and manuscript builds. \\
+Small public fixtures and schema contracts & Project repository. & Supports L0/L1 code-level reproduction without downloading full raw datasets. \\
+Raw third-party source files & Excluded from Git; obtained from original providers. & Raw third-party data remain governed by original provider licenses and access conditions. \\
+Full prediction files and model checkpoints & Excluded from Git unless provided through an external artifact release. & Prevents large local outputs from being treated as repository source files. \\
+Derived evaluation artifacts & External artifact release. & Supports L2/L3 result-level audit through prediction files, threshold logs, manifests, checksums, and commit identifiers. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This boundary distinguishes L0/L1 code-level reproduction from L2/L3 result-level audit. Full numerical reproduction requires public-source rebuilds or released artifacts; the Git repository alone verifies the executable contracts, fixture behavior, and manuscript build rather than redistributing raw data or full experiment outputs.
+
 \section*{Ethics Statement}
 
 This study uses public scholarly metadata and benchmark-style record linkage data. It does not involve human participants, clinical records, private user behavior, or animal experiments. Any future manual validation should be limited to scholarly record relation labels and should avoid collecting sensitive personal information.

@@ -297,6 +297,37 @@ def check_declaration_statements(manuscript_text: str) -> list[str]:
     return errors
 
 
+def check_data_code_availability_boundary(manuscript_text: str) -> list[str]:
+    """Check whether the data/code availability statement separates repository and artifact scope.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing data/code availability boundary markers.
+    """
+    required_markers = [
+        r"\section*{Data and Code Availability}",
+        r"\label{tab:data-code-availability-boundary}",
+        "Source code and CLI entry points",
+        "Small public fixtures and schema contracts",
+        "Raw third-party source files",
+        "Full prediction files and model checkpoints",
+        "Derived evaluation artifacts",
+        "prediction files, threshold logs, manifests, checksums, and commit identifiers",
+        "L0/L1 code-level reproduction",
+        "L2/L3 result-level audit",
+        "raw third-party data remain governed by original provider licenses",
+        "full numerical reproduction requires public-source rebuilds or released artifacts",
+    ]
+    lowered_text = manuscript_text.lower()
+    return [
+        f"data/code availability boundary missing marker: {marker}"
+        for marker in required_markers
+        if marker.lower() not in lowered_text
+    ]
+
+
 def check_forbidden_claims(manuscript_text: str) -> list[str]:
     """Check forbidden unsupported claims in the manuscript.
 
@@ -2486,6 +2517,7 @@ def main() -> int:
     errors.extend(check_error_taxonomy(manuscript_text))
     errors.extend(check_validity_threats(manuscript_text))
     errors.extend(check_declaration_statements(manuscript_text))
+    errors.extend(check_data_code_availability_boundary(manuscript_text))
     errors.extend(check_operating_point_disclosure(manuscript_text))
     errors.extend(check_statistical_interpretation_boundary(manuscript_text))
     errors.extend(check_threshold_sensitivity_status(manuscript_text))

@@ -72,6 +72,43 @@ def test_check_declaration_statements_rejects_vague_declarations() -> None:
     assert any("no competing interests" in error for error in errors)
 
 
+def test_check_data_code_availability_boundary_accepts_complete_boundary() -> None:
+    """验证数据与代码可用性边界完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\section*{Data and Code Availability}",
+            r"\label{tab:data-code-availability-boundary}",
+            "The repository includes Source code and CLI entry points.",
+            "The repository includes Small public fixtures and schema contracts.",
+            "The repository excludes Raw third-party source files.",
+            "The repository excludes Full prediction files and model checkpoints.",
+            "The external artifact release should contain Derived evaluation artifacts.",
+            "The external artifact release should contain prediction files, threshold logs, manifests, checksums, and commit identifiers.",
+            "The statement distinguishes L0/L1 code-level reproduction from L2/L3 result-level audit.",
+            "The statement says raw third-party data remain governed by original provider licenses.",
+            "The statement says full numerical reproduction requires public-source rebuilds or released artifacts.",
+        ]
+    )
+
+    errors = module.check_data_code_availability_boundary(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_data_code_availability_boundary_rejects_missing_artifact_boundary() -> None:
+    """验证数据可用性声明缺少 artifact 边界时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\section*{Data and Code Availability} Data are available on request."
+
+    errors = module.check_data_code_availability_boundary(manuscript_text)
+
+    assert any("data-code-availability-boundary" in error for error in errors)
+    assert any("Full prediction files and model checkpoints" in error for error in errors)
+
+
 def test_check_highlights_accepts_five_concise_bullets() -> None:
     """验证 5 条简洁投稿 highlights 可通过检查。"""
 
