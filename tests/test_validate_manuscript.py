@@ -2813,12 +2813,32 @@ def test_check_extended_protocol_boundary_rejects_unreported_extended_results() 
 
 
 def test_check_claim_interpretation_boundary_accepts_complete_boundary() -> None:
-    """验证主稿包含正式论文风格的 claim interpretation boundary 时可通过检查。"""
+    """验证 claim interpretation boundary 迁入补充材料后仍可通过检查。"""
 
     module = _load_validate_manuscript_module()
     checker = getattr(module, "check_claim_interpretation_boundary", None)
     assert callable(checker)
     manuscript_text = "\n".join(
+        [
+            r"\section{Claim Interpretation Boundary}",
+            "The full claim-interpretation boundary table is reported in the supplementary material.",
+            "The contribution clarity is tied to the IAD-Bench contract.",
+            "The identity-agenda confusion is part of the boundary.",
+            "HNFMR as a false-merge safety problem.",
+            "The writing reproducibility is limited to code-level checks.",
+            "The repository supports fixture rebuilds.",
+            "The repository supports schema validation.",
+            "The repository supports artifact-release preparation.",
+            "The experimental strength is limited to the Open-v2 evidence snapshot.",
+            "The evaluation completeness is limited by artifact-backed ablations.",
+            "The table requires threshold grids.",
+            "The table requires a manual-validation slice.",
+            "The method design soundness remains bounded by source-heldout validation.",
+            "The boundary requires topic-heldout checks.",
+            "The boundary requires failure-case analysis.",
+        ]
+    )
+    supplementary_text = "\n".join(
         [
             r"\section{Claim Interpretation Boundary}",
             r"\label{tab:claim-interpretation-boundary}",
@@ -2840,7 +2860,7 @@ def test_check_claim_interpretation_boundary_accepts_complete_boundary() -> None
         ]
     )
 
-    errors = checker(manuscript_text)
+    errors = checker(manuscript_text, supplementary_text)
 
     assert errors == []
 
@@ -2862,7 +2882,7 @@ def test_check_claim_interpretation_boundary_rejects_missing_boundaries() -> Non
     errors = checker(manuscript_text)
 
     assert any("claim-interpretation-boundary" in error for error in errors)
-    assert any("Boundary before stronger wording" in error for error in errors)
+    assert any("full claim-interpretation boundary table" in error for error in errors)
     assert any("manual-validation slice" in error for error in errors)
 
 
@@ -4584,7 +4604,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 50.",
+            "Completed audit cycles: 51.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -4968,6 +4988,16 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "operational validity",
             "validity-threat clarity without main-text table overload",
             "supplementary validity-threat boundary",
+            "## Audit Cycle 51: Claim Interpretation Boundary Density Gate",
+            "claim-interpretation table-density reduction",
+            "full claim-interpretation boundary table",
+            "contribution clarity",
+            "writing reproducibility",
+            "experimental strength",
+            "evaluation completeness",
+            "method design soundness",
+            "claim-interpretation clarity without main-text table overload",
+            "supplementary claim-interpretation boundary",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -4986,7 +5016,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 50",
+        "Completed audit cycles: 51",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -4997,7 +5027,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 50" in error for error in errors)
+    assert any("Completed audit cycles: 51" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

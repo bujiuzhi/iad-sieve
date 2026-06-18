@@ -3027,7 +3027,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 50",
+        "Completed audit cycles: 51",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3135,6 +3135,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 48: Result Interpretation Guardrails Density Gate",
         "Audit Cycle 49: Claim-Evidence Boundary Density Gate",
         "Audit Cycle 50: Validity Threats Density Gate",
+        "Audit Cycle 51: Claim Interpretation Boundary Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
         "method-writing clarity",
@@ -3257,6 +3258,15 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "operational validity",
         "validity-threat clarity without main-text table overload",
         "supplementary validity-threat boundary",
+        "claim-interpretation table-density reduction",
+        "full claim-interpretation boundary table",
+        "contribution clarity",
+        "writing reproducibility",
+        "experimental strength",
+        "evaluation completeness",
+        "method design soundness",
+        "claim-interpretation clarity without main-text table overload",
+        "supplementary claim-interpretation boundary",
         "remote reproducibility",
         "strong model matrix",
         "model superiority",
@@ -3592,16 +3602,35 @@ def check_validity_threats(manuscript_text: str, supplementary_text: str = "") -
     return errors
 
 
-def check_claim_interpretation_boundary(manuscript_text: str) -> list[str]:
+def check_claim_interpretation_boundary(manuscript_text: str, supplementary_text: str = "") -> list[str]:
     """Check whether the main manuscript contains a formal claim-interpretation boundary.
 
     参数:
         manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
 
     返回:
         list[str]: Error messages for missing claim-interpretation boundary markers.
     """
-    required_markers = [
+    required_main_markers = [
+        r"\section{Claim Interpretation Boundary}",
+        "full claim-interpretation boundary table is reported in the supplementary material",
+        "contribution clarity is tied to the IAD-Bench contract",
+        "identity-agenda confusion",
+        "HNFMR as a false-merge safety problem",
+        "writing reproducibility is limited to code-level checks",
+        "fixture rebuilds",
+        "schema validation",
+        "artifact-release preparation",
+        "experimental strength is limited to the Open-v2 evidence snapshot",
+        "evaluation completeness is limited by artifact-backed ablations",
+        "threshold grids",
+        "manual-validation slice",
+        "method design soundness remains bounded by source-heldout validation",
+        "topic-heldout checks",
+        "failure-case analysis",
+    ]
+    required_supplement_markers = [
         r"\section{Claim Interpretation Boundary}",
         r"\label{tab:claim-interpretation-boundary}",
         "Claim interpretation boundary",
@@ -3626,10 +3655,16 @@ def check_claim_interpretation_boundary(manuscript_text: str) -> list[str]:
         "Reviewer-facing claim checklist",
     ]
     errors = [
-        f"claim interpretation boundary missing marker: {marker}"
-        for marker in required_markers
+        f"claim interpretation boundary missing manuscript marker: {marker}"
+        for marker in required_main_markers
         if marker not in manuscript_text
     ]
+    evidence_text = supplementary_text or manuscript_text
+    errors.extend(
+        f"claim interpretation boundary missing supplementary marker: {marker}"
+        for marker in required_supplement_markers
+        if marker not in evidence_text
+    )
     errors.extend(
         f"claim interpretation boundary uses internal-review marker: {marker}"
         for marker in forbidden_markers
@@ -4417,7 +4452,7 @@ def main() -> int:
     errors.extend(check_related_work_positioning(manuscript_text, supplementary_text))
     errors.extend(check_error_taxonomy(manuscript_text))
     errors.extend(check_validity_threats(manuscript_text, supplementary_text))
-    errors.extend(check_claim_interpretation_boundary(manuscript_text))
+    errors.extend(check_claim_interpretation_boundary(manuscript_text, supplementary_text))
     errors.extend(check_declaration_statements(manuscript_text))
     errors.extend(check_data_code_availability_boundary(manuscript_text))
     errors.extend(check_cli_entrypoint_contract(pyproject_text, cli_entrypoint_text))

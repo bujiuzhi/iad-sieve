@@ -550,6 +550,29 @@ Mechanism claims should be tied to explicit ablation outputs. The repository pro
 
 Cluster-level claims should be tied to artifacts generated after the pair decisions are converted into connected components. A defensible package should include cluster assignments, a cluster metric summary, a cannot-link audit, and command logs for the merge policy. Without those outputs, pair-level FMR and HNFMR should not be interpreted as proof that cluster-level contamination has been reduced or eliminated.
 
+\section{Claim Interpretation Boundary}
+
+The main manuscript summarizes the claim interpretation boundary in prose. Table~\ref{tab:claim-interpretation-boundary} preserves the full matrix that maps each review dimension to the present evidence and the wording boundary before stronger claims.
+
+\begin{table}[H]
+\caption{Claim interpretation boundary. Each row maps a common review dimension to the present evidence and the wording boundary that should not be crossed without additional artifacts.}
+\label{tab:claim-interpretation-boundary}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.18\linewidth}L{0.26\linewidth}L{0.24\linewidth}L{0.22\linewidth}}
+\toprule
+Review dimension & Main evidence location & Supported wording & Boundary before stronger wording \\
+\midrule
+Contribution clarity & Introduction, problem formulation, and IAD-Bench contract. & The manuscript identifies identity-agenda confusion and HNFMR as a false-merge safety problem. & Do not frame the work as a universal replacement for entity resolution or scientific representation learning. \\
+Writing reproducibility & Method, implementation details, data/code availability, and supplementary protocol. & The repository supports code-level checks, fixture rebuilds, schema validation, and artifact-release preparation. & Full numerical audit requires external artifacts with predictions, logs, manifests, and checksums. \\
+Experimental strength & Open-v2 evidence snapshot, operating-point disclosure, and result audit trail. & Current evidence supports targeted false-merge suppression under the stated Open-v2 scope. & Stronger ranking claims require same-scope predictions, threshold logs, bootstrap intervals, and released metric tables. \\
+Evaluation completeness & Claim-evidence boundary, manual-validation boundary, and uncertainty requirements. & The manuscript separates gold, proxy, silver, and future manual-review evidence layers. & Component causality or human-gold claims require artifact-backed ablations, threshold grids, and a manual-validation slice. \\
+Method design soundness & Risk score rationale, merge-decision rule, and validity threats. & IAD-Risk exposes identity, agenda, ANI risk, thresholds, and cannot-link behavior. & Broad deployment claims require source-heldout validation, topic-heldout checks, and failure-case analysis. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Reviewer Evidence Gate}
 
 This section states the evidence gate that should be applied before a reviewer reads the present results as stronger than the manuscript claims. The current package supports a bounded mechanism claim: identity-agenda separation and false-merge risk gating can suppress hard-negative automatic merges in the reported Open-v2 evidence snapshot. Stronger claims require released artifacts that bind the same rows, thresholds, logs, and checksums to the submitted text.
