@@ -1062,6 +1062,37 @@ def test_check_formal_submission_claim_lockdown_rejects_chinese_completion_claim
     assert any("main manuscript" in error and "final-upload completion claim" in error for error in errors)
 
 
+def test_check_formal_source_typography_hygiene_accepts_ascii_submission_text() -> None:
+    """验证正式投稿材料使用 ASCII 标点和无编辑标记时可通过。"""
+
+    module = _load_validate_manuscript_module()
+    document_texts = {
+        "main manuscript": "IAD-Risk uses risk-aware merge gating -- not a leaderboard claim.",
+        "cover letter": "The manuscript is complete as an anonymous pre-submission draft.",
+    }
+
+    errors = module.check_formal_source_typography_hygiene(document_texts)
+
+    assert errors == []
+
+
+def test_check_formal_source_typography_hygiene_rejects_unicode_punctuation_and_markers() -> None:
+    """验证正式投稿材料中的 Unicode 标点和未完成编辑标记会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    document_texts = {
+        "main manuscript": "IAD-Risk uses risk-aware gating – not “broad superiority”.",
+        "cover letter": "TODO replace this sentence and remove bad glyph �.",
+    }
+
+    errors = module.check_formal_source_typography_hygiene(document_texts)
+
+    assert any("main manuscript" in error and "en dash" in error for error in errors)
+    assert any("main manuscript" in error and "left double quotation mark" in error for error in errors)
+    assert any("cover letter" in error and "unfinished edit marker TODO" in error for error in errors)
+    assert any("cover letter" in error and "replacement character" in error for error in errors)
+
+
 def test_check_final_upload_metadata_rejects_placeholders() -> None:
     """验证 final-upload 门禁会拒绝未填写的投稿元数据。"""
 

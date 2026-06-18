@@ -93,6 +93,27 @@ CITATION_COMMAND_PATTERN = re.compile(
     r"\\(?:cite|citep|citet|citealp|citealt|citeauthor|citeyear|citeyearpar)\*?(?:\s*\[[^\]]*\]){0,2}\s*\{([^}]+)\}"
 )
 BIBTEX_ENTRY_PATTERN = re.compile(r"@\w+\s*\{\s*([^,\s]+)\s*,", re.MULTILINE)
+FORMAL_SOURCE_FORBIDDEN_CHARACTERS = {
+    "\u2010": "Unicode hyphen",
+    "\u2011": "non-breaking hyphen",
+    "\u2012": "figure dash",
+    "\u2013": "en dash",
+    "\u2014": "em dash",
+    "\u2015": "horizontal bar",
+    "\u2212": "minus sign",
+    "\u2018": "left single quotation mark",
+    "\u2019": "right single quotation mark",
+    "\u201c": "left double quotation mark",
+    "\u201d": "right double quotation mark",
+    "\u2026": "ellipsis",
+    "\ufffd": "replacement character",
+}
+FORMAL_SOURCE_FORBIDDEN_MARKERS = [
+    "TODO",
+    "FIXME",
+    "TBD",
+    "[?]",
+]
 FORBIDDEN_PHRASES = [
     "state-of-the-art",
     "state of the art",
@@ -232,6 +253,27 @@ def check_formal_submission_claim_lockdown(document_texts: dict[str, str]) -> li
                 continue
             line_number = document_text.count("\n", 0, match.start()) + 1
             errors.append(f"{document_name} contains unsafe formal completion claim ({label}) on line {line_number}")
+    return errors
+
+
+def check_formal_source_typography_hygiene(document_texts: dict[str, str]) -> list[str]:
+    """Check formal submission sources for unsafe typography and edit markers.
+
+    参数:
+        document_texts: Mapping from formal submission document name to text.
+
+    返回:
+        list[str]: Error messages for unsafe characters or unfinished edit markers.
+    """
+    errors: list[str] = []
+    for document_name, document_text in document_texts.items():
+        for line_number, line in enumerate(document_text.splitlines(), start=1):
+            for character, label in FORMAL_SOURCE_FORBIDDEN_CHARACTERS.items():
+                if character in line:
+                    errors.append(f"{document_name} contains {label} on line {line_number}")
+            for marker in FORMAL_SOURCE_FORBIDDEN_MARKERS:
+                if marker in line:
+                    errors.append(f"{document_name} contains unfinished edit marker {marker} on line {line_number}")
     return errors
 
 
@@ -1399,6 +1441,19 @@ def main() -> int:
                 "highlights": highlights_text,
                 "keywords": keywords_text,
                 "cover letter": cover_letter_text,
+                "DKE/Elsevier draft source": elsevier_draft_source_text,
+            }
+        )
+    )
+    errors.extend(
+        check_formal_source_typography_hygiene(
+            {
+                "main manuscript": manuscript_text,
+                "supplementary material": supplementary_text,
+                "highlights": highlights_text,
+                "keywords": keywords_text,
+                "cover letter": cover_letter_text,
+                "references": bibliography_text,
                 "DKE/Elsevier draft source": elsevier_draft_source_text,
             }
         )
