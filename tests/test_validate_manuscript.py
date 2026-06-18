@@ -409,6 +409,10 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
             "Reviewers can run python manuscript/scripts/validate_artifact_release.py.",
             "The validator checks required result identifiers.",
             "The validator checks conditional claim artifacts.",
+            r"The package documents \path{open_v2_main_results}.",
+            "The artifact package records per-row denominator counts.",
+            "The artifact package records the per-row threshold source.",
+            "The artifact package records the scope label used in the main table.",
             r"The package documents \path{threshold_sensitivity_grid}.",
             r"The package documents \path{cluster_metric_summary}.",
             r"The package documents \path{cannot_link_audit}.",
@@ -486,6 +490,63 @@ def test_check_result_claim_boundary_rejects_missing_row_level_audit_binding() -
 
     errors = module.check_result_claim_boundary(manuscript_text, supplementary_text)
 
+    assert any("per-row denominator counts" in error for error in errors)
+    assert any("per-row threshold source" in error for error in errors)
+    assert any("scope label used in the main table" in error for error in errors)
+
+
+def test_check_result_claim_boundary_rejects_missing_supplementary_row_schema() -> None:
+    """验证补充材料必须说明 Open-v2 主结果表行级 schema。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\label{tab:openv2-results}",
+            r"\subsection{Claim-Evidence Boundary for Result Interpretation}",
+            r"\subsection{Result Audit Trail}",
+            r"\label{tab:result-artifact-crosswalk}",
+            r"\label{tab:claim-evidence-boundary-main}",
+            r"\path{open_v2_main_results}",
+            r"\path{iad_bench_split_summary}",
+            r"\path{representation_baseline_scores}",
+            r"\path{supervised_baseline_predictions}",
+            r"\path{iad_risk_predictions}",
+            r"\path{threshold_selection_logs}",
+            r"\path{bootstrap_intervals}",
+            r"\path{ablation_suite}",
+            r"\path{manual_validation_slice}",
+            r"\path{threshold_sensitivity_grid}",
+            "Each row uses a prediction or score file, metric summary, and checksum or manifest.",
+            "Each row records per-row denominator counts.",
+            "Each row records the per-row threshold source.",
+            "Each row records the scope label used in the main table.",
+            "The evidence does not support a broad method-ranking claim.",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Artifact Package Requirements}",
+            r"\section{Claim-Evidence Matrix}",
+            "The released artifact package includes checksums.sha256.",
+            "Reviewers can run python manuscript/scripts/build_artifact_release_skeleton.py.",
+            "Reviewers can run python manuscript/scripts/populate_artifact_release.py.",
+            "Reviewers can run python manuscript/scripts/finalize_artifact_release.py.",
+            "Reviewers can run python manuscript/scripts/validate_artifact_release.py.",
+            "The validator checks required result identifiers.",
+            "The validator checks conditional claim artifacts.",
+            r"The package documents \path{threshold_sensitivity_grid}.",
+            r"The package documents \path{cluster_metric_summary}.",
+            r"The package documents \path{cannot_link_audit}.",
+            "The package states that cluster-level quality claims require cluster assignments.",
+            "The package states that cluster-level quality claims require cannot-link coverage.",
+            "The package states that cluster-level quality claims require cluster contamination rate.",
+            "The validator checks exclusion of raw third-party data.",
+        ]
+    )
+
+    errors = module.check_result_claim_boundary(manuscript_text, supplementary_text)
+
+    assert any("open_v2_main_results" in error for error in errors)
     assert any("per-row denominator counts" in error for error in errors)
     assert any("per-row threshold source" in error for error in errors)
     assert any("scope label used in the main table" in error for error in errors)
