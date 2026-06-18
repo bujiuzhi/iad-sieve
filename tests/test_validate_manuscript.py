@@ -1781,6 +1781,22 @@ def test_check_auxiliary_model_evidence_absent_rejects_unsupported_model_phrases
     assert any("cover letter" in error and "GPT" in error for error in errors)
 
 
+def test_check_auxiliary_model_evidence_absent_rejects_process_traces() -> None:
+    """验证正式投稿材料出现 AI 工具或修改记录痕迹时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    document_texts = {
+        "cover letter": "Codex work record: 本次修改 cleaned the documentation.",
+        "highlights": "AI-generated submission summary.",
+    }
+
+    errors = module.check_auxiliary_model_evidence_absent(document_texts)
+
+    assert any("cover letter" in error and "Codex" in error for error in errors)
+    assert any("cover letter" in error and "本次修改" in error for error in errors)
+    assert any("highlights" in error and "AI-generated" in error for error in errors)
+
+
 def test_check_formal_submission_claim_lockdown_accepts_conservative_boundaries() -> None:
     """验证正式投稿材料中的保守主张边界不会被误判。"""
 
