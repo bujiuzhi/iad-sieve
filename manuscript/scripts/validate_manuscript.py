@@ -93,6 +93,9 @@ CITATION_COMMAND_PATTERN = re.compile(
     r"\\(?:cite|citep|citet|citealp|citealt|citeauthor|citeyear|citeyearpar)\*?(?:\s*\[[^\]]*\]){0,2}\s*\{([^}]+)\}"
 )
 BIBTEX_ENTRY_PATTERN = re.compile(r"@\w+\s*\{\s*([^,\s]+)\s*,", re.MULTILINE)
+LATEX_LABEL_PATTERN = re.compile(r"\\label\{([^}]+)\}")
+LATEX_REFERENCE_PATTERN = re.compile(r"\\(?:ref|eqref|pageref|autoref)\{([^}]+)\}")
+ALLOWED_LABEL_PREFIXES = ("fig:", "tab:", "eq:", "sec:", "alg:", "app:")
 FORMAL_SOURCE_FORBIDDEN_CHARACTERS = {
     "\u2010": "Unicode hyphen",
     "\u2011": "non-breaking hyphen",
@@ -455,6 +458,55 @@ def check_citation_bibliography_alignment(document_texts: dict[str, str], biblio
         errors.append(f"citation keys missing from references.bib: {missing_bibliography_keys}")
     if uncited_bibliography_keys:
         errors.append(f"references.bib contains uncited entries: {uncited_bibliography_keys}")
+    return errors
+
+
+def extract_latex_labels(document_text: str) -> list[str]:
+    """Extract LaTeX label keys while preserving duplicates.
+
+    参数:
+        document_text: LaTeX source text.
+
+    返回:
+        list[str]: Label keys in source order.
+    """
+    return [match.group(1).strip() for match in LATEX_LABEL_PATTERN.finditer(document_text)]
+
+
+def extract_latex_references(document_text: str) -> set[str]:
+    """Extract LaTeX cross-reference keys.
+
+    参数:
+        document_text: LaTeX source text.
+
+    返回:
+        set[str]: Referenced label keys.
+    """
+    return {match.group(1).strip() for match in LATEX_REFERENCE_PATTERN.finditer(document_text) if match.group(1).strip()}
+
+
+def check_latex_cross_references(document_texts: dict[str, str]) -> list[str]:
+    """Check LaTeX labels and cross-references within each source file.
+
+    参数:
+        document_texts: Mapping from document name to LaTeX source text.
+
+    返回:
+        list[str]: Error messages for duplicate labels, invalid label prefixes, or missing references.
+    """
+    errors: list[str] = []
+    for document_name, document_text in document_texts.items():
+        labels = extract_latex_labels(document_text)
+        label_set = set(labels)
+        duplicate_labels = sorted({label for label in labels if labels.count(label) > 1})
+        invalid_labels = sorted(label for label in label_set if not label.startswith(ALLOWED_LABEL_PREFIXES))
+        missing_reference_targets = sorted(extract_latex_references(document_text) - label_set)
+        if duplicate_labels:
+            errors.append(f"{document_name} contains duplicate LaTeX labels: {duplicate_labels}")
+        if invalid_labels:
+            errors.append(f"{document_name} contains labels without approved prefixes: {invalid_labels}")
+        if missing_reference_targets:
+            errors.append(f"{document_name} references missing LaTeX labels: {missing_reference_targets}")
     return errors
 
 
@@ -1564,6 +1616,15 @@ def main() -> int:
                 "DKE/Elsevier draft source": elsevier_draft_source_text,
             },
             bibliography_text,
+        )
+    )
+    errors.extend(
+        check_latex_cross_references(
+            {
+                "main manuscript": manuscript_text,
+                "supplementary material": supplementary_text,
+                "DKE/Elsevier draft source": elsevier_draft_source_text,
+            }
         )
     )
     latex_pdf_path = ROOT / "build" / "iad-risk-manuscript-latex.pdf"

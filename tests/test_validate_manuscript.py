@@ -368,6 +368,48 @@ def test_check_citation_bibliography_alignment_rejects_missing_duplicate_and_unc
     assert any("uncited entries" in error and "uncited2024" in error for error in errors)
 
 
+def test_check_latex_cross_references_accepts_defined_labels_and_refs() -> None:
+    """验证 LaTeX label 和 ref 在同一源文件内一致时可通过。"""
+
+    module = _load_validate_manuscript_module()
+    document_texts = {
+        "main manuscript": "\n".join(
+            [
+                r"Table~\ref{tab:results} and Figure~\ref{fig:pipeline}.",
+                r"\label{tab:results}",
+                r"\label{fig:pipeline}",
+            ]
+        ),
+        "supplementary material": r"\label{sec:appendix}",
+    }
+
+    errors = module.check_latex_cross_references(document_texts)
+
+    assert errors == []
+
+
+def test_check_latex_cross_references_rejects_duplicate_missing_and_bad_prefixes() -> None:
+    """验证重复 label、缺失 ref 目标和不规范前缀会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    document_texts = {
+        "main manuscript": "\n".join(
+            [
+                r"Table~\ref{tab:missing}.",
+                r"\label{results}",
+                r"\label{tab:duplicate}",
+                r"\label{tab:duplicate}",
+            ]
+        )
+    }
+
+    errors = module.check_latex_cross_references(document_texts)
+
+    assert any("duplicate LaTeX labels" in error and "tab:duplicate" in error for error in errors)
+    assert any("approved prefixes" in error and "results" in error for error in errors)
+    assert any("missing LaTeX labels" in error and "tab:missing" in error for error in errors)
+
+
 def test_check_method_feature_contract_accepts_complete_contract() -> None:
     """验证方法特征契约完整时可通过检查。"""
 
