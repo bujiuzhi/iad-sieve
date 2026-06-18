@@ -73,6 +73,9 @@ For each author, select the applicable CRediT roles and then draft the final aut
 - Data boundary:
 - Artifact boundary:
 - Final statement for submission system:
+- Research data statement for submission system:
+- Artifact URL or DOI embedded in research data statement:
+- Raw third-party data redistribution boundary included:
 
 ## Artifact release
 
@@ -90,7 +93,7 @@ For each author, select the applicable CRediT roles and then draft the final aut
 - Highlights:
 - Suggested reviewers, if required:
 - Excluded reviewers, if any:
-- Research data statement:
+- Research data statement, including the artifact URL or DOI exactly as recorded above:
 - Additional declarations required by the live submission system:
 
 ## Final title page

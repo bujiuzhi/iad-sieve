@@ -519,21 +519,36 @@ def check_submission_statement_fields(metadata_text: str) -> list[str]:
 
 
 def check_research_data_statement(metadata_text: str) -> list[str]:
-    """Check whether target-specific research data statement metadata is present.
+    """Check whether target-specific research data statement metadata is usable.
 
     参数:
         metadata_text: Submission metadata YAML text.
 
     返回:
-        list[str]: Error messages for missing target-specific research data statement fields.
+        list[str]: Error messages for missing or inconsistent research data statement fields.
     """
     target_journal = scalar_value(metadata_text, "target_journal").strip().lower()
     statements = parse_mapping_section(metadata_text, "statements")
     research_data_statement = statements.get("research_data_statement", "")
     target_journal_label = RESEARCH_DATA_STATEMENT_REQUIRED_TARGETS.get(target_journal)
+    errors: list[str] = []
     if target_journal_label and not research_data_statement:
-        return [f"research data statement is missing for {target_journal_label}"]
-    return []
+        errors.append(f"research data statement is missing for {target_journal_label}")
+    if target_journal_label and research_data_statement:
+        artifact_row = parse_mapping_section(metadata_text, "artifact_boundary")
+        artifact_values = [
+            value
+            for value in (
+                artifact_row.get("artifact_release_url", ""),
+                artifact_row.get("artifact_release_doi", ""),
+            )
+            if value
+        ]
+        if artifact_values and not any(value in research_data_statement for value in artifact_values):
+            errors.append(
+                f"research data statement missing artifact release URL or DOI value for {target_journal_label}"
+            )
+    return errors
 
 
 def check_author_contribution_statement(metadata_text: str) -> list[str]:

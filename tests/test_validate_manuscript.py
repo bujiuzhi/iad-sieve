@@ -4527,6 +4527,133 @@ def test_check_final_upload_metadata_rejects_missing_research_data_statement_for
     assert any("research data statement is missing for Data & Knowledge Engineering" in error for error in errors)
 
 
+def test_check_final_upload_metadata_rejects_research_data_statement_without_artifact_link() -> None:
+    """验证 DKE research data statement 必须包含 artifact URL 或 DOI。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = "\n".join(
+        [
+            'target_journal: "Data & Knowledge Engineering"',
+            'review_mode: "single_anonymized_with_final_author_identities"',
+            "target_journal_template_bound: true",
+            "authors:",
+            '  - name: "Example Author"',
+            '    affiliation: "Example University"',
+            '    email: "author@example.edu"',
+            '    orcid: "0000-0002-1825-0097"',
+            "corresponding_author:",
+            '  name: "Example Author"',
+            '  affiliation: "Example University"',
+            '  email: "author@example.edu"',
+            '  orcid: "0000-0002-1825-0097"',
+            "funding:",
+            "  no_external_funding_declared: true",
+            '  funding_statement: "The authors received no external funding for this work."',
+            "  funding_sources: []",
+            "  grant_numbers: []",
+            "statements:",
+            '  originality: "The manuscript is original, has not been published previously, and is not under consideration elsewhere."',
+            '  author_approval: "All listed authors have approved the submitted version."',
+            '  competing_interests: "The authors declare no competing interests."',
+            '  ethics: "This study uses public scholarly metadata and does not involve human participants."',
+            '  data_code_availability: "The repository provides source code, fixtures, and artifact-release instructions."',
+            '  research_data_statement: "The research data are described in the public repository."',
+            "author_contributions:",
+            "  credit_taxonomy_required_before_final_upload: true",
+            '  contribution_statement: "Example Author: conceptualization and writing - original draft."',
+            "  roles:",
+            '    - author: "Example Author"',
+            '      credit_roles: "Conceptualization; Writing - original draft"',
+            "permissions:",
+            "  no_third_party_material_requiring_permission_declared: true",
+            "  third_party_material_requires_permission: false",
+            '  permissions_statement: "No third-party material requiring permission is included."',
+            "  permission_files: []",
+            "artifact_boundary:",
+            '  artifact_release_url: "https://doi.org/10.0000/example"',
+            '  artifact_release_doi: "10.0000/example"',
+            "final_upload_checklist:",
+            "  target_journal_selected: true",
+            "  target_journal_template_applied: true",
+            "  author_metadata_completed: true",
+            "  corresponding_author_completed: true",
+            "  manuscript_pdf_rebuilt_after_template: true",
+            "  supplementary_pdf_rebuilt_after_template: true",
+            "  submission_system_files_verified: true",
+            "  artifact_release_prepared_or_linked: true",
+        ]
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any(
+        "research data statement missing artifact release URL or DOI value for Data & Knowledge Engineering" in error
+        for error in errors
+    )
+
+
+def test_check_final_upload_metadata_accepts_dke_research_data_statement_with_artifact_link() -> None:
+    """验证 DKE research data statement 包含 artifact URL 时通过元数据门禁。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = "\n".join(
+        [
+            'target_journal: "Data & Knowledge Engineering"',
+            'review_mode: "single_anonymized_with_final_author_identities"',
+            "target_journal_template_bound: true",
+            "authors:",
+            '  - name: "Example Author"',
+            '    affiliation: "Example University"',
+            '    email: "author@example.edu"',
+            '    orcid: "0000-0002-1825-0097"',
+            "corresponding_author:",
+            '  name: "Example Author"',
+            '  affiliation: "Example University"',
+            '  email: "author@example.edu"',
+            '  orcid: "0000-0002-1825-0097"',
+            "funding:",
+            "  no_external_funding_declared: true",
+            '  funding_statement: "The authors received no external funding for this work."',
+            "  funding_sources: []",
+            "  grant_numbers: []",
+            "statements:",
+            '  originality: "The manuscript is original, has not been published previously, and is not under consideration elsewhere."',
+            '  author_approval: "All listed authors have approved the submitted version."',
+            '  competing_interests: "The authors declare no competing interests."',
+            '  ethics: "This study uses public scholarly metadata and does not involve human participants."',
+            '  data_code_availability: "The repository provides source code, fixtures, and artifact-release instructions."',
+            '  research_data_statement: "Source code and small fixtures are available in the repository; the full result artifact is available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
+            "author_contributions:",
+            "  credit_taxonomy_required_before_final_upload: true",
+            '  contribution_statement: "Example Author: conceptualization, methodology, software, validation, and writing - original draft."',
+            "  roles:",
+            '    - author: "Example Author"',
+            '      credit_roles: "Conceptualization; Methodology; Software; Validation; Writing - original draft"',
+            "permissions:",
+            "  no_third_party_material_requiring_permission_declared: true",
+            "  third_party_material_requires_permission: false",
+            '  permissions_statement: "No third-party material requiring permission is included."',
+            "  permission_files: []",
+            "artifact_boundary:",
+            '  artifact_release_url: "https://doi.org/10.0000/example"',
+            '  artifact_release_doi: "10.0000/example"',
+            "final_upload_checklist:",
+            "  target_journal_selected: true",
+            "  target_journal_template_applied: true",
+            "  author_metadata_completed: true",
+            "  corresponding_author_completed: true",
+            "  manuscript_pdf_rebuilt_after_template: true",
+            "  supplementary_pdf_rebuilt_after_template: true",
+            "  submission_system_files_verified: true",
+            "  artifact_release_prepared_or_linked: true",
+        ]
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert errors == []
+
+
 def test_check_final_upload_metadata_rejects_missing_author_contribution_statement() -> None:
     """验证 final-upload 门禁拒绝缺少作者贡献声明的元数据。"""
 
