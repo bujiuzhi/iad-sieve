@@ -52,6 +52,19 @@ This matrix records the current reviewer-facing answer to the five required self
 | Evaluation completeness self-review | Are ablations, metrics, datasets, and label strata sufficient for the claimed scope? | needs new experiment | The manuscript reports F1, FMR, HNFMR, label strata, scope compatibility, threshold-status boundaries, and manual-validation requirements. | Add artifact-backed ablations, threshold grid, manual-validation slice, and source-heldout package before stronger robustness or component-causality claims. |
 | Method design soundness self-review | Does the method have realistic assumptions and a positive net benefit despite added complexity? | pass | The method exposes thresholds, cannot-link behavior, audit metadata, and explicit boundaries for silver labels and source transfer. | Reassess threshold transfer and deployment complexity after the selected journal route and external artifact are fixed. |
 
+## Reviewer Response Matrix
+
+This matrix anticipates likely reviewer questions and maps each answer to manuscript evidence and a conservative response boundary. It should be used to keep the cover letter, response letter, and final template conversion aligned with the same claim limits.
+
+| Likely reviewer question | Response stance | Evidence location | Boundary to keep |
+| --- | --- | --- | --- |
+| Is identity-agenda confusion a new problem or only ordinary semantic similarity? | Treat it as a targeted false-merge failure mode in scholarly work deduplication. | Introduction, Problem Formulation, HNFMR definition, and contribution-evidence summary. | Do not claim a universal prevalence estimate across all scholarly corpora. |
+| Why are silver hard negatives acceptable without complete human gold labels? | Use them as stress-test evidence and keep them separate from DeepMatcher gold identity labels. | IAD-Bench label layers, Open-v2 composition, limitations, and supplementary manual-validation protocol. | Do not call OpenAlex or OpenCitations labels human gold. |
+| Are the result rows comparable if pair scopes differ? | Interpret the table as a scope-bounded evidence snapshot rather than a single leaderboard. | Scope compatibility table, operating-point disclosure, and result audit trail. | Do not claim broad method ranking until same released prediction scope is available. |
+| Does the method beat strong supervised baselines? | Present RoBERTa as a strong baseline and keep the main claim at transparent false-merge control. | Main Open-v2 results, baseline section, and claim-evidence boundary. | Do not claim SOTA or universal superiority. |
+| Is the mechanism causal without full ablation output? | State that current evidence is mechanism-consistent and that causal ablation claims require artifacts. | Mechanism evidence table and supplementary uncertainty and ablation requirements. | Do not claim completed component causality before no-gate, no-ANI, and single-space variants are released. |
+| Can readers reproduce the reported numbers without raw data in Git? | Separate fixture-level code reproduction from L2/L3 result-level artifact reproduction. | Data and Code Availability, supplementary reproduction levels, artifact manifest template, and checksums policy. | Do not imply full numerical audit without external artifact release. |
+
 ## Audit Cycle 1: Claim Discipline
 
 Outcome: pass with residual artifact requirements.

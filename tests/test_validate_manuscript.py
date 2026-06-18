@@ -1015,6 +1015,14 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "Method design soundness self-review",
             "The stronger package requires same-scope prediction files.",
             "It also requires artifact-backed ablations.",
+            "## Reviewer Response Matrix",
+            "This matrix anticipates likely reviewer questions.",
+            "A reviewer may ask about identity-agenda confusion.",
+            "The response discusses silver hard negatives.",
+            "The table is a scope-bounded evidence snapshot.",
+            "It presents RoBERTa as a strong baseline.",
+            "The current evidence is mechanism-consistent.",
+            "The repository supports fixture-level code reproduction.",
             "## Audit Cycle 1: Claim Discipline",
             "## Audit Cycle 2: Submission Readiness",
             "## Audit Cycle 3: Q2/B Acceptance Gate",
@@ -1048,6 +1056,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_final_gate() -> None:
 
     assert any("Reviewer Risk Register" in error for error in errors)
     assert any("Adversarial Self-Review Matrix" in error for error in errors)
+    assert any("Reviewer Response Matrix" in error for error in errors)
     assert any("Q2/B Acceptance Gate" in error for error in errors)
     assert any("Final Package Hygiene" in error for error in errors)
     assert any("Minimum Gate Before Final Upload" in error for error in errors)
