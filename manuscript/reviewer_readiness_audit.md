@@ -10,15 +10,15 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 9.
+Completed audit cycles: 10.
 
-Highest current reviewer-facing risks: final-upload metadata, external artifact release, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.
 
 Non-code external inputs still required: author metadata, target-journal confirmation, funding statement, author contribution statement, permissions statement, live submission-system fields, and artifact release URL or DOI.
 
-Next revision trigger: repeat the editorial desk check after template conversion, cover-letter customization, or artifact-link insertion.
+Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.
 
 ## Audit Dimensions
 
@@ -41,7 +41,7 @@ Next revision trigger: repeat the editorial desk check after template conversion
 | Confidence intervals and statistical significance may be overread. | Medium | The manuscript reports point estimates and adds a statistical interpretation boundary that reserves bootstrap intervals, significance tests, and model-ranking claims for artifact-backed evidence. | Release bootstrap intervals, predefined tests, resampling logs, random seeds, and checksums before claiming interval-supported superiority. |
 | First-screen submission materials may drift in claim scope. | Medium | Title, abstract, conclusion, cover letter, highlights, and keywords are checked for editorial claim alignment around the same problem, method, evidence snapshot, and claim boundary. | Re-run the editorial alignment gate after template conversion or journal-specific cover-letter edits. |
 | Reproducibility depends on files outside Git. | Medium | Fixture rebuild, public-source commands, artifact manifest template, and checksums policy are documented. | Publish the L3 artifact release and link it in submission metadata. |
-| Final upload may mismatch journal system fields. | High | A submission-system checklist records file, metadata, PDF, and artifact checks. | Confirm target journal, author metadata, funding statement, author contribution statement, permissions statement, template, and live system fields. |
+| Final upload may mismatch journal template or system fields. | High | A submission-system checklist records file, metadata, PDF, artifact, source-archive, and template-binding checks. | Confirm target journal, set `target_journal_template_bound`, rebuild the final template source and PDFs, and verify the live system fields. |
 
 ## Claim-Evidence Check
 
@@ -166,16 +166,24 @@ The reviewer-facing interpretation is narrow. A valid `open_v2_main_results` fil
 
 The mandatory command for this gate is `python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release`. The gate should be run after `populate_artifact_release.py` and `finalize_artifact_release.py`, because the finalizer refreshes manifest SHA256 values and `validate_artifact_release.py` checks both checksums and the `open_v2_main_results` row-level schema.
 
+## Audit Cycle 10: Final Template Binding and System Metadata Gate
+
+Outcome: pass for validator coverage; blocked for final upload until the selected journal template is bound to the final manuscript source.
+
+This cycle checks whether final-upload readiness is coupled to the selected journal template rather than only to a generated PDF. The submission metadata, final-upload checklist, and submission-system checklist require `target_journal_template_bound`, `target_journal_template_applied`, rebuilt main and supplementary PDFs after template conversion, and a source archive rebuilt after template conversion. The gate prevents a template-independent PDF or DKE/Elsevier preflight package from being treated as final upload evidence.
+
+The reviewer-facing boundary is narrow. Template binding is a publication-format and submission-system consistency gate; it does not strengthen the scientific evidence. The manuscript should not be uploaded until the selected journal template matches the final manuscript source, `python manuscript/scripts/validate_submission_package.py --final-upload` passes, and the cover letter, metadata, and availability statements all name the same target journal and artifact release.
+
 ## Minimum Gate Before Final Upload
 
 The manuscript should not be uploaded to a journal system until all of the following are true:
 
-1. `submission_metadata.yml` contains the selected target journal and completed author metadata.
-2. `main.tex` is converted to the selected journal template and rebuilt.
+1. `submission_metadata.yml` contains the selected target journal, `target_journal_template_bound: true`, and completed author metadata.
+2. `main.tex` or the selected journal source is converted to the selected journal template and rebuilt.
 3. `supplementary_material.tex` is rebuilt after any final source edits.
 4. The artifact release has a real URL or DOI, validates against its checksum file, and records the same repository commit used by the final manuscript package.
 5. The funding statement text, author contribution statement, permissions statement, data/code availability statement, and journal-specific research data statement are complete and consistent with the live submission system, with CRediT roles covering every listed author and with the repository URL, repository commit, and artifact URL or DOI embedded in the availability statements.
 6. `python manuscript/scripts/validate_manuscript.py --strict-latex` passes.
 7. `python manuscript/scripts/validate_submission_package.py --final-upload` passes.
-8. `submission_system_checklist.md` has been checked against the live journal system.
+8. `submission_system_checklist.md` has been checked against the live journal system, and the selected journal template matches the final manuscript source.
 9. The Q2/B acceptance gate is either fully ready or the manuscript title, abstract, cover letter, and conclusion avoid any Q2/B-complete or broad-superiority wording.

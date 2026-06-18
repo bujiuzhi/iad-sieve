@@ -3381,11 +3381,11 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 9.",
-            "Highest current reviewer-facing risks: final-upload metadata, external artifact release, and stronger evidence gates.",
+            "Completed audit cycles: 10.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, target-journal confirmation, funding statement, author contribution statement, permissions statement, live submission-system fields, and artifact release URL or DOI.",
-            "Next revision trigger: repeat the editorial desk check after template conversion, cover-letter customization, or artifact-link insertion.",
+            "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
             "## Audit Dimensions",
             "Contribution",
             "Writing clarity",
@@ -3469,6 +3469,12 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "per-row threshold source",
             "scope label used in the main table",
             "validate_artifact_release.py",
+            "## Audit Cycle 10: Final Template Binding and System Metadata Gate",
+            "target_journal_template_bound",
+            "target_journal_template_applied",
+            "source archive rebuilt after template conversion",
+            "selected journal template matches the final manuscript source",
+            "DKE/Elsevier preflight package",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload",
@@ -3487,7 +3493,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 9",
+        "Completed audit cycles: 10",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -3498,7 +3504,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 9" in error for error in errors)
+    assert any("Completed audit cycles: 10" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -3615,6 +3621,29 @@ def test_check_reviewer_readiness_audit_rejects_missing_artifact_row_level_audit
     assert any("per-row denominator counts" in error for error in errors)
     assert any("per-row threshold source" in error for error in errors)
     assert any("scope label used in the main table" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_template_binding_gate() -> None:
+    """验证审稿准备度审计必须覆盖最终模板绑定门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Audit Cycle 10: Final Template Binding and System Metadata Gate",
+        "target_journal_template_bound",
+        "target_journal_template_applied",
+        "source archive rebuilt after template conversion",
+        "selected journal template matches the final manuscript source",
+        "DKE/Elsevier preflight package",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Final Template Binding and System Metadata Gate" in error for error in errors)
+    assert any("target_journal_template_bound" in error for error in errors)
+    assert any("target_journal_template_applied" in error for error in errors)
+    assert any("selected journal template matches the final manuscript source" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_final_gate() -> None:
