@@ -10,9 +10,9 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 32.
+Completed audit cycles: 33.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, manuscript artifact-validation text drift, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.
 
@@ -353,6 +353,14 @@ Outcome: pass for L2 public-source rebuild traceability wording and release-temp
 This gate checks whether a reader can understand how the project remains reproducible when raw third-party data and full experimental outputs are not committed to Git. The supplementary material now separates no-network fixture rebuilding from L2 public-source rebuilding and requires a release-level `source_input_manifest`, `processing_run_log`, output summaries, and checksum coverage before L2 rebuilds are treated as result evidence. The data-processing documentation records the same boundary for repository users.
 
 The reviewer-facing boundary is chain of custody. The repository can prove that adapters, CLI entry points, fixture rebuilds, schema checks, and release validators are executable; it cannot by itself prove the Open-v2 numerical table without real public-source inputs or an L3 artifact release. Therefore the artifact release template and validator now require `source_input_manifest` and `processing_run_log` alongside result tables, predictions, threshold logs, and split summaries.
+
+## Audit Cycle 33: Main-Text L2 Provenance Alignment Gate
+
+Outcome: pass for main-text L2 provenance alignment; blocked for final numerical reproduction until the real release contains populated `source_input_manifest`, `processing_run_log`, prediction files, threshold logs, metric summaries, and checksums.
+
+This gate checks whether the main manuscript itself names the L2 provenance artifacts introduced in the supplementary material and release template. The reproduction-level table, result audit trail, result artifact crosswalk, and Data and Code Availability section now state that L2 public-source rebuilds require `source_input_manifest` and `processing_run_log` in addition to prediction, threshold, manifest, checksum, and metric artifacts.
+
+The reviewer-facing boundary is source-to-result alignment. Main text, supplementary material, artifact release template, validator, and tests now use the same provenance vocabulary, reducing the risk that reviewers see the artifact rules as supplemental-only instructions. This alignment still does not create the artifact release; it only ensures the submitted manuscript points to the evidence that must exist before full numerical reproduction or final-upload readiness can be claimed.
 
 ## Minimum Gate Before Final Upload
 

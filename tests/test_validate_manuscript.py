@@ -270,7 +270,11 @@ def test_check_data_code_availability_boundary_accepts_complete_boundary() -> No
             "The repository excludes Raw third-party source files.",
             "The repository excludes Full prediction files and model checkpoints.",
             "The external artifact release should contain Derived evaluation artifacts.",
+            "The external artifact release should contain source input manifests.",
+            "The external artifact release should contain processing run logs.",
             "The external artifact release should contain prediction files, threshold logs, manifests, checksums, and commit identifiers.",
+            r"The external artifact release should include \path{source_input_manifest}.",
+            r"The external artifact release should include \path{processing_run_log}.",
             "The statement distinguishes L0/L1 code-level reproduction from L2/L3 result-level audit.",
             "The statement says raw third-party data remain governed by original provider licenses.",
             "The statement says full numerical reproduction requires public-source rebuilds or released artifacts.",
@@ -587,6 +591,8 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
             r"\path{supervised_baseline_predictions}",
             r"\path{iad_risk_predictions}",
             r"\path{threshold_selection_logs}",
+            r"\path{source_input_manifest}",
+            r"\path{processing_run_log}",
             r"\path{bootstrap_intervals}",
             r"\path{ablation_suite}",
             r"\path{manual_validation_slice}",
@@ -605,6 +611,10 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
             "Threshold logs expose threshold name.",
             "Threshold logs expose selection split.",
             "Threshold logs expose selection metric.",
+            "Rebuild provenance exposes public input provenance.",
+            "Rebuild provenance exposes code commits.",
+            "Rebuild provenance exposes output paths.",
+            "Rebuild provenance exposes exit status.",
             "External artifacts require artifact-level and manuscript-package validation.",
             r"\path{manuscript/scripts/validate_artifact_release.py}",
             r"\path{manuscript/scripts/validate_submission_package.py}",
@@ -4000,8 +4010,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 32.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, manuscript artifact-validation text drift, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
+            "Completed audit cycles: 33.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -4265,6 +4275,15 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "chain of custody",
             "real public-source inputs",
             "alongside result tables, predictions, threshold logs, and split summaries",
+            "## Audit Cycle 33: Main-Text L2 Provenance Alignment Gate",
+            "main-text L2 provenance alignment",
+            "reproduction-level table",
+            "result audit trail",
+            "result artifact crosswalk",
+            "Data and Code Availability section now state",
+            "source-to-result alignment",
+            "same provenance vocabulary",
+            "supplemental-only instructions",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -4283,7 +4302,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 32",
+        "Completed audit cycles: 33",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -4294,7 +4313,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 32" in error for error in errors)
+    assert any("Completed audit cycles: 33" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -4764,6 +4783,31 @@ def test_check_reviewer_readiness_audit_rejects_missing_l2_traceability_gate() -
     assert any("L2 Public-Source Rebuild Traceability Gate" in error for error in errors)
     assert any("source_input_manifest" in error for error in errors)
     assert any("chain of custody" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_main_text_l2_alignment_gate() -> None:
+    """验证审稿准备度审计必须覆盖主稿 L2 provenance 对齐门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Audit Cycle 33: Main-Text L2 Provenance Alignment Gate",
+        "main-text L2 provenance alignment",
+        "reproduction-level table",
+        "result audit trail",
+        "result artifact crosswalk",
+        "Data and Code Availability section now state",
+        "source-to-result alignment",
+        "same provenance vocabulary",
+        "supplemental-only instructions",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Main-Text L2 Provenance Alignment Gate" in error for error in errors)
+    assert any("main-text L2 provenance alignment" in error for error in errors)
+    assert any("same provenance vocabulary" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_final_upload_source_control_package_gate() -> None:
