@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from urllib.parse import unquote, urlparse
 
 
 FINAL_UPLOAD_BLOCKED_MARKERS = {
@@ -325,7 +326,25 @@ def check_artifact_release_link(metadata_text: str) -> list[str]:
         errors.append("artifact release URL is invalid")
     if artifact_doi and DOI_PATTERN.fullmatch(artifact_doi) is None:
         errors.append("artifact release DOI is invalid")
+    doi_url_value = doi_from_url(artifact_url) if artifact_url else ""
+    if doi_url_value and artifact_doi and doi_url_value.lower() != artifact_doi.lower():
+        errors.append("artifact release URL DOI does not match artifact release DOI")
     return errors
+
+
+def doi_from_url(value: str) -> str:
+    """Extract a DOI from a doi.org URL.
+
+    参数:
+        value: Artifact release URL.
+
+    返回:
+        str: DOI path from the URL, or an empty string when the URL is not a doi.org URL.
+    """
+    parsed_url = urlparse(value)
+    if parsed_url.netloc.lower() != "doi.org":
+        return ""
+    return unquote(parsed_url.path.lstrip("/")).strip()
 
 
 def check_final_upload_review_mode(metadata_text: str) -> list[str]:
