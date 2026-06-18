@@ -10,9 +10,9 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 73.
+Completed audit cycles: 74.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.
 
@@ -683,11 +683,19 @@ This gate checks whether `target_journal_template_bound` and `target_journal_tem
 
 The reviewer-facing boundary is formatting and submission-policy traceability. A passing author-guide gate shows that the authors checked the selected journal's current instructions before final upload; it does not prove institutional ranking status, author declarations, live submission-system consistency, artifact access, or stronger scientific evidence.
 
+## Audit Cycle 74: Author Identity Material Traceability Gate
+
+Outcome: pass for final-upload author identity material traceability gate implementation; blocked for DKE final upload until author-approved biography files and photograph files are recorded outside the anonymous preflight package.
+
+This gate checks whether `author_biographies_and_photos_ready` alone is enough for a DKE or DKE-like final upload. It is not. The final-upload metadata validator now requires `author_identity_materials.biography_files`, `author_identity_materials.photograph_files`, and `author_identity_materials.author_identity_materials_verified` when the selected route is Data & Knowledge Engineering or when author biography and photograph materials are explicitly marked as required. This prevents a final-upload package from passing only because a boolean checklist item was set to true.
+
+The reviewer-facing boundary is author-material traceability, not scientific evidence strengthening. A passing author identity material gate shows that required external biography and photograph records exist for the final author-visible upload route; it does not place those identity-bearing files into the anonymous DKE/Elsevier preflight package and does not remove the need for author confirmation, live submission-system verification, or artifact release validation.
+
 ## Minimum Gate Before Final Upload
 
 The manuscript should not be uploaded to a journal system until all of the following are true:
 
-1. `submission_metadata.yml` contains the selected target journal, selected author-guide source and recheck date, confirmed template requirements, author-confirmed ranking/category status with source and checked date, `target_journal_template_bound: true`, completed author metadata, and author biography/photo readiness when the selected route requires it.
+1. `submission_metadata.yml` contains the selected target journal, selected author-guide source and recheck date, confirmed template requirements, author-confirmed ranking/category status with source and checked date, `target_journal_template_bound: true`, completed author metadata, and `author_identity_materials` records for biography/photo files when the selected route requires them.
 2. `main.tex` or the selected journal source is converted to the selected journal template and rebuilt.
 3. `supplementary_material.tex` is rebuilt after any final source edits.
 4. The artifact release has a real URL or DOI, validates against its checksum file, records the same repository commit used by the final manuscript package in both `README.md` and `manifest.json`, and stores the same public URL or DOI plus a public access status in the artifact manifest publication object.

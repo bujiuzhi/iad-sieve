@@ -33,6 +33,12 @@ target_preparation:
 
 authors: []
 
+author_identity_materials:
+  author_biography_and_photo_required_before_upload: true
+  biography_files: []
+  photograph_files: []
+  author_identity_materials_verified: false
+
 corresponding_author:
   name: ""
   affiliation: ""

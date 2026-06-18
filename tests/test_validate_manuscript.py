@@ -110,6 +110,7 @@ def test_check_final_upload_information_request_rejects_missing_credit_roles() -
             "Additional file or system target",
             "`submission`, `target_preparation`, `target_journal_template_bound`, `final_upload_checklist.target_journal_selected`",
             "`authors`, `author_contributions.roles`, `final_upload_checklist.author_metadata_completed`",
+            "`author_identity_materials`, `final_upload_checklist.author_biographies_and_photos_ready`",
             "`corresponding_author`, `final_upload_checklist.corresponding_author_completed`",
             "`funding`, `statements`, `final_upload_checklist.funding_statement_text_ready`",
             "`author_contributions`, `final_upload_checklist.contribution_statement_complete`",
@@ -123,6 +124,15 @@ def test_check_final_upload_information_request_rejects_missing_credit_roles() -
             "Review mode",
             "Author list",
             "Author order",
+            "Author biographies and photographs",
+            "author_identity_materials",
+            "author_biography_and_photo_required_before_upload",
+            "biography_files",
+            "photograph_files",
+            "author_identity_materials_verified",
+            "Biography file path",
+            "Photograph file path",
+            "Author identity materials verified",
             "Corresponding author",
             "Funding statement",
             "Author contribution statement",
@@ -4732,6 +4742,11 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "Submission metadata",
             "target_journal_template_bound",
             "target ranking/category confirmation fields",
+            "Author biographies and photographs",
+            "author_identity_materials",
+            "biography_files",
+            "photograph_files",
+            "author_identity_materials_verified",
             "Artifact release manifest",
             "## Artifact Release Package Checks",
             "python manuscript/scripts/build_artifact_release_skeleton.py --output-dir /path/to/release --repository-commit",
@@ -4785,6 +4800,7 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "Permission files are listed when third-party permission is required.",
             "The data availability statement matches artifact release status.",
             "The generative AI declaration records AI tool use status, author review and responsibility, AI authorship exclusion, and whether any machine-generated figures, images, or artwork are included.",
+            "`author_identity_materials`, `biography_files`, `photograph_files`, and `author_identity_materials_verified` are completed before `author_biographies_and_photos_ready` is marked true.",
             "## Cover Letter Customization Checks",
             "The cover letter names the selected target journal.",
             "The cover letter states the final article type.",
@@ -5328,8 +5344,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 73.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.",
+            "Completed audit cycles: 74.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -5925,6 +5941,13 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "`target_preparation.selected_author_guide_rechecked_date`",
             "`target_preparation.selected_template_requirements_confirmed`",
             "formatting and submission-policy traceability",
+            "## Audit Cycle 74: Author Identity Material Traceability Gate",
+            "author identity material traceability gate implementation",
+            "`author_identity_materials.biography_files`",
+            "`author_identity_materials.photograph_files`",
+            "`author_identity_materials.author_identity_materials_verified`",
+            "boolean checklist item was set to true",
+            "anonymous DKE/Elsevier preflight package",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -5943,7 +5966,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 73",
+        "Completed audit cycles: 74",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -5954,7 +5977,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 73" in error for error in errors)
+    assert any("Completed audit cycles: 74" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -7585,6 +7608,11 @@ def _build_filled_final_upload_metadata_text(
         '    affiliation: "Example University"',
         '    email: "author@example.edu"',
         '    orcid: "0000-0002-1825-0097"',
+        "author_identity_materials:",
+        "  author_biography_and_photo_required_before_upload: false",
+        "  biography_files: []",
+        "  photograph_files: []",
+        "  author_identity_materials_verified: true",
         "corresponding_author:",
         '  name: "Example Author"',
         '  affiliation: "Example University"',
@@ -7710,6 +7738,11 @@ def test_check_final_upload_metadata_accepts_filled_metadata() -> None:
             '    affiliation: "Example University"',
             '    email: "author@example.edu"',
             '    orcid: "0000-0002-1825-0097"',
+            "author_identity_materials:",
+            "  author_biography_and_photo_required_before_upload: false",
+            "  biography_files: []",
+            "  photograph_files: []",
+            "  author_identity_materials_verified: true",
             "corresponding_author:",
             '  name: "Example Author"',
             '  affiliation: "Example University"',
@@ -7852,6 +7885,36 @@ def test_check_final_upload_metadata_rejects_missing_live_system_verification() 
 
     assert any("live submission system verification is incomplete" in error for error in errors)
     assert any("final upload package verification against live system is incomplete" in error for error in errors)
+
+
+def test_check_final_upload_metadata_rejects_missing_dke_author_identity_materials() -> None:
+    """验证 DKE final-upload 门禁拒绝缺失的作者简历和照片材料清单。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = _build_filled_final_upload_metadata_text()
+    metadata_text = metadata_text.replace(
+        'target_journal: "Journal of Scholarly Data"',
+        "\n".join(
+            [
+                'target_journal: "Data & Knowledge Engineering"',
+                'review_mode: "single_anonymized_with_final_author_identities"',
+            ]
+        ),
+    )
+    metadata_text = metadata_text.replace(
+        "  author_biography_and_photo_required_before_upload: false",
+        "  author_biography_and_photo_required_before_upload: true",
+    )
+    metadata_text = metadata_text.replace(
+        "  author_identity_materials_verified: true",
+        "  author_identity_materials_verified: false",
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any("author biography file list is missing" in error for error in errors)
+    assert any("author photograph file list is missing" in error for error in errors)
+    assert any("author identity materials verification is incomplete" in error for error in errors)
 
 
 def test_check_final_upload_metadata_rejects_missing_generative_ai_declaration() -> None:
@@ -8553,6 +8616,11 @@ def test_check_final_upload_metadata_accepts_dke_research_data_statement_with_ar
             '  ethics: "This study uses public scholarly metadata and does not involve human participants."',
             '  data_code_availability: "Source code and fixtures are available at https://example.org/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
             '  research_data_statement: "Source code and small fixtures are available in the repository; the full result artifact is available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
+            "author_identity_materials:",
+            "  author_biography_and_photo_required_before_upload: true",
+            '  biography_files: ["author-materials/example-author-biography.md"]',
+            '  photograph_files: ["author-materials/example-author-photo.jpg"]',
+            "  author_identity_materials_verified: true",
             "author_contributions:",
             "  credit_taxonomy_required_before_final_upload: true",
             '  contribution_statement: "Example Author: conceptualization, methodology, software, validation, and writing - original draft."',

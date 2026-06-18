@@ -220,6 +220,12 @@ def _write_final_upload_metadata(manuscript_root: Path) -> None:
                 '    email: "author@example.edu"',
                 '    orcid: "0000-0002-1825-0097"',
                 "",
+                "author_identity_materials:",
+                "  author_biography_and_photo_required_before_upload: false",
+                "  biography_files: []",
+                "  photograph_files: []",
+                "  author_identity_materials_verified: true",
+                "",
                 "corresponding_author:",
                 '  name: "Example Author"',
                 '  affiliation: "Example University"',
@@ -391,6 +397,12 @@ def _write_dke_final_upload_metadata(manuscript_root: Path) -> None:
                 '    affiliation: "Example University"',
                 '    email: "author@example.edu"',
                 '    orcid: "0000-0002-1825-0097"',
+                "",
+                "author_identity_materials:",
+                "  author_biography_and_photo_required_before_upload: true",
+                '  biography_files: ["author-materials/example-author-biography.md"]',
+                '  photograph_files: ["author-materials/example-author-photo.jpg"]',
+                "  author_identity_materials_verified: true",
                 "",
                 "corresponding_author:",
                 '  name: "Example Author"',
@@ -981,6 +993,42 @@ def test_build_submission_package_rejects_dke_final_upload_without_elsevier_file
         module.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
 
     assert "DKE/Elsevier final upload requires DKE/Elsevier source and PDF files" in str(exc_info.value)
+
+
+def test_build_submission_package_rejects_dke_final_upload_without_author_identity_materials(tmp_path) -> None:
+    """验证 DKE 正式上传包拒绝缺失的作者简历和照片材料清单。"""
+
+    module = _load_submission_package_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_dke_preflight_files(manuscript_root)
+    _write_dke_final_upload_metadata(manuscript_root)
+    _write_dke_final_upload_cover_letter(manuscript_root)
+    metadata_path = manuscript_root / "submission_metadata.yml"
+    metadata_text = metadata_path.read_text(encoding="utf-8")
+    metadata_text = metadata_text.replace(
+        '  biography_files: ["author-materials/example-author-biography.md"]',
+        "  biography_files: []",
+    )
+    metadata_text = metadata_text.replace(
+        '  photograph_files: ["author-materials/example-author-photo.jpg"]',
+        "  photograph_files: []",
+    )
+    metadata_text = metadata_text.replace(
+        "  author_identity_materials_verified: true",
+        "  author_identity_materials_verified: false",
+    )
+    metadata_path.write_text(metadata_text, encoding="utf-8")
+
+    with pytest.raises(ValueError) as exc_info:
+        module.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True, dke_preflight=True)
+
+    message = str(exc_info.value)
+    assert "author biography file list is missing" in message
+    assert "author photograph file list is missing" in message
+    assert "author identity materials verification is incomplete" in message
 
 
 def test_build_submission_package_rejects_generic_final_upload_cover_letter(tmp_path) -> None:

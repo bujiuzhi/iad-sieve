@@ -195,6 +195,41 @@ def parse_mapping_section(metadata_text: str, section_name: str) -> dict[str, st
     return mapping
 
 
+def section_key_has_value(metadata_text: str, section_name: str, key_name: str) -> bool:
+    """Check whether a section key has a scalar or sequence value.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+        section_name: Top-level section name.
+        key_name: Key name to inspect inside the section.
+
+    返回:
+        bool: True when the key contains at least one non-empty value.
+    """
+    lines = section_lines(metadata_text, section_name)
+    for index, line in enumerate(lines):
+        stripped_line = line.strip()
+        if not stripped_line.startswith(f"{key_name}:"):
+            continue
+        inline_value = strip_yaml_value(stripped_line.split(":", 1)[1])
+        if inline_value and inline_value != "[]":
+            return True
+        key_indent = len(line) - len(line.lstrip(" \t"))
+        for following_line in lines[index + 1 :]:
+            following_stripped = following_line.strip()
+            if not following_stripped:
+                continue
+            following_indent = len(following_line) - len(following_line.lstrip(" \t"))
+            if following_indent <= key_indent and ":" in following_stripped:
+                break
+            if following_stripped.startswith("- "):
+                item_value = strip_yaml_value(following_stripped[2:])
+                if item_value:
+                    return True
+        return False
+    return False
+
+
 def parse_author_rows(metadata_text: str) -> list[dict[str, str]]:
     """Parse author rows from submission metadata.
 
@@ -617,6 +652,36 @@ def target_journal_requires_elsevier_files(metadata_text: str) -> bool:
     return target_journal.strip().lower() in ELSEVIER_TARGET_JOURNALS
 
 
+def check_author_identity_materials(metadata_text: str) -> list[str]:
+    """Check DKE/Elsevier author biography and photograph material records.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages for unresolved author identity material records.
+    """
+    target_journal = scalar_value(metadata_text, "target_journal").strip().lower()
+    row = parse_mapping_section(metadata_text, "author_identity_materials")
+    requirement_recorded = (
+        row.get("author_biography_and_photo_required_before_upload", "").lower() == "true"
+    )
+    required_for_selected_route = target_journal == "data & knowledge engineering" or requirement_recorded
+    if not required_for_selected_route:
+        return []
+    if not row:
+        return ["author identity materials section is missing"]
+
+    errors: list[str] = []
+    if row.get("author_identity_materials_verified", "").lower() != "true":
+        errors.append("author identity materials verification is incomplete")
+    if not section_key_has_value(metadata_text, "author_identity_materials", "biography_files"):
+        errors.append("author biography file list is missing")
+    if not section_key_has_value(metadata_text, "author_identity_materials", "photograph_files"):
+        errors.append("author photograph file list is missing")
+    return errors
+
+
 def check_funding_statement(metadata_text: str) -> list[str]:
     """Check whether final-upload metadata declares funding status and wording.
 
@@ -902,6 +967,7 @@ def check_final_upload_metadata_text(metadata_text: str) -> list[str]:
         f"final upload metadata unresolved: {message}"
         for message in check_target_preparation_confirmation(metadata_text)
     )
+    errors.extend(f"final upload metadata unresolved: {message}" for message in check_author_identity_materials(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_funding_statement(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_submission_statement_fields(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_data_code_availability_statement(metadata_text))
