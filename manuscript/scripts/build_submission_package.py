@@ -180,44 +180,60 @@ def check_final_upload_cover_letter(manuscript_root: Path) -> list[str]:
     return check_final_upload_cover_letter_text(cover_letter_text, metadata_text)
 
 
-def write_manifest(output_dir: Path, records: list[dict], dke_preflight: bool = False) -> Path:
+def write_manifest(output_dir: Path, records: list[dict], dke_preflight: bool = False, final_upload: bool = False) -> Path:
     """Write a JSON submission manifest.
 
     参数:
         output_dir: Package output directory.
         records: Manifest file records.
         dke_preflight: Whether the package includes DKE/Elsevier provisional files.
+        final_upload: Whether the package is a final journal upload preflight package.
 
     返回:
         Path: Manifest path.
     """
-    submission_stage = (
-        "dke_elsevier_anonymous_preflight"
-        if dke_preflight
-        else "template_independent_anonymous_pre_submission"
-    )
-    description = (
-        "DKE/Elsevier preflight package with anonymous elsarticle source and PDF."
-        if dke_preflight
-        else "Template-independent manuscript submission package."
-    )
+    if final_upload:
+        submission_stage = "final_journal_upload_preflight"
+        description = "Final journal upload preflight package with target journal and author metadata."
+        author_status = "provided_for_final_upload"
+        target_journal_bound = True
+        final_upload_requirements = [
+            "target journal document class",
+            "journal-specific reference style",
+            "author metadata",
+            "artifact release linked",
+        ]
+    else:
+        submission_stage = (
+            "dke_elsevier_anonymous_preflight"
+            if dke_preflight
+            else "template_independent_anonymous_pre_submission"
+        )
+        description = (
+            "DKE/Elsevier preflight package with anonymous elsarticle source and PDF."
+            if dke_preflight
+            else "Template-independent manuscript submission package."
+        )
+        author_status = "anonymous_placeholder"
+        target_journal_bound = False
+        final_upload_requirements = [
+            "target journal document class",
+            "journal-specific reference style",
+            "author metadata",
+        ]
     manifest = {
         "package_name": "iad-risk-dke-preflight-package" if dke_preflight else "iad-risk-submission-package",
         "package_type": "journal_submission",
         "submission_stage": submission_stage,
         "description": description,
         "anonymization": {
-            "author_status": "anonymous_placeholder",
+            "author_status": author_status,
             "author_metadata_required_before_final_upload": True,
         },
         "journal_template": {
-            "target_journal_bound": False,
+            "target_journal_bound": target_journal_bound,
             "dke_elsevier_preflight_included": dke_preflight,
-            "final_upload_requirements": [
-                "target journal document class",
-                "journal-specific reference style",
-                "author metadata",
-            ],
+            "final_upload_requirements": final_upload_requirements,
         },
         "reproducibility_level": {
             "code_and_fixture_rebuild": "covered by repository scripts",
@@ -314,7 +330,7 @@ def build_submission_package(
             raise ValueError("; ".join(final_upload_errors))
     remove_existing_output(output_dir, zip_path)
     records = copy_submission_files(manuscript_root, output_dir, dke_preflight)
-    manifest_path = write_manifest(output_dir, records, dke_preflight)
+    manifest_path = write_manifest(output_dir, records, dke_preflight, final_upload)
     checksum_path = write_checksums(output_dir)
     archive_path = create_zip_archive(output_dir, zip_path) if zip_path else None
     summary = {

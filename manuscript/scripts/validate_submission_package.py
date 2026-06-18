@@ -215,12 +215,13 @@ def parse_checksums(text: str) -> dict[str, str]:
     return checksums
 
 
-def check_manifest_text(manifest_text: str, dke_preflight: bool = False) -> list[str]:
+def check_manifest_text(manifest_text: str, dke_preflight: bool = False, final_upload: bool = False) -> list[str]:
     """Check submission manifest structure and roles.
 
     参数:
         manifest_text: JSON manifest content.
         dke_preflight: Whether the package should include DKE/Elsevier files.
+        final_upload: Whether the package should be marked for final journal upload.
 
     返回:
         list[str]: Error messages.
@@ -235,17 +236,32 @@ def check_manifest_text(manifest_text: str, dke_preflight: bool = False) -> list
         errors.append(f"submission_manifest.json missing top-level fields: {sorted(missing_fields)}")
     if manifest.get("package_type") != "journal_submission":
         errors.append("submission_manifest.json package_type must be journal_submission")
-    expected_stage = "dke_elsevier_anonymous_preflight" if dke_preflight else "template_independent_anonymous_pre_submission"
+    if final_upload:
+        expected_stage = "final_journal_upload_preflight"
+    elif dke_preflight:
+        expected_stage = "dke_elsevier_anonymous_preflight"
+    else:
+        expected_stage = "template_independent_anonymous_pre_submission"
     if manifest.get("submission_stage") != expected_stage:
         errors.append(f"submission_manifest.json submission_stage must be {expected_stage}")
     anonymization = manifest.get("anonymization")
-    if not isinstance(anonymization, dict) or anonymization.get("author_status") != "anonymous_placeholder":
-        errors.append("submission_manifest.json must record anonymous author placeholder status")
+    expected_author_status = "provided_for_final_upload" if final_upload else "anonymous_placeholder"
+    if not isinstance(anonymization, dict) or anonymization.get("author_status") != expected_author_status:
+        if final_upload:
+            errors.append("submission_manifest.json must record final-upload author metadata status")
+        else:
+            errors.append("submission_manifest.json must record anonymous author placeholder status")
     journal_template = manifest.get("journal_template")
-    if not isinstance(journal_template, dict) or journal_template.get("target_journal_bound") is not False:
-        errors.append("submission_manifest.json must record that no target journal template is bound")
+    expected_target_journal_bound = True if final_upload else False
+    if not isinstance(journal_template, dict) or journal_template.get("target_journal_bound") is not expected_target_journal_bound:
+        if final_upload:
+            errors.append("submission_manifest.json must record that target journal template is bound")
+        else:
+            errors.append("submission_manifest.json must record that no target journal template is bound")
     elif "target journal document class" not in journal_template.get("final_upload_requirements", []):
         errors.append("submission_manifest.json missing target journal document class final-upload requirement")
+    elif final_upload and "artifact release linked" not in journal_template.get("final_upload_requirements", []):
+        errors.append("submission_manifest.json missing artifact release linked final-upload requirement")
     if dke_preflight and journal_template.get("dke_elsevier_preflight_included") is not True:
         errors.append("submission_manifest.json must record DKE/Elsevier preflight inclusion")
     reproducibility_level = manifest.get("reproducibility_level")
@@ -455,7 +471,7 @@ def validate_package_directory(package_dir: Path, final_upload: bool = False, dk
     metadata_path = package_dir / "submission_metadata.yml"
     cover_letter_path = package_dir / "cover_letter.md"
     if manifest_path.exists():
-        errors.extend(check_manifest_text(manifest_path.read_text(encoding="utf-8"), dke_preflight))
+        errors.extend(check_manifest_text(manifest_path.read_text(encoding="utf-8"), dke_preflight, final_upload))
     if final_upload:
         if metadata_path.exists():
             metadata_text = metadata_path.read_text(encoding="utf-8")
@@ -552,7 +568,7 @@ def validate_zip_archive(
                 checksums_text = archive.read(f"{package_root_name}/checksums.sha256").decode("utf-8")
             except KeyError as exc:
                 return errors + [f"zip archive missing required metadata file: {exc}"]
-            errors.extend(check_manifest_text(manifest_text, dke_preflight))
+            errors.extend(check_manifest_text(manifest_text, dke_preflight, final_upload))
             if final_upload:
                 try:
                     metadata_text = archive.read(f"{package_root_name}/submission_metadata.yml").decode("utf-8")

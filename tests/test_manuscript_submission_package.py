@@ -351,8 +351,13 @@ def test_build_submission_package_accepts_final_upload_with_filled_metadata(tmp_
     _write_final_upload_cover_letter(manuscript_root)
 
     summary = module.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
+    manifest = json.loads((output_dir / "submission_manifest.json").read_text(encoding="utf-8"))
 
     assert summary["file_count"] == 11
+    assert manifest["submission_stage"] == "final_journal_upload_preflight"
+    assert manifest["anonymization"]["author_status"] == "provided_for_final_upload"
+    assert manifest["journal_template"]["target_journal_bound"] is True
+    assert "artifact release linked" in manifest["journal_template"]["final_upload_requirements"]
 
 
 def test_build_submission_package_rejects_generic_final_upload_cover_letter(tmp_path) -> None:
@@ -558,6 +563,35 @@ def test_validate_submission_package_accepts_final_upload_with_filled_metadata(t
     errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True)
 
     assert errors == []
+
+
+def test_validate_submission_package_rejects_final_upload_manifest_with_anonymous_stage(tmp_path) -> None:
+    """验证正式上传校验器拒绝仍标记为匿名预投稿状态的 manifest。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_final_upload_metadata(manuscript_root)
+    _write_final_upload_cover_letter(manuscript_root)
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
+    manifest_path = output_dir / "submission_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["submission_stage"] = "template_independent_anonymous_pre_submission"
+    manifest["anonymization"]["author_status"] = "anonymous_placeholder"
+    manifest["journal_template"]["target_journal_bound"] = False
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False), encoding="utf-8")
+    builder.write_checksums(output_dir)
+    builder.create_zip_archive(output_dir, zip_path)
+
+    errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True)
+
+    assert any("submission_stage must be final_journal_upload_preflight" in error for error in errors)
+    assert any("must record final-upload author metadata status" in error for error in errors)
+    assert any("must record that target journal template is bound" in error for error in errors)
 
 
 def test_validate_submission_package_rejects_generic_final_upload_cover_letter(tmp_path) -> None:
