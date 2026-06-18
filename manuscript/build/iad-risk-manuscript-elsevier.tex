@@ -498,24 +498,7 @@ Same-work F1 is computed on pairs whose identity labels come from the gold layer
 
 \subsection{Decision-to-Metric Mapping}
 
-The reported metrics treat the selective merge decision as a pair-level prediction. In this mapping, automatic merge is the positive decision, while block and defer are non-merge decisions. Deferred same-work pairs reduce recall in same-work F1, so a system cannot improve F1 by deferring positive identity pairs without penalty. FMR and HNFMR count only automatic merges among non-identity rows, while coverage and defer rate must be reported separately before operational automation claims are made.
-
-\begin{table}[H]
-\caption{Decision-to-metric mapping for selective merge outputs. The mapping prevents block and defer decisions from being hidden inside false-merge metrics.}
-\label{tab:decision-metric-mapping}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{L{0.22\linewidth}L{0.31\linewidth}L{0.37\linewidth}}
-\toprule
-Decision output & Metric treatment & Interpretation boundary \\
-\midrule
-Merge & Positive prediction for same-work F1; counted as an error for FMR/HNFMR when the label is non-identity. & Measures automatic merge behavior under the fixed operating point. \\
-Block & Non-merge prediction. & Suppresses false merges but does not count as resolving a positive same-work pair. \\
-Defer & Non-merge prediction. & Protects against unsafe automatic decisions but shifts the case to review and lowers recall when the pair is truly same-work. \\
-\bottomrule
-\end{tabular}
-\end{table}
+The reported metrics treat the selective merge decision as a pair-level prediction. In this mapping, automatic merge is the positive decision, while block and defer are non-merge decisions. Deferred same-work pairs reduce recall in same-work F1, so a system cannot improve F1 by deferring positive identity pairs without penalty. FMR and HNFMR count only automatic merges among non-identity rows, while coverage and defer rate must be reported separately before operational automation claims are made. The full decision-to-metric mapping table is reported in the supplementary material. Operationally, merge is a positive prediction for same-work F1 and is counted as an FMR/HNFMR error when the label is non-identity; block suppresses false merges but does not resolve a positive same-work pair; and defer protects against unsafe automatic decisions but shifts the case to review and lowers recall when the pair is truly same-work.
 
 \subsection{Metric Formula Boundary}
 

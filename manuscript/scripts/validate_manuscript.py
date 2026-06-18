@@ -1670,29 +1670,50 @@ def check_pair_cluster_evidence_boundary(manuscript_text: str, supplementary_tex
     return errors
 
 
-def check_decision_metric_mapping(manuscript_text: str) -> list[str]:
+def check_decision_metric_mapping(manuscript_text: str, supplementary_text: str = "") -> list[str]:
     """Check whether selective decisions are mapped to reported metrics.
 
     参数:
         manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
 
     返回:
         list[str]: Error messages for missing decision-to-metric mapping markers.
     """
-    required_markers = [
+    required_main_markers = [
         r"\subsection{Decision-to-Metric Mapping}",
-        r"\label{tab:decision-metric-mapping}",
+        "full decision-to-metric mapping table is reported in the supplementary material",
         "automatic merge is the positive decision",
         "block and defer are non-merge decisions",
         "Deferred same-work pairs reduce recall",
         "FMR and HNFMR count only automatic merges among non-identity rows",
         "coverage and defer rate must be reported separately",
+        "block suppresses false merges",
+        "defer protects against unsafe automatic decisions",
     ]
-    return [
-        f"decision-to-metric mapping missing marker: {marker}"
-        for marker in required_markers
+    required_supplement_markers = [
+        r"\section{Decision-to-Metric Mapping}",
+        r"\label{tab:decision-metric-mapping}",
+        "Decision-to-metric mapping for selective merge outputs",
+        "Decision output",
+        "Metric treatment",
+        "Interpretation boundary",
+        "Merge",
+        "Block",
+        "Defer",
+    ]
+    errors = [
+        f"decision-to-metric mapping missing manuscript marker: {marker}"
+        for marker in required_main_markers
         if marker not in manuscript_text
     ]
+    evidence_text = supplementary_text or manuscript_text
+    errors.extend(
+        f"decision-to-metric mapping missing supplementary marker: {marker}"
+        for marker in required_supplement_markers
+        if marker not in evidence_text
+    )
+    return errors
 
 
 def check_metric_formula_boundary(manuscript_text: str, supplementary_text: str = "") -> list[str]:
@@ -3173,7 +3194,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 59",
+        "Completed audit cycles: 60",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3290,8 +3311,17 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 57: Threshold Sensitivity Evidence Status Density Gate",
         "Audit Cycle 58: Operating Point Disclosure Density Gate",
         "Audit Cycle 59: Metric Formula Boundary Density Gate",
+        "Audit Cycle 60: Decision-to-Metric Mapping Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
+        "decision-to-metric table-density reduction",
+        "full decision-to-metric mapping table",
+        "automatic merge is the positive decision",
+        "block and defer are non-merge decisions",
+        "deferred same-work pairs reduce recall",
+        "FMR/HNFMR count only automatic merges",
+        "decision-to-metric clarity without main-text table overload",
+        "supplementary decision-to-metric mapping",
         "method-writing clarity",
         "training and inference trace",
         "schema loading",
@@ -4750,7 +4780,7 @@ def main() -> int:
     errors.extend(check_operating_point_disclosure(manuscript_text, supplementary_text))
     errors.extend(check_selective_decision_coverage_boundary(manuscript_text, supplementary_text))
     errors.extend(check_pair_cluster_evidence_boundary(manuscript_text, supplementary_text))
-    errors.extend(check_decision_metric_mapping(manuscript_text))
+    errors.extend(check_decision_metric_mapping(manuscript_text, supplementary_text))
     errors.extend(check_metric_formula_boundary(manuscript_text, supplementary_text))
     errors.extend(check_threshold_uncertainty_reporting(manuscript_text))
     errors.extend(check_statistical_interpretation_boundary(manuscript_text))

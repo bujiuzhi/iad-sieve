@@ -564,6 +564,27 @@ Model ranking & Restricted to mechanism interpretation rather than a universal r
 \end{tabular}
 \end{table}
 
+\section{Decision-to-Metric Mapping}
+
+The main manuscript summarizes the decision-to-metric mapping in prose. Table~\ref{tab:decision-metric-mapping} preserves how merge, block, and defer outputs are interpreted by same-work F1, FMR, and HNFMR.
+
+\begin{table}[H]
+\caption{Decision-to-metric mapping for selective merge outputs. The mapping prevents block and defer decisions from being hidden inside false-merge metrics.}
+\label{tab:decision-metric-mapping}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.22\linewidth}L{0.31\linewidth}L{0.37\linewidth}}
+\toprule
+Decision output & Metric treatment & Interpretation boundary \\
+\midrule
+Merge & Positive prediction for same-work F1; counted as an error for FMR/HNFMR when the label is non-identity. & Measures automatic merge behavior under the fixed operating point. \\
+Block & Non-merge prediction. & Suppresses false merges but does not count as resolving a positive same-work pair. \\
+Defer & Non-merge prediction. & Protects against unsafe automatic decisions but shifts the case to review and lowers recall when the pair is truly same-work. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Metric Formula Boundary}
 
 The main manuscript summarizes metric formulas in prose. Table~\ref{tab:metric-formula-boundary} preserves the denominator and label-stratum boundary used to interpret same-work F1, FMR, and HNFMR.
