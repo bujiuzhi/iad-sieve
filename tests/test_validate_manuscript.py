@@ -988,6 +988,8 @@ def test_check_contribution_evidence_summary_accepts_complete_summary() -> None:
             "IAD-Risk as a risk-aware merge mechanism.",
             "The paper reports hard-negative false-merge rate.",
             "Gold, proxy, silver, and manual-validation layers are separated.",
+            "The evaluation uses a shared Open-v2 pair schema.",
+            "It marks row-scope differences between full-scope baselines and held-out IAD-Risk rows.",
             "The result includes same-work F1=0.980 and zero observed HNFMR.",
             "The manuscript makes not a broad method-ranking claim.",
         ]
@@ -1007,6 +1009,8 @@ def test_check_contribution_evidence_summary_rejects_missing_boundary() -> None:
     errors = module.check_contribution_evidence_summary(manuscript_text)
 
     assert any("IAD-Risk as a risk-aware merge mechanism" in error for error in errors)
+    assert any("shared Open-v2 pair schema" in error for error in errors)
+    assert any("row-scope differences" in error for error in errors)
     assert any("not a broad method-ranking claim" in error for error in errors)
 
 
@@ -4040,8 +4044,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 37.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
+            "Completed audit cycles: 38.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -4158,6 +4162,11 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "submission_metadata.yml",
             "live submission system",
             "declaration authority",
+            "## Audit Cycle 38: Introduction Row-Scope Comparison Boundary Gate",
+            "shared Open-v2 pair schema",
+            "row-scope differences between full-scope baselines and held-out IAD-Risk rows",
+            "same-scope ranking implication",
+            "contribution paragraph",
             "## Audit Cycle 10: Final Template Binding and System Metadata Gate",
             "target_journal_template_bound",
             "target_journal_template_applied",
@@ -4356,7 +4365,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 37",
+        "Completed audit cycles: 38",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -4367,7 +4376,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 37" in error for error in errors)
+    assert any("Completed audit cycles: 38" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

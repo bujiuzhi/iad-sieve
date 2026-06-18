@@ -10,9 +10,9 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 37.
+Completed audit cycles: 38.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.
 
@@ -393,6 +393,14 @@ Outcome: pass for anonymous preflight manuscript declaration boundary; blocked f
 This gate checks whether the main manuscript prematurely asserts a final competing-interest declaration. In the anonymous preflight manuscript, the Competing Interests section now states that the competing-interest declaration is not finalized and must be confirmed by the listed authors before final upload. This keeps the manuscript source aligned with the blank preflight declaration fields in `submission_metadata.yml`.
 
 The reviewer-facing boundary is declaration authority. The current source package can support scientific review and template preparation, but it must not be treated as an author-approved final declaration package until the selected journal route, author list, competing-interest status, metadata file, and live submission-system fields are synchronized.
+
+## Audit Cycle 38: Introduction Row-Scope Comparison Boundary Gate
+
+Outcome: pass for introduction-level row-scope comparison wording; blocked for same-scope ranking claims until all row families share released prediction scopes, threshold logs, metric summaries, and checksums.
+
+This gate checks whether the contribution paragraph can be misread as claiming that all reported baselines and IAD-Risk rows are directly ranked under one identical evaluation scope. The introduction now states that IAD-Risk is evaluated within a shared Open-v2 pair schema while explicitly marking row-scope differences between full-scope baselines and held-out IAD-Risk rows. This keeps the first-page contribution aligned with the Open-v2 table, result interpretation guardrails, and submission-material claim boundary.
+
+The reviewer-facing boundary is ranking interpretation. A shared schema supports auditable row construction and relation semantics, but it does not remove the full-scope versus held-out test distinction or authorize a same-scope ranking implication before the external artifact release supplies matched prediction files and threshold records.
 
 ## Minimum Gate Before Final Upload
 
