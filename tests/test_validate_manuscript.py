@@ -1473,6 +1473,15 @@ def test_check_scoring_merge_algorithm_accepts_complete_contract() -> None:
     module = _load_validate_manuscript_module()
     manuscript_text = "\n".join(
         [
+            r"\subsection{Training and Inference Trace}",
+            r"\label{tab:training-inference-trace}",
+            "The implementation keeps training, threshold fixation, inference, and metric export in one auditable trace.",
+            "Schema loading",
+            "Supervised fitting",
+            "Threshold fixation",
+            "Pair scoring",
+            "Decision emission",
+            "Metric export",
             r"\subsection{Scoring and Merge Algorithm}",
             r"\label{tab:scoring-merge-algorithm}",
             "The executable method follows a fixed scoring and merge order.",
@@ -3754,7 +3763,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 21.",
+            "Completed audit cycles: 22.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release README completeness, artifact release commit validity, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -3946,6 +3955,16 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "author-approved biography text and photograph files",
             "short biography for each author and a passport-type photograph",
             "final-upload workflow must collect them",
+            "## Audit Cycle 22: Method Execution Traceability Gate",
+            "method-writing clarity",
+            "training and inference trace",
+            "schema loading",
+            "masked supervision",
+            "threshold fixation",
+            "pair scoring",
+            "decision emission",
+            "metric export",
+            "relation-head predictions",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload",
@@ -3964,7 +3983,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 21",
+        "Completed audit cycles: 22",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -3975,7 +3994,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 21" in error for error in errors)
+    assert any("Completed audit cycles: 22" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

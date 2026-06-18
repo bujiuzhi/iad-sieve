@@ -236,7 +236,7 @@ Open-v2 combined pair scope & 10,415 & Provides the shared pair contract for the
 
 \subsection{Overview}
 
-IAD-Risk converts scholarly deduplication into selective risk-aware matching. Given a candidate pair, the model estimates identity, agenda, and agenda-non-identity signals, then derives a false-merge risk score. The final merge decision is made only when identity evidence exceeds a same-work threshold and risk evidence remains below blocking thresholds. Figure~\ref{fig:iad-risk-pipeline} summarizes the workflow. The method section follows the same execution order: it first defines identity and agenda signals, then introduces the relation heads and risk score, then specifies the merge gate, algorithmic audit trail, operational boundary, and implementation details.
+IAD-Risk converts scholarly deduplication into selective risk-aware matching. Given a candidate pair, the model estimates identity, agenda, and agenda-non-identity signals, then derives a false-merge risk score. The final merge decision is made only when identity evidence exceeds a same-work threshold and risk evidence remains below blocking thresholds. Figure~\ref{fig:iad-risk-pipeline} summarizes the workflow. The method section follows the same execution order: it first defines identity and agenda signals, then introduces the relation heads and risk score, then specifies the training and inference trace, merge gate, algorithmic audit trail, operational boundary, and implementation details.
 
 \begin{figure}[H]
 \centering
@@ -323,6 +323,30 @@ Z &= \sum_{(i,j)}(m^w_{ij}+m^a_{ij}+m^n_{ij}),\\
 \end{aligned}
 \]
 where $\mathrm{CE}$ is binary cross-entropy and $\lambda_w,\lambda_a,\lambda_n$ control the contribution of each supervision channel. Missing labels therefore do not create negative examples for unrelated heads. A mini-batch with $Z=0$ is skipped before the optimizer update, and each reported relation head requires positive mask coverage in the declared training split. DeepMatcher pairs supervise same-work identity, whereas OpenAlex/OpenCitations silver hard negatives supervise agenda-non-identity risk without being promoted to human gold identity labels. The false-merge risk score is not directly supervised; it is derived after the relation heads are estimated.
+
+\subsection{Training and Inference Trace}
+
+The implementation keeps training, threshold fixation, inference, and metric export in one auditable trace. This trace is necessary because IAD-Risk is a selective decision system: the same row-level decisions that produce same-work F1 also determine FMR, HNFMR, automatic merge coverage, block rate, and defer rate. Table~\ref{tab:training-inference-trace} gives the execution contract that reviewers should use when checking whether a result artifact matches the method description.
+
+\begin{table}[H]
+\caption{Training and inference trace for IAD-Risk. Each phase states the required operation and the artifact or invariant that makes the phase auditable.}
+\label{tab:training-inference-trace}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.18\linewidth}L{0.42\linewidth}L{0.30\linewidth}}
+\toprule
+Phase & Required operation & Auditable output or invariant \\
+\midrule
+Schema loading & Load pair records with relation labels, label strength, provenance, split, and hard-negative fields. & Pair IDs and split fields remain unchanged from input to prediction output. \\
+Supervised fitting & Optimize the masked objective only where the relevant supervision mask is valid. & Gold, proxy, and silver labels are not silently converted into labels for unrelated heads. \\
+Threshold fixation & Select or record $\tau_w$, $\tau_a$, and $\tau_r$ before held-out reporting. & Threshold source, value, selection split, and selection metric are written to the threshold log. \\
+Pair scoring & Predict $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, and $p_{\mathrm{ani}}$, then derive $p_{\mathrm{risk}}$. & Prediction rows expose relation scores and the derived risk value for each pair. \\
+Decision emission & Apply cannot-link evidence and the risk-aware merge gate to emit merge, block, or defer. & Decision rows record threshold values, threshold source, and cannot-link status. \\
+Metric export & Count same-work F1, FMR, HNFMR, coverage, block rate, and defer rate from the same decision file. & Metric summaries and checksums bind denominators to the prediction artifact. \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Risk-Aware Merge Decision}
 

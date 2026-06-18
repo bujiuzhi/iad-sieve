@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 21.
+Completed audit cycles: 22.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release README completeness, artifact release commit validity, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -265,6 +265,14 @@ Outcome: pass for checklist and metadata-validator coverage; blocked for final u
 This cycle checks a non-scientific but submission-critical DKE requirement. The publisher guide requests a short biography for each author and a passport-type photograph as a separate figure. The current anonymous preflight package must not include these identity-bearing files, but the final-upload workflow must collect them after author order and corresponding-author details are confirmed.
 
 The reviewer-facing boundary is administrative rather than evidential. Author biographies and photographs do not strengthen the method, experiments, or reproducibility claims. They are tracked because missing author-material files can block or delay journal-system upload even when the manuscript PDF, source archive, and artifact release are otherwise ready.
+
+## Audit Cycle 22: Method Execution Traceability Gate
+
+Outcome: pass for method-writing clarity; blocked for result-level audit until external prediction, threshold, metric, and checksum artifacts are populated and linked.
+
+This cycle checks whether the Method section gives reviewers a reproducible execution path rather than only a conceptual model description. The manuscript now states the training and inference trace from schema loading through masked supervision, threshold fixation, pair scoring, decision emission, and metric export. This closes a writing-clarity risk: reviewers can see how relation-head predictions, fixed thresholds, cannot-link evidence, merge/block/defer decisions, and metric denominators should align in a result artifact.
+
+The reviewer-facing boundary remains unchanged. A clear execution trace improves method reproducibility from the manuscript text, but it does not by itself prove the Open-v2 numbers. Result-level audit still requires populated prediction files, threshold logs, metric summaries, manifests, checksums, and the external artifact URL or DOI.
 
 ## Minimum Gate Before Final Upload
 
