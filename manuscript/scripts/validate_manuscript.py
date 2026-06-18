@@ -1007,6 +1007,35 @@ def check_baseline_scope_alignment(manuscript_text: str) -> list[str]:
     return errors
 
 
+def check_baseline_inclusion_rationale(manuscript_text: str) -> list[str]:
+    """Check whether baseline inclusion and exclusion rules are explicit.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing baseline inclusion rationale.
+    """
+    required_markers = [
+        r"\subsection{Baseline Inclusion Rationale}",
+        r"\label{tab:baseline-inclusion-rationale}",
+        "exact identifier matching",
+        "title-normalization rules",
+        "Traditional entity-resolution systems",
+        "Scientific representation baselines",
+        "RoBERTa pair classification",
+        "Included as primary evidence only when metric summaries, prediction files, threshold records, and checksums are available",
+        "Excluded from primary result table when only utility code or fixture-level checks are available",
+        "not a claim that omitted baselines were outperformed",
+        "same-scope baseline matrix is required before broad ranking claims",
+    ]
+    return [
+        f"baseline inclusion rationale missing marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
+
+
 def check_baseline_fairness_controls(manuscript_text: str) -> list[str]:
     """Check whether baseline comparisons state fairness controls.
 
@@ -2432,6 +2461,7 @@ def main() -> int:
     errors.extend(check_statistical_interpretation_boundary(manuscript_text))
     errors.extend(check_threshold_sensitivity_status(manuscript_text))
     errors.extend(check_baseline_scope_alignment(manuscript_text))
+    errors.extend(check_baseline_inclusion_rationale(manuscript_text))
     errors.extend(check_baseline_fairness_controls(manuscript_text))
     errors.extend(check_result_interpretation_guardrails(manuscript_text))
     errors.extend(check_split_leakage_controls(manuscript_text))

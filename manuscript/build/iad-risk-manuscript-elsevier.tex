@@ -569,6 +569,31 @@ Reviewer interpretation & Supports fixed-threshold false-merge control, not thre
 
 The main table reports two scientific representation cosine baselines and one supervised pair-classifier baseline: SciNCL cosine, SPECTER2 adapter cosine, and RoBERTa pair classification. These rows are evaluated through the same pair schema so that same-work F1 and hard-negative false-merge rate can be interpreted without mixing label strengths. Other repository baseline utilities are not used as primary manuscript evidence unless their metric summaries, prediction files, thresholds, and checksums are included in the released artifact package.
 
+\subsection{Baseline Inclusion Rationale}
+
+The baseline set is selected by evidence availability and reviewer relevance rather than by convenience. Table~\ref{tab:baseline-inclusion-rationale} states which baseline families are used as primary evidence and which are kept outside the main result table until their artifacts are complete. This prevents utility code, fixture-level checks, or partially audited runs from being presented as if they were complete comparison experiments.
+
+\begin{table}[H]
+\caption{Baseline inclusion rationale. A baseline enters the primary result table only when it has auditable outputs under the reported pair scope.}
+\label{tab:baseline-inclusion-rationale}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.24\linewidth}L{0.30\linewidth}L{0.36\linewidth}}
+\toprule
+Baseline family & Current role & Inclusion or exclusion rule \\
+\midrule
+Exact identifier matching & Important sanity-check family for DOI, arXiv, and publication-lineage evidence. & Excluded from primary result table when only utility code or fixture-level checks are available; full metrics require prediction files and checksums. \\
+Title-normalization rules & Useful lower-bound family for metadata-only deduplication. & Excluded until the same pair scope, threshold records, metric summaries, and error cases are released. \\
+Traditional entity-resolution systems & Relevant workflow baselines for blocking, matching, and clustering comparisons. & Included as primary evidence only when metric summaries, prediction files, threshold records, and checksums are available. \\
+Scientific representation baselines & Primary stress-test evidence for single-space scientific relatedness. & Included because SciNCL cosine and SPECTER2 adapter cosine have reported score summaries under Open-v2. \\
+RoBERTa pair classification & Strong supervised comparator for pair-level matching. & Included as a primary supervised comparator while keeping the result below broad ranking claims. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Omitting a baseline family from Table~\ref{tab:openv2-results} is not a claim that omitted baselines were outperformed. It means the current manuscript does not yet have the artifact-backed evidence needed to make that row auditable. A same-scope baseline matrix is required before broad ranking claims, especially for exact identifier matching, title-normalization rules, and traditional entity-resolution systems.
+
 \subsection{Baseline Fairness Controls}
 
 Baseline comparison is controlled through the pair contract rather than through a broad leaderboard claim. All baselines consume the same IAD-Bench pair records for the row scope being reported, and each row uses the same train/dev/test split field when training is required. Threshold-sensitive rows use validation-selected operating points before held-out reporting. All systems report same-work F1, FMR, and HNFMR from the same metric implementation.

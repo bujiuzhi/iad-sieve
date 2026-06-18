@@ -933,6 +933,43 @@ def test_check_baseline_scope_alignment_rejects_unreported_primary_baselines() -
     assert any("single-space union baselines" in error for error in errors)
 
 
+def test_check_baseline_inclusion_rationale_accepts_complete_rationale() -> None:
+    """验证 baseline 纳入和排除理由完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Baseline Inclusion Rationale}",
+            r"\label{tab:baseline-inclusion-rationale}",
+            "The table discusses exact identifier matching.",
+            "It also discusses title-normalization rules.",
+            "Traditional entity-resolution systems require the same artifacts.",
+            "Scientific representation baselines are included as primary evidence.",
+            "RoBERTa pair classification is included as a supervised comparator.",
+            "Included as primary evidence only when metric summaries, prediction files, threshold records, and checksums are available.",
+            "Excluded from primary result table when only utility code or fixture-level checks are available.",
+            "The omission is not a claim that omitted baselines were outperformed.",
+            "A same-scope baseline matrix is required before broad ranking claims.",
+        ]
+    )
+
+    errors = module.check_baseline_inclusion_rationale(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_baseline_inclusion_rationale_rejects_missing_omitted_baseline_boundary() -> None:
+    """验证 baseline 纳入理由缺少排除边界时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\subsection{Baseline Inclusion Rationale}"
+
+    errors = module.check_baseline_inclusion_rationale(manuscript_text)
+
+    assert any("exact identifier matching" in error for error in errors)
+    assert any("not a claim that omitted baselines were outperformed" in error for error in errors)
+
+
 def test_check_baseline_fairness_controls_accepts_complete_controls() -> None:
     """验证 baseline 公平比较控制完整时可通过检查。"""
 
