@@ -51,6 +51,11 @@ CREDIT_AUTHOR_ROLES = {
     "Writing - original draft",
     "Writing - review and editing",
 }
+
+RESEARCH_DATA_STATEMENT_REQUIRED_TARGETS = {
+    "data & knowledge engineering": "Data & Knowledge Engineering",
+    "information systems": "Information Systems",
+}
 DKE_ELSEVIER_FILE_REQUIREMENT_ERROR = "DKE/Elsevier final upload requires DKE/Elsevier source and PDF files"
 FINAL_UPLOAD_TRUE_FIELDS = {
     "target_journal_template_bound": "target journal template is not bound",
@@ -525,8 +530,9 @@ def check_research_data_statement(metadata_text: str) -> list[str]:
     target_journal = scalar_value(metadata_text, "target_journal").strip().lower()
     statements = parse_mapping_section(metadata_text, "statements")
     research_data_statement = statements.get("research_data_statement", "")
-    if target_journal == "information systems" and not research_data_statement:
-        return ["research data statement is missing for Information Systems"]
+    target_journal_label = RESEARCH_DATA_STATEMENT_REQUIRED_TARGETS.get(target_journal)
+    if target_journal_label and not research_data_statement:
+        return [f"research data statement is missing for {target_journal_label}"]
     return []
 
 
