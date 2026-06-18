@@ -28,6 +28,8 @@ from submission_metadata_checks import (
     FINAL_UPLOAD_TRUE_FIELDS,
     check_final_upload_cover_letter_text as check_structured_final_upload_cover_letter_text,
     check_final_upload_metadata_text as check_structured_final_upload_metadata_text,
+    parse_mapping_section,
+    scalar_value,
 )
 
 REQUIRED_FILES = [
@@ -2708,7 +2710,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 35",
+        "Completed audit cycles: 36",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -2720,6 +2722,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "L2 public-source rebuild chain-of-custody gap",
         "selective-decision workload evidence",
         "anonymous cover-letter declaration confirmation",
+        "preflight metadata declaration placeholders",
         "artifact release README completeness",
         "artifact release commit validity",
         "artifact README/manifest commit mismatch",
@@ -2912,6 +2915,12 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "author contribution",
         "generative AI declarations",
         "does not treat author declarations as finalized",
+        "Preflight Metadata Declaration Placeholder Gate",
+        "tracked metadata declaration placeholders",
+        "statements.originality",
+        "statements.author_approval",
+        "statements.competing_interests",
+        "structured metadata integrity",
         "target_journal_template_bound",
         "target_journal_template_applied",
         "source archive rebuilt after template conversion",
@@ -3575,7 +3584,21 @@ def check_submission_metadata(metadata_text: str) -> list[str]:
         "first_screen_claim_lockdown_confirmed: false",
         "artifact_release_prepared_or_linked: false",
     ]
-    return [f"submission metadata missing marker: {marker}" for marker in required_markers if marker not in metadata_text]
+    errors = [f"submission metadata missing marker: {marker}" for marker in required_markers if marker not in metadata_text]
+    is_preflight_metadata = (
+        "authors: []" in metadata_text
+        or scalar_value(metadata_text, "author_metadata_completed").lower() != "true"
+        or scalar_value(metadata_text, "target_journal_selected").lower() != "true"
+    )
+    if is_preflight_metadata:
+        statements = parse_mapping_section(metadata_text, "statements")
+        for field_name in ["originality", "author_approval", "competing_interests"]:
+            if statements.get(field_name, ""):
+                errors.append(
+                    "submission metadata preflight declaration must remain empty until final upload: "
+                    f"statements.{field_name}"
+                )
+    return errors
 
 
 def check_final_upload_metadata(metadata_text: str) -> list[str]:

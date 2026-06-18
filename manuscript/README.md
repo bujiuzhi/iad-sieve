@@ -117,4 +117,4 @@ python manuscript/scripts/validate_submission_package.py --dke-preflight
 
 `reviewer_readiness_audit.md` 记录投稿前的审稿准备度、主要拒稿风险、证据边界和最终上传门槛。该文件用于质量控制，不作为最终投稿附件。
 
-`submission_metadata.yml` 中的 `final_upload_checklist` 是正式上传门禁。只有目标期刊、期刊模板、作者元数据、作者 biography/photo 材料、通讯作者元数据、经费声明文本、作者贡献声明、第三方材料许可声明、生成式 AI 使用声明、模板后 PDF 重建、投稿系统文件核对和 artifact release 信息均完成后，才应使用 `--final-upload` 生成或校验最终投稿包。`scripts/submission_metadata_checks.py` 会同时检查作者邮箱、ORCID、经费声明文本、作者贡献声明、permissions statement、generative AI declaration 和 artifact release URL/DOI 的基本结构。
+`submission_metadata.yml` 中的 `final_upload_checklist` 是正式上传门禁。当前匿名预投稿源中的 `statements.originality`、`statements.author_approval` 和 `statements.competing_interests` 保持空值，避免在作者名单、通讯作者和 live submission-system 字段确认前写入最终作者声明。只有目标期刊、期刊模板、作者元数据、作者 biography/photo 材料、通讯作者元数据、经费声明文本、作者贡献声明、第三方材料许可声明、生成式 AI 使用声明、模板后 PDF 重建、投稿系统文件核对和 artifact release 信息均完成后，才应使用 `--final-upload` 生成或校验最终投稿包。`scripts/submission_metadata_checks.py` 会同时检查作者邮箱、ORCID、经费声明文本、作者贡献声明、permissions statement、generative AI declaration 和 artifact release URL/DOI 的基本结构。
