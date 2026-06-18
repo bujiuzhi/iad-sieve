@@ -471,7 +471,7 @@ Topic-heldout readiness audit & Tests whether enough topics exist to reserve uns
 \end{tabular}
 \end{table}
 
-These controls reduce two common reviewer concerns. First, the model cannot gain accuracy from explicit provenance or split identifiers because those fields are audit metadata rather than predictive features. Second, a held-out result is interpreted only within the split and coverage regime that generated it. If a split-readiness audit blocks source-heldout or topic-heldout claims, the manuscript keeps the conclusion at the level of random-split or mechanism evidence instead of presenting it as broad generalization.
+These controls reduce two common validity risks. First, the model cannot gain accuracy from explicit provenance or split identifiers because those fields are audit metadata rather than predictive features. Second, a held-out result is interpreted only within the split and coverage regime that generated it. If a split-readiness audit blocks source-heldout or topic-heldout claims, the manuscript keeps the conclusion at the level of random-split or mechanism evidence instead of presenting it as broad generalization.
 
 \subsection{Experimental Questions}
 
@@ -583,7 +583,7 @@ Fixed operating point & Reported through the operating-point disclosure table an
 Threshold grid & The threshold grid is not reported as primary evidence in the current manuscript. & Sensitivity table generated from the same prediction files over predefined threshold ranges. \\
 Metric stability & Interpreted only for the reported operating points. & Per-threshold F1, FMR, HNFMR, pair counts, random seeds, and command logs. \\
 Artifact manifest & Required for numerical audit but not included in Git. & Manifest and checksums that bind prediction files, summaries, thresholds, and code commit. \\
-Reviewer interpretation & Supports fixed-threshold false-merge control, not threshold-stable ranking across all operating points. & Stronger threshold-stability wording only after the released artifact contains the grid evidence. \\
+Interpretation boundary & Supports fixed-threshold false-merge control, not threshold-stable ranking across all operating points. & Stronger threshold-stability wording only after the released artifact contains the grid evidence. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -594,7 +594,7 @@ The main table reports two scientific representation cosine baselines and one su
 
 \subsection{Baseline Inclusion Rationale}
 
-The baseline set is selected by evidence availability and reviewer relevance rather than by convenience. Table~\ref{tab:baseline-inclusion-rationale} states which baseline families are used as primary evidence and which are kept outside the main result table until their artifacts are complete. This prevents utility code, fixture-level checks, or partially audited runs from being presented as if they were complete comparison experiments.
+The baseline set is selected by evidence availability and evaluation relevance rather than by convenience. Table~\ref{tab:baseline-inclusion-rationale} states which baseline families are used as primary evidence and which are kept outside the main result table until their artifacts are complete. This prevents utility code, fixture-level checks, or partially audited runs from being presented as if they were complete comparison experiments.
 
 \begin{table}[H]
 \caption{Baseline inclusion rationale. A baseline enters the primary result table only when it has auditable outputs under the reported pair scope.}
@@ -700,7 +700,7 @@ Table~\ref{tab:openv2-results} should be read together with the artifact boundar
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{L{0.22\linewidth}L{0.36\linewidth}L{0.32\linewidth}}
 \toprule
-Main-table evidence & Required artifact IDs & Reviewer audit purpose \\
+Main-table evidence & Required artifact IDs & Audit purpose \\
 \midrule
 Open-v2 aggregate table & \path{open_v2_main_results}, \path{iad_bench_split_summary} & Verifies row scopes, pair counts, document counts, label strata, and metric columns. \\
 Representation cosine baselines & \path{representation_baseline_scores}, \path{threshold_selection_logs} & Verifies SciNCL and SPECTER2 scores, threshold choices, and full-pair false-merge rates. \\
@@ -801,7 +801,7 @@ Future stronger comparison & Same released prediction scope plus manual-validati
 \end{tabular}
 \end{table}
 
-This scope boundary is important for review. The evidence is sufficient for the paper's conservative claim that identity-agenda disentanglement is a practical false-merge control mechanism. It is not sufficient for a broad ranking claim until all row families are regenerated with the same released prediction scope, threshold-selection logs, checksums, and an independent manual-validation slice.
+This scope boundary is important for interpretation. The evidence is sufficient for the paper's conservative claim that identity-agenda disentanglement is a practical false-merge control mechanism. It is not sufficient for a broad ranking claim until all row families are regenerated with the same released prediction scope, threshold-selection logs, checksums, and an independent manual-validation slice.
 
 \subsection{Extended Protocols and Boundaries}
 
@@ -859,7 +859,7 @@ This study has four limitations. First, OpenAlex/OpenCitations hard negatives ar
 
 Construct validity depends on whether the label strata measure the intended relations. DeepMatcher pairs provide same-work identity evidence, but OpenAlex/OpenCitations hard negatives are silver stress-test pairs rather than manual non-identity gold. Internal validity depends on threshold selection and split separation; therefore threshold-sensitive systems must select thresholds on validation data and report held-out metrics. External validity is limited by the current source mix: the Open-v2 evidence supports the identity-agenda mechanism, while broader claims require more source-heldout and domain-diverse evaluation. Reproducibility depends on public data availability and stable processing scripts because the repository deliberately avoids redistributing large third-party data files.
 
-Table~\ref{tab:validity-threats} summarizes the main validity risks and the safeguards used in the manuscript. The table is intentionally conservative: a mitigation reduces a specific reviewer concern, but it does not turn proxy or silver evidence into human-adjudicated truth.
+Table~\ref{tab:validity-threats} summarizes the main validity risks and the safeguards used in the manuscript. The table is intentionally conservative: a mitigation reduces a specific validity risk, but it does not turn proxy or silver evidence into human-adjudicated truth.
 
 \begin{table}[H]
 \caption{Threats to validity and claim boundaries. Each risk is paired with the current mitigation and the remaining statement that should not be over-claimed.}
@@ -922,7 +922,7 @@ Raw third-party data are not redistributed in the repository because the origina
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{L{0.25\linewidth}L{0.30\linewidth}L{0.35\linewidth}}
 \toprule
-Availability class & Included location & Reviewer use \\
+Availability class & Included location & Evaluation use \\
 \midrule
 Source code and CLI entry points & Project repository. & Supports installation, schema checks, fixture rebuilds, baseline execution, model training entry points, and manuscript builds. \\
 Small public fixtures and schema contracts & Project repository. & Supports L0/L1 code-level reproduction without downloading full raw datasets. \\

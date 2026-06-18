@@ -143,7 +143,7 @@ python -m iad_sieve.cli build-iad-bench \
 
 \section{Data Processing Traceability}
 
-Table~\ref{tab:data-processing-traceability} gives the reviewer-facing trace from public source files to derived evaluation artifacts. The repository commits the processing commands and schema checks, but keeps the raw source files and large derived outputs outside Git. This separation allows an independent reader to rebuild the same artifact classes from obtained public sources while respecting source licenses and keeping the public repository small.
+Table~\ref{tab:data-processing-traceability} gives the audit trace from public source files to derived evaluation artifacts. The repository commits the processing commands and schema checks, but keeps the raw source files and large derived outputs outside Git. This separation allows an independent reader to rebuild the same artifact classes from obtained public sources while respecting source licenses and keeping the public repository small.
 
 \begin{table}[H]
 \caption{Traceability from public data sources to derived IAD-Bench artifacts. Git contains commands, schemas, tests, and manifests; full-size inputs and outputs are verified through external artifact checksums.}

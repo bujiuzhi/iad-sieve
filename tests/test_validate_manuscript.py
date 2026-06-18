@@ -2919,6 +2919,46 @@ def test_check_formal_source_typography_hygiene_rejects_unicode_punctuation_and_
     assert any("cover letter" in error and "replacement character" in error for error in errors)
 
 
+def test_check_formal_manuscript_review_language_accepts_method_review_terms() -> None:
+    """验证正文方法学语义中的人工评审用语不会被误伤。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_formal_manuscript_review_language", None)
+    assert callable(checker)
+    manuscript_text = "\n".join(
+        [
+            "The protocol requires two independent reviewers.",
+            "Human review process is specified as future validation.",
+            "The manuscript reports manual-review evidence boundaries.",
+        ]
+    )
+
+    errors = checker(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_formal_manuscript_review_language_rejects_internal_audit_labels() -> None:
+    """验证正式正文不得保留内部审稿清单式标签。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_formal_manuscript_review_language", None)
+    assert callable(checker)
+    manuscript_text = "\n".join(
+        [
+            "Reviewer interpretation supports fixed-threshold false-merge control.",
+            "Main-table evidence & Required artifact IDs & Reviewer audit purpose.",
+            "Availability class & Included location & Reviewer use.",
+        ]
+    )
+
+    errors = checker(manuscript_text)
+
+    assert any("Reviewer interpretation" in error for error in errors)
+    assert any("Reviewer audit purpose" in error for error in errors)
+    assert any("Reviewer use" in error for error in errors)
+
+
 def test_check_final_upload_metadata_rejects_placeholders() -> None:
     """验证 final-upload 门禁会拒绝未填写的投稿元数据。"""
 

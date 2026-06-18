@@ -138,6 +138,16 @@ FORMAL_SOURCE_FORBIDDEN_MARKERS = [
     "TBD",
     "[?]",
 ]
+FORMAL_MANUSCRIPT_INTERNAL_REVIEW_MARKERS = [
+    "Reviewer-Facing",
+    "reviewer-facing",
+    "Reviewer interpretation",
+    "Reviewer audit purpose",
+    "Reviewer use",
+    "reviewer relevance",
+    "reviewer concerns",
+    "important for review",
+]
 FORBIDDEN_PHRASES = [
     "state-of-the-art",
     "state of the art",
@@ -405,6 +415,26 @@ def check_formal_source_typography_hygiene(document_texts: dict[str, str]) -> li
             for marker in FORMAL_SOURCE_FORBIDDEN_MARKERS:
                 if marker in line:
                     errors.append(f"{document_name} contains unfinished edit marker {marker} on line {line_number}")
+    return errors
+
+
+def check_formal_manuscript_review_language(
+    manuscript_text: str,
+    document_name: str = "formal manuscript",
+) -> list[str]:
+    """Check whether formal manuscript text avoids internal review-workflow labels.
+
+    参数:
+        manuscript_text: Formal manuscript or supplementary LaTeX source text.
+        document_name: Human-readable document name used in validation errors.
+
+    返回:
+        list[str]: Error messages for internal reviewer-workflow markers.
+    """
+    errors: list[str] = []
+    for marker in FORMAL_MANUSCRIPT_INTERNAL_REVIEW_MARKERS:
+        if marker in manuscript_text:
+            errors.append(f"{document_name} contains internal review marker: {marker}")
     return errors
 
 
@@ -2632,6 +2662,8 @@ def main() -> int:
             }
         )
     )
+    errors.extend(check_formal_manuscript_review_language(manuscript_text, "main manuscript"))
+    errors.extend(check_formal_manuscript_review_language(supplementary_text, "supplementary material"))
     errors.extend(check_abstract_quantitative_evidence(manuscript_text))
     errors.extend(check_abstract_length(manuscript_text))
     errors.extend(check_contribution_evidence_summary(manuscript_text))
