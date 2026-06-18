@@ -966,6 +966,46 @@ def test_check_operating_point_disclosure_rejects_missing_threshold_boundary() -
     assert any("post-hoc best test thresholds" in error for error in errors)
 
 
+def test_check_selective_decision_coverage_boundary_accepts_complete_boundary() -> None:
+    """验证选择性决策覆盖率边界完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_selective_decision_coverage_boundary", None)
+    assert callable(checker)
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Selective Decision Coverage Boundary}",
+            r"\label{tab:selective-decision-coverage}",
+            "Automatic merge coverage",
+            "Block rate",
+            "defer rate",
+            "Review load",
+            "same prediction files",
+            "The current manuscript does not claim throughput reduction.",
+            "It does not claim all-pair automatic resolution.",
+        ]
+    )
+
+    errors = checker(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_selective_decision_coverage_boundary_rejects_missing_defer_boundary() -> None:
+    """验证选择性决策缺少 defer 与吞吐边界时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_selective_decision_coverage_boundary", None)
+    assert callable(checker)
+    manuscript_text = r"\subsection{Selective Decision Coverage Boundary}"
+
+    errors = checker(manuscript_text)
+
+    assert any("defer rate" in error for error in errors)
+    assert any("throughput reduction" in error for error in errors)
+    assert any("all-pair automatic resolution" in error for error in errors)
+
+
 def test_check_threshold_sensitivity_status_accepts_bounded_claim() -> None:
     """验证阈值敏感性边界完整时可通过检查。"""
 

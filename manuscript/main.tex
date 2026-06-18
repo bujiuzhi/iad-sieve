@@ -563,6 +563,28 @@ IAD-Risk transformer variants & $p_{\mathrm{work}}$, $p_{\mathrm{ani}}$, and $p_
 \end{tabular}
 \end{table}
 
+\subsection{Selective Decision Coverage Boundary}
+
+IAD-Risk is a selective decision system, so false-merge metrics should be interpreted together with coverage and review-load evidence. A low FMR or HNFMR is not by itself a throughput claim if the operating point blocks or defers many pairs. Table~\ref{tab:selective-decision-coverage} defines the additional quantities that must be released before making operational automation claims. The current manuscript therefore reports false-merge control under fixed operating points, but does not claim throughput reduction and does not claim all-pair automatic resolution.
+
+\begin{table}[H]
+\caption{Selective decision coverage boundary. Coverage and review-load quantities must be computed from the same prediction files as the reported risk metrics before operational deployment claims are made.}
+\label{tab:selective-decision-coverage}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.24\linewidth}L{0.32\linewidth}L{0.34\linewidth}}
+\toprule
+Quantity & Required artifact source & Interpretation boundary \\
+\midrule
+Automatic merge coverage & Merge decisions from the same prediction files and thresholds. & Needed before claiming that the system resolves a large fraction of pairs automatically. \\
+Block rate & Blocked decisions under the reported risk gate. & Separates safety-driven blocking from improved identity recognition. \\
+Defer rate & Deferred decisions under the fixed operating point. & High defer rate shifts work to manual review and must be reported with FMR/HNFMR. \\
+Review load & Counts by label stratum, source, and hard-negative level. & Needed before claiming operational throughput reduction or review-cost savings. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Threshold Sensitivity Evidence Status}
 
 Threshold stability is treated as an audit requirement, not as an unsupported robustness claim. The current Open-v2 table reports fixed operating points and therefore supports the mechanism interpretation under those operating points. A stronger statement that the method is stable across thresholds would require a threshold grid computed from the same prediction files, predefined threshold ranges, metric summaries for each setting, and checksums in the released artifact manifest.

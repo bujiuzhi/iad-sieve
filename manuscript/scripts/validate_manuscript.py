@@ -83,6 +83,7 @@ REQUIRED_SECTIONS = [
     r"\subsection{Threshold Selection and Uncertainty Reporting}",
     r"\subsection{Statistical Interpretation Boundary}",
     r"\subsection{Operating Point Disclosure}",
+    r"\subsection{Selective Decision Coverage Boundary}",
     r"\subsection{Threshold Sensitivity Evidence Status}",
     r"\subsection{Claim-Evidence Boundary for Result Interpretation}",
     r"\subsection{Result Audit Trail}",
@@ -1032,6 +1033,33 @@ def check_operating_point_disclosure(manuscript_text: str) -> list[str]:
         "Prediction file, model JSON, thresholds, and checksums",
     ]
     return [f"operating point disclosure missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+
+
+def check_selective_decision_coverage_boundary(manuscript_text: str) -> list[str]:
+    """Check whether selective merge decisions state coverage and deferral boundaries.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing selective-decision coverage markers.
+    """
+    required_markers = [
+        r"\subsection{Selective Decision Coverage Boundary}",
+        r"\label{tab:selective-decision-coverage}",
+        "Automatic merge coverage",
+        "Block rate",
+        "defer rate",
+        "Review load",
+        "same prediction files",
+        "does not claim throughput reduction",
+        "does not claim all-pair automatic resolution",
+    ]
+    return [
+        f"selective decision coverage boundary missing marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
 
 
 def check_threshold_sensitivity_status(manuscript_text: str) -> list[str]:
@@ -2715,6 +2743,7 @@ def main() -> int:
     errors.extend(check_declaration_statements(manuscript_text))
     errors.extend(check_data_code_availability_boundary(manuscript_text))
     errors.extend(check_operating_point_disclosure(manuscript_text))
+    errors.extend(check_selective_decision_coverage_boundary(manuscript_text))
     errors.extend(check_statistical_interpretation_boundary(manuscript_text))
     errors.extend(check_threshold_sensitivity_status(manuscript_text))
     errors.extend(check_baseline_scope_alignment(manuscript_text))
