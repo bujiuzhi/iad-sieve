@@ -17,6 +17,7 @@ After the authors complete this form, copy the confirmed values into `submission
 | Data and code availability statement | `repository_reference`, `artifact_boundary`, `statements.research_data_statement` | Manuscript declarations and research-data statement field |
 | Artifact release | `artifact_boundary`, `final_upload_checklist.artifact_release_prepared_or_linked` | Public artifact record and live submission system |
 | PDF and system checks | `final_upload_checklist.manuscript_pdf_rebuilt_after_template`, `final_upload_checklist.supplementary_pdf_rebuilt_after_template`, `final_upload_checklist.submission_system_files_verified` | Rebuilt PDFs and live submission system |
+| Submission text consistency | `final_upload_checklist.submission_system_files_verified` | Title, abstract, keywords, and highlights copied from source files into the live submission system |
 
 ## Target journal
 
@@ -116,6 +117,14 @@ For each author, select the applicable CRediT roles and then draft the final aut
 - Excluded reviewers, if any:
 - Research data statement, including the artifact URL or DOI exactly as recorded above:
 - Additional declarations required by the live submission system:
+
+### Submission text consistency
+
+- Title source checked against `main.tex` after journal-template conversion:
+- Abstract copied exactly from `main.tex` after journal-template conversion:
+- Keywords copied exactly from `keywords.md`:
+- Highlights copied exactly from `highlights.md`:
+- First-page title, abstract, keywords, and highlights were previewed in the live submission system:
 
 ## Final title page
 

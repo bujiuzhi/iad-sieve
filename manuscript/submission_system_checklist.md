@@ -96,6 +96,17 @@ Before upload, verify:
 9. The artifact release URL or DOI resolves publicly or according to the journal's access policy.
 10. The manuscript does not claim human gold labels, broad method superiority, or threshold stability unless the corresponding artifact evidence exists.
 
+## Live Submission Text Checks
+
+Before upload, verify:
+
+1. Title, abstract, keywords, and highlights are copied from the current source files.
+2. The title and abstract match `main.tex` after journal-template conversion.
+3. Keywords match `keywords.md` exactly unless the selected journal requires a documented wording change.
+4. Highlights match `highlights.md` exactly unless the selected journal does not collect highlights.
+5. The live submission system preview shows the same title, abstract, keywords, and highlights that appear in the source files.
+6. Mark `submission_system_files_verified` true only after these text fields and upload files are checked in the live submission system.
+
 ## File Hygiene Checks
 
 Before upload, verify:

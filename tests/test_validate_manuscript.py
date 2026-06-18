@@ -87,6 +87,7 @@ def test_check_final_upload_information_request_rejects_missing_required_fields(
     assert any("Permissions statement" in error for error in errors)
     assert any("Artifact release URL or DOI" in error for error in errors)
     assert any("Live submission-system fields" in error for error in errors)
+    assert any("Submission text consistency" in error for error in errors)
     assert any("Submission metadata mapping" in error for error in errors)
 
 
@@ -194,6 +195,24 @@ def test_check_final_upload_information_request_rejects_legacy_checklist_names()
     assert any("manuscript_pdf_rebuilt_after_template" in error for error in errors)
     assert any("submission_system_files_verified" in error for error in errors)
     assert any("artifact_release_prepared_or_linked" in error for error in errors)
+
+
+def test_check_final_upload_information_request_rejects_missing_text_consistency() -> None:
+    """验证最终上传信息表必须要求投稿系统首屏文本与源文件一致。"""
+
+    module = _load_validate_manuscript_module()
+    request_text = Path("manuscript/final_upload_information_request.md").read_text(encoding="utf-8")
+    request_text = request_text.replace("Submission text consistency", "Removed text checks")
+    request_text = request_text.replace("Title source checked against `main.tex`", "Title source checked")
+    request_text = request_text.replace("Keywords copied exactly from `keywords.md`", "Keywords copied")
+    request_text = request_text.replace("Highlights copied exactly from `highlights.md`", "Highlights copied")
+
+    errors = module.check_final_upload_information_request(request_text)
+
+    assert any("Submission text consistency" in error for error in errors)
+    assert any("Title source checked against `main.tex`" in error for error in errors)
+    assert any("Keywords copied exactly from `keywords.md`" in error for error in errors)
+    assert any("Highlights copied exactly from `highlights.md`" in error for error in errors)
 
 
 def test_final_upload_request_checklist_fields_track_metadata_true_fields() -> None:
@@ -3010,6 +3029,13 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "The source archive includes manifest and checksum files.",
             "The source archive excludes build caches and generated zip files.",
             "The source archive is rebuilt after template conversion.",
+            "## Live Submission Text Checks",
+            "Title, abstract, keywords, and highlights are copied from the current source files.",
+            "The title and abstract match `main.tex` after journal-template conversion.",
+            "Keywords match `keywords.md` exactly unless the selected journal requires a documented wording change.",
+            "Highlights match `highlights.md` exactly unless the selected journal does not collect highlights.",
+            "The live submission system preview shows the same title, abstract, keywords, and highlights.",
+            "Mark `submission_system_files_verified` true only after these text fields and upload files are checked.",
             "## Final Metadata Checks",
             "The selected journal template matches the final manuscript source.",
             "The funding statement is completed and matches the manuscript and submission system.",
@@ -3055,6 +3081,27 @@ def test_check_submission_system_checklist_rejects_missing_template_bound_field(
 
     assert any("target_journal_template_bound" in error for error in errors)
     assert any("selected journal template matches the final manuscript source" in error for error in errors)
+
+
+def test_check_submission_system_checklist_rejects_missing_live_text_checks() -> None:
+    """验证投稿系统清单必须覆盖首屏文本与源文件一致性检查。"""
+
+    module = _load_validate_manuscript_module()
+    checklist_text = Path("manuscript/submission_system_checklist.md").read_text(encoding="utf-8")
+    checklist_text = checklist_text.replace("## Live Submission Text Checks", "## Removed live text checks")
+    checklist_text = checklist_text.replace(
+        "Title, abstract, keywords, and highlights are copied from the current source files",
+        "Submission text fields are reviewed",
+    )
+    checklist_text = checklist_text.replace("Keywords match `keywords.md` exactly", "Keywords are reviewed")
+    checklist_text = checklist_text.replace("Highlights match `highlights.md` exactly", "Highlights are reviewed")
+
+    errors = module.check_submission_system_checklist(checklist_text)
+
+    assert any("Live Submission Text Checks" in error for error in errors)
+    assert any("Title, abstract, keywords, and highlights are copied" in error for error in errors)
+    assert any("Keywords match `keywords.md` exactly" in error for error in errors)
+    assert any("Highlights match `highlights.md` exactly" in error for error in errors)
 
 
 def test_check_submission_system_checklist_rejects_missing_publisher_declarations() -> None:
