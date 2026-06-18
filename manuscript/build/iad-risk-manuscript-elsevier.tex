@@ -1023,7 +1023,11 @@ Method design soundness & Risk score rationale, merge-decision rule, and validit
 
 \section{Conclusion}
 
-IAD-Risk addresses a specific failure mode in scholarly entity matching: the tendency to confuse agenda similarity with work identity. By separating identity and agenda evidence and gating automatic pair merges through false-merge risk, the framework supports safer pair-level deduplication decisions under stratified gold, proxy, and silver evaluation. The current evidence supports targeted false-merge suppression and a reproducible benchmark contract, but it does not claim cluster-level deployment quality without cluster artifacts. Additional validation should expand independent manual review, source-heldout evaluation, and cluster-level artifact audits before the framework is used for broad method ranking across scholarly domains.
+IAD-Risk addresses a specific failure mode in scholarly entity matching: the tendency to confuse agenda similarity with work identity. The core idea is to separate identity and agenda evidence before a pair is allowed to become an automatic merge. By adding agenda-non-identity supervision and a false-merge risk gate, the framework turns scholarly deduplication from an unconditional similarity decision into a selective decision process that can block or defer risky pairs.
+
+The Open-v2 evidence supports a conservative conclusion: identity-agenda disentanglement can provide targeted false-merge suppression under the reported pair scope and operating points. IAD-Bench contributes a reproducible benchmark contract by keeping gold identity labels, proxy agenda evidence, and silver hard negatives separate throughout training, evaluation, and claim interpretation. This separation is the main practical lesson of the study: relatedness evidence is useful for retrieval and candidate generation, but it must not be treated as sufficient evidence of work identity.
+
+The manuscript does not claim cluster-level deployment quality without cluster artifacts, nor does it claim broad method ranking across scholarly domains. Additional validation should expand independent manual review, source-heldout evaluation, same-scope baseline prediction releases, and cluster-level artifact audits. These extensions would make it possible to test whether the present pair-level safety mechanism transfers to broader source mixtures and production-style deduplication workflows.
 
 \section*{Data and Code Availability}
 
