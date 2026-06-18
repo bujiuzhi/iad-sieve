@@ -242,7 +242,7 @@ Open-v2 combined pair scope & 10,415 & Provides the shared pair contract for the
 
 \subsection{Overview}
 
-IAD-Risk converts scholarly deduplication into selective risk-aware matching. Given a candidate pair, the model estimates identity, agenda, and agenda-non-identity signals, then derives a false-merge risk score. The final merge decision is made only when identity evidence exceeds a same-work threshold and risk evidence remains below blocking thresholds. Figure~\ref{fig:iad-risk-pipeline} summarizes the workflow.
+IAD-Risk converts scholarly deduplication into selective risk-aware matching. Given a candidate pair, the model estimates identity, agenda, and agenda-non-identity signals, then derives a false-merge risk score. The final merge decision is made only when identity evidence exceeds a same-work threshold and risk evidence remains below blocking thresholds. Figure~\ref{fig:iad-risk-pipeline} summarizes the workflow. The method section follows the same execution order: it first defines identity and agenda signals, then introduces the relation heads and risk score, then specifies the merge gate, algorithmic audit trail, operational boundary, and implementation details.
 
 \begin{figure}[H]
 \centering
@@ -328,6 +328,7 @@ p_{\mathrm{risk}}<\tau_r,\quad
 \mathrm{cannot\_link}_{ij}=0.
 \]
 This rule is deliberately selective. It can reject or defer high-risk pairs instead of forcing every semantically related pair into a binary match decision. The same decision interface also supports constrained union-find clustering, where cannot-link evidence can block documented conflicts when coverage is available.
+Operationally, the three outputs have different meanings. A pair is merged only when all gate conditions pass. A pair is blocked when explicit cannot-link evidence, high agenda-non-identity evidence, or high derived risk makes an automatic merge unsafe under the fixed operating point. A pair is deferred when identity evidence is insufficient for automatic merging but the available evidence does not justify a hard block. This distinction lets the method control false merges without claiming that every unresolved pair has been fully adjudicated.
 
 \subsection{Scoring and Merge Algorithm}
 
