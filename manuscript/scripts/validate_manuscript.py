@@ -40,6 +40,7 @@ REQUIRED_FILES = [
     ROOT / "scripts" / "validate_submission_package.py",
     ROOT / "scripts" / "validate_artifact_release.py",
     ROOT / "scripts" / "build_artifact_release_skeleton.py",
+    ROOT / "scripts" / "finalize_artifact_release.py",
     ROOT / "scripts" / "build_elsevier_draft.py",
     ROOT / "scripts" / "check_latex_warnings.py",
     ROOT / "scripts" / "check_pdf_rendering.py",
@@ -1114,6 +1115,7 @@ def check_artifact_release_manifest_template(template_text: str) -> list[str]:
         for command in [
             "sha256sum -c checksums.sha256",
             "python manuscript/scripts/validate_artifact_release.py --artifact-dir",
+            "python manuscript/scripts/finalize_artifact_release.py --artifact-dir",
             "python manuscript/scripts/validate_manuscript.py --strict-latex",
             "python manuscript/scripts/verify_fixture_rebuild.py",
             "python scripts/check_public_release.py",
@@ -1198,6 +1200,7 @@ def check_artifact_release_readme_template(readme_text: str) -> list[str]:
         "Minimum Validation Commands",
         "sha256sum -c checksums.sha256",
         "python manuscript/scripts/validate_artifact_release.py --artifact-dir",
+        "python manuscript/scripts/finalize_artifact_release.py --artifact-dir",
         "python manuscript/scripts/validate_manuscript.py --strict-latex",
         "python manuscript/scripts/verify_fixture_rebuild.py",
         "python scripts/check_public_release.py",
@@ -1267,6 +1270,36 @@ def check_artifact_release_skeleton_builder(script_text: str) -> list[str]:
     ]
 
 
+def check_artifact_release_finalizer(script_text: str) -> list[str]:
+    """Check whether the artifact release finalizer keeps required safeguards.
+
+    参数:
+        script_text: Artifact release finalizer source text.
+
+    返回:
+        list[str]: Error messages for missing finalization safeguards.
+    """
+    required_markers = [
+        "import argparse",
+        "import logging",
+        'DEFAULT_RELEASE_STATUS = "release_candidate"',
+        "checksums.sha256",
+        "def finalize_artifact_release(",
+        "def update_artifact_checksums(",
+        "def write_checksums(",
+        "def run_artifact_validator(",
+        "--artifact-dir",
+        "--release-status",
+        "--skip-validate",
+        "missing required artifact files",
+    ]
+    return [
+        f"artifact release finalizer missing marker: {marker}"
+        for marker in required_markers
+        if marker not in script_text
+    ]
+
+
 def check_submission_system_checklist(checklist_text: str) -> list[str]:
     """Check whether the final upload checklist covers system-file review needs.
 
@@ -1297,6 +1330,7 @@ def check_submission_system_checklist(checklist_text: str) -> list[str]:
         "Artifact release manifest",
         "Artifact Release Package Checks",
         "python manuscript/scripts/build_artifact_release_skeleton.py --output-dir /path/to/release --repository-commit",
+        "python manuscript/scripts/finalize_artifact_release.py --artifact-dir",
         "python manuscript/scripts/validate_artifact_release.py --artifact-dir",
         "DKE/Elsevier Preflight Package Checks",
         "python manuscript/scripts/build_submission_package.py --dke-preflight",
@@ -2023,6 +2057,10 @@ def main() -> int:
         if artifact_release_skeleton_builder_path.exists()
         else ""
     )
+    artifact_release_finalizer_path = ROOT / "scripts" / "finalize_artifact_release.py"
+    artifact_release_finalizer_text = (
+        artifact_release_finalizer_path.read_text(encoding="utf-8") if artifact_release_finalizer_path.exists() else ""
+    )
     submission_system_checklist_path = ROOT / "submission_system_checklist.md"
     submission_system_checklist_text = (
         submission_system_checklist_path.read_text(encoding="utf-8") if submission_system_checklist_path.exists() else ""
@@ -2106,6 +2144,7 @@ def main() -> int:
     errors.extend(check_artifact_release_manifest_template(artifact_release_template_text))
     errors.extend(check_artifact_release_readme_template(artifact_release_readme_template_text))
     errors.extend(check_artifact_release_skeleton_builder(artifact_release_skeleton_builder_text))
+    errors.extend(check_artifact_release_finalizer(artifact_release_finalizer_text))
     errors.extend(check_submission_system_checklist(submission_system_checklist_text))
     errors.extend(check_reviewer_readiness_audit(reviewer_readiness_audit_text))
     errors.extend(check_manual_validation_protocol(supplementary_text))

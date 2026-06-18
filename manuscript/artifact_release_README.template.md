@@ -29,6 +29,7 @@ Run these commands from the repository root after unpacking the release:
 
 ```bash
 cd /path/to/iad-sieve
+python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release
 cd /path/to/release
 sha256sum -c checksums.sha256
 cd /path/to/iad-sieve
