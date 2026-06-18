@@ -39,6 +39,10 @@ artifact_boundary:
   full_numeric_audit_requires_external_artifact: true
   broad_method_ranking_claimed: false
   silver_labels_claimed_as_human_gold: false
+  release_manifest_template: "artifact_release_manifest.template.json"
+  artifact_release_url: ""
+  artifact_release_doi: ""
+  artifact_release_required_before_final_upload: true
 
 final_upload_checklist:
   target_journal_selected: false

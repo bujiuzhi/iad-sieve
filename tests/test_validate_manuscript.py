@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 from pathlib import Path
 
 
@@ -506,6 +507,79 @@ def test_check_target_journal_shortlist_rejects_missing_boundary() -> None:
 
     assert any("Rank-sensitive labels" in error for error in errors)
     assert any("must be reconfirmed" in error for error in errors)
+
+
+def test_check_artifact_release_manifest_template_accepts_complete_template() -> None:
+    """验证 artifact release 模板包含结果审计必要字段时可通过。"""
+
+    module = _load_validate_manuscript_module()
+    template_text = json.dumps(
+        {
+            "package_type": "result_artifact_release",
+            "release_status": "template_pending_external_artifact",
+            "data_policy": {
+                "raw_third_party_data_included": False,
+                "model_checkpoints_included": False,
+                "personal_or_secret_material_included": False,
+                "derived_evaluation_artifacts_included": True,
+            },
+            "required_directories": ["configs", "tables", "predictions", "reports", "logs"],
+            "required_top_level_files": ["README.md", "manifest.json", "checksums.sha256"],
+            "required_artifacts": [
+                {"artifact_id": "open_v2_main_results"},
+                {"artifact_id": "iad_risk_predictions"},
+                {"artifact_id": "representation_baseline_scores"},
+                {"artifact_id": "supervised_baseline_predictions"},
+                {"artifact_id": "threshold_selection_logs"},
+                {"artifact_id": "iad_bench_split_summary"},
+            ],
+            "minimum_validation_commands": [
+                "sha256sum -c checksums.sha256",
+                "python manuscript/scripts/validate_manuscript.py --strict-latex",
+                "python manuscript/scripts/verify_fixture_rebuild.py",
+                "python scripts/check_public_release.py",
+            ],
+            "claim_boundaries": {
+                "silver_labels_are_not_human_gold": True,
+                "manual_validation_required_for_human_gold_claims": True,
+                "same_scope_prediction_files_required_for_broad_ranking": True,
+                "threshold_grid_required_for_threshold_stability_claims": True,
+            },
+        }
+    )
+
+    errors = module.check_artifact_release_manifest_template(template_text)
+
+    assert errors == []
+
+
+def test_check_artifact_release_manifest_template_rejects_unsafe_data_policy() -> None:
+    """验证 artifact release 模板不得允许原始数据或缺少关键预测文件。"""
+
+    module = _load_validate_manuscript_module()
+    template_text = json.dumps(
+        {
+            "package_type": "result_artifact_release",
+            "release_status": "template_pending_external_artifact",
+            "data_policy": {
+                "raw_third_party_data_included": True,
+                "model_checkpoints_included": False,
+                "personal_or_secret_material_included": False,
+                "derived_evaluation_artifacts_included": False,
+            },
+            "required_directories": ["tables"],
+            "required_top_level_files": ["manifest.json"],
+            "required_artifacts": [{"artifact_id": "open_v2_main_results"}],
+            "minimum_validation_commands": [],
+            "claim_boundaries": {},
+        }
+    )
+
+    errors = module.check_artifact_release_manifest_template(template_text)
+
+    assert any("raw_third_party_data_included" in error for error in errors)
+    assert any("iad_risk_predictions" in error for error in errors)
+    assert any("sha256sum -c checksums.sha256" in error for error in errors)
 
 
 def test_check_cover_letter_accepts_required_submission_statements() -> None:

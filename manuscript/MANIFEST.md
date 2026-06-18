@@ -11,6 +11,7 @@
 | `highlights.md` | 亮点说明 |
 | `keywords.md` | 关键词 |
 | `target_journal_shortlist.md` | 目标期刊候选与模板前置要求 |
+| `artifact_release_manifest.template.json` | 结果 artifact release 元数据模板 |
 | `submission_metadata.yml` | 投稿系统元数据字段 |
 | `scripts/validate_manuscript.py` | 稿件材料校验 |
 | `scripts/verify_fixture_rebuild.py` | 无网络 fixture 重建校验 |
@@ -35,6 +36,8 @@ cd manuscript && ./scripts/build_latex_pdf.sh
 该材料包当前不绑定具体期刊模板。正式上传前，应按目标期刊要求调整 `main.tex` 文档类并补充作者元数据。
 
 `target_journal_shortlist.md` 用于记录候选期刊和模板前置要求，不作为正式投稿附件。目标期刊和分区/分类应在最终上传前由作者按所在单位认可的数据源重新确认。
+
+`artifact_release_manifest.template.json` 用于准备正式 artifact release，不作为当前匿名预投稿包的替代物。正式上传前应生成真实 artifact manifest、checksum 和公开链接。
 
 ## 正式上传检查项
 

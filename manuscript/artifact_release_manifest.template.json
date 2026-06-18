@@ -1,0 +1,112 @@
+{
+  "package_name": "iad-risk-paper-artifacts",
+  "package_type": "result_artifact_release",
+  "release_status": "template_pending_external_artifact",
+  "manuscript_title": "IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication",
+  "repository": {
+    "url": "https://github.com/bujiuzhi/iad-sieve",
+    "commit": "fill-with-release-commit",
+    "branch": "main",
+    "source_tree_clean": true
+  },
+  "data_policy": {
+    "raw_third_party_data_included": false,
+    "model_checkpoints_included": false,
+    "personal_or_secret_material_included": false,
+    "derived_evaluation_artifacts_included": true,
+    "source_licenses_respected": true
+  },
+  "reproducibility_levels": {
+    "L0_code_check": "Repository tests, CLI help, manuscript validation, and public-release scan.",
+    "L1_fixture_rebuild": "No-network fixture rebuild from tests/fixtures.",
+    "L2_public_source_rebuild": "Rebuild from independently obtained public raw files.",
+    "L3_result_audit": "Released tables, predictions, logs, configs, manifests, and checksums."
+  },
+  "required_top_level_files": [
+    "README.md",
+    "manifest.json",
+    "checksums.sha256"
+  ],
+  "required_directories": [
+    "configs",
+    "tables",
+    "predictions",
+    "reports",
+    "logs"
+  ],
+  "required_artifacts": [
+    {
+      "artifact_id": "open_v2_main_results",
+      "required": true,
+      "expected_location": "tables/open_v2_main_results.csv",
+      "claim_support": "Main Open-v2 result table with same-work F1, FMR, HNFMR, pair counts, and row scopes."
+    },
+    {
+      "artifact_id": "iad_risk_predictions",
+      "required": true,
+      "expected_location": "predictions/iad_risk_transformer_predictions.jsonl",
+      "claim_support": "Held-out IAD-Risk merge decisions, thresholds, relation-head scores, and split identifiers."
+    },
+    {
+      "artifact_id": "representation_baseline_scores",
+      "required": true,
+      "expected_location": "predictions/representation_baseline_scores.jsonl",
+      "claim_support": "Full-pair SciNCL and SPECTER2 score files used for false-merge risk comparison."
+    },
+    {
+      "artifact_id": "supervised_baseline_predictions",
+      "required": true,
+      "expected_location": "predictions/roberta_pair_classifier_predictions.jsonl",
+      "claim_support": "Supervised pair-classifier baseline predictions under the same pair schema."
+    },
+    {
+      "artifact_id": "threshold_selection_logs",
+      "required": true,
+      "expected_location": "logs/threshold_selection_logs.jsonl",
+      "claim_support": "Operating-point selection source, threshold values, and validation/test separation."
+    },
+    {
+      "artifact_id": "iad_bench_split_summary",
+      "required": true,
+      "expected_location": "reports/iad_bench_split_summary.jsonl",
+      "claim_support": "Pair counts, document counts, label strata, split coverage, and source coverage."
+    },
+    {
+      "artifact_id": "bootstrap_intervals",
+      "required": false,
+      "expected_location": "reports/bootstrap_intervals.csv",
+      "claim_support": "Confidence intervals only if cited by the final manuscript."
+    },
+    {
+      "artifact_id": "ablation_suite",
+      "required": false,
+      "expected_location": "reports/iad_ablation_suite.csv",
+      "claim_support": "Component-level causality only if cited by the final manuscript."
+    },
+    {
+      "artifact_id": "manual_validation_slice",
+      "required": false,
+      "expected_location": "reports/manual_validation_slice.csv",
+      "claim_support": "Human label-precision claims only if cited by the final manuscript."
+    }
+  ],
+  "checksum_policy": {
+    "algorithm": "SHA256",
+    "checksum_file": "checksums.sha256",
+    "all_required_artifacts_must_be_listed": true,
+    "manifest_must_record_artifact_checksums": true
+  },
+  "minimum_validation_commands": [
+    "sha256sum -c checksums.sha256",
+    "python -m iad_sieve.cli --help",
+    "python manuscript/scripts/validate_manuscript.py --strict-latex",
+    "python manuscript/scripts/verify_fixture_rebuild.py",
+    "python scripts/check_public_release.py"
+  ],
+  "claim_boundaries": {
+    "silver_labels_are_not_human_gold": true,
+    "manual_validation_required_for_human_gold_claims": true,
+    "same_scope_prediction_files_required_for_broad_ranking": true,
+    "threshold_grid_required_for_threshold_stability_claims": true
+  }
+}

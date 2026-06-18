@@ -7,6 +7,7 @@ coverage, PDF readability, and local LaTeX toolchain availability.
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import shutil
 import subprocess
@@ -26,6 +27,7 @@ REQUIRED_FILES = [
     ROOT / "highlights.md",
     ROOT / "keywords.md",
     ROOT / "target_journal_shortlist.md",
+    ROOT / "artifact_release_manifest.template.json",
     ROOT / "submission_metadata.yml",
     ROOT / "scripts" / "validate_manuscript.py",
     ROOT / "scripts" / "verify_fixture_rebuild.py",
@@ -579,6 +581,98 @@ def check_target_journal_shortlist(shortlist_text: str) -> list[str]:
     ]
 
 
+def check_artifact_release_manifest_template(template_text: str) -> list[str]:
+    """Check whether the artifact release manifest template covers result audit needs.
+
+    参数:
+        template_text: Artifact release manifest template JSON text.
+
+    返回:
+        list[str]: Error messages for malformed or incomplete release template content.
+    """
+    try:
+        template = json.loads(template_text)
+    except json.JSONDecodeError as exc:
+        return [f"artifact release manifest template is invalid JSON: {exc}"]
+
+    errors: list[str] = []
+    if template.get("package_type") != "result_artifact_release":
+        errors.append("artifact release manifest template package_type must be result_artifact_release")
+    if template.get("release_status") != "template_pending_external_artifact":
+        errors.append("artifact release manifest template must remain a pending external artifact template")
+
+    data_policy = template.get("data_policy")
+    if not isinstance(data_policy, dict):
+        errors.append("artifact release manifest template missing data_policy object")
+    else:
+        expected_false_fields = [
+            "raw_third_party_data_included",
+            "model_checkpoints_included",
+            "personal_or_secret_material_included",
+        ]
+        for field in expected_false_fields:
+            if data_policy.get(field) is not False:
+                errors.append(f"artifact release data_policy must set {field} to false")
+        if data_policy.get("derived_evaluation_artifacts_included") is not True:
+            errors.append("artifact release data_policy must include derived evaluation artifacts")
+
+    required_directories = set(template.get("required_directories", []))
+    for directory_name in {"configs", "tables", "predictions", "reports", "logs"}:
+        if directory_name not in required_directories:
+            errors.append(f"artifact release manifest template missing required directory: {directory_name}")
+
+    required_top_level_files = set(template.get("required_top_level_files", []))
+    for file_name in {"README.md", "manifest.json", "checksums.sha256"}:
+        if file_name not in required_top_level_files:
+            errors.append(f"artifact release manifest template missing top-level file: {file_name}")
+
+    artifacts = template.get("required_artifacts")
+    if not isinstance(artifacts, list):
+        errors.append("artifact release manifest template missing required_artifacts list")
+        artifact_ids: set[str] = set()
+    else:
+        artifact_ids = {str(row.get("artifact_id", "")) for row in artifacts if isinstance(row, dict)}
+    for artifact_id in {
+        "open_v2_main_results",
+        "iad_risk_predictions",
+        "representation_baseline_scores",
+        "supervised_baseline_predictions",
+        "threshold_selection_logs",
+        "iad_bench_split_summary",
+    }:
+        if artifact_id not in artifact_ids:
+            errors.append(f"artifact release manifest template missing required artifact: {artifact_id}")
+
+    validation_commands = template.get("minimum_validation_commands")
+    if not isinstance(validation_commands, list):
+        errors.append("artifact release manifest template missing minimum_validation_commands list")
+    else:
+        validation_text = "\n".join(str(command) for command in validation_commands)
+        for command in [
+            "sha256sum -c checksums.sha256",
+            "python manuscript/scripts/validate_manuscript.py --strict-latex",
+            "python manuscript/scripts/verify_fixture_rebuild.py",
+            "python scripts/check_public_release.py",
+        ]:
+            if command not in validation_text:
+                errors.append(f"artifact release manifest template missing validation command: {command}")
+
+    claim_boundaries = template.get("claim_boundaries")
+    if not isinstance(claim_boundaries, dict):
+        errors.append("artifact release manifest template missing claim_boundaries object")
+    else:
+        for field in [
+            "silver_labels_are_not_human_gold",
+            "manual_validation_required_for_human_gold_claims",
+            "same_scope_prediction_files_required_for_broad_ranking",
+            "threshold_grid_required_for_threshold_stability_claims",
+        ]:
+            if claim_boundaries.get(field) is not True:
+                errors.append(f"artifact release claim boundary must be true: {field}")
+
+    return errors
+
+
 def check_related_work_positioning(manuscript_text: str) -> list[str]:
     """Check whether related work includes closest-work positioning.
 
@@ -772,6 +866,10 @@ def check_submission_metadata(metadata_text: str) -> list[str]:
         "full_numeric_audit_requires_external_artifact: true",
         "broad_method_ranking_claimed: false",
         "silver_labels_claimed_as_human_gold: false",
+        "release_manifest_template: \"artifact_release_manifest.template.json\"",
+        "artifact_release_url: \"\"",
+        "artifact_release_doi: \"\"",
+        "artifact_release_required_before_final_upload: true",
         "final_upload_checklist:",
         "target_journal_selected: false",
         "target_journal_template_applied: false",
@@ -938,6 +1036,10 @@ def main() -> int:
     target_journal_shortlist_text = (
         target_journal_shortlist_path.read_text(encoding="utf-8") if target_journal_shortlist_path.exists() else ""
     )
+    artifact_release_template_path = ROOT / "artifact_release_manifest.template.json"
+    artifact_release_template_text = (
+        artifact_release_template_path.read_text(encoding="utf-8") if artifact_release_template_path.exists() else ""
+    )
     cover_letter_path = ROOT / "cover_letter.md"
     cover_letter_text = cover_letter_path.read_text(encoding="utf-8") if cover_letter_path.exists() else ""
     submission_metadata_path = ROOT / "submission_metadata.yml"
@@ -975,6 +1077,7 @@ def main() -> int:
     errors.extend(check_extended_protocol_boundary(manuscript_text))
     errors.extend(check_environment_setup(supplementary_text))
     errors.extend(check_target_journal_shortlist(target_journal_shortlist_text))
+    errors.extend(check_artifact_release_manifest_template(artifact_release_template_text))
     errors.extend(check_manual_validation_protocol(supplementary_text))
     errors.extend(check_result_claim_boundary(manuscript_text, supplementary_text))
     errors.extend(check_highlights(highlights_text))
