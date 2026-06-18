@@ -10,9 +10,9 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 38.
+Completed audit cycles: 39.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.
 
@@ -401,6 +401,14 @@ Outcome: pass for introduction-level row-scope comparison wording; blocked for s
 This gate checks whether the contribution paragraph can be misread as claiming that all reported baselines and IAD-Risk rows are directly ranked under one identical evaluation scope. The introduction now states that IAD-Risk is evaluated within a shared Open-v2 pair schema while explicitly marking row-scope differences between full-scope baselines and held-out IAD-Risk rows. This keeps the first-page contribution aligned with the Open-v2 table, result interpretation guardrails, and submission-material claim boundary.
 
 The reviewer-facing boundary is ranking interpretation. A shared schema supports auditable row construction and relation semantics, but it does not remove the full-scope versus held-out test distinction or authorize a same-scope ranking implication before the external artifact release supplies matched prediction files and threshold records.
+
+## Audit Cycle 39: Installable CLI Entry-Point Traceability Gate
+
+Outcome: pass for Git-only command discovery and source entry-point binding; blocked for full numerical audit until the external artifact release is populated, finalized, validated, and linked.
+
+This gate checks whether a reviewer can locate the executable project entry point from tracked source files before running fixture rebuilds or artifact commands. The main manuscript now states that the package source lives under `src/iad_sieve`, that `pyproject.toml` exposes `iad-sieve = iad_sieve.cli:main`, and that `python -m iad_sieve.cli --help` verifies argparse command discovery from the repository. The manuscript validator also checks these markers against the tracked source contract rather than treating the data-availability wording as an unverified prose claim.
+
+The reviewer-facing boundary is executable traceability. This gate proves that Git-only reviewers can discover the CLI, inspect the package entry point, and run fixture-level rebuild commands without raw third-party data. It does not prove the Open-v2 numerical table, threshold choices, prediction files, bootstrap intervals, workload metrics, ablations, or cluster-level artifacts; those remain tied to the L2/L3 public-source rebuild or the external artifact release with manifests and checksums.
 
 ## Minimum Gate Before Final Upload
 
