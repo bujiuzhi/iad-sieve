@@ -40,6 +40,18 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 | The method is threshold-stable. | Not claimed. | Add only after threshold-grid artifact evidence exists. |
 | Human validation is complete. | Not claimed. | Add only after reviewed slice, adjudication log, and agreement report exist. |
 
+## Adversarial Self-Review Matrix
+
+This matrix records the current reviewer-facing answer to the five required self-review dimensions. The status values are intentionally strict: `pass` means the present manuscript text and package evidence are sufficient for the bounded claim, `needs revision` means wording or structure must be tightened before final upload, and `needs new experiment` means stronger evidence is required before making the corresponding stronger claim.
+
+| Dimension | Skeptical reviewer question | Status | Current evidence | Required revision or experiment before stronger claim |
+| --- | --- | --- | --- | --- |
+| Contribution self-review | What new knowledge does the paper give beyond ordinary entity matching or scientific representation scoring? | pass | The manuscript defines identity-agenda confusion, HNFMR, IAD-Bench label-strength separation, and risk-aware merge gating. | Keep the novelty framed as false-merge control and benchmark contract design, not broad model superiority. |
+| Writing clarity self-review | Can a knowledgeable reader reproduce the method and understand each module's motivation? | pass | The method section defines identity, agenda, ANI, risk score, thresholds, feature groups, and provenance-aware masking. | Recheck length, figure placement, and title-page formatting after target-journal template conversion. |
+| Experimental strength self-review | Are the reported gains meaningful against strong baselines under a fair interpretation? | needs new experiment | Open-v2 evidence reports representation baseline HNFMR 0.790--0.999, RoBERTa FMR 0.001/HNFMR 0.0001, and IAD-Risk HNFMR=0.000 on the reported held-out scope. | Release same-scope prediction files, threshold logs, checksums, and bootstrap intervals before claiming stronger comparative advantage. |
+| Evaluation completeness self-review | Are ablations, metrics, datasets, and label strata sufficient for the claimed scope? | needs new experiment | The manuscript reports F1, FMR, HNFMR, label strata, scope compatibility, threshold-status boundaries, and manual-validation requirements. | Add artifact-backed ablations, threshold grid, manual-validation slice, and source-heldout package before stronger robustness or component-causality claims. |
+| Method design soundness self-review | Does the method have realistic assumptions and a positive net benefit despite added complexity? | pass | The method exposes thresholds, cannot-link behavior, audit metadata, and explicit boundaries for silver labels and source transfer. | Reassess threshold transfer and deployment complexity after the selected journal route and external artifact are fixed. |
+
 ## Audit Cycle 1: Claim Discipline
 
 Outcome: pass with residual artifact requirements.

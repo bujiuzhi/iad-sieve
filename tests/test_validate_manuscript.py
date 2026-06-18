@@ -1006,6 +1006,15 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "Threshold results may be sensitive.",
             "Reproducibility depends on files outside Git.",
             "## Claim-Evidence Check",
+            "## Adversarial Self-Review Matrix",
+            "`pass`, `needs revision`, and `needs new experiment` are strict status values.",
+            "Contribution self-review",
+            "Writing clarity self-review",
+            "Experimental strength self-review",
+            "Evaluation completeness self-review",
+            "Method design soundness self-review",
+            "The stronger package requires same-scope prediction files.",
+            "It also requires artifact-backed ablations.",
             "## Audit Cycle 1: Claim Discipline",
             "## Audit Cycle 2: Submission Readiness",
             "## Audit Cycle 3: Q2/B Acceptance Gate",
@@ -1038,6 +1047,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_final_gate() -> None:
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Reviewer Risk Register" in error for error in errors)
+    assert any("Adversarial Self-Review Matrix" in error for error in errors)
     assert any("Q2/B Acceptance Gate" in error for error in errors)
     assert any("Final Package Hygiene" in error for error in errors)
     assert any("Minimum Gate Before Final Upload" in error for error in errors)
