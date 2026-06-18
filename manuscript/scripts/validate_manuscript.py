@@ -2476,6 +2476,7 @@ def check_editorial_claim_alignment(
                 "false-merge risk",
                 "targeted false-merge suppression",
                 "reproducible benchmark contract",
+                "does not claim cluster-level deployment quality without cluster artifacts",
                 "Additional validation",
                 "broad method ranking",
             ],

@@ -3250,6 +3250,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
             "IAD-Risk addresses a specific failure mode by separating identity and agenda evidence.",
             "It uses false-merge risk and supports targeted false-merge suppression.",
             "The contribution includes a reproducible benchmark contract.",
+            "It does not claim cluster-level deployment quality without cluster artifacts.",
             "Additional validation is needed before broad method ranking.",
         ]
     )
@@ -3294,6 +3295,71 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
     )
 
     assert errors == []
+
+
+def test_check_editorial_claim_alignment_rejects_conclusion_without_cluster_boundary() -> None:
+    """验证结论必须同步声明 cluster-level 部署质量边界。"""
+
+    module = _load_validate_manuscript_module()
+    title = "IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication"
+    manuscript_text = "\n".join(
+        [
+            rf"\title{{{title}}}",
+            r"\begin{abstract}",
+            "This paper studies identity-agenda confusion and proposes IAD-Risk.",
+            "It evaluates IAD-Bench under an Open-v2 evidence snapshot.",
+            "The results include HNFMR 0.790--0.999 and HNFMR=0.000.",
+            "The paper avoids broad method-ranking claims.",
+            r"\end{abstract}",
+            r"\section{Conclusion}",
+            "IAD-Risk addresses a specific failure mode by separating identity and agenda evidence.",
+            "It uses false-merge risk and supports targeted false-merge suppression.",
+            "The contribution includes a reproducible benchmark contract.",
+            "Additional validation is needed before broad method ranking.",
+        ]
+    )
+    cover_letter_text = "\n".join(
+        [
+            title,
+            "The paper studies identity-agenda confusion and proposes IAD-Risk.",
+            "The manuscript contributes IAD-Bench and reports an Open-v2 evidence snapshot.",
+            "The result includes HNFMR 0.790--0.999 and HNFMR=0.000.",
+            "The manuscript does not claim broad method superiority.",
+            "raw third-party data and full experimental outputs are not redistributed in Git.",
+        ]
+    )
+    highlights_text = "\n".join(
+        [
+            "- Identity-agenda confusion causes risky scholarly work merges.",
+            "- IAD-Risk separates identity, agenda, and ANI evidence.",
+            "- IAD-Bench keeps gold, proxy, and silver labels separate.",
+            "- Open-v2 scope-bounded evidence reports IAD-Risk HNFMR=0.000.",
+            "- Fixtures and artifact rules support reproducible review.",
+        ]
+    )
+    keywords_text = (
+        "scholarly entity matching; work deduplication; identity-agenda disentanglement; "
+        "false-merge risk; provenance-aware evaluation"
+    )
+    metadata_text = "\n".join(
+        [
+            f'title: "{title}"',
+            "broad_method_ranking_claimed: false",
+            "silver_labels_claimed_as_human_gold: false",
+            "artifact_release_required_before_final_upload: true",
+        ]
+    )
+
+    errors = module.check_editorial_claim_alignment(
+        manuscript_text,
+        cover_letter_text,
+        highlights_text,
+        keywords_text,
+        metadata_text,
+    )
+
+    assert any("main conclusion" in error for error in errors)
+    assert any("cluster-level deployment quality" in error for error in errors)
 
 
 def test_check_editorial_claim_alignment_rejects_drifted_submission_materials() -> None:
