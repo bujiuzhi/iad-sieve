@@ -211,6 +211,47 @@ def parse_author_rows(metadata_text: str) -> list[dict[str, str]]:
     return rows
 
 
+def parse_contribution_role_rows(metadata_text: str) -> list[dict[str, str]]:
+    """Parse structured author contribution role rows from submission metadata.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[dict[str, str]]: Parsed contribution rows under author_contributions.roles.
+    """
+    rows: list[dict[str, str]] = []
+    current_row: dict[str, str] | None = None
+    in_roles = False
+    for raw_line in section_lines(metadata_text, "author_contributions"):
+        stripped_line = raw_line.strip()
+        if not stripped_line:
+            continue
+        if stripped_line == "roles:":
+            in_roles = True
+            continue
+        if not in_roles:
+            continue
+        if stripped_line.startswith("- "):
+            if current_row is not None:
+                rows.append(current_row)
+            current_row = {}
+            parsed = parse_key_value_line(stripped_line[2:])
+            if parsed is not None:
+                key, value = parsed
+                current_row[key] = value
+            continue
+        if current_row is None:
+            continue
+        parsed = parse_key_value_line(stripped_line)
+        if parsed is not None:
+            key, value = parsed
+            current_row[key] = value
+    if current_row is not None:
+        rows.append(current_row)
+    return rows
+
+
 def check_email(value: str, label: str) -> list[str]:
     """Check whether an email value is present and syntactically valid.
 
@@ -637,18 +678,26 @@ def check_author_contribution_statement(metadata_text: str) -> list[str]:
         "credit_statement",
         "",
     )
-    contribution_section_text = "\n".join(section_lines(metadata_text, "author_contributions"))
     credit_required = contribution_row.get("credit_taxonomy_required_before_final_upload", "").lower() == "true"
-    has_credit_roles = (
-        "roles:" in contribution_section_text
-        and "roles: []" not in contribution_section_text
-        and any(role_name in contribution_section_text for role_name in CREDIT_AUTHOR_ROLES)
-    )
+    contribution_role_rows = parse_contribution_role_rows(metadata_text)
+    valid_role_rows = [
+        row
+        for row in contribution_role_rows
+        if row.get("author", "").strip()
+        and any(role_name in row.get("credit_roles", "") for role_name in CREDIT_AUTHOR_ROLES)
+    ]
+    has_credit_roles = bool(valid_role_rows)
     errors: list[str] = []
     if not contribution_statement and not has_credit_roles:
         errors.append("author contribution statement is missing")
     if credit_required and not has_credit_roles:
         errors.append("CRediT author contribution roles are missing")
+    if credit_required and valid_role_rows:
+        role_authors = {row.get("author", "").strip().lower() for row in valid_role_rows}
+        for author_row in parse_author_rows(metadata_text):
+            author_name = author_row.get("name", "").strip()
+            if author_name and author_name.lower() not in role_authors:
+                errors.append(f"CRediT author contribution roles missing for author: {author_name}")
     return errors
 
 

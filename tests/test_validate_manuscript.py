@@ -4901,6 +4901,76 @@ def test_check_final_upload_metadata_rejects_missing_credit_roles_when_required(
     assert any("CRediT author contribution roles are missing" in error for error in errors)
 
 
+def test_check_final_upload_metadata_rejects_missing_credit_roles_for_each_author() -> None:
+    """验证 CRediT 角色必须覆盖每一位作者。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = "\n".join(
+        [
+            'target_journal: "Data & Knowledge Engineering"',
+            'review_mode: "single_anonymized_with_final_author_identities"',
+            "target_journal_template_bound: true",
+            "authors:",
+            '  - name: "First Author"',
+            '    affiliation: "Example University"',
+            '    email: "first@example.edu"',
+            '    orcid: "0000-0002-1825-0097"',
+            '  - name: "Second Author"',
+            '    affiliation: "Example Institute"',
+            '    email: "second@example.edu"',
+            '    orcid: "0000-0002-1694-233X"',
+            "corresponding_author:",
+            '  name: "First Author"',
+            '  affiliation: "Example University"',
+            '  email: "first@example.edu"',
+            '  orcid: "0000-0002-1825-0097"',
+            "funding:",
+            "  no_external_funding_declared: true",
+            '  funding_statement: "The authors received no external funding for this work."',
+            "  funding_sources: []",
+            "  grant_numbers: []",
+            "statements:",
+            '  originality: "The manuscript is original, has not been published previously, and is not under consideration elsewhere."',
+            '  author_approval: "All listed authors have approved the submitted version."',
+            '  competing_interests: "The authors declare no competing interests."',
+            '  ethics: "This study uses public scholarly metadata and does not involve human participants."',
+            '  data_code_availability: "Source code and fixtures are available at https://example.org/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
+            '  research_data_statement: "The full result artifact is available at https://doi.org/10.0000/example."',
+            "author_contributions:",
+            "  credit_taxonomy_required_before_final_upload: true",
+            '  contribution_statement: "First Author: conceptualization and writing - original draft. Second Author: validation."',
+            "  roles:",
+            '    - author: "First Author"',
+            '      credit_roles: "Conceptualization; Writing - original draft"',
+            "permissions:",
+            "  no_third_party_material_requiring_permission_declared: true",
+            "  third_party_material_requires_permission: false",
+            '  permissions_statement: "No third-party material requiring permission is included."',
+            "  permission_files: []",
+            "repository_reference:",
+            '  repository_url: "https://example.org/iad-sieve.git"',
+            '  repository_commit: "abcdef1234567890"',
+            '  repository_branch: "main"',
+            "artifact_boundary:",
+            '  artifact_release_url: "https://doi.org/10.0000/example"',
+            '  artifact_release_doi: "10.0000/example"',
+            "final_upload_checklist:",
+            "  target_journal_selected: true",
+            "  target_journal_template_applied: true",
+            "  author_metadata_completed: true",
+            "  corresponding_author_completed: true",
+            "  manuscript_pdf_rebuilt_after_template: true",
+            "  supplementary_pdf_rebuilt_after_template: true",
+            "  submission_system_files_verified: true",
+            "  artifact_release_prepared_or_linked: true",
+        ]
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any("CRediT author contribution roles missing for author: Second Author" in error for error in errors)
+
+
 def test_check_final_upload_metadata_rejects_missing_permissions_statement() -> None:
     """验证 final-upload 门禁拒绝缺少第三方材料许可声明的元数据。"""
 

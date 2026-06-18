@@ -39,6 +39,7 @@ For each author, provide the final Author order, name, affiliation, email, ORCID
 - Contribution taxonomy required by target journal:
 - Final Author contribution statement:
 - Author-order confirmation:
+- CRediT roles cover every listed author:
 
 ### CRediT author contribution statement
 
@@ -116,6 +117,7 @@ For each author, select the applicable CRediT roles and then draft the final aut
 - corresponding_author_complete:
 - funding_statement_complete:
 - contribution_statement_complete:
+- credit_roles_cover_all_authors:
 - permissions_statement_complete:
 - artifact_release_public:
 - artifact_release_manifest_validated:

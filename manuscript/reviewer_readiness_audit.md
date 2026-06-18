@@ -162,7 +162,7 @@ The manuscript should not be uploaded to a journal system until all of the follo
 2. `main.tex` is converted to the selected journal template and rebuilt.
 3. `supplementary_material.tex` is rebuilt after any final source edits.
 4. The artifact release has a real URL or DOI, validates against its checksum file, and records the same repository commit used by the final manuscript package.
-5. The funding statement, author contribution statement, permissions statement, data/code availability statement, and journal-specific research data statement are complete and consistent with the live submission system, with the repository URL, repository commit, and artifact URL or DOI embedded in the availability statements.
+5. The funding statement, author contribution statement, permissions statement, data/code availability statement, and journal-specific research data statement are complete and consistent with the live submission system, with CRediT roles covering every listed author and with the repository URL, repository commit, and artifact URL or DOI embedded in the availability statements.
 6. `python manuscript/scripts/validate_manuscript.py --strict-latex` passes.
 7. `python manuscript/scripts/validate_submission_package.py --final-upload` passes.
 8. `submission_system_checklist.md` has been checked against the live journal system.
