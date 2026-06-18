@@ -2003,6 +2003,45 @@ def test_check_final_upload_metadata_rejects_orcid_checksum_error() -> None:
     assert any("corresponding author ORCID is invalid" in error for error in errors)
 
 
+def test_check_final_upload_metadata_rejects_anonymous_review_for_dke() -> None:
+    """验证 DKE final-upload 门禁拒绝匿名预审 review_mode。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = "\n".join(
+        [
+            'review_mode: "anonymous_review"',
+            'target_journal: "Data & Knowledge Engineering"',
+            "target_journal_template_bound: true",
+            "authors:",
+            '  - name: "Example Author"',
+            '    affiliation: "Example University"',
+            '    email: "author@example.edu"',
+            '    orcid: "0000-0002-1825-0097"',
+            "corresponding_author:",
+            '  name: "Example Author"',
+            '  affiliation: "Example University"',
+            '  email: "author@example.edu"',
+            '  orcid: "0000-0002-1825-0097"',
+            "artifact_boundary:",
+            '  artifact_release_url: "https://doi.org/10.0000/example"',
+            '  artifact_release_doi: "10.0000/example"',
+            "final_upload_checklist:",
+            "  target_journal_selected: true",
+            "  target_journal_template_applied: true",
+            "  author_metadata_completed: true",
+            "  corresponding_author_completed: true",
+            "  manuscript_pdf_rebuilt_after_template: true",
+            "  supplementary_pdf_rebuilt_after_template: true",
+            "  submission_system_files_verified: true",
+            "  artifact_release_prepared_or_linked: true",
+        ]
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any("review mode must include final author identities for Data & Knowledge Engineering" in error for error in errors)
+
+
 def test_check_final_upload_metadata_rejects_missing_template_and_checklist_fields() -> None:
     """验证 final-upload 门禁拒绝缺失的模板绑定和清单布尔字段。"""
 

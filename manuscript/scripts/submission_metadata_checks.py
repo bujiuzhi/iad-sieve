@@ -25,6 +25,11 @@ EMAIL_PATTERN = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 ORCID_PATTERN = re.compile(r"^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$")
 URL_PATTERN = re.compile(r"^https?://[^\s]+$", re.IGNORECASE)
 DOI_PATTERN = re.compile(r"^10\.[^\s/]+/[^\s]+$", re.IGNORECASE)
+AUTHOR_VISIBLE_REVIEW_JOURNALS = {
+    "data & knowledge engineering": "Data & Knowledge Engineering",
+    "information systems": "Information Systems",
+    "scientometrics": "Scientometrics",
+}
 FINAL_UPLOAD_TRUE_FIELDS = {
     "target_journal_template_bound": "target journal template is not bound",
     "target_journal_selected": "target journal checklist item is incomplete",
@@ -318,6 +323,24 @@ def check_artifact_release_link(metadata_text: str) -> list[str]:
     return errors
 
 
+def check_final_upload_review_mode(metadata_text: str) -> list[str]:
+    """Check whether final-upload review mode matches the selected journal route.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages.
+    """
+    target_journal = scalar_value(metadata_text, "target_journal")
+    review_mode = scalar_value(metadata_text, "review_mode")
+    normalized_target = target_journal.strip().lower()
+    if review_mode == "anonymous_review" and normalized_target in AUTHOR_VISIBLE_REVIEW_JOURNALS:
+        journal_name = AUTHOR_VISIBLE_REVIEW_JOURNALS[normalized_target]
+        return [f"review mode must include final author identities for {journal_name}"]
+    return []
+
+
 def check_final_upload_cover_letter_text(cover_letter_text: str, metadata_text: str) -> list[str]:
     """Check final-upload cover letter target and artifact boundaries.
 
@@ -362,4 +385,5 @@ def check_final_upload_metadata_text(metadata_text: str) -> list[str]:
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_author_rows(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_corresponding_author(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_artifact_release_link(metadata_text))
+    errors.extend(f"final upload metadata unresolved: {message}" for message in check_final_upload_review_mode(metadata_text))
     return sorted(set(errors))
