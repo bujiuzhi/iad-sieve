@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 68.
+Completed audit cycles: 69.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -641,6 +641,14 @@ Outcome: pass for training-trace table-density reduction; blocked for implementa
 This gate checks whether the training and inference trace table is needed in the main manuscript. The main manuscript now states the execution boundary in prose: schema loading preserves pair IDs and split fields, supervised fitting uses the masked objective, threshold fixation records threshold source, selection split, and selection metric, pair scoring writes relation scores and the derived risk score, decision emission records merge, block, or defer with cannot-link status, and metric export binds denominators and checksums to the same prediction artifact. The supplementary material preserves the full training and inference trace table with phase, required operation, and auditable output or invariant columns.
 
 The reviewer-facing boundary is training-trace clarity without main-text table overload. The validator still requires the supplementary training-inference trace table and the explicit rule that gold, proxy, and silver labels are not silently converted into unrelated supervision.
+
+## Audit Cycle 69: Scoring and Merge Algorithm Density Gate
+
+Outcome: pass for scoring-algorithm table-density reduction; blocked for implementation-equivalence claims until released artifacts expose pair inputs, relation-head outputs, derived risk scores, threshold values, cannot-link flags, decisions, denominators, and checksum-bound artifact rows for the same evaluated scope.
+
+This gate checks whether the scoring and merge algorithm table is needed in the main manuscript. The main manuscript now states the scoring boundary in prose: the executable method follows a fixed scoring and merge order; it loads candidate-pair schema metadata, builds identity, agenda, ANI, and cannot-link feature groups without using audit metadata as predictors, predicts relation heads, computes the derived risk score, applies a merge gate that combines thresholds, cannot-link status, and threshold source, and writes decision, row scope, denominators, thresholds, and checksum-bound artifact rows. In short, the merge gate combines fixed thresholds with cannot-link evidence before a merge, block, or defer decision is emitted. The supplementary material preserves the full scoring and merge algorithm table with step, operation, required inputs or outputs, and audit role columns.
+
+The reviewer-facing boundary is scoring-algorithm clarity without main-text table overload. The validator still requires the supplementary scoring-merge algorithm table and the explicit rule that same-work F1, FMR, HNFMR, coverage, and defer-rate audits refer to the same decision file.
 
 ## Minimum Gate Before Final Upload
 

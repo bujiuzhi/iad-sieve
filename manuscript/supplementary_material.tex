@@ -200,6 +200,26 @@ Metric export & Count same-work F1, FMR, HNFMR, coverage, block rate, and defer 
 \end{table}
 
 \begin{table}[H]
+\caption{Scoring and merge algorithm for IAD-Risk. The table gives the execution order that connects pair inputs, relation-head outputs, risk gating, and metric-counting artifacts.}
+\label{tab:scoring-merge-algorithm}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.10\linewidth}L{0.28\linewidth}L{0.30\linewidth}L{0.22\linewidth}}
+\toprule
+Step & Operation & Required inputs or outputs & Audit role \\
+\midrule
+1 & Load a candidate pair and schema metadata. & Pair ID, document IDs, label strength, provenance, split, and hard-negative level. & Fixes row identity before scoring. \\
+2 & Build feature groups without using audit metadata as predictors. & Identity, agenda, ANI, and cannot-link feature groups. & Prevents provenance or split leakage. \\
+3 & Predict relation heads. & $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, and $p_{\mathrm{ani}}$. & Records interpretable relation evidence. \\
+4 & Compute derived false-merge risk. & $p_{\mathrm{risk}}=\max\{p_{\mathrm{ani}},p_{\mathrm{agenda}}(1-p_{\mathrm{work}})\}$. & Makes the blocking score reproducible. \\
+5 & Apply the merge gate and cannot-link evidence. & $\tau_w$, $\tau_a$, $\tau_r$, cannot-link flag, and threshold source. & Emits merge, block, or defer under a fixed operating point. \\
+6 & Write prediction and metric audit fields. & Decision, row scope, denominators, thresholds, and checksum-bound artifact row. & Supports same-work F1, FMR, HNFMR, coverage, and defer-rate audits. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
 \caption{Operational complexity and net-benefit boundary. The framework is intended for safety-sensitive scholarly identity decisions, not as a universal replacement for simple deduplication pipelines.}
 \label{tab:operational-net-benefit}
 \centering

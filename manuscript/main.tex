@@ -289,27 +289,7 @@ Operationally, the three outputs have different meanings. A pair is merged only 
 
 \subsection{Scoring and Merge Algorithm}
 
-The executable method follows a fixed scoring and merge order. For each candidate pair, IAD-Risk first builds identity, agenda, ANI, and audit fields from the pair schema. It then predicts the three relation heads, computes the derived risk score, applies cannot-link evidence, and emits one of three decisions: merge, block, or defer. Table~\ref{tab:scoring-merge-algorithm} states the algorithmic contract used by the implementation and the artifact audit.
-
-\begin{table}[H]
-\caption{Scoring and merge algorithm for IAD-Risk. The table gives the execution order that connects pair inputs, relation-head outputs, risk gating, and metric-counting artifacts.}
-\label{tab:scoring-merge-algorithm}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{L{0.10\linewidth}L{0.28\linewidth}L{0.30\linewidth}L{0.22\linewidth}}
-\toprule
-Step & Operation & Required inputs or outputs & Audit role \\
-\midrule
-1 & Load a candidate pair and schema metadata. & Pair ID, document IDs, label strength, provenance, split, and hard-negative level. & Fixes row identity before scoring. \\
-2 & Build feature groups without using audit metadata as predictors. & Identity, agenda, ANI, and cannot-link feature groups. & Prevents provenance or split leakage. \\
-3 & Predict relation heads. & $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, and $p_{\mathrm{ani}}$. & Records interpretable relation evidence. \\
-4 & Compute derived false-merge risk. & $p_{\mathrm{risk}}=\max\{p_{\mathrm{ani}},p_{\mathrm{agenda}}(1-p_{\mathrm{work}})\}$. & Makes the blocking score reproducible. \\
-5 & Apply the merge gate and cannot-link evidence. & $\tau_w$, $\tau_a$, $\tau_r$, cannot-link flag, and threshold source. & Emits merge, block, or defer under a fixed operating point. \\
-6 & Write prediction and metric audit fields. & Decision, row scope, denominators, thresholds, and checksum-bound artifact row. & Supports same-work F1, FMR, HNFMR, coverage, and defer-rate audits. \\
-\bottomrule
-\end{tabular}
-\end{table}
+The executable method follows a fixed scoring and merge order. The full scoring and merge algorithm table is reported in the supplementary material. For each candidate pair, IAD-Risk first loads pair ID, document IDs, label strength, provenance, split, and hard-negative level from the pair schema. It then builds identity, agenda, ANI, and audit fields, including cannot-link feature groups, without using audit metadata as predictors. The relation heads output $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, and $p_{\mathrm{ani}}$; the derived risk score is $p_{\mathrm{risk}}=\max\{p_{\mathrm{ani}},p_{\mathrm{agenda}}(1-p_{\mathrm{work}})\}$. The merge gate combines $\tau_w$, $\tau_a$, $\tau_r$, the cannot-link flag, and threshold source to emit merge, block, or defer under a fixed operating point. The implementation then writes prediction and metric audit fields, including decision, row scope, denominators, thresholds, and checksum-bound artifact rows, so that same-work F1, FMR, HNFMR, coverage, and defer-rate audits all refer to the same decision file.
 
 \subsection{Operational Complexity and Net Benefit}
 

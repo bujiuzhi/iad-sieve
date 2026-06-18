@@ -2016,13 +2016,14 @@ def test_check_scoring_merge_algorithm_accepts_complete_contract() -> None:
             "The decision emission records merge, block, or defer.",
             "The metric export binds denominators and checksums.",
             r"\subsection{Scoring and Merge Algorithm}",
-            r"\label{tab:scoring-merge-algorithm}",
+            "The full scoring and merge algorithm table is reported in the supplementary material.",
             "The executable method follows a fixed scoring and merge order.",
             "IAD-Risk first builds identity, agenda, ANI, and audit fields.",
             "It builds feature groups without using audit metadata as predictors.",
             r"The heads output $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, and $p_{\mathrm{ani}}$.",
             r"The derived risk score is $p_{\mathrm{risk}}=\max\{p_{\mathrm{ani}},p_{\mathrm{agenda}}(1-p_{\mathrm{work}})\}$.",
             "The gate uses a cannot-link flag and emits merge, block, or defer.",
+            "The artifact rows include decision, row scope, denominators, thresholds, and checksum-bound artifact rows.",
             "The artifact supports same-work F1, FMR, HNFMR, coverage, and defer-rate audits.",
         ]
     )
@@ -2045,6 +2046,22 @@ def test_check_scoring_merge_algorithm_accepts_complete_contract() -> None:
             "Prediction rows expose relation scores.",
             "cannot-link status",
             "Metric summaries and checksums bind denominators.",
+            r"\label{tab:scoring-merge-algorithm}",
+            "Scoring and merge algorithm for IAD-Risk.",
+            "Step",
+            "Operation",
+            "Required inputs or outputs",
+            "Audit role",
+            "Load a candidate pair and schema metadata",
+            "Build feature groups without using audit metadata as predictors",
+            "Predict relation heads",
+            "Compute derived false-merge risk",
+            "Apply the merge gate and cannot-link evidence",
+            "Write prediction and metric audit fields",
+            "Fixes row identity before scoring",
+            "Prevents provenance or split leakage",
+            "Emits merge, block, or defer under a fixed operating point",
+            "Supports same-work F1, FMR, HNFMR, coverage, and defer-rate audits",
         ]
     )
 
@@ -5299,7 +5316,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 68.",
+            "Completed audit cycles: 69.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -5855,6 +5872,16 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "metric export binds denominators and checksums",
             "training-trace clarity without main-text table overload",
             "supplementary training-inference trace table",
+            "## Audit Cycle 69: Scoring and Merge Algorithm Density Gate",
+            "scoring-algorithm table-density reduction",
+            "full scoring and merge algorithm table",
+            "fixed scoring and merge order",
+            "identity, agenda, ANI, and cannot-link feature groups",
+            "derived risk score",
+            "merge gate combines",
+            "decision, row scope, denominators, thresholds, and checksum-bound artifact rows",
+            "scoring-algorithm clarity without main-text table overload",
+            "supplementary scoring-merge algorithm table",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -5873,7 +5900,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 68",
+        "Completed audit cycles: 69",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -5884,7 +5911,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 68" in error for error in errors)
+    assert any("Completed audit cycles: 69" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
