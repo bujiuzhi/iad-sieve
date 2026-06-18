@@ -875,6 +875,29 @@ Operational validity & Pair errors can propagate through transitive merges. & Ri
 \end{tabular}
 \end{table}
 
+\section{Reviewer-Facing Claim Checklist}
+
+Table~\ref{tab:reviewer-facing-claim-checklist} summarizes the claim boundary that should guide interpretation of the manuscript. The checklist is included to make the main evidence location, supported wording, and boundary before stronger wording explicit for readers. It also separates manuscript-supported conclusions from claims that require artifact-backed ablations, a manual-validation slice, or broader source-heldout validation.
+
+\begin{table}[H]
+\caption{Reviewer-facing claim checklist. Each row maps a common review dimension to the present evidence and the wording boundary that should not be crossed without additional artifacts.}
+\label{tab:reviewer-facing-claim-checklist}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.18\linewidth}L{0.26\linewidth}L{0.24\linewidth}L{0.22\linewidth}}
+\toprule
+Review dimension & Main evidence location & Supported wording & Boundary before stronger wording \\
+\midrule
+Contribution clarity & Introduction, problem formulation, and IAD-Bench contract. & The manuscript identifies identity-agenda confusion and HNFMR as a false-merge safety problem. & Do not frame the work as a universal replacement for entity resolution or scientific representation learning. \\
+Writing reproducibility & Method, implementation details, data/code availability, and supplementary protocol. & The repository supports code-level checks, fixture rebuilds, schema validation, and artifact-release preparation. & Full numerical audit requires external artifacts with predictions, logs, manifests, and checksums. \\
+Experimental strength & Open-v2 evidence snapshot, operating-point disclosure, and result audit trail. & Current evidence supports targeted false-merge suppression under the stated Open-v2 scope. & Stronger ranking claims require same-scope predictions, threshold logs, bootstrap intervals, and released metric tables. \\
+Evaluation completeness & Claim-evidence boundary, manual-validation boundary, and uncertainty requirements. & The manuscript separates gold, proxy, silver, and future manual-review evidence layers. & Component causality or human-gold claims require artifact-backed ablations, threshold grids, and a manual-validation slice. \\
+Method design soundness & Risk score rationale, merge-decision rule, and validity threats. & IAD-Risk exposes identity, agenda, ANI risk, thresholds, and cannot-link behavior. & Broad deployment claims require source-heldout validation, topic-heldout checks, and failure-case analysis. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Conclusion}
 
 IAD-Risk addresses a specific failure mode in scholarly entity matching: the tendency to confuse agenda similarity with work identity. By separating identity and agenda evidence and gating automatic merges through false-merge risk, the framework makes deduplication safer under stratified gold, proxy, and silver evaluation. The current evidence supports targeted false-merge suppression and a reproducible benchmark contract. Additional validation should expand independent manual review and source-heldout evaluation before the framework is used for broad method ranking across scholarly domains.
