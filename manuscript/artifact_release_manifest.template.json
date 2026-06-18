@@ -39,7 +39,7 @@
       "artifact_id": "open_v2_main_results",
       "required": true,
       "expected_location": "tables/open_v2_main_results.csv",
-      "claim_support": "Main Open-v2 result table with same-work F1, FMR, HNFMR, pair counts, and row scopes."
+      "claim_support": "Main Open-v2 result table with same-work F1, FMR, HNFMR, pair counts, row scopes, per-row denominator counts, per-row threshold source, and scope label used in the main table."
     },
     {
       "artifact_id": "iad_risk_predictions",

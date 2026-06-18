@@ -16,6 +16,12 @@ VALIDATOR_SCRIPT_PATH = PROJECT_ROOT / "manuscript" / "scripts" / "validate_arti
 MANIFEST_TEMPLATE_PATH = PROJECT_ROOT / "manuscript" / "artifact_release_manifest.template.json"
 README_TEMPLATE_PATH = PROJECT_ROOT / "manuscript" / "artifact_release_README.template.md"
 TEST_COMMIT = "0123456789abcdef0123456789abcdef01234567"
+OPEN_V2_MAIN_RESULTS_CSV = "\n".join(
+    [
+        "system,scope_type,same_work_f1,fmr,hnfmr,same_work_f1_denominator,fmr_denominator,hnfmr_denominator,threshold_source",
+        "IAD-Risk,Open-v2,0.61,0.08,0.12,100,200,50,threshold_selection_logs",
+    ]
+) + "\n"
 
 
 def _load_module(module_name: str, script_path: Path):
@@ -85,7 +91,10 @@ def _write_source_artifacts(source_dir: Path, skip_artifact_id: str | None = Non
             continue
         if row["artifact_id"] == skip_artifact_id:
             continue
-        _write_file(source_dir / row["expected_location"], f"{row['artifact_id']}\n")
+        if row["artifact_id"] == "open_v2_main_results":
+            _write_file(source_dir / row["expected_location"], OPEN_V2_MAIN_RESULTS_CSV)
+        else:
+            _write_file(source_dir / row["expected_location"], f"{row['artifact_id']}\n")
     _write_file(source_dir / "configs" / "model_config.json", '{"seed": 7}\n')
 
 

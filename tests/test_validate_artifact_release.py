@@ -76,7 +76,19 @@ def _write_complete_release(artifact_dir: Path, release_status: str = "release_c
     _write_file(artifact_dir / "README.md", "# IAD-Risk Artifact Release\n")
     _write_file(artifact_dir / "configs" / "model_config.json", '{"seed": 7}\n')
     for artifact_id, relative_path in artifact_locations.items():
-        _write_file(artifact_dir / relative_path, f"{artifact_id}\n")
+        if artifact_id == "open_v2_main_results":
+            _write_file(
+                artifact_dir / relative_path,
+                "\n".join(
+                    [
+                        "system,scope_type,same_work_f1,fmr,hnfmr,same_work_f1_denominator,fmr_denominator,hnfmr_denominator,threshold_source",
+                        "IAD-Risk,Open-v2,0.61,0.08,0.12,100,200,50,threshold_selection_logs",
+                    ]
+                )
+                + "\n",
+            )
+        else:
+            _write_file(artifact_dir / relative_path, f"{artifact_id}\n")
 
     required_artifacts = [
         {
@@ -158,6 +170,24 @@ def _refresh_checksums(artifact_dir: Path) -> None:
     (artifact_dir / "checksums.sha256").write_text("\n".join(checksum_lines) + "\n", encoding="utf-8")
 
 
+def _refresh_manifest_artifact_checksums(artifact_dir: Path) -> None:
+    """重新写入 manifest.json 中 artifact 文件的 SHA256。
+
+    参数:
+        artifact_dir: Release 目录。
+
+    返回:
+        无。
+    """
+    manifest_path = artifact_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    for row in manifest["required_artifacts"]:
+        location = row.get("expected_location")
+        if location:
+            row["sha256"] = _sha256_file(artifact_dir / location)
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+
 def test_validate_artifact_release_accepts_complete_release(tmp_path) -> None:
     """验证完整 artifact release 目录可通过校验。"""
 
@@ -168,6 +198,23 @@ def test_validate_artifact_release_accepts_complete_release(tmp_path) -> None:
     errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
 
     assert errors == []
+
+
+def test_validate_artifact_release_rejects_open_v2_results_without_row_audit_columns(tmp_path) -> None:
+    """验证 Open-v2 主结果表缺少行级审计列时会被拒绝。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    _write_file(artifact_dir / "tables" / "open_v2_main_results.csv", "system,same_work_f1,fmr,hnfmr\nIAD-Risk,0.1,0.2,0.3\n")
+    _refresh_manifest_artifact_checksums(artifact_dir)
+    _refresh_checksums(artifact_dir)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("scope_type" in error for error in errors)
+    assert any("same_work_f1_denominator" in error for error in errors)
+    assert any("threshold_source" in error for error in errors)
 
 
 def test_validate_artifact_release_rejects_missing_checksum_entry(tmp_path) -> None:

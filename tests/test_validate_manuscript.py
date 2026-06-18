@@ -2012,7 +2012,13 @@ def test_check_artifact_release_manifest_template_accepts_complete_template() ->
             "required_directories": ["configs", "tables", "predictions", "reports", "logs"],
             "required_top_level_files": ["README.md", "manifest.json", "checksums.sha256"],
             "required_artifacts": [
-                {"artifact_id": "open_v2_main_results"},
+                {
+                    "artifact_id": "open_v2_main_results",
+                    "claim_support": (
+                        "Main Open-v2 result table with same-work F1, FMR, HNFMR, pair counts, row scopes, "
+                        "per-row denominator counts, per-row threshold source, and scope label used in the main table."
+                    ),
+                },
                 {"artifact_id": "iad_risk_predictions"},
                 {"artifact_id": "representation_baseline_scores"},
                 {"artifact_id": "supervised_baseline_predictions"},
@@ -2065,6 +2071,24 @@ def test_check_artifact_release_manifest_template_accepts_complete_template() ->
     errors = module.check_artifact_release_manifest_template(template_text)
 
     assert errors == []
+
+
+def test_check_artifact_release_manifest_template_rejects_missing_result_row_audit_claim() -> None:
+    """验证 artifact release manifest 模板必须说明主结果表行级审计列。"""
+
+    module = _load_validate_manuscript_module()
+    template_path = Path(__file__).resolve().parents[1] / "manuscript" / "artifact_release_manifest.template.json"
+    template = json.loads(template_path.read_text(encoding="utf-8"))
+    for artifact_row in template["required_artifacts"]:
+        if artifact_row.get("artifact_id") == "open_v2_main_results":
+            artifact_row["claim_support"] = "Main Open-v2 result table."
+    template_text = json.dumps(template)
+
+    errors = module.check_artifact_release_manifest_template(template_text)
+
+    assert any("per-row denominator counts" in error for error in errors)
+    assert any("per-row threshold source" in error for error in errors)
+    assert any("scope label used in the main table" in error for error in errors)
 
 
 def test_check_artifact_release_manifest_template_rejects_unsafe_data_policy() -> None:
@@ -2257,6 +2281,9 @@ def test_check_artifact_release_readme_template_accepts_complete_template() -> N
             "python scripts/check_public_release.py",
             "## Required Artifact IDs",
             "open_v2_main_results",
+            "per-row denominator counts",
+            "per-row threshold source",
+            "scope label used in the main table",
             "iad_risk_predictions",
             "representation_baseline_scores",
             "supervised_baseline_predictions",
@@ -2287,6 +2314,26 @@ def test_check_artifact_release_readme_template_accepts_complete_template() -> N
     errors = module.check_artifact_release_readme_template(readme_text)
 
     assert errors == []
+
+
+def test_check_artifact_release_readme_template_rejects_missing_result_row_audit_description() -> None:
+    """验证 artifact release README 模板必须说明主结果表行级审计列。"""
+
+    module = _load_validate_manuscript_module()
+    readme_path = Path(__file__).resolve().parents[1] / "manuscript" / "artifact_release_README.template.md"
+    readme_text = readme_path.read_text(encoding="utf-8")
+    for marker in [
+        "per-row denominator counts",
+        "per-row threshold source",
+        "scope label used in the main table",
+    ]:
+        readme_text = readme_text.replace(marker, "")
+
+    errors = module.check_artifact_release_readme_template(readme_text)
+
+    assert any("per-row denominator counts" in error for error in errors)
+    assert any("per-row threshold source" in error for error in errors)
+    assert any("scope label used in the main table" in error for error in errors)
 
 
 def test_check_artifact_release_readme_template_rejects_missing_release_boundaries() -> None:

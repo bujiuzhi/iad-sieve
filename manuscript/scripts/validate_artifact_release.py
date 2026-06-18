@@ -8,6 +8,7 @@ boundaries, and no raw third-party data or local secrets.
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
 import json
 import logging
@@ -30,6 +31,17 @@ REQUIRED_ARTIFACT_IDS = {
     "supervised_baseline_predictions",
     "threshold_selection_logs",
     "iad_bench_split_summary",
+}
+OPEN_V2_MAIN_RESULTS_REQUIRED_COLUMNS = {
+    "system",
+    "scope_type",
+    "same_work_f1",
+    "fmr",
+    "hnfmr",
+    "same_work_f1_denominator",
+    "fmr_denominator",
+    "hnfmr_denominator",
+    "threshold_source",
 }
 EXPECTED_FALSE_DATA_POLICY_FIELDS = {
     "raw_third_party_data_included",
@@ -341,6 +353,32 @@ def check_repository_fields(manifest: dict[str, Any]) -> list[str]:
     return errors
 
 
+def check_open_v2_main_results_schema(csv_path: Path) -> list[str]:
+    """Check the Open-v2 main result table row-level audit schema.
+
+    参数:
+        csv_path: Path to tables/open_v2_main_results.csv.
+
+    返回:
+        list[str]: Error messages for missing required columns.
+    """
+    try:
+        with csv_path.open("r", encoding="utf-8", newline="") as file_handle:
+            reader = csv.reader(file_handle)
+            header = next(reader, None)
+    except OSError as exc:
+        return [f"open_v2_main_results.csv cannot be read: {exc}"]
+    if not header:
+        return ["open_v2_main_results.csv is empty or missing a header row"]
+
+    actual_columns = {column.strip() for column in header if column.strip()}
+    missing_columns = OPEN_V2_MAIN_RESULTS_REQUIRED_COLUMNS - actual_columns
+    return [
+        f"open_v2_main_results.csv missing row-level audit column: {column}"
+        for column in sorted(missing_columns)
+    ]
+
+
 def check_manifest_artifacts(
     manifest: dict[str, Any],
     template: dict[str, Any] | None,
@@ -406,6 +444,18 @@ def check_manifest_artifacts(
 
     for artifact_id in sorted(required_ids & set(artifact_rows)):
         check_artifact_payload(artifact_id, artifact_rows[artifact_id], "required_artifacts", True)
+
+    open_v2_row = artifact_rows.get("open_v2_main_results")
+    if isinstance(open_v2_row, dict):
+        open_v2_location = str(open_v2_row.get("expected_location", "")).strip()
+        open_v2_location_path = Path(open_v2_location)
+        if (
+            open_v2_location
+            and not open_v2_location_path.is_absolute()
+            and ".." not in open_v2_location_path.parts
+            and (artifact_dir / open_v2_location).is_file()
+        ):
+            errors.extend(check_open_v2_main_results_schema(artifact_dir / open_v2_location))
 
     claim_boundaries = manifest.get("claim_boundaries")
     if isinstance(claim_boundaries, dict):

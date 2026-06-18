@@ -1657,8 +1657,12 @@ def check_artifact_release_manifest_template(template_text: str) -> list[str]:
     if not isinstance(artifacts, list):
         errors.append("artifact release manifest template missing required_artifacts list")
         artifact_ids: set[str] = set()
+        artifact_rows_by_id: dict[str, dict[str, object]] = {}
     else:
         artifact_ids = {str(row.get("artifact_id", "")) for row in artifacts if isinstance(row, dict)}
+        artifact_rows_by_id = {
+            str(row.get("artifact_id", "")): row for row in artifacts if isinstance(row, dict)
+        }
     required_artifact_ids = {
         "open_v2_main_results",
         "iad_risk_predictions",
@@ -1681,6 +1685,19 @@ def check_artifact_release_manifest_template(template_text: str) -> list[str]:
     for artifact_id in conditional_artifact_ids:
         if artifact_id not in artifact_ids:
             errors.append(f"artifact release manifest template missing conditional artifact: {artifact_id}")
+    open_v2_row = artifact_rows_by_id.get("open_v2_main_results")
+    if isinstance(open_v2_row, dict):
+        claim_support = str(open_v2_row.get("claim_support", ""))
+        for marker in [
+            "per-row denominator counts",
+            "per-row threshold source",
+            "scope label used in the main table",
+        ]:
+            if marker not in claim_support:
+                errors.append(
+                    "artifact release manifest template open_v2_main_results "
+                    f"claim_support missing marker: {marker}"
+                )
 
     validation_commands = template.get("minimum_validation_commands")
     if not isinstance(validation_commands, list):
@@ -1786,6 +1803,9 @@ def check_artifact_release_readme_template(readme_text: str) -> list[str]:
         "python scripts/check_public_release.py",
         "Required Artifact IDs",
         "open_v2_main_results",
+        "per-row denominator counts",
+        "per-row threshold source",
+        "scope label used in the main table",
         "iad_risk_predictions",
         "representation_baseline_scores",
         "supervised_baseline_predictions",

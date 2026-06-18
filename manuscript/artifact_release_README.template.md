@@ -43,6 +43,7 @@ python scripts/check_public_release.py
 ## Required Artifact IDs
 
 - open_v2_main_results
+  - tables/open_v2_main_results.csv must include per-row denominator counts, per-row threshold source, and scope label used in the main table.
 - iad_risk_predictions
 - representation_baseline_scores
 - supervised_baseline_predictions
