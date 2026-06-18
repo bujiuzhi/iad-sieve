@@ -604,6 +604,52 @@ def test_check_artifact_release_manifest_template_rejects_unsafe_data_policy() -
     assert any("sha256sum -c checksums.sha256" in error for error in errors)
 
 
+def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
+    """验证投稿系统上传清单覆盖文件、元数据和阻断项时可通过。"""
+
+    module = _load_validate_manuscript_module()
+    checklist_text = "\n".join(
+        [
+            "# Submission System Checklist",
+            "This is not a manuscript file for journal upload.",
+            "## Required Upload Files",
+            "Main manuscript source",
+            "Main manuscript PDF",
+            "Supplementary source",
+            "Supplementary PDF",
+            "Bibliography",
+            "Cover letter",
+            "Highlights",
+            "Keywords",
+            "Submission metadata",
+            "Artifact release manifest",
+            "## Final Metadata Checks",
+            "## File Hygiene Checks",
+            "No `data/`, `outputs/`, cache, local connection, credential, or raw third-party file.",
+            "## Current Blocking Items",
+            "Target journal has not been author-confirmed.",
+            "Artifact release URL or DOI has not been created.",
+        ]
+    )
+
+    errors = module.check_submission_system_checklist(checklist_text)
+
+    assert errors == []
+
+
+def test_check_submission_system_checklist_rejects_missing_hygiene_boundary() -> None:
+    """验证投稿系统上传清单缺少文件卫生边界时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    checklist_text = "# Submission System Checklist\n## Required Upload Files\nMain manuscript source"
+
+    errors = module.check_submission_system_checklist(checklist_text)
+
+    assert any("File Hygiene Checks" in error for error in errors)
+    assert any("raw third-party file" in error for error in errors)
+    assert any("Artifact release URL or DOI" in error for error in errors)
+
+
 def test_check_cover_letter_accepts_required_submission_statements() -> None:
     """验证 cover letter 含正式投稿声明时可通过检查。"""
 

@@ -28,6 +28,7 @@ REQUIRED_FILES = [
     ROOT / "keywords.md",
     ROOT / "target_journal_shortlist.md",
     ROOT / "artifact_release_manifest.template.json",
+    ROOT / "submission_system_checklist.md",
     ROOT / "submission_metadata.yml",
     ROOT / "scripts" / "validate_manuscript.py",
     ROOT / "scripts" / "verify_fixture_rebuild.py",
@@ -694,6 +695,43 @@ def check_artifact_release_manifest_template(template_text: str) -> list[str]:
     return errors
 
 
+def check_submission_system_checklist(checklist_text: str) -> list[str]:
+    """Check whether the final upload checklist covers system-file review needs.
+
+    参数:
+        checklist_text: Submission system checklist Markdown text.
+
+    返回:
+        list[str]: Error messages for missing upload-checklist markers.
+    """
+    required_markers = [
+        "# Submission System Checklist",
+        "not a manuscript file for journal upload",
+        "Required Upload Files",
+        "Final Metadata Checks",
+        "File Hygiene Checks",
+        "Current Blocking Items",
+        "Main manuscript source",
+        "Main manuscript PDF",
+        "Supplementary source",
+        "Supplementary PDF",
+        "Bibliography",
+        "Cover letter",
+        "Highlights",
+        "Keywords",
+        "Submission metadata",
+        "Artifact release manifest",
+        "No `data/`, `outputs/`, cache, local connection, credential, or raw third-party file",
+        "Target journal has not been author-confirmed",
+        "Artifact release URL or DOI has not been created",
+    ]
+    return [
+        f"submission system checklist missing marker: {marker}"
+        for marker in required_markers
+        if marker not in checklist_text
+    ]
+
+
 def check_related_work_positioning(manuscript_text: str) -> list[str]:
     """Check whether related work includes closest-work positioning.
 
@@ -891,6 +929,10 @@ def check_submission_metadata(metadata_text: str) -> list[str]:
         "artifact_release_url: \"\"",
         "artifact_release_doi: \"\"",
         "artifact_release_required_before_final_upload: true",
+        "upload_preparation:",
+        "submission_system_checklist_file: \"submission_system_checklist.md\"",
+        "live_submission_system_verified: false",
+        "final_upload_package_verified_against_system: false",
         "final_upload_checklist:",
         "target_journal_selected: false",
         "target_journal_template_applied: false",
@@ -1061,6 +1103,10 @@ def main() -> int:
     artifact_release_template_text = (
         artifact_release_template_path.read_text(encoding="utf-8") if artifact_release_template_path.exists() else ""
     )
+    submission_system_checklist_path = ROOT / "submission_system_checklist.md"
+    submission_system_checklist_text = (
+        submission_system_checklist_path.read_text(encoding="utf-8") if submission_system_checklist_path.exists() else ""
+    )
     cover_letter_path = ROOT / "cover_letter.md"
     cover_letter_text = cover_letter_path.read_text(encoding="utf-8") if cover_letter_path.exists() else ""
     submission_metadata_path = ROOT / "submission_metadata.yml"
@@ -1100,6 +1146,7 @@ def main() -> int:
     errors.extend(check_environment_setup(supplementary_text))
     errors.extend(check_target_journal_shortlist(target_journal_shortlist_text))
     errors.extend(check_artifact_release_manifest_template(artifact_release_template_text))
+    errors.extend(check_submission_system_checklist(submission_system_checklist_text))
     errors.extend(check_manual_validation_protocol(supplementary_text))
     errors.extend(check_result_claim_boundary(manuscript_text, supplementary_text))
     errors.extend(check_highlights(highlights_text))

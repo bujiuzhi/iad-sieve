@@ -44,6 +44,11 @@ artifact_boundary:
   artifact_release_doi: ""
   artifact_release_required_before_final_upload: true
 
+upload_preparation:
+  submission_system_checklist_file: "submission_system_checklist.md"
+  live_submission_system_verified: false
+  final_upload_package_verified_against_system: false
+
 final_upload_checklist:
   target_journal_selected: false
   target_journal_template_applied: false
