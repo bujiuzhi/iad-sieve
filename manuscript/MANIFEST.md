@@ -72,7 +72,7 @@ Artifact release 的 `repository.commit` 必须是 7 到 40 位十六进制 Git 
 
 `iad_risk_predictions`、`representation_baseline_scores`、`supervised_baseline_predictions` 和 `threshold_selection_logs` 是外部结果 artifact 的行级预测与阈值证据。预测与分数 JSONL 必须记录 `pair_id`、`source_document_id`、`target_document_id`、expected labels、label strength、hard-negative level、split identifiers、`score_field` 或概率字段、`threshold_value`、threshold source 和 `merge_prediction`。阈值日志必须记录 system、threshold_name、`threshold_value`、selection_split、selection_metric、selection_rule、applied_scope 和 `score_field`，用于证明阈值来自固定验证流程而不是测试后选择。
 
-`final_upload_information_request.md` 用于收集正式上传前的 Author list、Corresponding author、Funding statement、Author contribution statement、Permissions statement、Artifact release URL or DOI 和 Live submission-system fields。该文件不作为正式投稿附件；作者确认这些外部输入后，再同步更新 `submission_metadata.yml`、投稿信和目标期刊系统字段。
+`final_upload_information_request.md` 用于收集正式上传前的 Author list、Corresponding author、Funding statement、Author contribution statement、Permissions statement、Generative AI declaration、Artifact release URL or DOI 和 Live submission-system fields。该文件不作为正式投稿附件；作者确认这些外部输入后，再同步更新 `submission_metadata.yml`、投稿信和目标期刊系统字段。
 
 `submission_system_checklist.md` 用于正式上传前逐项核对文件、元数据、PDF 和 artifact release，不作为当前匿名预投稿包的替代物。
 
@@ -86,4 +86,4 @@ Artifact release 的 `repository.commit` 必须是 7 到 40 位十六进制 Git 
 
 ## 正式上传检查项
 
-`submission_metadata.yml` 中的 `final_upload_checklist` 记录正式上传前必须完成的项目。当前预投稿包保持匿名预投稿状态；正式上传前应至少完成目标期刊选择、期刊模板套用、作者信息、通讯作者信息、经费声明文本、作者贡献声明、第三方材料许可声明、模板后 PDF 重建、投稿系统文件核对和 artifact release 链接。`scripts/submission_metadata_checks.py` 对最终上传元数据执行结构检查，包括作者邮箱、ORCID、经费声明文本、作者贡献声明、permissions statement 和 artifact release URL/DOI。
+`submission_metadata.yml` 中的 `final_upload_checklist` 记录正式上传前必须完成的项目。当前预投稿包保持匿名预投稿状态；正式上传前应至少完成目标期刊选择、期刊模板套用、作者信息、通讯作者信息、经费声明文本、作者贡献声明、第三方材料许可声明、生成式 AI 使用声明、模板后 PDF 重建、投稿系统文件核对和 artifact release 链接。`scripts/submission_metadata_checks.py` 对最终上传元数据执行结构检查，包括作者邮箱、ORCID、经费声明文本、作者贡献声明、permissions statement、generative AI declaration 和 artifact release URL/DOI。

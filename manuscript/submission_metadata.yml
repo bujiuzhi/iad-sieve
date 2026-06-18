@@ -58,6 +58,14 @@ permissions:
   permissions_statement: ""
   permission_files: []
 
+generative_ai:
+  declaration_required_before_final_upload: true
+  ai_tools_used_in_manuscript_preparation: ""
+  declaration_statement: ""
+  author_review_and_responsibility_confirmed: false
+  ai_not_listed_as_author_confirmed: false
+  ai_generated_images_or_artwork_included: false
+
 repository_reference:
   repository_url: ""
   repository_commit: ""
@@ -91,6 +99,7 @@ final_upload_checklist:
   funding_statement_text_ready: false
   contribution_statement_complete: false
   permissions_statement_complete: false
+  generative_ai_declaration_complete: false
   manuscript_pdf_rebuilt_after_template: false
   supplementary_pdf_rebuilt_after_template: false
   submission_system_files_verified: false

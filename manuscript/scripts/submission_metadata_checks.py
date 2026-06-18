@@ -22,6 +22,7 @@ FINAL_UPLOAD_BLOCKED_MARKERS = {
     "funding_statement_text_ready: false": "funding statement text checklist item is incomplete",
     "contribution_statement_complete: false": "author contribution statement checklist item is incomplete",
     "permissions_statement_complete: false": "permissions statement checklist item is incomplete",
+    "generative_ai_declaration_complete: false": "generative AI declaration checklist item is incomplete",
     "manuscript_pdf_rebuilt_after_template: false": "manuscript PDF rebuild checklist item is incomplete",
     "supplementary_pdf_rebuilt_after_template: false": "supplementary PDF rebuild checklist item is incomplete",
     "submission_system_files_verified: false": "submission system file checklist item is incomplete",
@@ -81,6 +82,7 @@ FINAL_UPLOAD_TRUE_FIELDS = {
     "funding_statement_text_ready": "funding statement text checklist item is incomplete",
     "contribution_statement_complete": "author contribution statement checklist item is incomplete",
     "permissions_statement_complete": "permissions statement checklist item is incomplete",
+    "generative_ai_declaration_complete": "generative AI declaration checklist item is incomplete",
     "manuscript_pdf_rebuilt_after_template": "manuscript PDF rebuild checklist item is incomplete",
     "supplementary_pdf_rebuilt_after_template": "supplementary PDF rebuild checklist item is incomplete",
     "submission_system_files_verified": "submission system file checklist item is incomplete",
@@ -741,6 +743,35 @@ def check_permissions_statement(metadata_text: str) -> list[str]:
     return errors
 
 
+def check_generative_ai_declaration(metadata_text: str) -> list[str]:
+    """Check whether final-upload metadata declares AI-tool use status.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages for missing or unsafe generative AI declaration fields.
+    """
+    generative_ai_row = parse_mapping_section(metadata_text, "generative_ai")
+    ai_tools_used = generative_ai_row.get("ai_tools_used_in_manuscript_preparation", "")
+    declaration_statement = generative_ai_row.get("declaration_statement", "")
+    author_review_confirmed = generative_ai_row.get("author_review_and_responsibility_confirmed", "").lower() == "true"
+    ai_author_excluded = generative_ai_row.get("ai_not_listed_as_author_confirmed", "").lower() == "true"
+    ai_artwork_included = generative_ai_row.get("ai_generated_images_or_artwork_included", "").lower() == "true"
+    errors: list[str] = []
+    if not ai_tools_used:
+        errors.append("generative AI use status is missing")
+    if not declaration_statement:
+        errors.append("generative AI declaration statement is missing")
+    if not author_review_confirmed:
+        errors.append("generative AI author review confirmation is incomplete")
+    if not ai_author_excluded:
+        errors.append("AI authorship exclusion confirmation is incomplete")
+    if ai_artwork_included:
+        errors.append("machine-generated figures or artwork are not cleared for the selected submission route")
+    return errors
+
+
 def check_final_upload_cover_letter_text(cover_letter_text: str, metadata_text: str) -> list[str]:
     """Check final-upload cover letter target and artifact boundaries.
 
@@ -821,6 +852,7 @@ def check_final_upload_metadata_text(metadata_text: str) -> list[str]:
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_research_data_statement(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_author_contribution_statement(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_permissions_statement(metadata_text))
+    errors.extend(f"final upload metadata unresolved: {message}" for message in check_generative_ai_declaration(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_artifact_release_link(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_repository_reference(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_final_upload_review_mode(metadata_text))

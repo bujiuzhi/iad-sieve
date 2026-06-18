@@ -16,6 +16,7 @@ Repository URL and commit binding: keep the source `repository_reference` fields
 | Funding statement | `funding`, `statements`, `final_upload_checklist.funding_statement_text_ready` | Manuscript declarations and live submission system |
 | Author contribution statement | `author_contributions`, `final_upload_checklist.contribution_statement_complete` | Manuscript declarations and live submission system |
 | Permissions statement | `permissions`, `final_upload_checklist.permissions_statement_complete` | Manuscript declarations and permission files, if required |
+| Generative AI declaration | `generative_ai`, `final_upload_checklist.generative_ai_declaration_complete` | Manuscript declaration section and live submission system |
 | Data and code availability statement | `repository_reference`, `artifact_boundary`, `statements.research_data_statement` | Manuscript declarations and research-data statement field |
 | Artifact release | `artifact_boundary`, `final_upload_checklist.artifact_release_prepared_or_linked` | Public artifact record and live submission system |
 | PDF and system checks | `final_upload_checklist.manuscript_pdf_rebuilt_after_template`, `final_upload_checklist.supplementary_pdf_rebuilt_after_template`, `final_upload_checklist.submission_system_files_verified` | Rebuilt PDFs and live submission system |
@@ -76,6 +77,16 @@ For each author, select the applicable CRediT roles and then draft the final aut
 - Permissions statement text finalized even when no third-party material permission is required:
 - License or approval record:
 - Figure/table reuse notes:
+
+## Generative AI declaration
+
+- AI tools used in manuscript preparation:
+- Final generative AI declaration statement:
+- Author review and responsibility confirmed:
+- AI tool not listed as author or co-author:
+- Machine-generated figures, images, or artwork included:
+- If no AI tools were used, final no-use wording:
+- If only copy editing tools were used, target-journal exception confirmed:
 
 ## Declarations
 
@@ -148,6 +159,7 @@ For each author, select the applicable CRediT roles and then draft the final aut
 - funding_statement_text_ready:
 - contribution_statement_complete:
 - permissions_statement_complete:
+- generative_ai_declaration_complete:
 - manuscript_pdf_rebuilt_after_template:
 - supplementary_pdf_rebuilt_after_template:
 - submission_system_files_verified:

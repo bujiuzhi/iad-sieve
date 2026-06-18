@@ -10,13 +10,13 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 18.
+Completed audit cycles: 19.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, artifact release README completeness, artifact release commit validity, prediction artifact schema drift, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, artifact release README completeness, artifact release commit validity, prediction artifact schema drift, generative AI declaration consistency, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.
 
-Non-code external inputs still required: author metadata, target-journal confirmation, funding statement, author contribution statement, permissions statement, live submission-system fields, and artifact release URL or DOI.
+Non-code external inputs still required: author metadata, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.
 
 Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.
 
@@ -41,6 +41,7 @@ Next revision trigger: repeat the editorial desk check after target-journal temp
 | Confidence intervals and statistical significance may be overread. | Medium | The manuscript reports point estimates and adds a statistical interpretation boundary that reserves bootstrap intervals, significance tests, and model-ranking claims for artifact-backed evidence. | Release bootstrap intervals, predefined tests, resampling logs, random seeds, and checksums before claiming interval-supported superiority. |
 | First-screen submission materials may drift in claim scope. | Medium | Title, abstract, conclusion, cover letter, highlights, and keywords are checked for editorial claim alignment around the same problem, method, evidence snapshot, and claim boundary. | Re-run the editorial alignment gate after template conversion or journal-specific cover-letter edits. |
 | Live submission-system text may drift from source files. | Medium | The final-upload information request and submission-system checklist require title, abstract, keywords, and highlights to be copied from source files and previewed in the live submission system. | Mark `submission_system_files_verified` true only after these fields match `main.tex`, `keywords.md`, and `highlights.md` in the live system. |
+| Generative AI declaration may be missing or inconsistent with the publisher policy. | Medium | Submission metadata, final-upload information request, target-journal shortlist, and submission-system checklist now require AI-tool use status, author responsibility confirmation, AI authorship exclusion, and machine-generated figure/artwork status. | Complete the final journal-specific declaration wording and keep it consistent across the manuscript, metadata, and live submission system. |
 | Reproducibility depends on files outside Git. | Medium | Fixture rebuild, public-source commands, artifact manifest template, and checksums policy are documented. | Publish the L3 artifact release and link it in submission metadata. |
 | Final upload may mismatch journal template or system fields. | High | A submission-system checklist records file, metadata, PDF, artifact, source-archive, and template-binding checks. | Confirm target journal, set `target_journal_template_bound`, rebuild the final template source and PDFs, and verify the live system fields. |
 
@@ -92,7 +93,7 @@ The manuscript avoids unsupported broad-superiority, human-gold, and threshold-s
 
 Outcome: blocked for final upload.
 
-The template-independent package is internally consistent, but final upload remains blocked until the target journal, journal template, author metadata, corresponding-author metadata, funding statement, author contribution statement, third-party material permission statement, final template-specific PDFs, live submission-system fields, and artifact release link are completed.
+The template-independent package is internally consistent, but final upload remains blocked until the target journal, journal template, author metadata, corresponding-author metadata, funding statement, author contribution statement, third-party material permission statement, generative AI declaration, final template-specific PDFs, live submission-system fields, and artifact release link are completed.
 
 ## Audit Cycle 3: Q2/B Acceptance Gate
 
@@ -127,7 +128,7 @@ This cycle separates reviewer questions that can be answered from the current ma
 | The table mixes pair scopes and may not support a ranking. | `limited_answer` | Treat Open-v2 as a scope-bounded evidence snapshot and cite operating-point and scope-compatibility disclosures. | Do not claim method ranking, SOTA performance, or interval-supported superiority without same-scope prediction artifacts and bootstrap logs. |
 | The mechanism may not be causal without ablations. | `do_not_answer_as_claim` | Use only the current mechanism-consistent wording. | Do not claim completed component causality before no-gate, no-ANI, single-space, and threshold-grid artifacts are released. |
 | The result cannot be fully reproduced from Git alone. | `limited_answer` | Distinguish fixture-level code reproduction from L2/L3 artifact reproduction. | Do not imply full numerical audit until the external artifact release URL or DOI, manifest, and checksums are available. |
-| The paper is ready for final upload. | `do_not_answer_as_claim` | State that the anonymous pre-submission package validates, but final upload is still gated. | Do not state final-upload readiness until target journal, author metadata, funding statement, author contribution statement, permissions statement, final PDFs, live system fields, and artifact release link are complete. |
+| The paper is ready for final upload. | `do_not_answer_as_claim` | State that the anonymous pre-submission package validates, but final upload is still gated. | Do not state final-upload readiness until target journal, author metadata, funding statement, author contribution statement, permissions statement, generative AI declaration, final PDFs, live system fields, and artifact release link are complete. |
 
 ## Revision Trigger Register
 
@@ -229,7 +230,7 @@ Outcome: pass for package-builder coverage; blocked for final upload until targe
 
 This cycle closes a source-control binding edge case in the final-upload workflow. A tracked `submission_metadata.yml` file cannot reliably contain the Git commit of the commit that contains itself, because changing the file changes the commit hash. The final-upload package builder therefore keeps the source metadata eligible for anonymous pre-submission, reads `git remote origin`, `git rev-parse HEAD`, and the current branch during `--final-upload`, and writes `repository_url`, `repository_commit`, `repository_branch`, and the matching data/code availability statement into the package copy of `submission_metadata.yml`.
 
-The reviewer-facing boundary is traceability rather than new evidence. This gate ensures that the final package metadata and `submission_manifest.json` agree on the committed source revision used for upload. It does not solve the remaining external blockers: the package still needs confirmed author metadata, target-journal template binding, funding and contribution declarations, permissions wording, live submission-system verification, and an artifact release URL or DOI before final upload can pass.
+The reviewer-facing boundary is traceability rather than new evidence. This gate ensures that the final package metadata and `submission_manifest.json` agree on the committed source revision used for upload. It does not solve the remaining external blockers: the package still needs confirmed author metadata, target-journal template binding, funding and contribution declarations, permissions wording, generative AI declaration wording, live submission-system verification, and an artifact release URL or DOI before final upload can pass.
 
 ## Audit Cycle 18: Prediction Artifact Schema Gate
 
@@ -239,6 +240,14 @@ This cycle checks whether final-upload review instructions match the row-level p
 
 The reviewer-facing boundary is auditability rather than new empirical strength. A schema-complete prediction artifact lets reviewers recompute row-level decisions, denominators, and fixed operating points from the released files. It does not by itself establish threshold stability, statistical superiority, ablation causality, human-gold validation, or cluster-level quality; those remain gated by the optional artifacts and claim flags.
 
+## Audit Cycle 19: Generative AI Declaration Gate
+
+Outcome: pass for checklist and metadata validator coverage; blocked for final upload until the selected journal's live declaration wording is completed.
+
+This cycle separates publisher-required AI-tool disclosure from removable process notes. Formal manuscript files, cover-letter text, highlights, keywords, and submission packages must not contain development logs, assistant work summaries, or unexplained process traces. At the same time, the final upload workflow must record the actual AI-tool use status required by the selected publisher, confirm author review and responsibility, confirm that AI tools are not listed as authors, and confirm whether machine-generated figures, images, or artwork are included.
+
+The reviewer-facing boundary is compliance rather than scientific evidence. A completed generative AI declaration does not strengthen the method or experiments, but a missing or inconsistent declaration can trigger desk-check or production-stage issues. The declaration must therefore match `submission_metadata.yml`, `final_upload_information_request.md`, the manuscript declaration section if required by the target journal, and the live submission-system field before `generative_ai_declaration_complete` can be set to true.
+
 ## Minimum Gate Before Final Upload
 
 The manuscript should not be uploaded to a journal system until all of the following are true:
@@ -247,7 +256,7 @@ The manuscript should not be uploaded to a journal system until all of the follo
 2. `main.tex` or the selected journal source is converted to the selected journal template and rebuilt.
 3. `supplementary_material.tex` is rebuilt after any final source edits.
 4. The artifact release has a real URL or DOI, validates against its checksum file, and records the same repository commit used by the final manuscript package.
-5. The funding statement text, author contribution statement, permissions statement, data/code availability statement, and journal-specific research data statement are complete and consistent with the live submission system, with CRediT roles covering every listed author and with the repository URL, repository commit, and artifact URL or DOI embedded in the availability statements.
+5. The funding statement text, author contribution statement, permissions statement, generative AI declaration, data/code availability statement, and journal-specific research data statement are complete and consistent with the live submission system, with CRediT roles covering every listed author and with the repository URL, repository commit, and artifact URL or DOI embedded in the availability statements.
 6. `python manuscript/scripts/verify_fixture_rebuild.py` passes from the public source tree without requiring raw third-party data.
 7. `python scripts/check_public_release.py` passes and confirms that `data/`, `outputs/`, caches, credentials, and large local artifacts are outside the public package.
 8. `python manuscript/scripts/validate_manuscript.py --strict-latex` passes.

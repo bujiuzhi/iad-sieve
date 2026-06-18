@@ -111,6 +111,7 @@ def test_check_final_upload_information_request_rejects_missing_credit_roles() -
             "`funding`, `statements`, `final_upload_checklist.funding_statement_text_ready`",
             "`author_contributions`, `final_upload_checklist.contribution_statement_complete`",
             "`permissions`, `final_upload_checklist.permissions_statement_complete`",
+            "`generative_ai`, `final_upload_checklist.generative_ai_declaration_complete`",
             "`repository_reference`, `artifact_boundary`, `statements.research_data_statement`",
             "`artifact_boundary`, `final_upload_checklist.artifact_release_prepared_or_linked`",
             "`final_upload_checklist.manuscript_pdf_rebuilt_after_template`",
@@ -123,6 +124,11 @@ def test_check_final_upload_information_request_rejects_missing_credit_roles() -
             "Funding statement",
             "Author contribution statement",
             "Permissions statement",
+            "Generative AI declaration",
+            "AI tools used in manuscript preparation",
+            "Author review and responsibility confirmed",
+            "AI tool not listed as author or co-author",
+            "Machine-generated figures, images, or artwork included",
             "Competing interests",
             "Ethics statement",
             "Data and code availability statement",
@@ -2421,6 +2427,11 @@ def test_check_target_journal_shortlist_accepts_complete_shortlist() -> None:
             "Add the real artifact URL or DOI before final upload.",
             "Information Systems data statement is required.",
             "CRediT author contribution statement.",
+            "generative AI declaration.",
+            "AI-tool use.",
+            "AI tools as authors.",
+            "large-language-model use should be documented.",
+            "copy-editing-only tool use.",
             "Metrics are screening signals, not ranking proof.",
             "Review model and author metadata rules determine anonymization.",
             "Data statement and artifact link requirements determine final-upload blockers.",
@@ -2481,6 +2492,7 @@ def test_check_target_journal_shortlist_rejects_missing_current_source_snapshot(
     assert any("Official source snapshot date: 2026-06-18" in error for error in errors)
     assert any("Information Systems data statement is required" in error for error in errors)
     assert any("CRediT author contribution statement" in error for error in errors)
+    assert any("generative AI declaration" in error for error in errors)
 
 
 def test_check_target_journal_shortlist_rejects_missing_dke_preflight() -> None:
@@ -3271,6 +3283,7 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "The funding role is stated when funding exists.",
             "Permission files are listed when third-party permission is required.",
             "The data availability statement matches artifact release status.",
+            "The generative AI declaration records AI tool use status, author review and responsibility, AI authorship exclusion, and whether any machine-generated figures, images, or artwork are included.",
             "## Cover Letter Customization Checks",
             "The cover letter names the selected target journal.",
             "The cover letter states the final article type.",
@@ -3303,6 +3316,7 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "The funding statement is completed and matches the manuscript and submission system.",
             "The author contribution statement is completed before final upload.",
             "The permissions statement records third-party material permission status.",
+            "The generative AI declaration statement is complete and matches the selected journal's live submission field.",
             "## File Hygiene Checks",
             "No `data/`, `outputs/`, cache, local connection, credential, or raw third-party file.",
             "Anonymous packages contain no author email addresses, ORCID values, personal account URLs, local absolute paths, or development process notes.",
@@ -3739,10 +3753,10 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 18.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, artifact release README completeness, artifact release commit validity, prediction artifact schema drift, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
+            "Completed audit cycles: 19.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, artifact release README completeness, artifact release commit validity, prediction artifact schema drift, generative AI declaration consistency, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.",
-            "Non-code external inputs still required: author metadata, target-journal confirmation, funding statement, author contribution statement, permissions statement, live submission-system fields, and artifact release URL or DOI.",
+            "Non-code external inputs still required: author metadata, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
             "## Audit Dimensions",
             "Contribution",
@@ -3909,6 +3923,14 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "applied_scope",
             "score_field",
             "recompute row-level decisions, denominators, and fixed operating points",
+            "## Audit Cycle 19: Generative AI Declaration Gate",
+            "publisher-required AI-tool disclosure",
+            "removable process notes",
+            "AI-tool use status",
+            "author review and responsibility",
+            "AI tools are not listed as authors",
+            "machine-generated figures, images, or artwork",
+            "generative_ai_declaration_complete",
             "data/",
             "outputs/",
             "## Minimum Gate Before Final Upload",
@@ -3929,7 +3951,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 18",
+        "Completed audit cycles: 19",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -3940,7 +3962,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 18" in error for error in errors)
+    assert any("Completed audit cycles: 19" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -4287,6 +4309,32 @@ def test_check_reviewer_readiness_audit_rejects_missing_prediction_artifact_sche
     assert any("threshold_selection_logs" in error for error in errors)
     assert any("merge_prediction" in error for error in errors)
     assert any("selection_rule" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_generative_ai_declaration_gate() -> None:
+    """验证审稿准备度审计必须覆盖生成式 AI 声明门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Audit Cycle 19: Generative AI Declaration Gate",
+        "generative AI declaration consistency",
+        "publisher-required AI-tool disclosure",
+        "removable process notes",
+        "AI-tool use status",
+        "author review and responsibility",
+        "AI tools are not listed as authors",
+        "machine-generated figures, images, or artwork",
+        "generative_ai_declaration_complete",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Generative AI Declaration Gate" in error for error in errors)
+    assert any("generative AI declaration consistency" in error for error in errors)
+    assert any("AI-tool use status" in error for error in errors)
+    assert any("machine-generated figures, images, or artwork" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_final_gate() -> None:
@@ -5156,6 +5204,94 @@ def test_check_formal_manuscript_review_language_rejects_internal_audit_labels()
     assert any("Reviewer use" in error for error in errors)
 
 
+def _build_filled_final_upload_metadata_text(
+    generative_ai_lines: list[str] | None = None,
+    generative_ai_declaration_complete: bool = True,
+) -> str:
+    """构造用于 final-upload 门禁测试的完整投稿元数据文本。
+
+    参数:
+        generative_ai_lines: 生成式 AI 声明区的 YAML 行；None 表示使用合规默认值。
+        generative_ai_declaration_complete: final-upload checklist 中生成式 AI 声明项的状态。
+
+    返回:
+        str: 可传入 check_final_upload_metadata 的 YAML 文本。
+    """
+
+    if generative_ai_lines is None:
+        generative_ai_lines = [
+            "generative_ai:",
+            "  declaration_required_before_final_upload: true",
+            '  ai_tools_used_in_manuscript_preparation: "none"',
+            '  declaration_statement: "No generative AI tools were used in manuscript preparation."',
+            "  author_review_and_responsibility_confirmed: true",
+            "  ai_not_listed_as_author_confirmed: true",
+            "  ai_generated_images_or_artwork_included: false",
+        ]
+
+    checklist_value = str(generative_ai_declaration_complete).lower()
+    metadata_lines = [
+        'target_journal: "Journal of Scholarly Data"',
+        "target_journal_template_bound: true",
+        "authors:",
+        '  - name: "Example Author"',
+        '    affiliation: "Example University"',
+        '    email: "author@example.edu"',
+        '    orcid: "0000-0002-1825-0097"',
+        "corresponding_author:",
+        '  name: "Example Author"',
+        '  affiliation: "Example University"',
+        '  email: "author@example.edu"',
+        '  orcid: "0000-0002-1825-0097"',
+        "funding:",
+        "  no_external_funding_declared: true",
+        '  funding_statement: "The authors received no external funding for this work."',
+        "  funding_sources: []",
+        "  grant_numbers: []",
+        "statements:",
+        '  originality: "The manuscript is original, has not been published previously, and is not under consideration elsewhere."',
+        '  author_approval: "All listed authors have approved the submitted version."',
+        '  competing_interests: "The authors declare no competing interests."',
+        '  ethics: "This study uses public scholarly metadata and does not involve human participants."',
+        '  data_code_availability: "Source code and fixtures are available at https://example.org/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
+        "author_contributions:",
+        "  credit_taxonomy_required_before_final_upload: true",
+        '  contribution_statement: "Example Author: conceptualization, methodology, software, validation, and writing - original draft."',
+        "  roles:",
+        '    - author: "Example Author"',
+        '      credit_roles: "Conceptualization; Methodology; Software; Validation; Writing - original draft"',
+        "permissions:",
+        "  no_third_party_material_requiring_permission_declared: true",
+        "  third_party_material_requires_permission: false",
+        '  permissions_statement: "No third-party material requiring permission is included."',
+        "  permission_files: []",
+        *generative_ai_lines,
+        "repository_reference:",
+        '  repository_url: "https://example.org/iad-sieve.git"',
+        '  repository_commit: "abcdef1234567890"',
+        '  repository_branch: "main"',
+        "artifact_boundary:",
+        '  artifact_release_url: "https://doi.org/10.0000/example"',
+        '  artifact_release_doi: "10.0000/example"',
+        "final_upload_checklist:",
+        "  target_journal_selected: true",
+        "  article_type_confirmed: true",
+        "  review_mode_confirmed: true",
+        "  target_journal_template_applied: true",
+        "  author_metadata_completed: true",
+        "  corresponding_author_completed: true",
+        "  funding_statement_text_ready: true",
+        "  contribution_statement_complete: true",
+        "  permissions_statement_complete: true",
+        f"  generative_ai_declaration_complete: {checklist_value}",
+        "  manuscript_pdf_rebuilt_after_template: true",
+        "  supplementary_pdf_rebuilt_after_template: true",
+        "  submission_system_files_verified: true",
+        "  artifact_release_prepared_or_linked: true",
+    ]
+    return "\n".join(metadata_lines)
+
+
 def test_check_final_upload_metadata_rejects_placeholders() -> None:
     """验证 final-upload 门禁会拒绝未填写的投稿元数据。"""
 
@@ -5177,6 +5313,7 @@ def test_check_final_upload_metadata_rejects_placeholders() -> None:
             "funding_statement_text_ready: false",
             "contribution_statement_complete: false",
             "permissions_statement_complete: false",
+            "generative_ai_declaration_complete: false",
             "manuscript_pdf_rebuilt_after_template: false",
             "supplementary_pdf_rebuilt_after_template: false",
             "submission_system_files_verified: false",
@@ -5194,6 +5331,7 @@ def test_check_final_upload_metadata_rejects_placeholders() -> None:
     assert any("funding statement text checklist item is incomplete" in error for error in errors)
     assert any("author contribution statement checklist item is incomplete" in error for error in errors)
     assert any("permissions statement checklist item is incomplete" in error for error in errors)
+    assert any("generative AI declaration checklist item is incomplete" in error for error in errors)
     assert any("artifact release checklist item is incomplete" in error for error in errors)
 
 
@@ -5237,6 +5375,13 @@ def test_check_final_upload_metadata_accepts_filled_metadata() -> None:
             "  third_party_material_requires_permission: false",
             '  permissions_statement: "No third-party material requiring permission is included."',
             "  permission_files: []",
+            "generative_ai:",
+            "  declaration_required_before_final_upload: true",
+            "  ai_tools_used_in_manuscript_preparation: \"none\"",
+            "  declaration_statement: \"No generative AI tools were used in manuscript preparation.\"",
+            "  author_review_and_responsibility_confirmed: true",
+            "  ai_not_listed_as_author_confirmed: true",
+            "  ai_generated_images_or_artwork_included: false",
             "repository_reference:",
             '  repository_url: "https://example.org/iad-sieve.git"',
             '  repository_commit: "abcdef1234567890"',
@@ -5254,6 +5399,7 @@ def test_check_final_upload_metadata_accepts_filled_metadata() -> None:
             "  funding_statement_text_ready: true",
             "  contribution_statement_complete: true",
             "  permissions_statement_complete: true",
+            "  generative_ai_declaration_complete: true",
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
@@ -5264,6 +5410,45 @@ def test_check_final_upload_metadata_accepts_filled_metadata() -> None:
     errors = module.check_final_upload_metadata(metadata_text)
 
     assert errors == []
+
+
+def test_check_final_upload_metadata_rejects_missing_generative_ai_declaration() -> None:
+    """验证 final-upload 门禁拒绝缺失的生成式 AI 声明。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = _build_filled_final_upload_metadata_text(
+        generative_ai_lines=[],
+        generative_ai_declaration_complete=False,
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any("generative AI declaration checklist item is incomplete" in error for error in errors)
+    assert any("generative AI use status is missing" in error for error in errors)
+    assert any("generative AI declaration statement is missing" in error for error in errors)
+    assert any("generative AI author review confirmation is incomplete" in error for error in errors)
+    assert any("AI authorship exclusion confirmation is incomplete" in error for error in errors)
+
+
+def test_check_final_upload_metadata_rejects_ai_generated_artwork_without_clearance() -> None:
+    """验证 final-upload 门禁拒绝未被选刊路线允许的 AI 生成图像或 artwork。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = _build_filled_final_upload_metadata_text(
+        generative_ai_lines=[
+            "generative_ai:",
+            "  declaration_required_before_final_upload: true",
+            '  ai_tools_used_in_manuscript_preparation: "language editing"',
+            '  declaration_statement: "The authors reviewed and take responsibility for all manuscript content."',
+            "  author_review_and_responsibility_confirmed: true",
+            "  ai_not_listed_as_author_confirmed: true",
+            "  ai_generated_images_or_artwork_included: true",
+        ],
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any("machine-generated figures or artwork are not cleared for the selected submission route" in error for error in errors)
 
 
 def test_check_final_upload_metadata_rejects_missing_repository_reference() -> None:
@@ -5306,6 +5491,13 @@ def test_check_final_upload_metadata_rejects_missing_repository_reference() -> N
             "  third_party_material_requires_permission: false",
             '  permissions_statement: "No third-party material requiring permission is included."',
             "  permission_files: []",
+            "generative_ai:",
+            "  declaration_required_before_final_upload: true",
+            "  ai_tools_used_in_manuscript_preparation: \"none\"",
+            "  declaration_statement: \"No generative AI tools were used in manuscript preparation.\"",
+            "  author_review_and_responsibility_confirmed: true",
+            "  ai_not_listed_as_author_confirmed: true",
+            "  ai_generated_images_or_artwork_included: false",
             "artifact_boundary:",
             '  artifact_release_url: "https://doi.org/10.0000/example"',
             '  artifact_release_doi: "10.0000/example"',
@@ -5319,6 +5511,7 @@ def test_check_final_upload_metadata_rejects_missing_repository_reference() -> N
             "  funding_statement_text_ready: true",
             "  contribution_statement_complete: true",
             "  permissions_statement_complete: true",
+            "  generative_ai_declaration_complete: true",
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
@@ -5372,6 +5565,13 @@ def test_check_final_upload_metadata_rejects_data_code_statement_without_release
             "  third_party_material_requires_permission: false",
             '  permissions_statement: "No third-party material requiring permission is included."',
             "  permission_files: []",
+            "generative_ai:",
+            "  declaration_required_before_final_upload: true",
+            "  ai_tools_used_in_manuscript_preparation: \"none\"",
+            "  declaration_statement: \"No generative AI tools were used in manuscript preparation.\"",
+            "  author_review_and_responsibility_confirmed: true",
+            "  ai_not_listed_as_author_confirmed: true",
+            "  ai_generated_images_or_artwork_included: false",
             "repository_reference:",
             '  repository_url: "https://example.org/iad-sieve.git"',
             '  repository_commit: "abcdef1234567890"',
@@ -5389,6 +5589,7 @@ def test_check_final_upload_metadata_rejects_data_code_statement_without_release
             "  funding_statement_text_ready: true",
             "  contribution_statement_complete: true",
             "  permissions_statement_complete: true",
+            "  generative_ai_declaration_complete: true",
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
@@ -5434,6 +5635,7 @@ def test_check_final_upload_metadata_rejects_corresponding_author_outside_author
             "  funding_statement_text_ready: true",
             "  contribution_statement_complete: true",
             "  permissions_statement_complete: true",
+            "  generative_ai_declaration_complete: true",
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
@@ -5529,6 +5731,13 @@ def test_check_final_upload_metadata_rejects_no_external_funding_without_stateme
             "  third_party_material_requires_permission: false",
             '  permissions_statement: "No third-party material requiring permission is included."',
             "  permission_files: []",
+            "generative_ai:",
+            "  declaration_required_before_final_upload: true",
+            "  ai_tools_used_in_manuscript_preparation: \"none\"",
+            "  declaration_statement: \"No generative AI tools were used in manuscript preparation.\"",
+            "  author_review_and_responsibility_confirmed: true",
+            "  ai_not_listed_as_author_confirmed: true",
+            "  ai_generated_images_or_artwork_included: false",
             "repository_reference:",
             '  repository_url: "https://example.org/iad-sieve.git"',
             '  repository_commit: "abcdef1234567890"',
@@ -5646,6 +5855,13 @@ def test_check_final_upload_metadata_rejects_missing_research_data_statement_for
             "  third_party_material_requires_permission: false",
             '  permissions_statement: "No third-party material requiring permission is included."',
             "  permission_files: []",
+            "generative_ai:",
+            "  declaration_required_before_final_upload: true",
+            "  ai_tools_used_in_manuscript_preparation: \"none\"",
+            "  declaration_statement: \"No generative AI tools were used in manuscript preparation.\"",
+            "  author_review_and_responsibility_confirmed: true",
+            "  ai_not_listed_as_author_confirmed: true",
+            "  ai_generated_images_or_artwork_included: false",
             "repository_reference:",
             '  repository_url: "https://example.org/iad-sieve.git"',
             '  repository_commit: "abcdef1234567890"',
@@ -5713,6 +5929,13 @@ def test_check_final_upload_metadata_rejects_missing_research_data_statement_for
             "  third_party_material_requires_permission: false",
             '  permissions_statement: "No third-party material requiring permission is included."',
             "  permission_files: []",
+            "generative_ai:",
+            "  declaration_required_before_final_upload: true",
+            "  ai_tools_used_in_manuscript_preparation: \"none\"",
+            "  declaration_statement: \"No generative AI tools were used in manuscript preparation.\"",
+            "  author_review_and_responsibility_confirmed: true",
+            "  ai_not_listed_as_author_confirmed: true",
+            "  ai_generated_images_or_artwork_included: false",
             "artifact_boundary:",
             '  artifact_release_url: "https://doi.org/10.0000/example"',
             '  artifact_release_doi: "10.0000/example"',
@@ -5777,6 +6000,13 @@ def test_check_final_upload_metadata_rejects_research_data_statement_without_art
             "  third_party_material_requires_permission: false",
             '  permissions_statement: "No third-party material requiring permission is included."',
             "  permission_files: []",
+            "generative_ai:",
+            "  declaration_required_before_final_upload: true",
+            "  ai_tools_used_in_manuscript_preparation: \"none\"",
+            "  declaration_statement: \"No generative AI tools were used in manuscript preparation.\"",
+            "  author_review_and_responsibility_confirmed: true",
+            "  ai_not_listed_as_author_confirmed: true",
+            "  ai_generated_images_or_artwork_included: false",
             "artifact_boundary:",
             '  artifact_release_url: "https://doi.org/10.0000/example"',
             '  artifact_release_doi: "10.0000/example"',
@@ -5844,6 +6074,13 @@ def test_check_final_upload_metadata_accepts_dke_research_data_statement_with_ar
             "  third_party_material_requires_permission: false",
             '  permissions_statement: "No third-party material requiring permission is included."',
             "  permission_files: []",
+            "generative_ai:",
+            "  declaration_required_before_final_upload: true",
+            "  ai_tools_used_in_manuscript_preparation: \"none\"",
+            "  declaration_statement: \"No generative AI tools were used in manuscript preparation.\"",
+            "  author_review_and_responsibility_confirmed: true",
+            "  ai_not_listed_as_author_confirmed: true",
+            "  ai_generated_images_or_artwork_included: false",
             "repository_reference:",
             '  repository_url: "https://example.org/iad-sieve.git"',
             '  repository_commit: "abcdef1234567890"',
@@ -5861,6 +6098,7 @@ def test_check_final_upload_metadata_accepts_dke_research_data_statement_with_ar
             "  funding_statement_text_ready: true",
             "  contribution_statement_complete: true",
             "  permissions_statement_complete: true",
+            "  generative_ai_declaration_complete: true",
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
@@ -5963,6 +6201,13 @@ def test_check_final_upload_metadata_rejects_missing_credit_roles_when_required(
             "  third_party_material_requires_permission: false",
             '  permissions_statement: "No third-party material requiring permission is included."',
             "  permission_files: []",
+            "generative_ai:",
+            "  declaration_required_before_final_upload: true",
+            "  ai_tools_used_in_manuscript_preparation: \"none\"",
+            "  declaration_statement: \"No generative AI tools were used in manuscript preparation.\"",
+            "  author_review_and_responsibility_confirmed: true",
+            "  ai_not_listed_as_author_confirmed: true",
+            "  ai_generated_images_or_artwork_included: false",
             "artifact_boundary:",
             '  artifact_release_url: "https://doi.org/10.0000/example"',
             '  artifact_release_doi: "10.0000/example"',
@@ -6022,6 +6267,13 @@ def test_check_final_upload_metadata_rejects_empty_credit_roles_by_default() -> 
             "  third_party_material_requires_permission: false",
             '  permissions_statement: "No third-party material requiring permission is included."',
             "  permission_files: []",
+            "generative_ai:",
+            "  declaration_required_before_final_upload: true",
+            "  ai_tools_used_in_manuscript_preparation: \"none\"",
+            "  declaration_statement: \"No generative AI tools were used in manuscript preparation.\"",
+            "  author_review_and_responsibility_confirmed: true",
+            "  ai_not_listed_as_author_confirmed: true",
+            "  ai_generated_images_or_artwork_included: false",
             "repository_reference:",
             '  repository_url: "https://example.org/iad-sieve.git"',
             '  repository_commit: "abcdef1234567890"',
@@ -6039,6 +6291,7 @@ def test_check_final_upload_metadata_rejects_empty_credit_roles_by_default() -> 
             "  funding_statement_text_ready: true",
             "  contribution_statement_complete: true",
             "  permissions_statement_complete: true",
+            "  generative_ai_declaration_complete: true",
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
@@ -6097,6 +6350,13 @@ def test_check_final_upload_metadata_rejects_missing_credit_roles_for_each_autho
             "  third_party_material_requires_permission: false",
             '  permissions_statement: "No third-party material requiring permission is included."',
             "  permission_files: []",
+            "generative_ai:",
+            "  declaration_required_before_final_upload: true",
+            "  ai_tools_used_in_manuscript_preparation: \"none\"",
+            "  declaration_statement: \"No generative AI tools were used in manuscript preparation.\"",
+            "  author_review_and_responsibility_confirmed: true",
+            "  ai_not_listed_as_author_confirmed: true",
+            "  ai_generated_images_or_artwork_included: false",
             "repository_reference:",
             '  repository_url: "https://example.org/iad-sieve.git"',
             '  repository_commit: "abcdef1234567890"',
@@ -6220,6 +6480,13 @@ def test_check_final_upload_metadata_rejects_no_permission_without_statement_tex
             "  third_party_material_requires_permission: false",
             '  permissions_statement: ""',
             "  permission_files: []",
+            "generative_ai:",
+            "  declaration_required_before_final_upload: true",
+            "  ai_tools_used_in_manuscript_preparation: \"none\"",
+            "  declaration_statement: \"No generative AI tools were used in manuscript preparation.\"",
+            "  author_review_and_responsibility_confirmed: true",
+            "  ai_not_listed_as_author_confirmed: true",
+            "  ai_generated_images_or_artwork_included: false",
             "repository_reference:",
             '  repository_url: "https://example.org/iad-sieve.git"',
             '  repository_commit: "abcdef1234567890"',
@@ -6237,6 +6504,7 @@ def test_check_final_upload_metadata_rejects_no_permission_without_statement_tex
             "  funding_statement_text_ready: true",
             "  contribution_statement_complete: true",
             "  permissions_statement_complete: true",
+            "  generative_ai_declaration_complete: true",
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",

@@ -61,6 +61,7 @@ Before upload, verify:
 3. The funding role is stated when funding exists, including whether sponsors influenced study design, analysis, writing, or the decision to submit.
 4. Permission files are listed when third-party permission is required.
 5. The data availability statement matches artifact release status, including whether the release has a real URL or DOI.
+6. The generative AI declaration records AI tool use status, author review and responsibility, AI authorship exclusion, and whether any machine-generated figures, images, or artwork are included.
 
 ## Cover Letter Customization Checks
 
@@ -104,9 +105,10 @@ Before upload, verify:
 5. The funding statement text is completed and matches the manuscript and submission system.
 6. The author contribution statement is completed and matches the final author list.
 7. The permissions statement records whether third-party material permission is not required or lists the permission files needed by the journal.
-8. The competing-interest statement, data/code availability statement, and ethics statement are consistent across the manuscript and system fields.
-9. The artifact release URL or DOI resolves publicly or according to the journal's access policy.
-10. The manuscript does not claim human gold labels, broad method superiority, or threshold stability unless the corresponding artifact evidence exists.
+8. The generative AI declaration statement is complete and matches the selected journal's live submission field.
+9. The competing-interest statement, data/code availability statement, and ethics statement are consistent across the manuscript and system fields.
+10. The artifact release URL or DOI resolves publicly or according to the journal's access policy.
+11. The manuscript does not claim human gold labels, broad method superiority, or threshold stability unless the corresponding artifact evidence exists.
 
 ## Live Submission Text Checks
 
@@ -136,6 +138,7 @@ Before upload, verify:
 - Target journal template has not been applied.
 - Author and corresponding-author metadata are placeholders.
 - Funding, author contribution, and third-party material permission declarations are not final.
+- Generative AI declaration is not final.
 - Final template-specific PDFs have not been rebuilt.
 - Submission-system file upload has not been checked against a live journal system.
 - Artifact release URL or DOI has not been created.

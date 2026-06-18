@@ -111,10 +111,10 @@ python manuscript/scripts/validate_submission_package.py --dke-preflight
 
 `iad_risk_predictions`、`representation_baseline_scores`、`supervised_baseline_predictions` 和 `threshold_selection_logs` 是主结果表的行级复核入口。预测与分数 JSONL 至少需要包含 `pair_id`、`source_document_id`、`target_document_id`、expected labels、label strength、hard-negative level、split identifiers、`score_field` 或概率字段、`threshold_value`、threshold source 和 `merge_prediction`；阈值日志至少需要包含 system、threshold_name、`threshold_value`、selection_split、selection_metric、selection_rule、applied_scope 和 `score_field`。缺少这些字段时，外部 artifact 只能证明文件存在，不能支持 L3 result audit。
 
-`final_upload_information_request.md` 汇总正式上传前必须由作者确认或提供的外部输入，包括 Author list、Corresponding author、Funding statement、Author contribution statement、Permissions statement、Artifact release URL or DOI 和 Live submission-system fields。该文件不作为期刊上传附件；它用于防止在稿件、投稿信或 `submission_metadata.yml` 中填入未确认信息。
+`final_upload_information_request.md` 汇总正式上传前必须由作者确认或提供的外部输入，包括 Author list、Corresponding author、Funding statement、Author contribution statement、Permissions statement、Generative AI declaration、Artifact release URL or DOI 和 Live submission-system fields。该文件不作为期刊上传附件；它用于防止在稿件、投稿信或 `submission_metadata.yml` 中填入未确认信息。
 
 `submission_system_checklist.md` 记录最终上传到期刊系统前需要核对的文件、元数据、PDF 和 artifact release 项。该文件用于最终上传前检查，不作为当前预投稿包附件。
 
 `reviewer_readiness_audit.md` 记录投稿前的审稿准备度、主要拒稿风险、证据边界和最终上传门槛。该文件用于质量控制，不作为最终投稿附件。
 
-`submission_metadata.yml` 中的 `final_upload_checklist` 是正式上传门禁。只有目标期刊、期刊模板、作者元数据、通讯作者元数据、经费声明文本、作者贡献声明、第三方材料许可声明、模板后 PDF 重建、投稿系统文件核对和 artifact release 信息均完成后，才应使用 `--final-upload` 生成或校验最终投稿包。`scripts/submission_metadata_checks.py` 会同时检查作者邮箱、ORCID、经费声明文本、作者贡献声明、permissions statement 和 artifact release URL/DOI 的基本结构。
+`submission_metadata.yml` 中的 `final_upload_checklist` 是正式上传门禁。只有目标期刊、期刊模板、作者元数据、通讯作者元数据、经费声明文本、作者贡献声明、第三方材料许可声明、生成式 AI 使用声明、模板后 PDF 重建、投稿系统文件核对和 artifact release 信息均完成后，才应使用 `--final-upload` 生成或校验最终投稿包。`scripts/submission_metadata_checks.py` 会同时检查作者邮箱、ORCID、经费声明文本、作者贡献声明、permissions statement、generative AI declaration 和 artifact release URL/DOI 的基本结构。
