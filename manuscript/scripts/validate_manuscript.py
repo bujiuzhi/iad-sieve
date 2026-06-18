@@ -2717,6 +2717,8 @@ def check_submission_material_quantitative_summary(highlights_text: str, cover_l
             errors.append(f"cover letter missing quantitative evidence marker: {marker}")
     cover_letter_scope_markers = [
         "Open-v2 evidence snapshot",
+        "scope-bounded mechanism evidence",
+        "same-scope comparative ranking",
         "full pair scope",
         "same-work F1=0.980",
         "held-out test scope",
