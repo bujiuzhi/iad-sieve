@@ -159,6 +159,21 @@ def test_check_final_upload_information_request_rejects_legacy_checklist_names()
     assert any("artifact_release_prepared_or_linked" in error for error in errors)
 
 
+def test_final_upload_request_checklist_fields_track_metadata_true_fields() -> None:
+    """验证最终上传信息表字段从元数据最终上传门禁派生。"""
+
+    module = _load_validate_manuscript_module()
+
+    expected_fields = [
+        field_name
+        for field_name in module.FINAL_UPLOAD_TRUE_FIELDS
+        if field_name not in module.FINAL_UPLOAD_REQUEST_EXCLUDED_TRUE_FIELDS
+    ]
+
+    assert module.FINAL_UPLOAD_REQUEST_CHECKLIST_FIELDS == expected_fields
+    assert "target_journal_template_bound" not in module.FINAL_UPLOAD_REQUEST_CHECKLIST_FIELDS
+
+
 def test_check_data_code_availability_boundary_accepts_complete_boundary() -> None:
     """验证数据与代码可用性边界完整时可通过检查。"""
 

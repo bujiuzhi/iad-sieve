@@ -25,6 +25,7 @@ SCRIPT_ROOT = Path(__file__).resolve().parent
 if str(SCRIPT_ROOT) not in sys.path:
     sys.path.insert(0, str(SCRIPT_ROOT))
 from submission_metadata_checks import (
+    FINAL_UPLOAD_TRUE_FIELDS,
     check_final_upload_cover_letter_text as check_structured_final_upload_cover_letter_text,
     check_final_upload_metadata_text as check_structured_final_upload_metadata_text,
 )
@@ -217,20 +218,11 @@ FORMAL_COMPLETION_OVERCLAIM_PATTERNS = [
         "final-upload completion claim",
     ),
 ]
+FINAL_UPLOAD_REQUEST_EXCLUDED_TRUE_FIELDS = {"target_journal_template_bound"}
 FINAL_UPLOAD_REQUEST_CHECKLIST_FIELDS = [
-    "target_journal_selected",
-    "article_type_confirmed",
-    "review_mode_confirmed",
-    "target_journal_template_applied",
-    "author_metadata_completed",
-    "corresponding_author_completed",
-    "funding_statement_text_ready",
-    "contribution_statement_complete",
-    "permissions_statement_complete",
-    "manuscript_pdf_rebuilt_after_template",
-    "supplementary_pdf_rebuilt_after_template",
-    "submission_system_files_verified",
-    "artifact_release_prepared_or_linked",
+    field_name
+    for field_name in FINAL_UPLOAD_TRUE_FIELDS
+    if field_name not in FINAL_UPLOAD_REQUEST_EXCLUDED_TRUE_FIELDS
 ]
 
 
