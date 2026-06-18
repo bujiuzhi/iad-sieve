@@ -89,6 +89,10 @@ REQUIRED_SUPPLEMENT_SECTIONS = [
     r"\section{Claim Boundary}",
 ]
 MIN_BIB_ENTRIES = 10
+CITATION_COMMAND_PATTERN = re.compile(
+    r"\\(?:cite|citep|citet|citealp|citealt|citeauthor|citeyear|citeyearpar)\*?(?:\s*\[[^\]]*\]){0,2}\s*\{([^}]+)\}"
+)
+BIBTEX_ENTRY_PATTERN = re.compile(r"@\w+\s*\{\s*([^,\s]+)\s*,", re.MULTILINE)
 FORBIDDEN_PHRASES = [
     "state-of-the-art",
     "state of the art",
@@ -349,6 +353,67 @@ def check_bibliography_depth(bibliography_text: str) -> list[str]:
     if entry_count < MIN_BIB_ENTRIES:
         return [f"bibliography has {entry_count} entries; expected at least {MIN_BIB_ENTRIES}"]
     return []
+
+
+def extract_citation_keys(document_texts: dict[str, str]) -> set[str]:
+    """Extract citation keys from LaTeX document texts.
+
+    参数:
+        document_texts: Mapping from document name to LaTeX text.
+
+    返回:
+        set[str]: Citation keys used by citation commands.
+    """
+    citation_keys: set[str] = set()
+    for document_text in document_texts.values():
+        for match in CITATION_COMMAND_PATTERN.finditer(document_text):
+            for raw_key in match.group(1).split(","):
+                key = raw_key.strip()
+                if key:
+                    citation_keys.add(key)
+    return citation_keys
+
+
+def extract_bibtex_keys(bibliography_text: str) -> list[str]:
+    """Extract BibTeX entry keys while preserving duplicates.
+
+    参数:
+        bibliography_text: BibTeX source text.
+
+    返回:
+        list[str]: Entry keys in source order.
+    """
+    return [match.group(1).strip() for match in BIBTEX_ENTRY_PATTERN.finditer(bibliography_text)]
+
+
+def check_citation_bibliography_alignment(document_texts: dict[str, str], bibliography_text: str) -> list[str]:
+    """Check citation keys against the BibTeX bibliography.
+
+    参数:
+        document_texts: Mapping from formal LaTeX document name to text.
+        bibliography_text: BibTeX source text.
+
+    返回:
+        list[str]: Error messages for missing, duplicate, or uncited bibliography entries.
+    """
+    citation_keys = extract_citation_keys(document_texts)
+    bibliography_keys = extract_bibtex_keys(bibliography_text)
+    bibliography_key_set = set(bibliography_keys)
+    duplicate_keys = sorted({key for key in bibliography_keys if bibliography_keys.count(key) > 1})
+    missing_bibliography_keys = sorted(citation_keys - bibliography_key_set)
+    uncited_bibliography_keys = sorted(bibliography_key_set - citation_keys)
+    errors: list[str] = []
+    if not citation_keys:
+        errors.append("formal LaTeX sources contain no citation commands")
+    if not bibliography_keys:
+        errors.append("references.bib contains no BibTeX entries")
+    if duplicate_keys:
+        errors.append(f"references.bib contains duplicate BibTeX keys: {duplicate_keys}")
+    if missing_bibliography_keys:
+        errors.append(f"citation keys missing from references.bib: {missing_bibliography_keys}")
+    if uncited_bibliography_keys:
+        errors.append(f"references.bib contains uncited entries: {uncited_bibliography_keys}")
+    return errors
 
 
 def check_result_claim_boundary(manuscript_text: str, supplementary_text: str) -> list[str]:
@@ -1368,6 +1433,16 @@ def main() -> int:
     if args.final_upload:
         errors.extend(check_final_upload_metadata(submission_metadata_text))
     errors.extend(check_bibliography_depth(bibliography_text))
+    errors.extend(
+        check_citation_bibliography_alignment(
+            {
+                "main manuscript": manuscript_text,
+                "supplementary material": supplementary_text,
+                "DKE/Elsevier draft source": elsevier_draft_source_text,
+            },
+            bibliography_text,
+        )
+    )
     latex_pdf_path = ROOT / "build" / "iad-risk-manuscript-latex.pdf"
     elsevier_pdf_path = ROOT / "build" / "iad-risk-manuscript-elsevier.pdf"
     supplementary_pdf_path = ROOT / "build" / "iad-risk-supplementary-material.pdf"

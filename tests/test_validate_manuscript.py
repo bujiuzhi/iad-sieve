@@ -326,6 +326,48 @@ def test_check_openv2_benchmark_composition_rejects_missing_counts() -> None:
     assert any("not human non-identity gold" in error for error in errors)
 
 
+def test_check_citation_bibliography_alignment_accepts_matching_entries() -> None:
+    """验证 LaTeX 引用 key 与 BibTeX 条目一致时可通过。"""
+
+    module = _load_validate_manuscript_module()
+    document_texts = {
+        "main manuscript": r"\citep{fellegi1969record,mudgal2018deep} and \citet[see][Section 2]{li2020ditto}.",
+        "supplementary material": r"\citeyearpar{cohan2020specter}",
+    }
+    bibliography_text = "\n".join(
+        [
+            "@article{fellegi1969record, title={A}, year={1969}}",
+            "@inproceedings{mudgal2018deep, title={B}, year={2018}}",
+            "@inproceedings{li2020ditto, title={C}, year={2020}}",
+            "@inproceedings{cohan2020specter, title={D}, year={2020}}",
+        ]
+    )
+
+    errors = module.check_citation_bibliography_alignment(document_texts, bibliography_text)
+
+    assert errors == []
+
+
+def test_check_citation_bibliography_alignment_rejects_missing_duplicate_and_uncited_entries() -> None:
+    """验证引用与参考文献不一致时会报告缺失、重复和未引用条目。"""
+
+    module = _load_validate_manuscript_module()
+    document_texts = {"main manuscript": r"\citep{fellegi1969record,missing2026}"}
+    bibliography_text = "\n".join(
+        [
+            "@article{fellegi1969record, title={A}, year={1969}}",
+            "@article{fellegi1969record, title={Duplicate}, year={1970}}",
+            "@article{uncited2024, title={Uncited}, year={2024}}",
+        ]
+    )
+
+    errors = module.check_citation_bibliography_alignment(document_texts, bibliography_text)
+
+    assert any("duplicate BibTeX keys" in error and "fellegi1969record" in error for error in errors)
+    assert any("missing from references.bib" in error and "missing2026" in error for error in errors)
+    assert any("uncited entries" in error and "uncited2024" in error for error in errors)
+
+
 def test_check_method_feature_contract_accepts_complete_contract() -> None:
     """验证方法特征契约完整时可通过检查。"""
 
