@@ -72,6 +72,34 @@ def test_check_declaration_statements_rejects_vague_declarations() -> None:
     assert any("no competing interests" in error for error in errors)
 
 
+def test_check_final_upload_information_request_rejects_missing_required_fields() -> None:
+    """验证最终上传信息收集表必须覆盖所有外部输入字段。"""
+
+    module = _load_validate_manuscript_module()
+    request_text = "# Final Upload Information Request\nTarget journal\n"
+
+    errors = module.check_final_upload_information_request(request_text)
+
+    assert any("Author list" in error for error in errors)
+    assert any("Corresponding author" in error for error in errors)
+    assert any("Funding statement" in error for error in errors)
+    assert any("Author contribution statement" in error for error in errors)
+    assert any("Permissions statement" in error for error in errors)
+    assert any("Artifact release URL or DOI" in error for error in errors)
+    assert any("Live submission-system fields" in error for error in errors)
+
+
+def test_check_final_upload_information_request_accepts_complete_request() -> None:
+    """验证最终上传信息收集表覆盖所有外部输入字段时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    request_text = Path("manuscript/final_upload_information_request.md").read_text(encoding="utf-8")
+
+    errors = module.check_final_upload_information_request(request_text)
+
+    assert errors == []
+
+
 def test_check_data_code_availability_boundary_accepts_complete_boundary() -> None:
     """验证数据与代码可用性边界完整时可通过检查。"""
 
@@ -2434,6 +2462,11 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
         "per-row denominator counts",
         "per-row threshold source",
         "scope label used in the main table",
+        "final_upload_information_request.md",
+        "Author list",
+        "Corresponding author",
+        "Funding statement",
+        "Artifact release URL or DOI",
     ]:
         readme_text = readme_text.replace(marker, "")
         manifest_text = manifest_text.replace(marker, "")
@@ -2444,6 +2477,11 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
     assert any("per-row denominator counts" in error for error in errors)
     assert any("per-row threshold source" in error for error in errors)
     assert any("scope label used in the main table" in error for error in errors)
+    assert any("final_upload_information_request.md" in error for error in errors)
+    assert any("Author list" in error for error in errors)
+    assert any("Corresponding author" in error for error in errors)
+    assert any("Funding statement" in error for error in errors)
+    assert any("Artifact release URL or DOI" in error for error in errors)
 
 
 def test_check_related_work_positioning_rejects_missing_novelty_boundaries() -> None:

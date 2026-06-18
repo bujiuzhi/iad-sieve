@@ -41,6 +41,7 @@ REQUIRED_FILES = [
     ROOT / "target_journal_shortlist.md",
     ROOT / "artifact_release_manifest.template.json",
     ROOT / "artifact_release_README.template.md",
+    ROOT / "final_upload_information_request.md",
     ROOT / "submission_system_checklist.md",
     ROOT / "reviewer_readiness_audit.md",
     ROOT / "submission_metadata.yml",
@@ -325,6 +326,42 @@ def check_declaration_statements(manuscript_text: str) -> list[str]:
             if marker not in section_body:
                 errors.append(f"declaration statement {section_marker} missing marker: {marker}")
     return errors
+
+
+def check_final_upload_information_request(request_text: str) -> list[str]:
+    """Check whether the final-upload information request covers external inputs.
+
+    参数:
+        request_text: Final-upload information request Markdown text.
+
+    返回:
+        list[str]: Error messages for missing request fields.
+    """
+    required_markers = [
+        "# Final Upload Information Request",
+        "Target journal",
+        "Article type",
+        "Review mode",
+        "Author list",
+        "Author order",
+        "Corresponding author",
+        "Funding statement",
+        "Author contribution statement",
+        "Permissions statement",
+        "Competing interests",
+        "Ethics statement",
+        "Data and code availability statement",
+        "Artifact release URL or DOI",
+        "Artifact release manifest",
+        "Live submission-system fields",
+        "Final title page",
+        "Final-upload checklist",
+    ]
+    return [
+        f"final upload information request missing marker: {marker}"
+        for marker in required_markers
+        if marker not in request_text
+    ]
 
 
 def check_data_code_availability_boundary(manuscript_text: str) -> list[str]:
@@ -1862,6 +1899,11 @@ def check_manuscript_package_docs(readme_text: str, manifest_text: str) -> list[
         "per-row denominator counts",
         "per-row threshold source",
         "scope label used in the main table",
+        "final_upload_information_request.md",
+        "Author list",
+        "Corresponding author",
+        "Funding statement",
+        "Artifact release URL or DOI",
     ]
     errors: list[str] = []
     for document_name, document_text in {
@@ -2930,6 +2972,12 @@ def main() -> int:
         if artifact_release_readme_template_path.exists()
         else ""
     )
+    final_upload_information_request_path = ROOT / "final_upload_information_request.md"
+    final_upload_information_request_text = (
+        final_upload_information_request_path.read_text(encoding="utf-8")
+        if final_upload_information_request_path.exists()
+        else ""
+    )
     data_processing_pipeline_path = PROJECT_ROOT / "docs" / "data-processing-pipeline.md"
     data_processing_pipeline_text = (
         data_processing_pipeline_path.read_text(encoding="utf-8") if data_processing_pipeline_path.exists() else ""
@@ -3051,6 +3099,7 @@ def main() -> int:
     errors.extend(check_target_journal_shortlist(target_journal_shortlist_text))
     errors.extend(check_artifact_release_manifest_template(artifact_release_template_text))
     errors.extend(check_artifact_release_readme_template(artifact_release_readme_template_text))
+    errors.extend(check_final_upload_information_request(final_upload_information_request_text))
     readme_path = ROOT / "README.md"
     readme_text = readme_path.read_text(encoding="utf-8") if readme_path.exists() else ""
     manifest_path = ROOT / "MANIFEST.md"

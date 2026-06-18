@@ -13,6 +13,7 @@
 | `target_journal_shortlist.md` | 目标期刊候选与模板前置要求 |
 | `artifact_release_manifest.template.json` | 结果 artifact release 元数据模板 |
 | `artifact_release_README.template.md` | 外部结果 artifact release README 模板 |
+| `final_upload_information_request.md` | 正式上传前作者信息、声明和 artifact 链接收集表 |
 | `submission_system_checklist.md` | 正式投稿系统上传前核对清单 |
 | `reviewer_readiness_audit.md` | 审稿准备度与拒稿风险审计 |
 | `submission_metadata.yml` | 投稿系统元数据字段 |
@@ -66,6 +67,8 @@ python manuscript/scripts/validate_submission_package.py --dke-preflight
 `artifact_release_manifest.template.json` 和 `artifact_release_README.template.md` 用于准备正式 artifact release，不作为当前匿名预投稿包的替代物。`scripts/build_artifact_release_skeleton.py` 只生成外部 release 骨架；真实结果应从不纳入 Git 的 source artifact 目录通过 `scripts/populate_artifact_release.py` 填充。填入真实结果 artifact 后，应使用 `scripts/finalize_artifact_release.py` 刷新 manifest 和 checksum。正式上传前应创建公开链接，并用 `scripts/validate_artifact_release.py` 校验 release 目录。
 
 `open_v2_main_results` 是主结果表对应的外部结果 artifact。正式 artifact release 中的 CSV 必须包含 per-row denominator counts、per-row threshold source 和 scope label used in the main table，确保主结果表不是仅由文件名和 checksum 支撑，而是可按行追溯 denominator、阈值来源和评价范围。
+
+`final_upload_information_request.md` 用于收集正式上传前的 Author list、Corresponding author、Funding statement、Author contribution statement、Permissions statement、Artifact release URL or DOI 和 Live submission-system fields。该文件不作为正式投稿附件；作者确认这些外部输入后，再同步更新 `submission_metadata.yml`、投稿信和目标期刊系统字段。
 
 `submission_system_checklist.md` 用于正式上传前逐项核对文件、元数据、PDF 和 artifact release，不作为当前匿名预投稿包的替代物。
 
