@@ -205,6 +205,9 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
             r"\section{Artifact Package Requirements}",
             r"\section{Claim-Evidence Matrix}",
             "The released artifact package includes checksums.sha256.",
+            "Reviewers can run python manuscript/scripts/validate_artifact_release.py.",
+            "The validator checks required result identifiers.",
+            "The validator checks exclusion of raw third-party data.",
         ]
     )
 
@@ -224,6 +227,34 @@ def test_check_result_claim_boundary_rejects_result_table_without_audit_trail() 
 
     assert any("Result Audit Trail" in error for error in errors)
     assert any("Artifact Package Requirements" in error for error in errors)
+
+
+def test_check_result_claim_boundary_rejects_missing_artifact_validator_command() -> None:
+    """验证结果表审计边界要求补充材料列出 artifact release 校验命令。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\label{tab:openv2-results}",
+            r"\subsection{Claim-Evidence Boundary for Result Interpretation}",
+            r"\subsection{Result Audit Trail}",
+            r"\label{tab:claim-evidence-boundary-main}",
+            "Each row needs a prediction or score file, metric summary, and checksum or manifest.",
+            "The result does not support a broad method-ranking claim.",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Artifact Package Requirements}",
+            r"\section{Claim-Evidence Matrix}",
+            "The released artifact package includes checksums.sha256.",
+        ]
+    )
+
+    errors = module.check_result_claim_boundary(manuscript_text, supplementary_text)
+
+    assert any("validate_artifact_release.py" in error for error in errors)
+    assert any("required result identifiers" in error for error in errors)
 
 
 def test_check_contribution_evidence_summary_accepts_complete_summary() -> None:

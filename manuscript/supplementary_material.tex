@@ -161,6 +161,15 @@ paper-artifacts/
 
 The manifest should record the source data version, processing commands, dependency versions, random seeds, thresholds, split configuration, hardware summary, and SHA256 checksum for every result file. The checksums should be validated before using artifact files to support claims in the manuscript.
 
+\small
+\begin{verbatim}
+python manuscript/scripts/validate_artifact_release.py \
+  --artifact-dir /path/to/release
+\end{verbatim}
+\normalsize
+
+This release validation command checks the manifest schema, required artifact files, required result identifiers, checksum coverage, repository commit metadata, claim-boundary flags, and exclusion of raw third-party data, caches, credentials, local outputs, and model checkpoints.
+
 \section{Claim-Evidence Matrix}
 
 Table~\ref{tab:claim-evidence} maps the major manuscript claims to the evidence required for responsible interpretation. The matrix is part of the submission boundary: a claim should be weakened or removed if the corresponding evidence file is absent from the released artifact package.

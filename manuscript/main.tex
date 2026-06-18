@@ -132,8 +132,9 @@ IAD-Bench is a benchmark contract for organizing scholarly pair evidence. It is 
 \caption{IAD-Bench label layers. Gold, proxy, and silver labels are reported separately to avoid overstating evidence strength.}
 \label{tab:label-layers}
 \centering
-\small
-\begin{tabular}{lll}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.15\linewidth}L{0.42\linewidth}L{0.33\linewidth}}
 \toprule
 Layer & Source & Use in this paper \\
 \midrule
@@ -173,6 +174,7 @@ IAD-Risk converts scholarly deduplication into selective risk-aware matching. Gi
 \begin{figure}[H]
 \centering
 \small
+\resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[
   node distance=0.45cm,
   box/.style={draw, rounded corners, align=center, minimum height=0.8cm, text width=2.35cm},
@@ -188,6 +190,7 @@ IAD-Risk converts scholarly deduplication into selective risk-aware matching. Gi
 \draw[arrow] (heads) -- (gate);
 \draw[arrow] (gate) -- (output);
 \end{tikzpicture}
+}
 \caption{IAD-Risk pipeline. The framework first separates identity evidence from agenda evidence, then predicts relation signals and derives a false-merge risk score before applying a conservative merge gate.}
 \label{fig:iad-risk-pipeline}
 \end{figure}
@@ -317,9 +320,11 @@ The experiments ask four questions. RQ1 tests whether IAD-Risk preserves same-wo
 \caption{Evaluation protocol. Each question is tied to a label stratum and a metric so that evidence strength is not mixed across sources.}
 \label{tab:evaluation-protocol}
 \centering
-\begin{tabular}{llll}
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.08\linewidth}L{0.25\linewidth}L{0.17\linewidth}L{0.30\linewidth}}
 \toprule
-Question & Evidence layer & Primary metric & Interpretation \\
+RQ & Evidence layer & Metric & Interpretation \\
 \midrule
 RQ1 & Gold identity pairs & Same-work F1 & Duplicate matching ability \\
 RQ2 & Silver hard negatives & HNFMR & False-merge safety \\
@@ -461,7 +466,9 @@ Table~\ref{tab:openv2-results} should be read together with the artifact boundar
 \caption{Open-v2 evidence snapshot. Lower false-merge rate is better. Rows are reported only when supported by current output summaries; different pair counts indicate different available result scopes.}
 \label{tab:openv2-results}
 \centering
-\begin{tabular}{lrrrr}
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.36\linewidth}L{0.13\linewidth}rrr}
 \toprule
 System & Pairs & Same-work F1 $\uparrow$ & FMR $\downarrow$ & HNFMR $\downarrow$ \\
 \midrule

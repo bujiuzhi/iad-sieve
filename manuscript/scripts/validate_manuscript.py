@@ -333,6 +333,9 @@ def check_result_claim_boundary(manuscript_text: str, supplementary_text: str) -
         r"\section{Claim-Evidence Matrix}",
         "checksums.sha256",
         "released artifact package",
+        "python manuscript/scripts/validate_artifact_release.py",
+        "required result identifiers",
+        "exclusion of raw third-party data",
     ]
     errors: list[str] = []
     for marker in required_main_markers:
