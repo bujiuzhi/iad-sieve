@@ -25,6 +25,7 @@ REQUIRED_FILES = [
     ROOT / "cover_letter.md",
     ROOT / "highlights.md",
     ROOT / "keywords.md",
+    ROOT / "target_journal_shortlist.md",
     ROOT / "submission_metadata.yml",
     ROOT / "scripts" / "validate_manuscript.py",
     ROOT / "scripts" / "verify_fixture_rebuild.py",
@@ -551,6 +552,33 @@ def check_environment_setup(supplementary_text: str) -> list[str]:
     ]
 
 
+def check_target_journal_shortlist(shortlist_text: str) -> list[str]:
+    """Check whether target journal planning records candidates and boundaries.
+
+    参数:
+        shortlist_text: Target journal shortlist Markdown text.
+
+    返回:
+        list[str]: Error messages for missing target-journal planning markers.
+    """
+    required_markers = [
+        "# Target Journal Shortlist",
+        "Rank-sensitive labels",
+        "Primary practical target: Data & Knowledge Engineering",
+        "Stretch target: Information Systems",
+        "Domain backup: Scientometrics",
+        "Candidate Matrix",
+        "Template and File Implications",
+        "not a final submission record",
+        "must be reconfirmed",
+    ]
+    return [
+        f"target journal shortlist missing marker: {marker}"
+        for marker in required_markers
+        if marker not in shortlist_text
+    ]
+
+
 def check_related_work_positioning(manuscript_text: str) -> list[str]:
     """Check whether related work includes closest-work positioning.
 
@@ -630,12 +658,16 @@ def check_highlights(highlights_text: str) -> list[str]:
     """
     bullet_lines = [line for line in highlights_text.splitlines() if line.startswith("- ")]
     errors: list[str] = []
-    if not 3 <= len(bullet_lines) <= 6:
-        errors.append(f"highlights has {len(bullet_lines)} bullet lines; expected 3 to 6")
+    if not 3 <= len(bullet_lines) <= 5:
+        errors.append(f"highlights has {len(bullet_lines)} bullet lines; expected 3 to 5")
     for line in bullet_lines:
-        word_count = len(line[2:].split())
+        highlight = line[2:]
+        word_count = len(highlight.split())
         if word_count > 22:
             errors.append(f"highlight is too long ({word_count} words): {line}")
+        character_count = len(highlight)
+        if character_count > 85:
+            errors.append(f"highlight exceeds 85 characters ({character_count} characters): {line}")
     return errors
 
 
@@ -728,6 +760,11 @@ def check_submission_metadata(metadata_text: str) -> list[str]:
         "review_mode: \"anonymous_review\"",
         "target_journal_template_bound: false",
         "author_metadata_required_before_final_upload: true",
+        "target_preparation:",
+        "shortlist_file: \"target_journal_shortlist.md\"",
+        "primary_practical_candidate: \"Data & Knowledge Engineering\"",
+        "ranking_confirmation_required_before_final_upload: true",
+        "selected_target_requires_author_confirmation: true",
         "corresponding_author:",
         "competing_interests:",
         "data_code_availability:",
@@ -897,6 +934,10 @@ def main() -> int:
     highlights_text = highlights_path.read_text(encoding="utf-8") if highlights_path.exists() else ""
     keywords_path = ROOT / "keywords.md"
     keywords_text = keywords_path.read_text(encoding="utf-8") if keywords_path.exists() else ""
+    target_journal_shortlist_path = ROOT / "target_journal_shortlist.md"
+    target_journal_shortlist_text = (
+        target_journal_shortlist_path.read_text(encoding="utf-8") if target_journal_shortlist_path.exists() else ""
+    )
     cover_letter_path = ROOT / "cover_letter.md"
     cover_letter_text = cover_letter_path.read_text(encoding="utf-8") if cover_letter_path.exists() else ""
     submission_metadata_path = ROOT / "submission_metadata.yml"
@@ -914,6 +955,7 @@ def main() -> int:
                 "supplementary material": supplementary_text,
                 "highlights": highlights_text,
                 "keywords": keywords_text,
+                "target journal shortlist": target_journal_shortlist_text,
                 "cover letter": cover_letter_text,
             }
         )
@@ -932,6 +974,7 @@ def main() -> int:
     errors.extend(check_scope_compatibility(manuscript_text))
     errors.extend(check_extended_protocol_boundary(manuscript_text))
     errors.extend(check_environment_setup(supplementary_text))
+    errors.extend(check_target_journal_shortlist(target_journal_shortlist_text))
     errors.extend(check_manual_validation_protocol(supplementary_text))
     errors.extend(check_result_claim_boundary(manuscript_text, supplementary_text))
     errors.extend(check_highlights(highlights_text))

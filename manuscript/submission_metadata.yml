@@ -6,6 +6,14 @@ submission:
   target_journal_template_bound: false
   author_metadata_required_before_final_upload: true
 
+target_preparation:
+  shortlist_file: "target_journal_shortlist.md"
+  primary_practical_candidate: "Data & Knowledge Engineering"
+  stretch_candidate: "Information Systems"
+  domain_backup_candidate: "Scientometrics"
+  ranking_confirmation_required_before_final_upload: true
+  selected_target_requires_author_confirmation: true
+
 authors: []
 
 corresponding_author:

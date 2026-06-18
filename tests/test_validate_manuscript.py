@@ -33,11 +33,11 @@ def test_check_highlights_accepts_five_concise_bullets() -> None:
         [
             "# Highlights",
             "",
-            "- Identifies identity-agenda confusion as a false-merge risk.",
-            "- Separates identity, agenda, and agenda-non-identity evidence.",
-            "- Defines provenance-aware gold, proxy, and silver label layers.",
-            "- Reports targeted hard-negative false-merge suppression.",
-            "- Documents fixture rebuild commands and claim boundaries.",
+            "- Identity-agenda confusion causes risky scholarly work merges.",
+            "- IAD-Risk separates identity, agenda, and ANI evidence.",
+            "- IAD-Bench keeps gold, proxy, and silver labels separate.",
+            "- Open-v2 baselines show HNFMR 0.790--0.999.",
+            "- Fixtures and artifact rules support reproducible review.",
         ]
     )
 
@@ -54,7 +54,7 @@ def test_check_highlights_rejects_too_many_bullets() -> None:
 
     errors = module.check_highlights(highlights_text)
 
-    assert any("expected 3 to 6" in error for error in errors)
+    assert any("expected 3 to 5" in error for error in errors)
 
 
 def test_check_highlights_rejects_long_bullet() -> None:
@@ -70,6 +70,7 @@ def test_check_highlights_rejects_long_bullet() -> None:
     errors = module.check_highlights(long_bullet)
 
     assert any("highlight is too long" in error for error in errors)
+    assert any("exceeds 85 characters" in error for error in errors)
 
 
 def test_check_keywords_accepts_semicolon_separated_terms() -> None:
@@ -471,6 +472,40 @@ def test_check_environment_setup_rejects_missing_fixture_command() -> None:
 
     assert any("verify_fixture_rebuild.py" in error for error in errors)
     assert any("does not download full raw datasets" in error for error in errors)
+
+
+def test_check_target_journal_shortlist_accepts_complete_shortlist() -> None:
+    """验证目标期刊候选清单包含候选、边界和模板要求时可通过。"""
+
+    module = _load_validate_manuscript_module()
+    shortlist_text = "\n".join(
+        [
+            "# Target Journal Shortlist",
+            "This is not a final submission record.",
+            "Rank-sensitive labels must be reconfirmed before final upload.",
+            "Primary practical target: Data & Knowledge Engineering.",
+            "Stretch target: Information Systems.",
+            "Domain backup: Scientometrics.",
+            "## Candidate Matrix",
+            "## Template and File Implications",
+        ]
+    )
+
+    errors = module.check_target_journal_shortlist(shortlist_text)
+
+    assert errors == []
+
+
+def test_check_target_journal_shortlist_rejects_missing_boundary() -> None:
+    """验证目标期刊候选清单缺少确认边界时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    shortlist_text = "# Target Journal Shortlist\nPrimary practical target: Data & Knowledge Engineering."
+
+    errors = module.check_target_journal_shortlist(shortlist_text)
+
+    assert any("Rank-sensitive labels" in error for error in errors)
+    assert any("must be reconfirmed" in error for error in errors)
 
 
 def test_check_cover_letter_accepts_required_submission_statements() -> None:
