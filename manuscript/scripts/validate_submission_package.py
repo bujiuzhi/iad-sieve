@@ -143,6 +143,11 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--zip-path", default=str(DEFAULT_ZIP_PATH), help="Generated package zip path.")
     parser.add_argument("--final-upload", action="store_true", help="Require target journal and real author metadata.")
     parser.add_argument("--dke-preflight", action="store_true", help="Validate a DKE/Elsevier preflight package.")
+    parser.add_argument(
+        "--artifact-dir",
+        default="",
+        help="Optional external artifact release directory to cross-check repository commit during final upload.",
+    )
     parser.add_argument("--log-level", default="INFO", help="Logging level.")
     return parser.parse_args()
 
@@ -354,6 +359,82 @@ def check_final_upload_source_control_binding(manifest_text: str, metadata_text:
     return errors
 
 
+def load_artifact_manifest(artifact_dir: Path | None) -> tuple[dict | None, list[str]]:
+    """Load an external artifact release manifest for final-upload cross-checks.
+
+    参数:
+        artifact_dir: Optional artifact release directory.
+
+    返回:
+        tuple[dict | None, list[str]]: Parsed manifest object and error messages.
+    """
+    if artifact_dir is None:
+        return None, []
+    manifest_path = artifact_dir / "manifest.json"
+    if not manifest_path.is_file():
+        return None, [f"artifact release manifest missing: {manifest_path}"]
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        return None, [f"artifact release manifest is invalid JSON: {exc}"]
+    if not isinstance(manifest, dict):
+        return None, ["artifact release manifest must contain a JSON object"]
+    repository = manifest.get("repository")
+    if not isinstance(repository, dict):
+        return manifest, ["artifact release manifest missing repository object"]
+    artifact_commit = str(repository.get("commit", "")).strip()
+    if not COMMIT_PATTERN.fullmatch(artifact_commit):
+        return manifest, ["artifact release manifest repository.commit is invalid"]
+    return manifest, []
+
+
+def check_final_upload_artifact_source_binding(
+    manifest_text: str,
+    metadata_text: str,
+    artifact_manifest: dict | None,
+    location: str,
+) -> list[str]:
+    """Check final-upload commit binding against an external artifact manifest.
+
+    参数:
+        manifest_text: Submission manifest JSON text.
+        metadata_text: Submission metadata YAML text.
+        artifact_manifest: Optional parsed artifact release manifest.
+        location: Human-readable package location.
+
+    返回:
+        list[str]: Error messages for package/artifact commit drift.
+    """
+    if artifact_manifest is None:
+        return []
+    repository = artifact_manifest.get("repository")
+    if not isinstance(repository, dict):
+        return []
+    artifact_commit = str(repository.get("commit", "")).strip()
+    if not COMMIT_PATTERN.fullmatch(artifact_commit):
+        return []
+    errors: list[str] = []
+    metadata_commit = scalar_value(metadata_text, "repository_commit")
+    if metadata_commit and metadata_commit != artifact_commit:
+        errors.append(
+            f"{location} submission_metadata.yml repository_commit {metadata_commit} "
+            f"does not match artifact manifest repository.commit {artifact_commit}"
+        )
+    try:
+        manifest = json.loads(manifest_text)
+    except json.JSONDecodeError:
+        return errors
+    source_control = manifest.get("source_control")
+    if isinstance(source_control, dict) and source_control.get("available") is True:
+        package_commit = str(source_control.get("repository_commit", "")).strip()
+        if package_commit and package_commit != artifact_commit:
+            errors.append(
+                f"{location} source_control commit {package_commit} "
+                f"does not match artifact manifest repository.commit {artifact_commit}"
+            )
+    return errors
+
+
 def check_file_membership(file_names: set[str], location: str, dke_preflight: bool = False) -> list[str]:
     """Check exact package file membership.
 
@@ -537,13 +618,19 @@ def check_package_pdf_freshness(package_dir: Path, dke_preflight: bool = False) 
     return errors
 
 
-def validate_package_directory(package_dir: Path, final_upload: bool = False, dke_preflight: bool = False) -> list[str]:
+def validate_package_directory(
+    package_dir: Path,
+    final_upload: bool = False,
+    dke_preflight: bool = False,
+    artifact_manifest: dict | None = None,
+) -> list[str]:
     """Validate the generated package directory.
 
     参数:
         package_dir: Generated package directory.
         final_upload: Whether to require journal and author metadata for final upload.
         dke_preflight: Whether the package should include DKE/Elsevier files.
+        artifact_manifest: Optional external artifact release manifest.
 
     返回:
         list[str]: Error messages.
@@ -583,6 +670,14 @@ def validate_package_directory(package_dir: Path, final_upload: bool = False, dk
                         str(package_dir),
                     )
                 )
+                errors.extend(
+                    check_final_upload_artifact_source_binding(
+                        manifest_path.read_text(encoding="utf-8"),
+                        metadata_text,
+                        artifact_manifest,
+                        str(package_dir),
+                    )
+                )
             if cover_letter_path.exists():
                 errors.extend(check_final_upload_cover_letter_text(cover_letter_path.read_text(encoding="utf-8"), metadata_text))
             else:
@@ -616,6 +711,7 @@ def validate_zip_archive(
     final_upload: bool = False,
     dke_preflight: bool = False,
     package_root_name: str = PACKAGE_ROOT_NAME,
+    artifact_manifest: dict | None = None,
 ) -> list[str]:
     """Validate the generated package zip archive.
 
@@ -624,6 +720,7 @@ def validate_zip_archive(
         final_upload: Whether to require journal and author metadata for final upload.
         dke_preflight: Whether the package should include DKE/Elsevier files.
         package_root_name: Expected root directory name inside the zip archive.
+        artifact_manifest: Optional external artifact release manifest.
 
     返回:
         list[str]: Error messages.
@@ -685,6 +782,14 @@ def validate_zip_archive(
                 if target_journal_requires_elsevier_files(metadata_text) and not dke_preflight:
                     errors.append(DKE_ELSEVIER_FILE_REQUIREMENT_ERROR)
                 errors.extend(check_final_upload_source_control_binding(manifest_text, metadata_text, "zip archive"))
+                errors.extend(
+                    check_final_upload_artifact_source_binding(
+                        manifest_text,
+                        metadata_text,
+                        artifact_manifest,
+                        "zip archive",
+                    )
+                )
                 try:
                     cover_letter_text = archive.read(f"{package_root_name}/cover_letter.md").decode("utf-8")
                 except KeyError as exc:
@@ -742,6 +847,7 @@ def validate_submission_package(
     zip_path: Path,
     final_upload: bool = False,
     dke_preflight: bool = False,
+    artifact_dir: Path | None = None,
 ) -> list[str]:
     """Validate the package directory and zip archive.
 
@@ -750,16 +856,21 @@ def validate_submission_package(
         zip_path: Generated zip archive path.
         final_upload: Whether to require journal and author metadata for final upload.
         dke_preflight: Whether the package should include DKE/Elsevier files.
+        artifact_dir: Optional external artifact release directory.
 
     返回:
         list[str]: Error messages.
     """
-    errors = validate_package_directory(package_dir, final_upload, dke_preflight) + validate_zip_archive(
+    artifact_manifest, artifact_errors = load_artifact_manifest(artifact_dir) if final_upload else (None, [])
+    errors = list(artifact_errors)
+    errors.extend(validate_package_directory(package_dir, final_upload, dke_preflight, artifact_manifest))
+    errors.extend(validate_zip_archive(
         zip_path,
         final_upload,
         dke_preflight,
         package_dir.name,
-    )
+        artifact_manifest,
+    ))
     return unique_errors(errors)
 
 
@@ -786,6 +897,7 @@ def main() -> int:
             zip_path.resolve(),
             args.final_upload,
             args.dke_preflight,
+            Path(args.artifact_dir).resolve() if args.artifact_dir else None,
         )
     except Exception as exc:  # noqa: BLE001
         LOGGER.error("submission package validation failed: %s", exc)

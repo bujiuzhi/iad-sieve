@@ -10,11 +10,11 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 25.
+Completed audit cycles: 26.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
-Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.
+Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.
 
 Non-code external inputs still required: author metadata, DKE author biography and photograph materials if that route is selected, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.
 
@@ -298,6 +298,14 @@ This cycle closes a traceability gap in the external artifact release. The artif
 
 The reviewer-facing boundary is source traceability. A matching README and manifest commit prevents reviewers from receiving two different source anchors for the same artifact release. It does not prove that the result files were generated from that commit; that stronger guarantee still depends on command logs, checksums, prediction files, threshold logs, and the final package metadata naming the same source revision.
 
+## Audit Cycle 26: Final Package-Artifact Commit Binding Gate
+
+Outcome: pass for submission-package validator coverage; blocked for final upload until the external artifact release is populated, finalized, validated, and checked with `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release`.
+
+This cycle links the final manuscript package to the external result release. The submission package validator now accepts an optional artifact release directory in final-upload mode, reads the artifact `manifest.json`, and checks that artifact manifest `repository.commit` matches `submission_metadata.yml` field `repository_commit` and, when available, `submission_manifest.json` source-control commit. This prevents a final-upload package from naming one source revision while the external artifact release names another.
+
+The reviewer-facing boundary remains traceability. Passing the package-artifact commit gate means the final source package and external result release share the same source anchor; it does not prove numerical correctness unless the artifact release itself validates, its checksums pass, and the prediction, threshold, metric, and command-log artifacts were generated from the same final source revision.
+
 ## Minimum Gate Before Final Upload
 
 The manuscript should not be uploaded to a journal system until all of the following are true:
@@ -310,7 +318,7 @@ The manuscript should not be uploaded to a journal system until all of the follo
 6. `python manuscript/scripts/verify_fixture_rebuild.py` passes from the public source tree without requiring raw third-party data.
 7. `python scripts/check_public_release.py` passes and confirms that `data/`, `outputs/`, caches, credentials, and large local artifacts are outside the public package.
 8. `python manuscript/scripts/validate_manuscript.py --strict-latex` passes.
-9. `python manuscript/scripts/validate_submission_package.py --final-upload` passes.
+9. `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes after the external artifact release is finalized.
 10. `submission_system_checklist.md` has been checked against the live journal system; the selected journal template matches the final manuscript source; and the title, abstract, keywords, highlights, uploaded files, and live system preview have been verified against the final source package.
 11. The Q2/B acceptance gate is either fully ready or the manuscript title, abstract, cover letter, and conclusion avoid any Q2/B-complete or broad-superiority wording.
 12. Test fixtures, example summaries, and generated fixture rows are not used as proof of Q2/B completion unless they are regenerated from current live artifacts and current commit metadata.

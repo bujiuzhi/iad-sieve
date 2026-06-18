@@ -514,6 +514,22 @@ def _write_malformed_final_upload_metadata(manuscript_root: Path) -> None:
     )
 
 
+def _write_artifact_release_manifest(artifact_dir: Path, repository_commit: str = "abcdef1234567890") -> None:
+    """写入测试用外部 artifact release manifest。
+
+    参数:
+        artifact_dir: Artifact release 目录。
+        repository_commit: Artifact manifest 记录的源码提交号。
+
+    返回:
+        无。
+    """
+    _write_file(
+        artifact_dir / "manifest.json",
+        json.dumps({"repository": {"commit": repository_commit}}, indent=2) + "\n",
+    )
+
+
 def test_build_submission_package_writes_manifest_checksums_and_zip(tmp_path) -> None:
     """验证投稿包生成器只打包正式投稿材料。"""
 
@@ -918,6 +934,26 @@ def test_validate_submission_package_accepts_final_upload_with_filled_metadata(t
     assert errors == []
 
 
+def test_validate_submission_package_accepts_matching_final_upload_artifact_manifest(tmp_path) -> None:
+    """验证正式上传包可与同提交号 artifact manifest 绑定。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    artifact_dir = tmp_path / "artifact_release"
+    _write_required_manuscript_files(manuscript_root)
+    _write_final_upload_metadata(manuscript_root)
+    _write_final_upload_cover_letter(manuscript_root)
+    _write_artifact_release_manifest(artifact_dir)
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
+    errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True, artifact_dir=artifact_dir)
+
+    assert errors == []
+
+
 def test_validate_submission_package_rejects_manifest_without_source_control(tmp_path) -> None:
     """验证投稿包 manifest 缺少 source_control 字段时会被拒绝。"""
 
@@ -956,6 +992,27 @@ def test_validate_submission_package_rejects_final_upload_commit_mismatch(tmp_pa
 
     assert any("source_control commit bbbbbbbbbbbbbbbb" in error for error in errors)
     assert any("repository_commit abcdef1234567890" in error for error in errors)
+
+
+def test_validate_submission_package_rejects_final_upload_artifact_commit_mismatch(tmp_path) -> None:
+    """验证正式上传包和 artifact manifest 必须记录同一个提交号。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    artifact_dir = tmp_path / "artifact_release"
+    _write_required_manuscript_files(manuscript_root)
+    _write_final_upload_metadata(manuscript_root)
+    _write_final_upload_cover_letter(manuscript_root)
+    _write_artifact_release_manifest(artifact_dir, "bbbbbbbbbbbbbbbb")
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
+    errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True, artifact_dir=artifact_dir)
+
+    assert any("submission_metadata.yml repository_commit" in error for error in errors)
+    assert any("artifact manifest repository.commit" in error for error in errors)
 
 
 def test_validate_submission_package_rejects_final_upload_dirty_source_control(tmp_path, monkeypatch) -> None:
