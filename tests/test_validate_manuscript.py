@@ -4815,7 +4815,7 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "Keywords match `keywords.md` exactly unless the selected journal requires a documented wording change.",
             "Highlights match `highlights.md` exactly unless the selected journal does not collect highlights.",
             "The live submission system preview shows the same title, abstract, keywords, and highlights.",
-            "Mark `submission_system_files_verified` true only after these text fields and upload files are checked.",
+            "Mark `submission_system_files_verified`, `live_submission_system_verified`, and `final_upload_package_verified_against_system` true after the final package preview.",
             "## First-Screen Claim Lockdown Checks",
             "`cover_letter.md`, `highlights.md`, `keywords.md`, the abstract, and the conclusion describe the same problem, method, Open-v2 evidence snapshot, and claim boundary.",
             "Any journal-specific edit keeps the Open-v2 numbers scope-bounded.",
@@ -4835,6 +4835,7 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "## Final Metadata Checks",
             "The selected journal template matches the final manuscript source.",
             "`ranking_confirmation_completed`, `ranking_confirmation_source`, `ranking_confirmation_checked_date`, and `selected_target_author_confirmed` are complete before final upload.",
+            "`live_submission_system_verified` and `final_upload_package_verified_against_system` are true.",
             "The funding statement is completed and matches the manuscript and submission system.",
             "The author contribution statement is completed before final upload.",
             "The permissions statement records third-party material permission status.",
@@ -5326,9 +5327,9 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 71.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, target ranking confirmation gap, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.",
-            "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal and ranking/category status are author-confirmed from an authorized source, and the artifact manifest publication object records the same URL or DOI with public access status.",
+            "Completed audit cycles: 72.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.",
+            "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal and ranking/category status are author-confirmed from an authorized source, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
             "## Audit Dimensions",
@@ -5911,6 +5912,12 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "selected_target_author_confirmed",
             "publisher metrics remain screening signals",
             "rank/category traceability",
+            "## Audit Cycle 72: Live System Final Package Verification Gate",
+            "final-upload live-system verification gate implementation",
+            "`upload_preparation.live_submission_system_verified`",
+            "`upload_preparation.final_upload_package_verified_against_system`",
+            "source-file text consistency",
+            "operational traceability",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -5929,7 +5936,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 71",
+        "Completed audit cycles: 72",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -5940,7 +5947,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 71" in error for error in errors)
+    assert any("Completed audit cycles: 72" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -7603,6 +7610,9 @@ def _build_filled_final_upload_metadata_text(
         "artifact_boundary:",
         '  artifact_release_url: "https://doi.org/10.0000/example"',
         '  artifact_release_doi: "10.0000/example"',
+        "upload_preparation:",
+        "  live_submission_system_verified: true",
+        "  final_upload_package_verified_against_system: true",
         "final_upload_checklist:",
         "  target_journal_selected: true",
         "  article_type_confirmed: true",
@@ -7728,6 +7738,9 @@ def test_check_final_upload_metadata_accepts_filled_metadata() -> None:
             "artifact_boundary:",
             '  artifact_release_url: "https://doi.org/10.0000/example"',
             '  artifact_release_doi: "10.0000/example"',
+            "upload_preparation:",
+            "  live_submission_system_verified: true",
+            "  final_upload_package_verified_against_system: true",
             "final_upload_checklist:",
             "  target_journal_selected: true",
             "  article_type_confirmed: true",
@@ -7781,6 +7794,26 @@ def test_check_final_upload_metadata_rejects_missing_target_ranking_confirmation
     assert any("ranking/category confirmation source is missing" in error for error in errors)
     assert any("ranking/category confirmation checked date is missing" in error for error in errors)
     assert any("selected target journal author confirmation is incomplete" in error for error in errors)
+
+
+def test_check_final_upload_metadata_rejects_missing_live_system_verification() -> None:
+    """验证 final-upload 门禁拒绝未完成的 live system 终检记录。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = _build_filled_final_upload_metadata_text()
+    metadata_text = metadata_text.replace(
+        "  live_submission_system_verified: true",
+        "  live_submission_system_verified: false",
+    )
+    metadata_text = metadata_text.replace(
+        "  final_upload_package_verified_against_system: true",
+        "  final_upload_package_verified_against_system: false",
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any("live submission system verification is incomplete" in error for error in errors)
+    assert any("final upload package verification against live system is incomplete" in error for error in errors)
 
 
 def test_check_final_upload_metadata_rejects_missing_generative_ai_declaration() -> None:
@@ -7872,6 +7905,9 @@ def test_check_final_upload_metadata_rejects_missing_repository_reference() -> N
             "artifact_boundary:",
             '  artifact_release_url: "https://doi.org/10.0000/example"',
             '  artifact_release_doi: "10.0000/example"',
+            "upload_preparation:",
+            "  live_submission_system_verified: true",
+            "  final_upload_package_verified_against_system: true",
             "final_upload_checklist:",
             "  target_journal_selected: true",
             "  article_type_confirmed: true",
@@ -8498,6 +8534,9 @@ def test_check_final_upload_metadata_accepts_dke_research_data_statement_with_ar
             "artifact_boundary:",
             '  artifact_release_url: "https://doi.org/10.0000/example"',
             '  artifact_release_doi: "10.0000/example"',
+            "upload_preparation:",
+            "  live_submission_system_verified: true",
+            "  final_upload_package_verified_against_system: true",
             "final_upload_checklist:",
             "  target_journal_selected: true",
             "  article_type_confirmed: true",

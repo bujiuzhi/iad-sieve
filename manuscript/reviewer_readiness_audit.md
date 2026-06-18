@@ -10,11 +10,11 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 71.
+Completed audit cycles: 72.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, target ranking confirmation gap, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.
 
-Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal and ranking/category status are author-confirmed from an authorized source, and the artifact manifest publication object records the same URL or DOI with public access status.
+Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal and ranking/category status are author-confirmed from an authorized source, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.
 
 Non-code external inputs still required: author metadata, DKE author biography and photograph materials if that route is selected, target-journal confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.
 
@@ -667,6 +667,14 @@ This gate checks whether Q2/B language can be inferred from the target-journal s
 
 The reviewer-facing boundary is rank/category traceability, not evidence strengthening. A passing final-upload metadata gate shows that the authors confirmed the selected route and recorded the ranking source/date; it does not by itself improve the empirical evidence or permit broad superiority claims.
 
+## Audit Cycle 72: Live System Final Package Verification Gate
+
+Outcome: pass for final-upload live-system verification gate implementation; blocked for final upload until the authors verify the live submission-system preview and final package contents against the current source package.
+
+This gate checks whether `submission_system_files_verified` alone is enough to prove final-upload readiness. It is not. The final-upload metadata validator now also requires `upload_preparation.live_submission_system_verified` and `upload_preparation.final_upload_package_verified_against_system` before a final-upload package can pass. These fields separate source-file text consistency from the final operational check that the live journal system displays the same title, abstract, keywords, highlights, uploaded files, and package contents as the current source package.
+
+The reviewer-facing boundary is operational traceability, not scientific evidence strengthening. A passing live-system verification gate shows that the uploaded materials and live submission preview match the source package; it does not create author declarations, target-ranking confirmation, artifact release access, or stronger empirical evidence.
+
 ## Minimum Gate Before Final Upload
 
 The manuscript should not be uploaded to a journal system until all of the following are true:
@@ -680,6 +688,6 @@ The manuscript should not be uploaded to a journal system until all of the follo
 7. `python scripts/check_public_release.py` passes and confirms that `data/`, `outputs/`, caches, credentials, and large local artifacts are outside the public package.
 8. `python manuscript/scripts/validate_manuscript.py --strict-latex` passes.
 9. `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes after the external artifact release is finalized.
-10. `submission_system_checklist.md` has been checked against the live journal system; the selected journal template matches the final manuscript source; and the title, abstract, keywords, highlights, uploaded files, and live system preview have been verified against the final source package.
+10. `submission_system_checklist.md` has been checked against the live journal system; the selected journal template matches the final manuscript source; and the title, abstract, keywords, highlights, uploaded files, live system preview, and final package contents have been verified against the final source package with `live_submission_system_verified` and `final_upload_package_verified_against_system` set to true.
 11. The Q2/B acceptance gate is either fully ready or the manuscript title, abstract, cover letter, and conclusion avoid any Q2/B-complete or broad-superiority wording.
 12. Test fixtures, example summaries, and generated fixture rows are not used as proof of Q2/B completion unless they are regenerated from current live artifacts and current commit metadata.

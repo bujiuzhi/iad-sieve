@@ -90,6 +90,8 @@ FINAL_UPLOAD_TRUE_FIELDS = {
     "manuscript_pdf_rebuilt_after_template": "manuscript PDF rebuild checklist item is incomplete",
     "supplementary_pdf_rebuilt_after_template": "supplementary PDF rebuild checklist item is incomplete",
     "submission_system_files_verified": "submission system file checklist item is incomplete",
+    "live_submission_system_verified": "live submission system verification is incomplete",
+    "final_upload_package_verified_against_system": "final upload package verification against live system is incomplete",
     "first_screen_claim_lockdown_confirmed": "first-screen claim lockdown checklist item is incomplete",
     "artifact_release_prepared_or_linked": "artifact release checklist item is incomplete",
 }

@@ -20,8 +20,8 @@ Repository URL and commit binding: keep the source `repository_reference` fields
 | Generative AI declaration | `generative_ai`, `final_upload_checklist.generative_ai_declaration_complete` | Manuscript declaration section and live submission system |
 | Data and code availability statement | `repository_reference`, `artifact_boundary`, `statements.research_data_statement` | Manuscript declarations and research-data statement field |
 | Artifact release | `artifact_boundary`, `final_upload_checklist.artifact_release_prepared_or_linked` | Public artifact record and live submission system |
-| PDF and system checks | `final_upload_checklist.manuscript_pdf_rebuilt_after_template`, `final_upload_checklist.supplementary_pdf_rebuilt_after_template`, `final_upload_checklist.submission_system_files_verified`, `final_upload_checklist.first_screen_claim_lockdown_confirmed` | Rebuilt PDFs, first-screen claim lockdown, and live submission system |
-| Submission text consistency | `final_upload_checklist.submission_system_files_verified` | Title, abstract, keywords, and highlights copied from source files into the live submission system |
+| PDF and system checks | `final_upload_checklist.manuscript_pdf_rebuilt_after_template`, `final_upload_checklist.supplementary_pdf_rebuilt_after_template`, `final_upload_checklist.submission_system_files_verified`, `final_upload_checklist.first_screen_claim_lockdown_confirmed`, `upload_preparation.live_submission_system_verified`, `upload_preparation.final_upload_package_verified_against_system` | Rebuilt PDFs, first-screen claim lockdown, and live submission system |
+| Submission text consistency | `final_upload_checklist.submission_system_files_verified`, `upload_preparation.live_submission_system_verified`, `upload_preparation.final_upload_package_verified_against_system` | Title, abstract, keywords, highlights, uploaded files, and final package checked in the live submission system |
 
 ## Target journal
 
@@ -159,6 +159,8 @@ For each author, select the applicable CRediT roles and then draft the final aut
 - Highlights copied exactly from `highlights.md`:
 - First-page title, abstract, keywords, and highlights were previewed in the live submission system:
 - First-screen claim lockdown confirmed for `cover_letter.md`, `highlights.md`, `keywords.md`, the abstract, and the conclusion:
+- Live submission system verified:
+- Final upload package verified against live system:
 - First-screen materials preserve the Open-v2 evidence boundary and do not claim broad method superiority, SOTA ranking, statistical superiority, threshold stability, human-gold validation, Q2/B completion, final-upload readiness, or cluster-level deployment quality:
 
 ## Final title page
@@ -185,5 +187,7 @@ For each author, select the applicable CRediT roles and then draft the final aut
 - manuscript_pdf_rebuilt_after_template:
 - supplementary_pdf_rebuilt_after_template:
 - submission_system_files_verified:
+- live_submission_system_verified:
+- final_upload_package_verified_against_system:
 - first_screen_claim_lockdown_confirmed:
 - artifact_release_prepared_or_linked:

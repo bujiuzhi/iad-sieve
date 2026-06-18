@@ -53,7 +53,7 @@ Before using the DKE/Elsevier preflight package, verify:
 2. `python manuscript/scripts/validate_submission_package.py --dke-preflight` passes.
 3. `build/iad-risk-dke-preflight-package.zip` contains `iad-risk-manuscript-elsevier.tex`, `iad-risk-manuscript-elsevier.pdf`, the generic LaTeX source files, submission text files, manifest, and checksums.
 4. The DKE/Elsevier preflight package remains anonymous and does not include `data/`, `outputs/`, raw third-party files, local caches, credentials, artifact outputs, author emails, ORCID values, personal account URLs, local absolute paths, or development process notes.
-5. Passing the DKE/Elsevier preflight package check does not complete the final-upload gate; author metadata, target confirmation, live submission-system fields, and artifact release URL or DOI remain required.
+5. Passing the DKE/Elsevier preflight package check does not complete the final-upload gate; author metadata, target confirmation, live submission-system fields, `live_submission_system_verified`, `final_upload_package_verified_against_system`, and artifact release URL or DOI remain required.
 
 ## Publisher Declaration Checks
 
@@ -114,7 +114,8 @@ Before upload, verify:
 10. Author biographies and photographs are ready when the selected DKE/Elsevier route requests them.
 11. The competing-interest statement, data/code availability statement, and ethics statement are consistent across the manuscript and system fields.
 12. The artifact release URL or DOI resolves publicly or according to the journal's access policy, and the artifact manifest `publication.public_access_status` records that public access state.
-13. The manuscript does not claim human gold labels, broad method superiority, or threshold stability unless the corresponding artifact evidence exists.
+13. `live_submission_system_verified` and `final_upload_package_verified_against_system` are true only after the live submission system preview and final package contents match the current source package.
+14. The manuscript does not claim human gold labels, broad method superiority, or threshold stability unless the corresponding artifact evidence exists.
 
 ## Live Submission Text Checks
 
@@ -125,7 +126,7 @@ Before upload, verify:
 3. Keywords match `keywords.md` exactly unless the selected journal requires a documented wording change.
 4. Highlights match `highlights.md` exactly unless the selected journal does not collect highlights.
 5. The live submission system preview shows the same title, abstract, keywords, and highlights that appear in the source files.
-6. Mark `submission_system_files_verified` true only after these text fields and upload files are checked in the live submission system.
+6. Mark `submission_system_files_verified`, `live_submission_system_verified`, and `final_upload_package_verified_against_system` true only after these text fields, uploaded files, and the final package preview are checked in the live submission system.
 
 ## First-Screen Claim Lockdown Checks
 
