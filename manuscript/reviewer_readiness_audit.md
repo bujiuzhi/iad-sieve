@@ -10,9 +10,9 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 17.
+Completed audit cycles: 18.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, artifact release README completeness, artifact release commit validity, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, artifact release README completeness, artifact release commit validity, prediction artifact schema drift, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.
 
@@ -230,6 +230,14 @@ Outcome: pass for package-builder coverage; blocked for final upload until targe
 This cycle closes a source-control binding edge case in the final-upload workflow. A tracked `submission_metadata.yml` file cannot reliably contain the Git commit of the commit that contains itself, because changing the file changes the commit hash. The final-upload package builder therefore keeps the source metadata eligible for anonymous pre-submission, reads `git remote origin`, `git rev-parse HEAD`, and the current branch during `--final-upload`, and writes `repository_url`, `repository_commit`, `repository_branch`, and the matching data/code availability statement into the package copy of `submission_metadata.yml`.
 
 The reviewer-facing boundary is traceability rather than new evidence. This gate ensures that the final package metadata and `submission_manifest.json` agree on the committed source revision used for upload. It does not solve the remaining external blockers: the package still needs confirmed author metadata, target-journal template binding, funding and contribution declarations, permissions wording, live submission-system verification, and an artifact release URL or DOI before final upload can pass.
+
+## Audit Cycle 18: Prediction Artifact Schema Gate
+
+Outcome: pass for checklist and validator coverage; blocked for final numerical audit until the external artifact release is populated, finalized, validated, and linked.
+
+This cycle checks whether final-upload review instructions match the row-level prediction schema enforced by `validate_artifact_release.py`. The final upload checklist now requires `iad_risk_predictions`, `representation_baseline_scores`, and `supervised_baseline_predictions` JSONL files to expose `pair_id`, `source_document_id`, `target_document_id`, expected labels, label strength, hard-negative level, split identifiers, score or probability fields, `threshold_value` where applicable, threshold source, and `merge_prediction`. It also requires `threshold_selection_logs` to expose system, threshold_name, `threshold_value`, selection_split, selection_metric, selection_rule, applied_scope, and `score_field`.
+
+The reviewer-facing boundary is auditability rather than new empirical strength. A schema-complete prediction artifact lets reviewers recompute row-level decisions, denominators, and fixed operating points from the released files. It does not by itself establish threshold stability, statistical superiority, ablation causality, human-gold validation, or cluster-level quality; those remain gated by the optional artifacts and claim flags.
 
 ## Minimum Gate Before Final Upload
 

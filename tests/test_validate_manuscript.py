@@ -3238,6 +3238,26 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "defer count",
             "automatic merge coverage",
             "defer rate",
+            "iad_risk_predictions",
+            "representation_baseline_scores",
+            "supervised_baseline_predictions",
+            "threshold_selection_logs",
+            "pair_id",
+            "source_document_id",
+            "target_document_id",
+            "label strength",
+            "hard-negative level",
+            "split identifiers",
+            "score or probability fields",
+            "threshold_value",
+            "threshold source",
+            "merge_prediction",
+            "threshold_name",
+            "selection_split",
+            "selection_metric",
+            "selection_rule",
+            "applied_scope",
+            "score_field",
             "## DKE/Elsevier Preflight Package Checks",
             "python manuscript/scripts/build_submission_package.py --dke-preflight",
             "python manuscript/scripts/validate_submission_package.py --dke-preflight",
@@ -3569,7 +3589,7 @@ def test_check_submission_system_checklist_rejects_missing_artifact_release_chec
 
 
 def test_check_submission_system_checklist_rejects_missing_artifact_row_schema_checks() -> None:
-    """验证投稿系统清单必须覆盖主结果表行级 schema 检查。"""
+    """验证投稿系统清单必须覆盖结果表和预测 artifact 行级 schema 检查。"""
 
     module = _load_validate_manuscript_module()
     checklist_text = Path("manuscript/submission_system_checklist.md").read_text(encoding="utf-8")
@@ -3583,6 +3603,26 @@ def test_check_submission_system_checklist_rejects_missing_artifact_row_schema_c
         "defer count",
         "automatic merge coverage",
         "defer rate",
+        "iad_risk_predictions",
+        "representation_baseline_scores",
+        "supervised_baseline_predictions",
+        "threshold_selection_logs",
+        "pair_id",
+        "source_document_id",
+        "target_document_id",
+        "label strength",
+        "hard-negative level",
+        "split identifiers",
+        "score or probability fields",
+        "threshold_value",
+        "threshold source",
+        "merge_prediction",
+        "threshold_name",
+        "selection_split",
+        "selection_metric",
+        "selection_rule",
+        "applied_scope",
+        "score_field",
     ]:
         checklist_text = checklist_text.replace(marker, "")
 
@@ -3594,6 +3634,12 @@ def test_check_submission_system_checklist_rejects_missing_artifact_row_schema_c
     assert any("scope label used in the main table" in error for error in errors)
     assert any("automatic merge coverage" in error for error in errors)
     assert any("defer rate" in error for error in errors)
+    assert any("iad_risk_predictions" in error for error in errors)
+    assert any("threshold_selection_logs" in error for error in errors)
+    assert any("pair_id" in error for error in errors)
+    assert any("threshold_value" in error for error in errors)
+    assert any("merge_prediction" in error for error in errors)
+    assert any("selection_rule" in error for error in errors)
 
 
 def test_check_submission_system_checklist_rejects_missing_declaration_gate_fields() -> None:
@@ -3693,8 +3739,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 17.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, artifact release README completeness, artifact release commit validity, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
+            "Completed audit cycles: 18.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, artifact release README completeness, artifact release commit validity, prediction artifact schema drift, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, target-journal confirmation, funding statement, author contribution statement, permissions statement, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -3840,6 +3886,29 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "writes `repository_url`, `repository_commit`, `repository_branch`",
             "matching data/code availability statement",
             "final package metadata and `submission_manifest.json` agree",
+            "## Audit Cycle 18: Prediction Artifact Schema Gate",
+            "row-level prediction schema enforced by `validate_artifact_release.py`",
+            "iad_risk_predictions",
+            "representation_baseline_scores",
+            "supervised_baseline_predictions",
+            "threshold_selection_logs",
+            "pair_id",
+            "source_document_id",
+            "target_document_id",
+            "label strength",
+            "hard-negative level",
+            "split identifiers",
+            "score or probability fields",
+            "threshold_value",
+            "threshold source",
+            "merge_prediction",
+            "threshold_name",
+            "selection_split",
+            "selection_metric",
+            "selection_rule",
+            "applied_scope",
+            "score_field",
+            "recompute row-level decisions, denominators, and fixed operating points",
             "data/",
             "outputs/",
             "## Minimum Gate Before Final Upload",
@@ -3860,7 +3929,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 17",
+        "Completed audit cycles: 18",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -3871,7 +3940,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 17" in error for error in errors)
+    assert any("Completed audit cycles: 18" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -4184,6 +4253,40 @@ def test_check_reviewer_readiness_audit_rejects_missing_final_upload_source_cont
     assert any("Final-Upload Source-Control Package Binding Gate" in error for error in errors)
     assert any("tracked `submission_metadata.yml`" in error for error in errors)
     assert any("matching data/code availability statement" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_prediction_artifact_schema_gate() -> None:
+    """验证审稿准备度审计必须覆盖 prediction artifact 行级 schema 门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Audit Cycle 18: Prediction Artifact Schema Gate",
+        "prediction artifact schema drift",
+        "row-level prediction schema enforced by `validate_artifact_release.py`",
+        "iad_risk_predictions",
+        "representation_baseline_scores",
+        "supervised_baseline_predictions",
+        "threshold_selection_logs",
+        "pair_id",
+        "source_document_id",
+        "target_document_id",
+        "threshold_value",
+        "merge_prediction",
+        "selection_rule",
+        "score_field",
+        "recompute row-level decisions, denominators, and fixed operating points",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Prediction Artifact Schema Gate" in error for error in errors)
+    assert any("prediction artifact schema drift" in error for error in errors)
+    assert any("iad_risk_predictions" in error for error in errors)
+    assert any("threshold_selection_logs" in error for error in errors)
+    assert any("merge_prediction" in error for error in errors)
+    assert any("selection_rule" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_final_gate() -> None:

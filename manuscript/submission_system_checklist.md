@@ -38,7 +38,9 @@ Before linking an external artifact release, verify:
 7. `manifest.json` records the release commit, source-tree cleanliness, required artifact IDs, claim boundaries, and SHA256 values for required artifacts.
 8. `checksums.sha256` covers every release file except itself and matches the file contents.
 9. `open_v2_main_results` resolves to `tables/open_v2_main_results.csv` with per-row denominator counts, per-row threshold source, scope label used in the main table, automatic merge count, block count, defer count, automatic merge coverage, and defer rate.
-10. The release excludes `data/`, `outputs/`, cache files, credentials, raw third-party files, and model checkpoints.
+10. `iad_risk_predictions`, `representation_baseline_scores`, and `supervised_baseline_predictions` resolve to JSONL files with `pair_id`, `source_document_id`, `target_document_id`, expected labels, label strength, hard-negative level, split identifiers, score or probability fields, `threshold_value` where applicable, threshold source, and `merge_prediction`.
+11. `threshold_selection_logs` resolves to a JSONL file with system, threshold_name, `threshold_value`, selection_split, selection_metric, selection_rule, applied_scope, and `score_field`.
+12. The release excludes `data/`, `outputs/`, cache files, credentials, raw third-party files, and model checkpoints.
 
 ## DKE/Elsevier Preflight Package Checks
 
