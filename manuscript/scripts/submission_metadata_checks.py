@@ -497,6 +497,28 @@ def check_submission_statement_fields(metadata_text: str) -> list[str]:
     ]
 
 
+def check_author_contribution_statement(metadata_text: str) -> list[str]:
+    """Check whether final-upload metadata declares author contributions.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages for missing author contribution information.
+    """
+    contribution_row = parse_mapping_section(metadata_text, "author_contributions")
+    contribution_statement = contribution_row.get("contribution_statement", "") or contribution_row.get(
+        "credit_statement",
+        "",
+    )
+    role_values = contribution_row.get("roles", "")
+    has_inline_roles = bool(role_values and role_values != "[]")
+    has_list_roles = any(line.strip().startswith("- ") for line in section_lines(metadata_text, "author_contributions"))
+    if contribution_statement or has_inline_roles or has_list_roles:
+        return []
+    return ["author contribution statement is missing"]
+
+
 def check_final_upload_cover_letter_text(cover_letter_text: str, metadata_text: str) -> list[str]:
     """Check final-upload cover letter target and artifact boundaries.
 
@@ -573,6 +595,7 @@ def check_final_upload_metadata_text(metadata_text: str) -> list[str]:
     )
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_funding_statement(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_submission_statement_fields(metadata_text))
+    errors.extend(f"final upload metadata unresolved: {message}" for message in check_author_contribution_statement(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_artifact_release_link(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_final_upload_review_mode(metadata_text))
     return sorted(set(errors))

@@ -44,6 +44,11 @@ funding:
   funding_sources: []
   grant_numbers: []
 
+author_contributions:
+  credit_taxonomy_required_before_final_upload: true
+  contribution_statement: ""
+  roles: []
+
 artifact_boundary:
   raw_third_party_data_included: false
   full_prediction_files_included: false

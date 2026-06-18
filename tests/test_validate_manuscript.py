@@ -2090,6 +2090,9 @@ def test_check_final_upload_metadata_accepts_filled_metadata() -> None:
             '  competing_interests: "The authors declare no competing interests."',
             '  ethics: "This study uses public scholarly metadata and does not involve human participants."',
             '  data_code_availability: "The repository provides source code, fixtures, and artifact-release instructions."',
+            "author_contributions:",
+            '  contribution_statement: "Example Author: conceptualization, methodology, software, validation, and writing - original draft."',
+            "  roles: []",
             "artifact_boundary:",
             '  artifact_release_url: "https://doi.org/10.0000/example"',
             '  artifact_release_doi: "10.0000/example"',
@@ -2235,6 +2238,55 @@ def test_check_final_upload_metadata_rejects_missing_submission_statements() -> 
     assert any("author approval statement is missing" in error for error in errors)
     assert any("ethics statement is missing" in error for error in errors)
     assert any("data/code availability statement is missing" in error for error in errors)
+
+
+def test_check_final_upload_metadata_rejects_missing_author_contribution_statement() -> None:
+    """验证 final-upload 门禁拒绝缺少作者贡献声明的元数据。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = "\n".join(
+        [
+            'target_journal: "Journal of Scholarly Data"',
+            "target_journal_template_bound: true",
+            "authors:",
+            '  - name: "Example Author"',
+            '    affiliation: "Example University"',
+            '    email: "author@example.edu"',
+            '    orcid: "0000-0002-1825-0097"',
+            "corresponding_author:",
+            '  name: "Example Author"',
+            '  affiliation: "Example University"',
+            '  email: "author@example.edu"',
+            '  orcid: "0000-0002-1825-0097"',
+            "funding:",
+            "  no_external_funding_declared: true",
+            '  funding_statement: "The authors received no external funding for this work."',
+            "  funding_sources: []",
+            "  grant_numbers: []",
+            "statements:",
+            '  originality: "The manuscript is original, has not been published previously, and is not under consideration elsewhere."',
+            '  author_approval: "All listed authors have approved the submitted version."',
+            '  competing_interests: "The authors declare no competing interests."',
+            '  ethics: "This study uses public scholarly metadata and does not involve human participants."',
+            '  data_code_availability: "The repository provides source code, fixtures, and artifact-release instructions."',
+            "artifact_boundary:",
+            '  artifact_release_url: "https://doi.org/10.0000/example"',
+            '  artifact_release_doi: "10.0000/example"',
+            "final_upload_checklist:",
+            "  target_journal_selected: true",
+            "  target_journal_template_applied: true",
+            "  author_metadata_completed: true",
+            "  corresponding_author_completed: true",
+            "  manuscript_pdf_rebuilt_after_template: true",
+            "  supplementary_pdf_rebuilt_after_template: true",
+            "  submission_system_files_verified: true",
+            "  artifact_release_prepared_or_linked: true",
+        ]
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any("author contribution statement is missing" in error for error in errors)
 
 
 def test_check_final_upload_metadata_rejects_duplicate_author_orcid() -> None:
