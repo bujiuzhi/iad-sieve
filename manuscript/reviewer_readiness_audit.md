@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 63.
+Completed audit cycles: 64.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -601,6 +601,14 @@ Outcome: pass for risk-score rationale table-density reduction; blocked for cali
 This gate checks whether the risk score design rationale table is needed in the main manuscript. The main manuscript now states the rationale in prose: $p_{\mathrm{risk}}$ is a conservative upper-envelope risk proxy, it increases with agenda-non-identity evidence, it increases when agenda evidence is high and identity evidence is weak, the max operator keeps direct ANI evidence or indirect agenda-without-identity evidence sufficient to block automatic merging, and the product term is not a calibrated probability. Threshold transfer must be rechecked under new source distributions. The supplementary material preserves the full risk score design rationale table with design element, design rationale, and boundary columns.
 
 The reviewer-facing boundary is risk-score clarity without main-text table overload. The validator still requires the supplementary risk score design rationale table, including the $p_{\mathrm{ani}}$ term, the $p_{\mathrm{agenda}}(1-p_{\mathrm{work}})$ term, Max operator, Threshold gate, the non-calibration boundary, and the threshold-transfer boundary.
+
+## Audit Cycle 64: Design Alternatives Density Gate
+
+Outcome: pass for design-alternatives table-density reduction; blocked for broad method-superiority claims until same-scope baseline predictions, threshold logs, interval estimates, and checksum-fixed artifacts are released.
+
+This gate checks whether the design alternatives table is needed in the main manuscript. The main manuscript now states the rejected shortcuts in prose: Tune a representation-similarity threshold, Use one supervised pair classifier, Use provenance as a model feature, Always force a binary merge decision, and Select thresholds after test results. It also states the reviewer-facing boundaries that RoBERTa remains a strong baseline, broad superiority is not claimed, and Threshold stability needs a released grid and checksums. The supplementary material preserves the full design-alternatives table with the alternative, why it is insufficient for this failure mode, the IAD-Risk design response, and evidence boundary.
+
+The reviewer-facing boundary is design-alternative clarity without main-text table overload. The validator still requires the supplementary design-alternatives table, including all five rejected shortcuts, the explicit RoBERTa baseline boundary, the broad-superiority boundary, and the threshold-stability artifact boundary.
 
 ## Minimum Gate Before Final Upload
 

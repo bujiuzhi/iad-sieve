@@ -1545,18 +1545,19 @@ def check_scoring_merge_algorithm(manuscript_text: str) -> list[str]:
     ]
 
 
-def check_design_alternative_boundaries(manuscript_text: str) -> list[str]:
+def check_design_alternative_boundaries(manuscript_text: str, supplementary_text: str = "") -> list[str]:
     """Check whether the method explains why simpler alternatives are insufficient.
 
     参数:
         manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
 
     返回:
         list[str]: Error messages for missing design-alternative boundaries.
     """
-    required_markers = [
+    required_main_markers = [
         r"\subsection{Design Alternatives and Rejected Shortcuts}",
-        r"\label{tab:design-alternatives}",
+        "full design-alternatives table is reported in the supplementary material",
         "Tune a representation-similarity threshold",
         "Use one supervised pair classifier",
         "Use provenance as a model feature",
@@ -1566,11 +1567,34 @@ def check_design_alternative_boundaries(manuscript_text: str) -> list[str]:
         "broad superiority is not claimed",
         "Threshold stability needs a released grid and checksums",
     ]
-    return [
-        f"design alternative boundary missing marker: {marker}"
-        for marker in required_markers
+    required_supplement_markers = [
+        r"\label{tab:design-alternatives}",
+        "Design alternatives considered during method design",
+        "Alternative",
+        "Why it is insufficient for this failure mode",
+        "IAD-Risk design response",
+        "Evidence boundary",
+        "Tune a representation-similarity threshold",
+        "Use one supervised pair classifier",
+        "Use provenance as a model feature",
+        "Always force a binary merge decision",
+        "Select thresholds after test results",
+        "RoBERTa remains a strong baseline",
+        "broad superiority is not claimed",
+        "Threshold stability needs a released grid and checksums",
+    ]
+    errors = [
+        f"design alternative boundary missing manuscript marker: {marker}"
+        for marker in required_main_markers
         if marker not in manuscript_text
     ]
+    evidence_text = supplementary_text or manuscript_text
+    errors.extend(
+        f"design alternative boundary missing supplementary marker: {marker}"
+        for marker in required_supplement_markers
+        if marker not in evidence_text
+    )
+    return errors
 
 
 def check_operating_point_disclosure(manuscript_text: str, supplementary_text: str = "") -> list[str]:
@@ -3275,7 +3299,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 63",
+        "Completed audit cycles: 64",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3396,8 +3420,18 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 61: Split and Leakage Controls Density Gate",
         "Audit Cycle 62: Feature and Head Specification Density Gate",
         "Audit Cycle 63: Risk Score Design Rationale Density Gate",
+        "Audit Cycle 64: Design Alternatives Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
+        "design-alternatives table-density reduction",
+        "full design-alternatives table",
+        "Tune a representation-similarity threshold",
+        "Use one supervised pair classifier",
+        "Use provenance as a model feature",
+        "Always force a binary merge decision",
+        "Select thresholds after test results",
+        "design-alternative clarity without main-text table overload",
+        "supplementary design-alternatives table",
         "risk-score rationale table-density reduction",
         "full risk score design rationale table",
         r"$p_{\mathrm{risk}}$ is a conservative upper-envelope risk proxy",
@@ -4880,7 +4914,7 @@ def main() -> int:
     errors.extend(check_method_design_supplementary_boundaries(supplementary_text))
     errors.extend(check_method_pipeline_figure(manuscript_text))
     errors.extend(check_scoring_merge_algorithm(manuscript_text))
-    errors.extend(check_design_alternative_boundaries(manuscript_text))
+    errors.extend(check_design_alternative_boundaries(manuscript_text, supplementary_text))
     errors.extend(check_related_work_positioning(manuscript_text, supplementary_text))
     errors.extend(check_error_taxonomy(manuscript_text, supplementary_text))
     errors.extend(check_validity_threats(manuscript_text, supplementary_text))
