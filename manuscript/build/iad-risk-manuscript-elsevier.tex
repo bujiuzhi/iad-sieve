@@ -594,26 +594,7 @@ Capacity-normalized review load & Review workload after subtracting automatic me
 
 \subsection{Pair-to-Cluster Evidence Boundary}
 
-The reported pair-level metrics do not by themselves prove cluster-level deduplication quality. Pair decisions can propagate through transitive merge propagation when a deduplication system turns accepted links into connected components. A single unsafe merge can contaminate a larger cluster, while one cannot-link decision can block a transitive path that would otherwise merge distinct works. Table~\ref{tab:pair-cluster-evidence-boundary} states the additional audit evidence required before pair-level false-merge control can be interpreted as a cluster-level deployment guarantee.
-
-\begin{table}[H]
-\caption{Pair-to-cluster evidence boundary. Cluster-level deployment claims require artifacts beyond pair-level prediction and metric files.}
-\label{tab:pair-cluster-evidence-boundary}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{L{0.25\linewidth}L{0.33\linewidth}L{0.32\linewidth}}
-\toprule
-Evidence item & Required artifact source & Interpretation boundary \\
-\midrule
-cluster assignments & Released component or cluster ID for each evaluated record. & Needed before computing cluster purity, split errors, or merged-work contamination. \\
-cannot-link violations & \path{cannot_link_audit} generated from the same merge decisions and identifier-conflict rules. & Needed before claiming that risk gates prevent transitive false merges. \\
-Cluster metric summary & \path{cluster_metric_summary} with cluster contamination rate, singleton rate, merge coverage, and conflict counts. & Needed before claiming cluster-level quality rather than pair-level risk control. \\
-Pair-to-cluster trace & Mapping from pair decisions, thresholds, and cannot-link flags to final components. & Required to audit whether a pair-level error changes a downstream cluster. \\
-Current manuscript claim & Pair-level F1, FMR, and HNFMR under fixed operating points. & The paper does not claim cluster-level contamination is eliminated. \\
-\bottomrule
-\end{tabular}
-\end{table}
+The reported pair-level metrics do not by themselves prove cluster-level deduplication quality. Pair decisions can propagate through transitive merge propagation when a deduplication system turns accepted links into connected components. A single unsafe merge can contaminate a larger cluster, while one cannot-link decision can block a transitive path that would otherwise merge distinct works. The full pair-to-cluster evidence boundary table is reported in the supplementary material. The main text keeps the deployment boundary as a prose rule: cluster assignments, cannot-link violations, \path{cannot_link_audit}, \path{cluster_metric_summary}, pair-to-cluster trace files, and cluster contamination rate are required before pair-level false-merge control can be interpreted as a cluster-level deployment guarantee. The paper therefore does not claim cluster-level contamination is eliminated.
 
 \subsection{Threshold Sensitivity Evidence Status}
 

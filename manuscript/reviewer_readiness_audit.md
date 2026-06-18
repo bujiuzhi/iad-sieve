@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 54.
+Completed audit cycles: 55.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -529,6 +529,14 @@ Outcome: pass for mechanism-evidence table-density reduction; blocked for full c
 This gate checks whether the mechanism-evidence table is needed in the main manuscript. The main manuscript now states the mechanism boundary in prose: topical relatedness creates merge risk only as a targeted failure-mode claim, explicit risk gating supports the reported Open-v2 contract and thresholds, component-causality claims require ablations, and cluster-level contamination claims require sufficient cannot-link coverage and cluster-level artifact audits. The supplementary material preserves the full mechanism-evidence boundary table with the mechanism questions, current evidence, and interpretation boundaries.
 
 The reviewer-facing boundary is mechanism-evidence clarity without main-text table overload. The edit keeps the mechanism section closer to a journal narrative while the validator still requires the supplementary mechanism-evidence boundary, including topical relatedness, explicit risk gating, component-causality claims, cluster-level contamination claims, and the explicit boundary that stronger causal or deployment claims require additional artifact-backed evidence.
+
+## Audit Cycle 55: Pair-to-Cluster Evidence Boundary Density Gate
+
+Outcome: pass for pair-to-cluster table-density reduction; blocked for cluster-level deployment claims until cluster assignments, cannot-link audits, cluster metric summaries, pair-to-cluster trace files, and checksum-fixed cluster artifacts are released.
+
+This gate checks whether the pair-to-cluster evidence boundary table is needed in the main manuscript. The main manuscript now states the deployment boundary in prose: pair-level metrics do not prove cluster-level deduplication quality, transitive merge propagation can move a pair error into a larger component, and cluster assignments, cannot-link violations, `cannot_link_audit`, `cluster_metric_summary`, pair-to-cluster trace files, and cluster contamination rate are required before stronger deployment claims are made. The supplementary material preserves the full pair-to-cluster evidence boundary table with each artifact source and interpretation boundary.
+
+The reviewer-facing boundary is pair-to-cluster clarity without main-text table overload. The edit keeps the experiments section focused on reported pair-level evidence while the validator still requires the supplementary pair-to-cluster evidence boundary, including cluster assignments, cannot-link violations, `cannot_link_audit`, `cluster_metric_summary`, pair-to-cluster trace files, cluster contamination rate, and the explicit rule that the paper does not claim cluster-level contamination is eliminated.
 
 ## Minimum Gate Before Final Upload
 

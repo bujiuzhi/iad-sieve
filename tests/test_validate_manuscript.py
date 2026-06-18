@@ -1966,8 +1966,8 @@ def test_check_selective_decision_coverage_boundary_rejects_missing_defer_bounda
     assert any("all-pair automatic resolution" in error for error in errors)
 
 
-def test_check_pair_cluster_evidence_boundary_accepts_complete_boundary() -> None:
-    """验证 pair-level 与 cluster-level 证据边界完整时可通过检查。"""
+def test_check_pair_cluster_evidence_boundary_accepts_supplementary_table() -> None:
+    """验证 pair-level 与 cluster-level 证据边界表迁入补充材料后可通过检查。"""
 
     module = _load_validate_manuscript_module()
     checker = getattr(module, "check_pair_cluster_evidence_boundary", None)
@@ -1975,11 +1975,54 @@ def test_check_pair_cluster_evidence_boundary_accepts_complete_boundary() -> Non
     manuscript_text = "\n".join(
         [
             r"\subsection{Pair-to-Cluster Evidence Boundary}",
-            r"\label{tab:pair-cluster-evidence-boundary}",
+            "The full pair-to-cluster evidence boundary table is reported in the supplementary material.",
             "pair-level metrics do not by themselves prove cluster-level deduplication quality.",
             "transitive merge propagation",
             "cannot-link violations",
             "cluster assignments",
+            "pair-to-cluster trace files",
+            "cluster_metric_summary",
+            "cannot_link_audit",
+            "cluster contamination rate",
+            "does not claim cluster-level contamination is eliminated",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Pair-to-Cluster Evidence Boundary}",
+            r"\label{tab:pair-cluster-evidence-boundary}",
+            "Pair-to-cluster evidence boundary.",
+            "Evidence item",
+            "Required artifact source",
+            "Interpretation boundary",
+            "cluster assignments",
+            "cannot-link violations",
+            "Cluster metric summary",
+            "Pair-to-cluster trace",
+            "cluster contamination rate",
+        ]
+    )
+
+    errors = checker(manuscript_text, supplementary_text)
+
+    assert errors == []
+
+
+def test_check_pair_cluster_evidence_boundary_rejects_missing_supplementary_table() -> None:
+    """验证缺少补充材料完整表时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_pair_cluster_evidence_boundary", None)
+    assert callable(checker)
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Pair-to-Cluster Evidence Boundary}",
+            "The full pair-to-cluster evidence boundary table is reported in the supplementary material.",
+            "pair-level metrics do not by themselves prove cluster-level deduplication quality.",
+            "transitive merge propagation",
+            "cannot-link violations",
+            "cluster assignments",
+            "pair-to-cluster trace files",
             "cluster_metric_summary",
             "cannot_link_audit",
             "cluster contamination rate",
@@ -1987,24 +2030,10 @@ def test_check_pair_cluster_evidence_boundary_accepts_complete_boundary() -> Non
         ]
     )
 
-    errors = checker(manuscript_text)
-
-    assert errors == []
-
-
-def test_check_pair_cluster_evidence_boundary_rejects_missing_cluster_audit() -> None:
-    """验证缺少 cluster audit 边界时会被拒绝。"""
-
-    module = _load_validate_manuscript_module()
-    checker = getattr(module, "check_pair_cluster_evidence_boundary", None)
-    assert callable(checker)
-    manuscript_text = r"\subsection{Pair-to-Cluster Evidence Boundary} pair-level metrics are reported."
-
-    errors = checker(manuscript_text)
+    errors = checker(manuscript_text, "")
 
     assert any("pair-cluster-evidence-boundary" in error for error in errors)
-    assert any("cluster assignments" in error for error in errors)
-    assert any("cannot_link_audit" in error for error in errors)
+    assert any("Pair-to-Cluster Evidence Boundary" in error for error in errors)
 
 
 def test_check_error_taxonomy_accepts_supplementary_table() -> None:
@@ -4746,7 +4775,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 54.",
+            "Completed audit cycles: 55.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -5170,6 +5199,15 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "cluster-level contamination claims",
             "mechanism-evidence clarity without main-text table overload",
             "supplementary mechanism-evidence boundary",
+            "## Audit Cycle 55: Pair-to-Cluster Evidence Boundary Density Gate",
+            "pair-to-cluster table-density reduction",
+            "full pair-to-cluster evidence boundary table",
+            "cluster assignments",
+            "cannot-link violations",
+            "pair-to-cluster trace files",
+            "cluster contamination rate",
+            "pair-to-cluster clarity without main-text table overload",
+            "supplementary pair-to-cluster evidence boundary",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -5188,7 +5226,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 54",
+        "Completed audit cycles: 55",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -5199,7 +5237,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 54" in error for error in errors)
+    assert any("Completed audit cycles: 55" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

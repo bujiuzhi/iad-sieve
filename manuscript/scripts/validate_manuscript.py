@@ -1572,32 +1572,54 @@ def check_selective_decision_coverage_boundary(manuscript_text: str) -> list[str
     ]
 
 
-def check_pair_cluster_evidence_boundary(manuscript_text: str) -> list[str]:
+def check_pair_cluster_evidence_boundary(manuscript_text: str, supplementary_text: str = "") -> list[str]:
     """Check whether pair-level metrics are separated from cluster-level claims.
 
     参数:
         manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
 
     返回:
         list[str]: Error messages for missing pair-to-cluster evidence boundaries.
     """
-    required_markers = [
+    required_main_markers = [
         r"\subsection{Pair-to-Cluster Evidence Boundary}",
-        r"\label{tab:pair-cluster-evidence-boundary}",
+        "full pair-to-cluster evidence boundary table is reported in the supplementary material",
         "pair-level metrics do not by themselves prove cluster-level deduplication quality",
         "transitive merge propagation",
         "cannot-link violations",
         "cluster assignments",
+        "pair-to-cluster trace files",
         "cluster_metric_summary",
         "cannot_link_audit",
         "cluster contamination rate",
         "does not claim cluster-level contamination is eliminated",
     ]
-    return [
-        f"pair-to-cluster evidence boundary missing marker: {marker}"
-        for marker in required_markers
+    required_supplement_markers = [
+        r"\section{Pair-to-Cluster Evidence Boundary}",
+        r"\label{tab:pair-cluster-evidence-boundary}",
+        "Pair-to-cluster evidence boundary",
+        "Evidence item",
+        "Required artifact source",
+        "Interpretation boundary",
+        "cluster assignments",
+        "cannot-link violations",
+        "Cluster metric summary",
+        "Pair-to-cluster trace",
+        "cluster contamination rate",
+    ]
+    errors = [
+        f"pair-to-cluster evidence boundary missing manuscript marker: {marker}"
+        for marker in required_main_markers
         if marker not in manuscript_text
     ]
+    evidence_text = supplementary_text or manuscript_text
+    errors.extend(
+        f"pair-to-cluster evidence boundary missing supplementary marker: {marker}"
+        for marker in required_supplement_markers
+        if marker not in evidence_text
+    )
+    return errors
 
 
 def check_decision_metric_mapping(manuscript_text: str) -> list[str]:
@@ -3056,7 +3078,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 54",
+        "Completed audit cycles: 55",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3168,6 +3190,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 52: Data and Code Availability Density Gate",
         "Audit Cycle 53: Error Taxonomy Density Gate",
         "Audit Cycle 54: Mechanism Evidence Boundary Density Gate",
+        "Audit Cycle 55: Pair-to-Cluster Evidence Boundary Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
         "method-writing clarity",
@@ -3326,6 +3349,14 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "cluster-level contamination claims",
         "mechanism-evidence clarity without main-text table overload",
         "supplementary mechanism-evidence boundary",
+        "pair-to-cluster table-density reduction",
+        "full pair-to-cluster evidence boundary table",
+        "cluster assignments",
+        "cannot-link violations",
+        "pair-to-cluster trace files",
+        "cluster contamination rate",
+        "pair-to-cluster clarity without main-text table overload",
+        "supplementary pair-to-cluster evidence boundary",
         "remote reproducibility",
         "strong model matrix",
         "model superiority",
@@ -4587,7 +4618,7 @@ def main() -> int:
     errors.extend(check_cli_entrypoint_contract(pyproject_text, cli_entrypoint_text))
     errors.extend(check_operating_point_disclosure(manuscript_text))
     errors.extend(check_selective_decision_coverage_boundary(manuscript_text))
-    errors.extend(check_pair_cluster_evidence_boundary(manuscript_text))
+    errors.extend(check_pair_cluster_evidence_boundary(manuscript_text, supplementary_text))
     errors.extend(check_decision_metric_mapping(manuscript_text))
     errors.extend(check_metric_formula_boundary(manuscript_text))
     errors.extend(check_threshold_uncertainty_reporting(manuscript_text))
