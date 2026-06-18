@@ -519,6 +519,28 @@ def check_author_contribution_statement(metadata_text: str) -> list[str]:
     return ["author contribution statement is missing"]
 
 
+def check_permissions_statement(metadata_text: str) -> list[str]:
+    """Check whether final-upload metadata declares third-party material permissions.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages for missing permissions declaration fields.
+    """
+    permissions_row = parse_mapping_section(metadata_text, "permissions")
+    permissions_statement = permissions_row.get("permissions_statement", "") or permissions_row.get("statement", "")
+    no_permission_required = (
+        permissions_row.get("no_third_party_material_requiring_permission_declared", "").lower() == "true"
+    )
+    requires_permission = permissions_row.get("third_party_material_requires_permission", "").lower() == "true"
+    permission_files = permissions_row.get("permission_files", "")
+    has_permission_files = bool(permission_files and permission_files != "[]")
+    if permissions_statement or no_permission_required or (requires_permission and has_permission_files):
+        return []
+    return ["permissions statement is missing"]
+
+
 def check_final_upload_cover_letter_text(cover_letter_text: str, metadata_text: str) -> list[str]:
     """Check final-upload cover letter target and artifact boundaries.
 
@@ -596,6 +618,7 @@ def check_final_upload_metadata_text(metadata_text: str) -> list[str]:
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_funding_statement(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_submission_statement_fields(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_author_contribution_statement(metadata_text))
+    errors.extend(f"final upload metadata unresolved: {message}" for message in check_permissions_statement(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_artifact_release_link(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_final_upload_review_mode(metadata_text))
     return sorted(set(errors))

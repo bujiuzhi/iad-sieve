@@ -49,6 +49,12 @@ author_contributions:
   contribution_statement: ""
   roles: []
 
+permissions:
+  no_third_party_material_requiring_permission_declared: false
+  third_party_material_requires_permission: false
+  permissions_statement: ""
+  permission_files: []
+
 artifact_boundary:
   raw_third_party_data_included: false
   full_prediction_files_included: false
