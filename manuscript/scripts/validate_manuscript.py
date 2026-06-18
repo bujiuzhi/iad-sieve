@@ -2775,6 +2775,8 @@ def check_editorial_claim_alignment(
                 "IAD-Risk",
                 "IAD-Bench",
                 "Open-v2 evidence snapshot",
+                "scope-bounded mechanism evidence",
+                "same-scope leaderboard",
                 "HNFMR 0.790--0.999",
                 "HNFMR=0.000",
                 "pair-level conclusion",
