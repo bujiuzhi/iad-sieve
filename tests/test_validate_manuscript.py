@@ -1218,6 +1218,9 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "claim lockdown",
             "## Audit Cycle 4: Final Package Hygiene",
             "anonymous package hygiene",
+            "## Audit Cycle 5: Editorial Desk Check",
+            "title, abstract, conclusion, cover letter, highlights, and keywords",
+            "editorial claim alignment",
             "author email addresses, ORCID values, personal account URLs, local absolute paths, and tool-generated process notes",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
@@ -1278,6 +1281,103 @@ def test_check_cover_letter_rejects_missing_submission_statements() -> None:
 
     assert any("not under consideration elsewhere" in error for error in errors)
     assert any("no competing interests" in error for error in errors)
+
+
+def test_check_editorial_claim_alignment_accepts_consistent_submission_materials() -> None:
+    """验证首屏投稿材料主张一致时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    title = "IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication"
+    manuscript_text = "\n".join(
+        [
+            rf"\title{{{title}}}",
+            r"\begin{abstract}",
+            "This paper studies identity-agenda confusion and proposes IAD-Risk.",
+            "It evaluates IAD-Bench under an Open-v2 evidence snapshot.",
+            "The results include HNFMR 0.790--0.999 and HNFMR=0.000.",
+            "The paper avoids broad method-ranking claims.",
+            r"\end{abstract}",
+            r"\section{Conclusion}",
+            "IAD-Risk addresses a specific failure mode by separating identity and agenda evidence.",
+            "It uses false-merge risk and supports targeted false-merge suppression.",
+            "The contribution includes a reproducible benchmark contract.",
+            "Additional validation is needed before broad method ranking.",
+        ]
+    )
+    cover_letter_text = "\n".join(
+        [
+            title,
+            "The paper studies identity-agenda confusion and proposes IAD-Risk.",
+            "The manuscript contributes IAD-Bench and reports an Open-v2 evidence snapshot.",
+            "The result includes HNFMR 0.790--0.999 and HNFMR=0.000.",
+            "The manuscript does not claim broad method superiority.",
+            "raw third-party data and full experimental outputs are not redistributed in Git.",
+        ]
+    )
+    highlights_text = "\n".join(
+        [
+            "- Identity-agenda confusion causes risky scholarly work merges.",
+            "- IAD-Risk separates identity, agenda, and ANI evidence.",
+            "- IAD-Bench keeps gold, proxy, and silver labels separate.",
+            "- Open-v2 baselines show HNFMR 0.790--0.999; IAD-Risk HNFMR=0.000.",
+            "- Fixtures and artifact rules support reproducible review.",
+        ]
+    )
+    keywords_text = (
+        "scholarly entity matching; work deduplication; identity-agenda disentanglement; "
+        "false-merge risk; provenance-aware evaluation"
+    )
+    metadata_text = "\n".join(
+        [
+            f'title: "{title}"',
+            "broad_method_ranking_claimed: false",
+            "silver_labels_claimed_as_human_gold: false",
+            "artifact_release_required_before_final_upload: true",
+        ]
+    )
+
+    errors = module.check_editorial_claim_alignment(
+        manuscript_text,
+        cover_letter_text,
+        highlights_text,
+        keywords_text,
+        metadata_text,
+    )
+
+    assert errors == []
+
+
+def test_check_editorial_claim_alignment_rejects_drifted_submission_materials() -> None:
+    """验证首屏投稿材料缺少统一题名、证据和边界时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\title{Different Title}",
+            r"\begin{abstract}",
+            "This abstract says only that IAD-Risk works well.",
+            r"\end{abstract}",
+            r"\section{Conclusion}",
+            "The method is strong.",
+        ]
+    )
+    cover_letter_text = "This cover letter omits the bounded claim boundary."
+    highlights_text = "- A short highlight."
+    keywords_text = "entity matching"
+    metadata_text = "broad_method_ranking_claimed: true"
+
+    errors = module.check_editorial_claim_alignment(
+        manuscript_text,
+        cover_letter_text,
+        highlights_text,
+        keywords_text,
+        metadata_text,
+    )
+
+    assert any("missing title" in error for error in errors)
+    assert any("IAD-Bench" in error for error in errors)
+    assert any("broad method-ranking claims" in error for error in errors)
+    assert any("broad_method_ranking_claimed: false" in error for error in errors)
 
 
 def test_check_auxiliary_model_evidence_absent_accepts_submission_materials() -> None:

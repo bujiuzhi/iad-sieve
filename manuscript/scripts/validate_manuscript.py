@@ -1209,6 +1209,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 2: Submission Readiness",
         "Audit Cycle 3: Q2/B Acceptance Gate",
         "Audit Cycle 4: Final Package Hygiene",
+        "Audit Cycle 5: Editorial Desk Check",
         "remote reproducibility",
         "strong model matrix",
         "model superiority",
@@ -1216,6 +1217,8 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "novelty and prior-art positioning",
         "claim lockdown",
         "anonymous package hygiene",
+        "title, abstract, conclusion, cover letter, highlights, and keywords",
+        "editorial claim alignment",
         "author email addresses, ORCID values, personal account URLs, local absolute paths, and tool-generated process notes",
         "Q2/B acceptance gate is either fully ready",
         "Minimum Gate Before Final Upload",
@@ -1461,6 +1464,122 @@ def check_submission_material_quantitative_summary(highlights_text: str, cover_l
     for marker in cover_letter_scope_markers:
         if marker not in cover_letter_text:
             errors.append(f"cover letter missing bounded evidence scope marker: {marker}")
+    return errors
+
+
+def check_editorial_claim_alignment(
+    manuscript_text: str,
+    cover_letter_text: str,
+    highlights_text: str,
+    keywords_text: str,
+    metadata_text: str,
+) -> list[str]:
+    """Check first-screen claim alignment across formal submission materials.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+        cover_letter_text: Cover letter Markdown text.
+        highlights_text: Highlights Markdown text.
+        keywords_text: Keywords Markdown text.
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages for title, evidence, or claim-boundary drift.
+    """
+    expected_title = "IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication"
+    errors: list[str] = []
+    for document_name, document_text in {
+        "main manuscript": manuscript_text,
+        "cover letter": cover_letter_text,
+        "submission metadata": metadata_text,
+    }.items():
+        if expected_title not in document_text:
+            errors.append(f"editorial claim alignment missing title in {document_name}: {expected_title}")
+
+    begin_marker = r"\begin{abstract}"
+    end_marker = r"\end{abstract}"
+    abstract_text = ""
+    if begin_marker in manuscript_text and end_marker in manuscript_text:
+        abstract_text = manuscript_text.split(begin_marker, 1)[1].split(end_marker, 1)[0]
+    else:
+        errors.append("editorial claim alignment could not locate main manuscript abstract")
+    conclusion_text = extract_latex_section_body(manuscript_text, r"\section{Conclusion}")
+    if not conclusion_text.strip():
+        errors.append("editorial claim alignment could not locate main manuscript conclusion")
+
+    required_markers_by_document = {
+        "main abstract": (
+            abstract_text,
+            [
+                "identity-agenda confusion",
+                "IAD-Risk",
+                "IAD-Bench",
+                "Open-v2 evidence snapshot",
+                "HNFMR 0.790--0.999",
+                "HNFMR=0.000",
+                "broad method-ranking claims",
+            ],
+        ),
+        "main conclusion": (
+            conclusion_text,
+            [
+                "specific failure mode",
+                "identity and agenda evidence",
+                "false-merge risk",
+                "targeted false-merge suppression",
+                "reproducible benchmark contract",
+                "Additional validation",
+                "broad method ranking",
+            ],
+        ),
+        "cover letter": (
+            cover_letter_text,
+            [
+                "identity-agenda confusion",
+                "IAD-Risk",
+                "IAD-Bench",
+                "Open-v2 evidence snapshot",
+                "HNFMR 0.790--0.999",
+                "HNFMR=0.000",
+                "does not claim broad method superiority",
+                "raw third-party data and full experimental outputs are not redistributed in Git",
+            ],
+        ),
+        "highlights": (
+            highlights_text,
+            [
+                "Identity-agenda confusion",
+                "IAD-Risk",
+                "IAD-Bench",
+                "HNFMR 0.790--0.999",
+                "IAD-Risk HNFMR=0.000",
+                "artifact rules",
+            ],
+        ),
+        "keywords": (
+            keywords_text,
+            [
+                "scholarly entity matching",
+                "work deduplication",
+                "identity-agenda disentanglement",
+                "false-merge risk",
+                "provenance-aware evaluation",
+            ],
+        ),
+        "submission metadata": (
+            metadata_text,
+            [
+                "broad_method_ranking_claimed: false",
+                "silver_labels_claimed_as_human_gold: false",
+                "artifact_release_required_before_final_upload: true",
+            ],
+        ),
+    }
+    for document_name, (document_text, required_markers) in required_markers_by_document.items():
+        lowered_text = document_text.lower()
+        for marker in required_markers:
+            if marker.lower() not in lowered_text:
+                errors.append(f"editorial claim alignment missing marker in {document_name}: {marker}")
     return errors
 
 
@@ -1836,6 +1955,15 @@ def main() -> int:
     errors.extend(check_elsevier_draft_source(manuscript_text, keywords_text, elsevier_draft_source_text))
     errors.extend(check_cover_letter(cover_letter_text))
     errors.extend(check_submission_material_quantitative_summary(highlights_text, cover_letter_text))
+    errors.extend(
+        check_editorial_claim_alignment(
+            manuscript_text,
+            cover_letter_text,
+            highlights_text,
+            keywords_text,
+            submission_metadata_text,
+        )
+    )
     errors.extend(check_submission_metadata(submission_metadata_text))
     if args.final_upload:
         errors.extend(check_final_upload_metadata(submission_metadata_text))
