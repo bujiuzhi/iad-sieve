@@ -33,6 +33,7 @@ For each author, provide the final Author order, name, affiliation, email, ORCID
 - Grant identifiers:
 - Funder role statement:
 - No-funding wording, if applicable:
+- Funding statement text finalized even when no external funding is declared:
 
 ## Author contribution statement
 
@@ -116,6 +117,7 @@ For each author, select the applicable CRediT roles and then draft the final aut
 - author_metadata_complete:
 - corresponding_author_complete:
 - funding_statement_complete:
+- funding_statement_text_ready:
 - contribution_statement_complete:
 - credit_roles_cover_all_authors:
 - permissions_statement_complete:

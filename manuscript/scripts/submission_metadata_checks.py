@@ -554,7 +554,7 @@ def target_journal_requires_elsevier_files(metadata_text: str) -> bool:
 
 
 def check_funding_statement(metadata_text: str) -> list[str]:
-    """Check whether final-upload metadata declares funding status.
+    """Check whether final-upload metadata declares funding status and wording.
 
     参数:
         metadata_text: Submission metadata YAML text.
@@ -567,9 +567,12 @@ def check_funding_statement(metadata_text: str) -> list[str]:
     no_external_funding = funding_row.get("no_external_funding_declared", "").lower() == "true"
     funding_sources = funding_row.get("funding_sources", "")
     has_funding_source = bool(funding_sources and funding_sources != "[]")
-    if funding_statement or no_external_funding or has_funding_source:
-        return []
-    return ["funding statement is missing"]
+    errors: list[str] = []
+    if not funding_statement:
+        errors.append("funding statement text is missing")
+    if not no_external_funding and not has_funding_source:
+        errors.append("funding status is missing")
+    return errors
 
 
 def check_submission_statement_fields(metadata_text: str) -> list[str]:
