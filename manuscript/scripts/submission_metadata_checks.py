@@ -35,6 +35,22 @@ ELSEVIER_TARGET_JOURNALS = {
     "data & knowledge engineering",
     "information systems",
 }
+CREDIT_AUTHOR_ROLES = {
+    "Conceptualization",
+    "Data curation",
+    "Formal analysis",
+    "Funding acquisition",
+    "Investigation",
+    "Methodology",
+    "Project administration",
+    "Resources",
+    "Software",
+    "Supervision",
+    "Validation",
+    "Visualization",
+    "Writing - original draft",
+    "Writing - review and editing",
+}
 DKE_ELSEVIER_FILE_REQUIREMENT_ERROR = "DKE/Elsevier final upload requires DKE/Elsevier source and PDF files"
 FINAL_UPLOAD_TRUE_FIELDS = {
     "target_journal_template_bound": "target journal template is not bound",
@@ -511,12 +527,19 @@ def check_author_contribution_statement(metadata_text: str) -> list[str]:
         "credit_statement",
         "",
     )
-    role_values = contribution_row.get("roles", "")
-    has_inline_roles = bool(role_values and role_values != "[]")
-    has_list_roles = any(line.strip().startswith("- ") for line in section_lines(metadata_text, "author_contributions"))
-    if contribution_statement or has_inline_roles or has_list_roles:
-        return []
-    return ["author contribution statement is missing"]
+    contribution_section_text = "\n".join(section_lines(metadata_text, "author_contributions"))
+    credit_required = contribution_row.get("credit_taxonomy_required_before_final_upload", "").lower() == "true"
+    has_credit_roles = (
+        "roles:" in contribution_section_text
+        and "roles: []" not in contribution_section_text
+        and any(role_name in contribution_section_text for role_name in CREDIT_AUTHOR_ROLES)
+    )
+    errors: list[str] = []
+    if not contribution_statement and not has_credit_roles:
+        errors.append("author contribution statement is missing")
+    if credit_required and not has_credit_roles:
+        errors.append("CRediT author contribution roles are missing")
+    return errors
 
 
 def check_permissions_statement(metadata_text: str) -> list[str]:
