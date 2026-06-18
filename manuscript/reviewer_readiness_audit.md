@@ -10,9 +10,9 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 10.
+Completed audit cycles: 11.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, live submission-system text consistency, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.
 
@@ -40,6 +40,7 @@ Next revision trigger: repeat the editorial desk check after target-journal temp
 | Threshold results may be sensitive. | Medium | Fixed operating points and threshold-sensitivity evidence status are documented. | Release threshold grid files before claiming threshold stability. |
 | Confidence intervals and statistical significance may be overread. | Medium | The manuscript reports point estimates and adds a statistical interpretation boundary that reserves bootstrap intervals, significance tests, and model-ranking claims for artifact-backed evidence. | Release bootstrap intervals, predefined tests, resampling logs, random seeds, and checksums before claiming interval-supported superiority. |
 | First-screen submission materials may drift in claim scope. | Medium | Title, abstract, conclusion, cover letter, highlights, and keywords are checked for editorial claim alignment around the same problem, method, evidence snapshot, and claim boundary. | Re-run the editorial alignment gate after template conversion or journal-specific cover-letter edits. |
+| Live submission-system text may drift from source files. | Medium | The final-upload information request and submission-system checklist require title, abstract, keywords, and highlights to be copied from source files and previewed in the live submission system. | Mark `submission_system_files_verified` true only after these fields match `main.tex`, `keywords.md`, and `highlights.md` in the live system. |
 | Reproducibility depends on files outside Git. | Medium | Fixture rebuild, public-source commands, artifact manifest template, and checksums policy are documented. | Publish the L3 artifact release and link it in submission metadata. |
 | Final upload may mismatch journal template or system fields. | High | A submission-system checklist records file, metadata, PDF, artifact, source-archive, and template-binding checks. | Confirm target journal, set `target_journal_template_bound`, rebuild the final template source and PDFs, and verify the live system fields. |
 
@@ -174,6 +175,14 @@ This cycle checks whether final-upload readiness is coupled to the selected jour
 
 The reviewer-facing boundary is narrow. Template binding is a publication-format and submission-system consistency gate; it does not strengthen the scientific evidence. The manuscript should not be uploaded until the selected journal template matches the final manuscript source, `python manuscript/scripts/validate_submission_package.py --final-upload` passes, and the cover letter, metadata, and availability statements all name the same target journal and artifact release.
 
+## Audit Cycle 11: Live Submission Text Consistency Gate
+
+Outcome: pass for checklist and validator coverage; blocked for final upload until the live submission-system preview is checked.
+
+This cycle checks whether the text entered into the journal system remains synchronized with the repository sources after template conversion and metadata insertion. The final-upload information request now requires the title and abstract to be checked against `main.tex`, keywords to be copied exactly from `keywords.md`, highlights to be copied exactly from `highlights.md`, and the live submission system preview to show the same title, abstract, keywords, and highlights.
+
+The reviewer-facing boundary is practical rather than scientific. A clean PDF is not enough if the submission system displays stale or manually edited first-screen text. Therefore `submission_system_files_verified` should remain false until title, abstract, keywords, highlights, uploaded files, and live system preview all match the final source package.
+
 ## Minimum Gate Before Final Upload
 
 The manuscript should not be uploaded to a journal system until all of the following are true:
@@ -185,5 +194,5 @@ The manuscript should not be uploaded to a journal system until all of the follo
 5. The funding statement text, author contribution statement, permissions statement, data/code availability statement, and journal-specific research data statement are complete and consistent with the live submission system, with CRediT roles covering every listed author and with the repository URL, repository commit, and artifact URL or DOI embedded in the availability statements.
 6. `python manuscript/scripts/validate_manuscript.py --strict-latex` passes.
 7. `python manuscript/scripts/validate_submission_package.py --final-upload` passes.
-8. `submission_system_checklist.md` has been checked against the live journal system, and the selected journal template matches the final manuscript source.
+8. `submission_system_checklist.md` has been checked against the live journal system; the selected journal template matches the final manuscript source; and the title, abstract, keywords, highlights, uploaded files, and live system preview have been verified against the final source package.
 9. The Q2/B acceptance gate is either fully ready or the manuscript title, abstract, cover letter, and conclusion avoid any Q2/B-complete or broad-superiority wording.

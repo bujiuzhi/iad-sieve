@@ -3444,8 +3444,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 10.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, and stronger evidence gates.",
+            "Completed audit cycles: 11.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, live submission-system text consistency, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, target-journal confirmation, funding statement, author contribution statement, permissions statement, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -3461,6 +3461,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "Confidence intervals and statistical significance may be overread.",
             "The current manuscript reports point estimates and reserves bootstrap intervals.",
             "No statistical significance claim is made.",
+            "Live submission-system text may drift from source files.",
             "Reproducibility depends on files outside Git.",
             "## Claim-Evidence Check",
             "## Adversarial Self-Review Matrix",
@@ -3538,6 +3539,13 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "source archive rebuilt after template conversion",
             "selected journal template matches the final manuscript source",
             "DKE/Elsevier preflight package",
+            "## Audit Cycle 11: Live Submission Text Consistency Gate",
+            "submission_system_files_verified",
+            "title, abstract, keywords, and highlights",
+            "`main.tex`",
+            "`keywords.md`",
+            "`highlights.md`",
+            "live submission system preview",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload",
@@ -3556,7 +3564,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 10",
+        "Completed audit cycles: 11",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -3567,7 +3575,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 10" in error for error in errors)
+    assert any("Completed audit cycles: 11" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -3707,6 +3715,30 @@ def test_check_reviewer_readiness_audit_rejects_missing_template_binding_gate() 
     assert any("target_journal_template_bound" in error for error in errors)
     assert any("target_journal_template_applied" in error for error in errors)
     assert any("selected journal template matches the final manuscript source" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_live_submission_text_gate() -> None:
+    """验证审稿准备度审计必须覆盖投稿系统首屏文本一致性门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Audit Cycle 11: Live Submission Text Consistency Gate",
+        "submission_system_files_verified",
+        "title, abstract, keywords, and highlights",
+        "`main.tex`",
+        "`keywords.md`",
+        "`highlights.md`",
+        "live submission system preview",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Live Submission Text Consistency Gate" in error for error in errors)
+    assert any("submission_system_files_verified" in error for error in errors)
+    assert any("title, abstract, keywords, and highlights" in error for error in errors)
+    assert any("live submission system preview" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_final_gate() -> None:
