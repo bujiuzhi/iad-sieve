@@ -89,6 +89,42 @@ def test_check_final_upload_information_request_rejects_missing_required_fields(
     assert any("Live submission-system fields" in error for error in errors)
 
 
+def test_check_final_upload_information_request_rejects_missing_credit_roles() -> None:
+    """验证最终上传信息收集表必须覆盖 CRediT 作者贡献角色。"""
+
+    module = _load_validate_manuscript_module()
+    request_text = "\n".join(
+        [
+            "# Final Upload Information Request",
+            "Target journal",
+            "Article type",
+            "Review mode",
+            "Author list",
+            "Author order",
+            "Corresponding author",
+            "Funding statement",
+            "Author contribution statement",
+            "Permissions statement",
+            "Competing interests",
+            "Ethics statement",
+            "Data and code availability statement",
+            "Artifact release URL or DOI",
+            "Artifact release manifest",
+            "Live submission-system fields",
+            "Final title page",
+            "Final-upload checklist",
+        ]
+    )
+
+    errors = module.check_final_upload_information_request(request_text)
+
+    assert any("CRediT author contribution statement" in error for error in errors)
+    assert any("Conceptualization" in error for error in errors)
+    assert any("Data curation" in error for error in errors)
+    assert any("Writing - original draft" in error for error in errors)
+    assert any("Writing - review and editing" in error for error in errors)
+
+
 def test_check_final_upload_information_request_accepts_complete_request() -> None:
     """验证最终上传信息收集表覆盖所有外部输入字段时可通过检查。"""
 

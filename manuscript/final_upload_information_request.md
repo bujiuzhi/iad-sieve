@@ -40,6 +40,14 @@ For each author, provide the final Author order, name, affiliation, email, ORCID
 - Final Author contribution statement:
 - Author-order confirmation:
 
+### CRediT author contribution statement
+
+For each author, select the applicable CRediT roles and then draft the final author contribution statement required by the selected journal.
+
+| Author order | Conceptualization | Data curation | Formal analysis | Funding acquisition | Investigation | Methodology | Project administration | Resources | Software | Supervision | Validation | Visualization | Writing - original draft | Writing - review and editing |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+
 ## Permissions statement
 
 - Third-party material used in the manuscript:
