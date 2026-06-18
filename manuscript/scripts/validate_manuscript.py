@@ -70,6 +70,7 @@ REQUIRED_SECTIONS = [
     r"\subsection{Threshold Sensitivity Evidence Status}",
     r"\subsection{Claim-Evidence Boundary for Result Interpretation}",
     r"\subsection{Result Audit Trail}",
+    r"\label{tab:result-artifact-crosswalk}",
     r"\subsection{Scope Compatibility of the Open-v2 Table}",
     r"\section{Mechanism and Error Analysis}",
     r"\section{Limitations}",
@@ -660,10 +661,20 @@ def check_result_claim_boundary(manuscript_text: str, supplementary_text: str) -
     required_main_markers = [
         r"\subsection{Claim-Evidence Boundary for Result Interpretation}",
         r"\subsection{Result Audit Trail}",
+        r"\label{tab:result-artifact-crosswalk}",
         r"\label{tab:claim-evidence-boundary-main}",
         "prediction or score file",
         "metric summary",
         "checksum or manifest",
+        r"\path{open_v2_main_results}",
+        r"\path{iad_bench_split_summary}",
+        r"\path{representation_baseline_scores}",
+        r"\path{supervised_baseline_predictions}",
+        r"\path{iad_risk_predictions}",
+        r"\path{threshold_selection_logs}",
+        r"\path{bootstrap_intervals}",
+        r"\path{ablation_suite}",
+        r"\path{manual_validation_slice}",
         "does not support a broad method-ranking claim",
     ]
     required_supplement_markers = [

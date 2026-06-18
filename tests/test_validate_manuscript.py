@@ -241,6 +241,16 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
             r"\subsection{Claim-Evidence Boundary for Result Interpretation}",
             r"\label{tab:claim-evidence-boundary-main}",
             r"\subsection{Result Audit Trail}",
+            r"\label{tab:result-artifact-crosswalk}",
+            r"\path{open_v2_main_results}",
+            r"\path{iad_bench_split_summary}",
+            r"\path{representation_baseline_scores}",
+            r"\path{supervised_baseline_predictions}",
+            r"\path{iad_risk_predictions}",
+            r"\path{threshold_selection_logs}",
+            r"\path{bootstrap_intervals}",
+            r"\path{ablation_suite}",
+            r"\path{manual_validation_slice}",
             "Each row uses a prediction or score file, metric summary, and checksum or manifest.",
             "The evidence does not support a broad method-ranking claim.",
             r"\label{tab:openv2-results}",
@@ -272,6 +282,7 @@ def test_check_result_claim_boundary_rejects_result_table_without_audit_trail() 
     errors = module.check_result_claim_boundary(manuscript_text, supplementary_text)
 
     assert any("Result Audit Trail" in error for error in errors)
+    assert any("result-artifact-crosswalk" in error for error in errors)
     assert any("Artifact Package Requirements" in error for error in errors)
 
 
@@ -284,6 +295,16 @@ def test_check_result_claim_boundary_rejects_missing_artifact_validator_command(
             r"\label{tab:openv2-results}",
             r"\subsection{Claim-Evidence Boundary for Result Interpretation}",
             r"\subsection{Result Audit Trail}",
+            r"\label{tab:result-artifact-crosswalk}",
+            r"\path{open_v2_main_results}",
+            r"\path{iad_bench_split_summary}",
+            r"\path{representation_baseline_scores}",
+            r"\path{supervised_baseline_predictions}",
+            r"\path{iad_risk_predictions}",
+            r"\path{threshold_selection_logs}",
+            r"\path{bootstrap_intervals}",
+            r"\path{ablation_suite}",
+            r"\path{manual_validation_slice}",
             r"\label{tab:claim-evidence-boundary-main}",
             "Each row needs a prediction or score file, metric summary, and checksum or manifest.",
             "The result does not support a broad method-ranking claim.",
