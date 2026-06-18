@@ -52,6 +52,20 @@ Outcome: blocked for final upload.
 
 The template-independent package is internally consistent, but final upload remains blocked until the target journal, journal template, author metadata, corresponding-author metadata, final template-specific PDFs, live submission-system fields, and artifact release link are completed.
 
+## Audit Cycle 3: Q2/B Acceptance Gate
+
+Outcome: blocked for Q2/B completion; acceptable for conservative target-journal selection.
+
+From a skeptical reviewer perspective, the manuscript can be considered for a conservative target-journal route only if its claims remain bounded to the current Open-v2 evidence snapshot. It should not be described as Q2/B-complete until the remote reproducibility, strong model matrix, model superiority, innovation depth, novelty and prior-art positioning, and claim lockdown gates are all closed with artifact-backed evidence.
+
+The current manuscript therefore keeps its strongest claims limited to identity-agenda false-merge control under stratified evidence. It does not claim SOTA performance, complete threshold stability, complete human gold validation, or broad source-heldout generalization.
+
+## Audit Cycle 4: Final Package Hygiene
+
+Outcome: pass for anonymous pre-submission package hygiene; blocked for final upload metadata.
+
+The anonymous package hygiene gate checks that generated submission packages exclude raw data, experiment outputs, local caches, credentials, author email addresses, ORCID values, personal account URLs, local absolute paths, and tool-generated process notes. This closes a common desk-check risk for anonymous review, but it does not replace the final-upload metadata gate because the target journal, authors, corresponding author, final template-specific PDFs, and artifact release URL or DOI remain unresolved.
+
 ## Minimum Gate Before Final Upload
 
 The manuscript should not be uploaded to a journal system until all of the following are true:
@@ -63,3 +77,4 @@ The manuscript should not be uploaded to a journal system until all of the follo
 5. `python manuscript/scripts/validate_manuscript.py --strict-latex` passes.
 6. `python manuscript/scripts/validate_submission_package.py --final-upload` passes.
 7. `submission_system_checklist.md` has been checked against the live journal system.
+8. The Q2/B acceptance gate is either fully ready or the manuscript title, abstract, cover letter, and conclusion avoid any Q2/B-complete or broad-superiority wording.

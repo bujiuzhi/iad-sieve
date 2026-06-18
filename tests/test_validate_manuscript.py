@@ -878,7 +878,18 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "## Claim-Evidence Check",
             "## Audit Cycle 1: Claim Discipline",
             "## Audit Cycle 2: Submission Readiness",
+            "## Audit Cycle 3: Q2/B Acceptance Gate",
+            "remote reproducibility",
+            "strong model matrix",
+            "model superiority",
+            "innovation depth",
+            "novelty and prior-art positioning",
+            "claim lockdown",
+            "## Audit Cycle 4: Final Package Hygiene",
+            "anonymous package hygiene",
+            "author email addresses, ORCID values, personal account URLs, local absolute paths, and tool-generated process notes",
             "## Minimum Gate Before Final Upload",
+            "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload",
         ]
     )
@@ -897,6 +908,8 @@ def test_check_reviewer_readiness_audit_rejects_missing_final_gate() -> None:
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Reviewer Risk Register" in error for error in errors)
+    assert any("Q2/B Acceptance Gate" in error for error in errors)
+    assert any("Final Package Hygiene" in error for error in errors)
     assert any("Minimum Gate Before Final Upload" in error for error in errors)
     assert any("--final-upload" in error for error in errors)
 
