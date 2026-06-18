@@ -850,6 +850,39 @@ def test_check_risk_calibration_overclaims_rejects_unsupported_calibration_wordi
     assert any("risk-calibrated" in error for error in errors)
 
 
+def test_check_method_cluster_overclaims_accepts_coverage_bounded_wording() -> None:
+    """验证方法部分可使用受 coverage 限定的 cannot-link 聚类表述。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_method_cluster_overclaims", None)
+    assert callable(checker)
+    manuscript_text = (
+        "The same decision interface also supports constrained union-find clustering, "
+        "where cannot-link evidence can block documented conflicts when coverage is available."
+    )
+
+    errors = checker(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_method_cluster_overclaims_rejects_unqualified_prevention_claim() -> None:
+    """验证方法部分不得无条件声明 cannot-link 防止传递性误合并。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_method_cluster_overclaims", None)
+    assert callable(checker)
+    manuscript_text = (
+        "The same decision interface also supports constrained union-find clustering, "
+        "where cannot-link evidence prevents transitive false merges."
+    )
+
+    errors = checker(manuscript_text)
+
+    assert any("unsupported method cluster-level claim" in error for error in errors)
+    assert any("prevents transitive false merges" in error for error in errors)
+
+
 def test_check_operational_net_benefit_boundary_accepts_complete_boundary() -> None:
     """验证方法复杂度和净收益边界完整时可通过检查。"""
 

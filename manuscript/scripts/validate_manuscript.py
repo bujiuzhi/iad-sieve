@@ -175,6 +175,10 @@ UNSUPPORTED_ABSTRACT_CLUSTER_PATTERNS = [
     re.compile(r"\beliminat\w*\b.{0,120}\bcluster[-\s]?level\s+contamination\b", re.IGNORECASE),
     re.compile(r"\bguarantee\w*\b.{0,120}\bcluster[-\s]?level\b", re.IGNORECASE),
 ]
+UNSUPPORTED_METHOD_CLUSTER_PATTERNS = [
+    re.compile(r"\bcannot-link\s+evidence\s+prevents\s+transitive\s+false\s+merges\b", re.IGNORECASE),
+    re.compile(r"\bguarantee\w*\s+(?:complete\s+)?cluster[-\s]?level\b", re.IGNORECASE),
+]
 AUXILIARY_MODEL_EVIDENCE_PHRASES = [
     "LLM",
     "GPT",
@@ -947,6 +951,22 @@ def check_risk_calibration_overclaims(manuscript_text: str) -> list[str]:
     for pattern in UNSUPPORTED_RISK_CALIBRATION_PATTERNS:
         for match in pattern.finditer(manuscript_text):
             errors.append(f"unsupported risk calibration wording found: {match.group(0)}")
+    return errors
+
+
+def check_method_cluster_overclaims(manuscript_text: str) -> list[str]:
+    """Check whether the method avoids unsupported cluster-level guarantees.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for method claims that require cluster artifacts.
+    """
+    errors: list[str] = []
+    for pattern in UNSUPPORTED_METHOD_CLUSTER_PATTERNS:
+        for match in pattern.finditer(manuscript_text):
+            errors.append(f"unsupported method cluster-level claim found: {match.group(0)}")
     return errors
 
 
@@ -2889,6 +2909,7 @@ def main() -> int:
     errors.extend(check_training_objective_masking(manuscript_text))
     errors.extend(check_risk_score_design_rationale(manuscript_text))
     errors.extend(check_risk_calibration_overclaims(manuscript_text))
+    errors.extend(check_method_cluster_overclaims(manuscript_text))
     errors.extend(check_operational_net_benefit_boundary(manuscript_text))
     errors.extend(check_version_identifier_policy(manuscript_text))
     errors.extend(check_method_pipeline_figure(manuscript_text))
