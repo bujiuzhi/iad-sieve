@@ -844,6 +844,29 @@ def check_method_feature_contract(manuscript_text: str) -> list[str]:
     return [f"method feature contract missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
 
 
+def check_training_objective_masking(manuscript_text: str) -> list[str]:
+    """Check whether the training objective states explicit supervision masks.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing masked-loss markers.
+    """
+    required_markers = [
+        r"\subsection{Training Objective}",
+        r"m^w_{ij}",
+        r"m^a_{ij}",
+        r"m^n_{ij}",
+        r"\sum_{(i,j)}",
+        r"\sum_{(i,j)}(m^w_{ij}+m^a_{ij}+m^n_{ij})",
+        "valid supervision channels",
+        "Missing labels therefore do not create negative examples",
+        "false-merge risk score is not directly supervised",
+    ]
+    return [f"training objective masking missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+
+
 def check_risk_score_design_rationale(manuscript_text: str) -> list[str]:
     """Check whether the method explains the false-merge risk score design.
 
@@ -2676,6 +2699,7 @@ def main() -> int:
     errors.extend(check_iad_bench_document_schema_contract(manuscript_text))
     errors.extend(check_iad_bench_pair_schema_contract(manuscript_text))
     errors.extend(check_method_feature_contract(manuscript_text))
+    errors.extend(check_training_objective_masking(manuscript_text))
     errors.extend(check_risk_score_design_rationale(manuscript_text))
     errors.extend(check_operational_net_benefit_boundary(manuscript_text))
     errors.extend(check_version_identifier_policy(manuscript_text))

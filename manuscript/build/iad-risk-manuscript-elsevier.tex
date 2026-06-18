@@ -302,14 +302,18 @@ Threshold gate & Converts the risk proxy into a merge, block, or defer decision.
 
 \subsection{Training Objective}
 
-The learning objective combines identity, agenda, and agenda-non-identity supervision without treating every source as the same label type; the false-merge risk score is derived after the relation heads are estimated. For a pair $(i,j)$, the model minimizes
+The learning objective combines identity, agenda, and agenda-non-identity supervision only through valid supervision channels. Let $m^w_{ij}$, $m^a_{ij}$, and $m^n_{ij}$ indicate whether pair $(i,j)$ has valid same-work, same-agenda, and agenda-non-identity supervision, respectively. The model minimizes the masked objective
 \[
-\mathcal{L}_{ij} =
-\lambda_w \mathrm{CE}(y^I_{ij}, p_{\mathrm{work}})
-+ \lambda_a \mathrm{CE}(y^A_{ij}, p_{\mathrm{agenda}})
-+ \lambda_n \mathrm{CE}(y^{ANI}_{ij}, p_{\mathrm{ani}}),
+\begin{aligned}
+Z &= \sum_{(i,j)}(m^w_{ij}+m^a_{ij}+m^n_{ij}),\\
+\mathcal{L} &= \frac{1}{Z}\sum_{(i,j)}\bigl[
+\lambda_w m^w_{ij}\mathrm{CE}(y^I_{ij}, p_{\mathrm{work}})\\
+&\quad + \lambda_a m^a_{ij}\mathrm{CE}(y^A_{ij}, p_{\mathrm{agenda}})
++ \lambda_n m^n_{ij}\mathrm{CE}(y^{ANI}_{ij}, p_{\mathrm{ani}})
+\bigr],
+\end{aligned}
 \]
-where $\mathrm{CE}$ is binary cross-entropy and $\lambda_w,\lambda_a,\lambda_n$ control the contribution of each supervision channel. The key design choice is provenance-aware masking: a pair contributes only to the heads for which its label source is valid. For example, DeepMatcher pairs supervise same-work identity, whereas OpenAlex/OpenCitations silver hard negatives supervise agenda-non-identity risk without being promoted to human gold identity labels.
+where $\mathrm{CE}$ is binary cross-entropy and $\lambda_w,\lambda_a,\lambda_n$ control the contribution of each supervision channel. Missing labels therefore do not create negative examples for unrelated heads. DeepMatcher pairs supervise same-work identity, whereas OpenAlex/OpenCitations silver hard negatives supervise agenda-non-identity risk without being promoted to human gold identity labels. The false-merge risk score is not directly supervised; it is derived after the relation heads are estimated.
 
 \subsection{Risk-Aware Merge Decision}
 

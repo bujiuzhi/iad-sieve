@@ -664,6 +664,52 @@ def test_check_latex_cross_references_rejects_duplicate_missing_and_bad_prefixes
     assert any("missing LaTeX labels" in error and "tab:missing" in error for error in errors)
 
 
+def test_check_training_objective_masking_accepts_explicit_masked_loss() -> None:
+    """验证训练目标显式包含来源掩码和归一化损失时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_training_objective_masking", None)
+    assert callable(checker)
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Training Objective}",
+            r"m^w_{ij}",
+            r"m^a_{ij}",
+            r"m^n_{ij}",
+            r"\sum_{(i,j)}",
+            r"\sum_{(i,j)}(m^w_{ij}+m^a_{ij}+m^n_{ij})",
+            "valid supervision channels",
+            "Missing labels therefore do not create negative examples.",
+            "The false-merge risk score is not directly supervised.",
+        ]
+    )
+
+    errors = checker(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_training_objective_masking_rejects_unmasked_loss() -> None:
+    """验证训练目标缺少来源掩码时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_training_objective_masking", None)
+    assert callable(checker)
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Training Objective}",
+            r"\mathcal{L}_{ij} = \lambda_w CE + \lambda_a CE + \lambda_n CE",
+            "The model uses provenance-aware masking.",
+        ]
+    )
+
+    errors = checker(manuscript_text)
+
+    assert any("m^w_{ij}" in error for error in errors)
+    assert any("Missing labels" in error for error in errors)
+    assert any("risk score is not directly supervised" in error for error in errors)
+
+
 def test_check_method_feature_contract_accepts_complete_contract() -> None:
     """验证方法特征契约完整时可通过检查。"""
 
