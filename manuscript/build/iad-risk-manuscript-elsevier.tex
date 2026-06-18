@@ -526,6 +526,8 @@ RQ4 & Gold/proxy/silver strata & Split metrics & Provenance-aware robustness \\
 \end{tabular}
 \end{table}
 
+These questions are ordered by the strength of evidence that the current package can support. RQ1 and RQ2 are the primary quantitative checks because they map directly to gold identity rows and silver hard-negative rows. RQ3 is a mechanism-consistency check, not a complete causal ablation claim. RQ4 is an interpretation check over label strata, not a claim that source-heldout or topic-heldout generalization has been fully established. This ordering keeps the result section focused on bounded false-merge evidence rather than on an unsupported same-scope method ranking.
+
 \subsection{Evaluation Metrics}
 
 Same-work F1 is computed on pairs whose identity labels come from the gold layer. Ordinary false-merge rate (FMR) is the fraction of non-identity pairs that the system marks for automatic merging. Hard-negative false-merge rate (HNFMR) is the same error measured only on agenda-level hard negatives, where topic or citation evidence is high but identity evidence is negative. Reporting both FMR and HNFMR separates general matching errors from the specific identity-agenda confusion that this paper studies.
