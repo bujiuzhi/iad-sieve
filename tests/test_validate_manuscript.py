@@ -1107,6 +1107,76 @@ def test_check_artifact_release_manifest_template_rejects_missing_conditional_cl
     assert any("conditional_claim_artifacts" in error for error in errors)
 
 
+def test_check_artifact_release_readme_template_accepts_complete_template() -> None:
+    """验证 artifact release README 模板覆盖审稿复现入口时可通过。"""
+
+    module = _load_validate_manuscript_module()
+    readme_text = "\n".join(
+        [
+            "# IAD-Risk Artifact Release README Template",
+            "This template is for the external result artifact release.",
+            "Do not include raw third-party data.",
+            "Do not include model checkpoints.",
+            "Do not include credentials, personal identifiers, or local paths.",
+            "## Required Top-Level Files",
+            "README.md",
+            "manifest.json",
+            "checksums.sha256",
+            "## Required Directories",
+            "configs/",
+            "tables/",
+            "predictions/",
+            "reports/",
+            "logs/",
+            "## Minimum Validation Commands",
+            "sha256sum -c checksums.sha256",
+            "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
+            "python manuscript/scripts/validate_manuscript.py --strict-latex",
+            "python manuscript/scripts/verify_fixture_rebuild.py",
+            "python scripts/check_public_release.py",
+            "## Required Artifact IDs",
+            "open_v2_main_results",
+            "iad_risk_predictions",
+            "representation_baseline_scores",
+            "supervised_baseline_predictions",
+            "threshold_selection_logs",
+            "iad_bench_split_summary",
+            "## Conditional Claim Artifacts",
+            "confidence_intervals_claimed requires bootstrap_intervals.",
+            "component_causality_claimed requires ablation_suite.",
+            "human_validation_claimed requires manual_validation_slice.",
+            "threshold_stability_claimed requires threshold_sensitivity_grid.",
+            "broad_method_ranking_claimed requires bootstrap_intervals, manual_validation_slice, and threshold_sensitivity_grid.",
+            "## Claim Boundaries",
+            "silver labels are not human gold.",
+            "full numerical audit requires external artifacts.",
+            "broad method ranking is not claimed unless conditional artifacts are complete.",
+            "## Reproduction Levels",
+            "L0 code check",
+            "L1 fixture rebuild",
+            "L2 public-source rebuild",
+            "L3 result audit",
+        ]
+    )
+
+    errors = module.check_artifact_release_readme_template(readme_text)
+
+    assert errors == []
+
+
+def test_check_artifact_release_readme_template_rejects_missing_release_boundaries() -> None:
+    """验证 artifact release README 模板缺少复现边界时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    readme_text = "# IAD-Risk Artifact Release README Template\nREADME.md\nmanifest.json\n"
+
+    errors = module.check_artifact_release_readme_template(readme_text)
+
+    assert any("raw third-party data" in error for error in errors)
+    assert any("validate_artifact_release.py" in error for error in errors)
+    assert any("threshold_sensitivity_grid" in error for error in errors)
+
+
 def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
     """验证投稿系统上传清单覆盖文件、元数据和阻断项时可通过。"""
 

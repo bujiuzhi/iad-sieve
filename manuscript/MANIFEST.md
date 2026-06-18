@@ -12,6 +12,7 @@
 | `keywords.md` | 关键词 |
 | `target_journal_shortlist.md` | 目标期刊候选与模板前置要求 |
 | `artifact_release_manifest.template.json` | 结果 artifact release 元数据模板 |
+| `artifact_release_README.template.md` | 外部结果 artifact release README 模板 |
 | `submission_system_checklist.md` | 正式投稿系统上传前核对清单 |
 | `reviewer_readiness_audit.md` | 审稿准备度与拒稿风险审计 |
 | `submission_metadata.yml` | 投稿系统元数据字段 |
@@ -55,7 +56,7 @@ python manuscript/scripts/validate_submission_package.py --dke-preflight
 
 `build/dke_preflight_package/` 和 `build/iad-risk-dke-preflight-package.zip` 是 DKE/Elsevier 匿名预投稿包的生成产物，不纳入 Git 跟踪；它们用于检查投稿文件组合，不替代最终上传门禁。
 
-`artifact_release_manifest.template.json` 用于准备正式 artifact release，不作为当前匿名预投稿包的替代物。正式上传前应生成真实 artifact manifest、checksum 和公开链接，并用 `scripts/validate_artifact_release.py` 校验 release 目录。
+`artifact_release_manifest.template.json` 和 `artifact_release_README.template.md` 用于准备正式 artifact release，不作为当前匿名预投稿包的替代物。正式上传前应生成真实 artifact manifest、README、checksum 和公开链接，并用 `scripts/validate_artifact_release.py` 校验 release 目录。
 
 `submission_system_checklist.md` 用于正式上传前逐项核对文件、元数据、PDF 和 artifact release，不作为当前匿名预投稿包的替代物。
 

@@ -30,6 +30,7 @@ REQUIRED_FILES = [
     ROOT / "keywords.md",
     ROOT / "target_journal_shortlist.md",
     ROOT / "artifact_release_manifest.template.json",
+    ROOT / "artifact_release_README.template.md",
     ROOT / "submission_system_checklist.md",
     ROOT / "reviewer_readiness_audit.md",
     ROOT / "submission_metadata.yml",
@@ -1168,6 +1169,72 @@ def check_artifact_release_manifest_template(template_text: str) -> list[str]:
     return errors
 
 
+def check_artifact_release_readme_template(readme_text: str) -> list[str]:
+    """Check whether the artifact release README template gives reviewers a safe entry point.
+
+    参数:
+        readme_text: Artifact release README template Markdown text.
+
+    返回:
+        list[str]: Error messages for missing release instructions or claim boundaries.
+    """
+    required_markers = [
+        "# IAD-Risk Artifact Release README Template",
+        "external result artifact release",
+        "Do not include raw third-party data",
+        "Do not include model checkpoints",
+        "Do not include credentials, personal identifiers, or local paths",
+        "Required Top-Level Files",
+        "README.md",
+        "manifest.json",
+        "checksums.sha256",
+        "Required Directories",
+        "configs/",
+        "tables/",
+        "predictions/",
+        "reports/",
+        "logs/",
+        "Minimum Validation Commands",
+        "sha256sum -c checksums.sha256",
+        "python manuscript/scripts/validate_artifact_release.py --artifact-dir",
+        "python manuscript/scripts/validate_manuscript.py --strict-latex",
+        "python manuscript/scripts/verify_fixture_rebuild.py",
+        "python scripts/check_public_release.py",
+        "Required Artifact IDs",
+        "open_v2_main_results",
+        "iad_risk_predictions",
+        "representation_baseline_scores",
+        "supervised_baseline_predictions",
+        "threshold_selection_logs",
+        "iad_bench_split_summary",
+        "Conditional Claim Artifacts",
+        "confidence_intervals_claimed",
+        "bootstrap_intervals",
+        "component_causality_claimed",
+        "ablation_suite",
+        "human_validation_claimed",
+        "manual_validation_slice",
+        "threshold_stability_claimed",
+        "threshold_sensitivity_grid",
+        "broad_method_ranking_claimed",
+        "Claim Boundaries",
+        "silver labels are not human gold",
+        "full numerical audit requires external artifacts",
+        "broad method ranking is not claimed unless conditional artifacts are complete",
+        "Reproduction Levels",
+        "L0 code check",
+        "L1 fixture rebuild",
+        "L2 public-source rebuild",
+        "L3 result audit",
+    ]
+    lowered_text = readme_text.lower()
+    return [
+        f"artifact release README template missing marker: {marker}"
+        for marker in required_markers
+        if marker.lower() not in lowered_text
+    ]
+
+
 def check_submission_system_checklist(checklist_text: str) -> list[str]:
     """Check whether the final upload checklist covers system-file review needs.
 
@@ -1911,6 +1978,12 @@ def main() -> int:
     artifact_release_template_text = (
         artifact_release_template_path.read_text(encoding="utf-8") if artifact_release_template_path.exists() else ""
     )
+    artifact_release_readme_template_path = ROOT / "artifact_release_README.template.md"
+    artifact_release_readme_template_text = (
+        artifact_release_readme_template_path.read_text(encoding="utf-8")
+        if artifact_release_readme_template_path.exists()
+        else ""
+    )
     submission_system_checklist_path = ROOT / "submission_system_checklist.md"
     submission_system_checklist_text = (
         submission_system_checklist_path.read_text(encoding="utf-8") if submission_system_checklist_path.exists() else ""
@@ -1992,6 +2065,7 @@ def main() -> int:
     errors.extend(check_environment_setup(supplementary_text))
     errors.extend(check_target_journal_shortlist(target_journal_shortlist_text))
     errors.extend(check_artifact_release_manifest_template(artifact_release_template_text))
+    errors.extend(check_artifact_release_readme_template(artifact_release_readme_template_text))
     errors.extend(check_submission_system_checklist(submission_system_checklist_text))
     errors.extend(check_reviewer_readiness_audit(reviewer_readiness_audit_text))
     errors.extend(check_manual_validation_protocol(supplementary_text))
