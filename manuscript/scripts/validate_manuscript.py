@@ -217,6 +217,21 @@ FORMAL_COMPLETION_OVERCLAIM_PATTERNS = [
         "final-upload completion claim",
     ),
 ]
+FINAL_UPLOAD_REQUEST_CHECKLIST_FIELDS = [
+    "target_journal_selected",
+    "article_type_confirmed",
+    "review_mode_confirmed",
+    "target_journal_template_applied",
+    "author_metadata_completed",
+    "corresponding_author_completed",
+    "funding_statement_text_ready",
+    "contribution_statement_complete",
+    "permissions_statement_complete",
+    "manuscript_pdf_rebuilt_after_template",
+    "supplementary_pdf_rebuilt_after_template",
+    "submission_system_files_verified",
+    "artifact_release_prepared_or_linked",
+]
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -373,6 +388,7 @@ def check_final_upload_information_request(request_text: str) -> list[str]:
         "Final title page",
         "Final-upload checklist",
     ]
+    required_markers.extend(f"- {field_name}:" for field_name in FINAL_UPLOAD_REQUEST_CHECKLIST_FIELDS)
     return [
         f"final upload information request missing marker: {marker}"
         for marker in required_markers

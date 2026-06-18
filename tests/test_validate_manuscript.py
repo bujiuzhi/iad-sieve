@@ -136,6 +136,29 @@ def test_check_final_upload_information_request_accepts_complete_request() -> No
     assert errors == []
 
 
+def test_check_final_upload_information_request_rejects_legacy_checklist_names() -> None:
+    """验证最终上传信息表不得使用与机器门禁不一致的旧字段名。"""
+
+    module = _load_validate_manuscript_module()
+    request_text = Path("manuscript/final_upload_information_request.md").read_text(encoding="utf-8")
+    request_text = request_text.replace("target_journal_template_applied", "journal_template_applied")
+    request_text = request_text.replace("author_metadata_completed", "author_metadata_complete")
+    request_text = request_text.replace("corresponding_author_completed", "corresponding_author_complete")
+    request_text = request_text.replace("manuscript_pdf_rebuilt_after_template", "manuscript_pdf_rebuilt_after_metadata")
+    request_text = request_text.replace("supplementary_pdf_rebuilt_after_template", "supplementary_pdf_rebuilt_after_metadata")
+    request_text = request_text.replace("submission_system_files_verified", "submission_system_fields_reviewed")
+    request_text = request_text.replace("artifact_release_prepared_or_linked", "artifact_release_public")
+
+    errors = module.check_final_upload_information_request(request_text)
+
+    assert any("target_journal_template_applied" in error for error in errors)
+    assert any("author_metadata_completed" in error for error in errors)
+    assert any("corresponding_author_completed" in error for error in errors)
+    assert any("manuscript_pdf_rebuilt_after_template" in error for error in errors)
+    assert any("submission_system_files_verified" in error for error in errors)
+    assert any("artifact_release_prepared_or_linked" in error for error in errors)
+
+
 def test_check_data_code_availability_boundary_accepts_complete_boundary() -> None:
     """验证数据与代码可用性边界完整时可通过检查。"""
 
