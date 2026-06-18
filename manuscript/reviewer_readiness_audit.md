@@ -8,6 +8,18 @@ This audit evaluates whether the template-independent manuscript package is read
 
 Current decision: conditionally ready for target-journal selection; not ready for final upload.
 
+## Audit Iteration Summary
+
+Completed audit cycles: 9.
+
+Highest current reviewer-facing risks: final-upload metadata, external artifact release, and stronger evidence gates.
+
+Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.
+
+Non-code external inputs still required: author metadata, target-journal confirmation, funding statement, author contribution statement, permissions statement, live submission-system fields, and artifact release URL or DOI.
+
+Next revision trigger: repeat the editorial desk check after template conversion, cover-letter customization, or artifact-link insertion.
+
 ## Audit Dimensions
 
 | Dimension | Current status | Evidence in the package | Residual requirement before final upload |
