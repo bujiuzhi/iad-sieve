@@ -54,6 +54,7 @@ REQUIRED_SECTIONS = [
     r"\section{Problem Formulation}",
     r"\subsection{Notation and Relation Semantics}",
     r"\section{IAD-Bench}",
+    r"\subsection{Pair Schema Contract}",
     r"\section{Method}",
     r"\subsection{Training Objective}",
     r"\subsection{Failure-Control Rationale}",
@@ -446,6 +447,39 @@ def check_openv2_benchmark_composition(manuscript_text: str) -> list[str]:
     ]
     return [
         f"Open-v2 benchmark composition missing marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
+
+
+def check_iad_bench_pair_schema_contract(manuscript_text: str) -> list[str]:
+    """Check whether IAD-Bench pair fields are stated in the manuscript.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing pair-schema contract markers.
+    """
+    required_markers = [
+        r"\subsection{Pair Schema Contract}",
+        r"\label{tab:iad-bench-pair-schema}",
+        r"\texttt{pair\_id}",
+        r"\texttt{source\_document\_id}",
+        r"\texttt{target\_document\_id}",
+        r"\texttt{relation\_label}",
+        r"\texttt{expected\_label}",
+        r"\texttt{expected\_agenda\_label}",
+        r"\texttt{label\_source}",
+        r"\texttt{label\_strength}",
+        r"\texttt{label\_provenance}",
+        r"\texttt{split}",
+        r"\texttt{hard\_negative\_level}",
+        "Separates same-work identity from agenda relatedness",
+        "identifies agenda-level hard negatives for HNFMR",
+    ]
+    return [
+        f"IAD-Bench pair schema contract missing marker: {marker}"
         for marker in required_markers
         if marker not in manuscript_text
     ]
@@ -1695,6 +1729,7 @@ def main() -> int:
     errors.extend(check_abstract_length(manuscript_text))
     errors.extend(check_contribution_evidence_summary(manuscript_text))
     errors.extend(check_openv2_benchmark_composition(manuscript_text))
+    errors.extend(check_iad_bench_pair_schema_contract(manuscript_text))
     errors.extend(check_method_feature_contract(manuscript_text))
     errors.extend(check_design_alternative_boundaries(manuscript_text))
     errors.extend(check_related_work_positioning(manuscript_text))

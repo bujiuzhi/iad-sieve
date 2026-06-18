@@ -152,6 +152,28 @@ Manual validation & Independent human review & External validation target \\
 \end{tabular}
 \end{table}
 
+\subsection{Pair Schema Contract}
+
+IAD-Bench uses a pair schema that makes relation semantics and evidence strength auditable. Table~\ref{tab:iad-bench-pair-schema} lists the required fields used by the manuscript. The schema separates the binary same-work target from agenda relatedness, records the source and strength of each label, and keeps split and hard-negative metadata visible so that training, threshold selection, held-out reporting, and manual audit cannot be silently mixed.
+
+\begin{table}[H]
+\caption{IAD-Bench pair schema contract. The schema records identity labels, agenda labels, provenance, split assignment, and hard-negative status for each pair.}
+\label{tab:iad-bench-pair-schema}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.24\linewidth}L{0.34\linewidth}L{0.32\linewidth}}
+\toprule
+Field group & Required fields & Reviewer-facing role \\
+\midrule
+Pair identity & \texttt{pair\_id}, \texttt{source\_document\_id}, \texttt{target\_document\_id} & Makes every row traceable to two standardized documents and prevents anonymous aggregate-only reporting. \\
+Relation targets & \texttt{relation\_label}, \texttt{expected\_label}, \texttt{expected\_agenda\_label} & Separates same-work identity from agenda relatedness before metrics are computed. \\
+Evidence source & \texttt{label\_source}, \texttt{label\_strength}, \texttt{label\_provenance} & Records whether a label is gold, proxy, silver, or human-audit evidence and what signals support it. \\
+Evaluation control & \texttt{split}, \texttt{hard\_negative\_level} & Controls train/dev/test/audit use and identifies agenda-level hard negatives for HNFMR. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 The Open-v2 benchmark variant used in the core evidence combines 415 DeepMatcher gold pairs with 10,000 OpenAlex-derived silver hard negatives, producing 10,415 pair records over 1,737 documents. The DeepMatcher component provides same-work gold labels, while the OpenAlex component stresses same-agenda non-identity behavior. This design is intentionally conservative: OpenAlex and OpenCitations are used to expose false-merge risk, not to replace human gold.
 
 \begin{table}[H]

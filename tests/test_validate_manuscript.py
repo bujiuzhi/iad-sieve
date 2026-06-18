@@ -372,6 +372,48 @@ def test_check_openv2_benchmark_composition_rejects_missing_counts() -> None:
     assert any("not human non-identity gold" in error for error in errors)
 
 
+def test_check_iad_bench_pair_schema_contract_accepts_complete_contract() -> None:
+    """验证 IAD-Bench pair schema 字段契约完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Pair Schema Contract}",
+            r"\label{tab:iad-bench-pair-schema}",
+            r"\texttt{pair\_id}",
+            r"\texttt{source\_document\_id}",
+            r"\texttt{target\_document\_id}",
+            r"\texttt{relation\_label}",
+            r"\texttt{expected\_label}",
+            r"\texttt{expected\_agenda\_label}",
+            r"\texttt{label\_source}",
+            r"\texttt{label\_strength}",
+            r"\texttt{label\_provenance}",
+            r"\texttt{split}",
+            r"\texttt{hard\_negative\_level}",
+            "Separates same-work identity from agenda relatedness.",
+            "The schema identifies agenda-level hard negatives for HNFMR.",
+        ]
+    )
+
+    errors = module.check_iad_bench_pair_schema_contract(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_iad_bench_pair_schema_contract_rejects_missing_fields() -> None:
+    """验证 IAD-Bench pair schema 缺少核心审计字段时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\subsection{Pair Schema Contract}"
+
+    errors = module.check_iad_bench_pair_schema_contract(manuscript_text)
+
+    assert any("iad-bench-pair-schema" in error for error in errors)
+    assert any("label\\_provenance" in error for error in errors)
+    assert any("hard\\_negative\\_level" in error for error in errors)
+
+
 def test_check_citation_bibliography_alignment_accepts_matching_entries() -> None:
     """验证 LaTeX 引用 key 与 BibTeX 条目一致时可通过。"""
 
