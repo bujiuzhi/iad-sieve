@@ -99,7 +99,7 @@ The anonymous package hygiene gate checks that generated submission packages exc
 
 Outcome: pass for template-independent first-screen claim alignment; must be repeated after journal-specific edits.
 
-The editorial desk check compares the title, abstract, conclusion, cover letter, highlights, and keywords against the same core story: IAD-Risk addresses identity-agenda confusion in scholarly work deduplication; IAD-Bench separates gold, proxy, and silver evidence; the Open-v2 evidence snapshot supports targeted false-merge suppression; and the paper does not claim broad method ranking, statistical superiority, threshold stability, or human-gold validation. This keeps the editorial claim alignment consistent before the manuscript reaches external review.
+The editorial desk check compares the title, abstract, conclusion, cover letter, highlights, and keywords against the same core story: IAD-Risk addresses identity-agenda confusion in scholarly work deduplication; IAD-Bench separates gold, proxy, and silver evidence; the Open-v2 evidence snapshot supports targeted false-merge suppression; and the paper does not claim broad method ranking, statistical superiority, threshold stability, cluster-level deployment quality, or human-gold validation. This keeps the editorial claim alignment consistent before the manuscript reaches external review.
 
 ## Audit Cycle 6: Reviewer Rebuttal Boundary
 
@@ -135,6 +135,14 @@ Outcome: pass for a conservative Data & Knowledge Engineering route; blocked for
 This cycle checks desk-rejection risk before final template binding. The current target-journal scope fit is strongest for Data & Knowledge Engineering because the manuscript is framed around data engineering, knowledge engineering, entity matching, benchmark contracts, and reproducible data-processing. Information Systems remains a stretch route because it would require a stronger same-scope experimental package, released prediction files, threshold logs, and broader systems-oriented evidence. Scientometrics remains a domain backup because it would require stronger science-of-science interpretation and manual-validation evidence.
 
 The novelty beyond ordinary entity matching should be stated as a bounded combination of identity-agenda confusion, HNFMR, label-strength-aware IAD-Bench construction, and risk-aware merge gating. This positioning is stronger than presenting another similarity scorer, but it must not be inflated into broad method superiority, SOTA ranking, or universal scholarly deduplication coverage. The practical decision is therefore to keep the DKE route active, treat Information Systems as blocked until the L3 artifact package and stronger baselines are complete, and treat Scientometrics as a backup that would need a domain-facing rewrite.
+
+## Audit Cycle 8: Pair-to-Cluster Claim Lockdown
+
+Outcome: pass for template-independent first-screen claim lockdown; blocked for cluster-level deployment claims until artifact-backed audits are released.
+
+The pair-to-cluster lockdown prevents pair-level metrics from being read as cluster-level deployment quality. The abstract, method, limitations, conclusion, cover letter, highlights, and supplementary material keep the current claim at pair-level false-merge control under the Open-v2 evidence snapshot. Stronger cluster-level claims require cluster artifacts that include `cluster_metric_summary`, `cannot_link_audit`, cluster assignments, cannot-link coverage, and cluster contamination rate.
+
+The first-screen materials carry the same boundary. The cover letter states that the manuscript does not claim cluster-level deployment quality without cluster artifacts. The highlights state that cluster-level claims require artifact-backed audits. The conclusion states that cluster-level artifact audits are future validation requirements before broad method ranking. This keeps cover letter, highlights, and conclusion aligned with the pair-to-cluster evidence boundary in the main manuscript.
 
 ## Minimum Gate Before Final Upload
 
