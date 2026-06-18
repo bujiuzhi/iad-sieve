@@ -11,8 +11,17 @@ target_preparation:
   primary_practical_candidate: "Data & Knowledge Engineering"
   stretch_candidate: "Information Systems"
   domain_backup_candidate: "Scientometrics"
+  provisional_target_status: "dke_preflight_ready_pending_author_confirmation"
+  dke_official_guide_rechecked: "2026-06-18"
   ranking_confirmation_required_before_final_upload: true
   selected_target_requires_author_confirmation: true
+  dke_preflight:
+    review_model: "single_anonymized"
+    abstract_word_limit_checked: true
+    keyword_count_checked: true
+    highlight_count_and_length_checked: true
+    elsarticle_conversion_pending_author_confirmation: true
+    artifact_release_required_before_upload: true
 
 authors: []
 

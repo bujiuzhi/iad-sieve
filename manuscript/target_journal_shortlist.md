@@ -22,6 +22,23 @@ Domain backup: Scientometrics.
 
 Rationale: Scientometrics is a strong thematic fit for scholarly metadata and science-of-science evaluation, especially because the manuscript uses OpenAlex/OpenCitations and studies scholarly work identity. The risk is that the current manuscript is primarily a data-engineering/entity-resolution method paper, while Scientometrics reviewers may expect a stronger bibliometric research question and domain interpretation.
 
+## Data & Knowledge Engineering Preflight
+
+Status: provisional preparation only; final upload metadata remains incomplete until author confirmation.
+
+Official guide rechecked: 2026-06-18.
+
+| Requirement area | DKE preparation status | Remaining action before final upload |
+| --- | --- | --- |
+| Scope fit | The manuscript is positioned around data engineering, knowledge engineering, entity matching, benchmark construction, and reproducible data-processing contracts. | Keep the paper framed as a data/knowledge-engineering method paper during template conversion. |
+| Review model | The current anonymous author placeholder is compatible with single anonymized review preparation. | Replace placeholders with real author metadata only when the title page and submission system are filled. |
+| Abstract | The current abstract is checked against a 250-word limit by `validate_manuscript.py`. | Recheck after any target-template edits. |
+| Keywords | `keywords.md` currently contains 1--7 semicolon-separated keywords. | Recheck if journal-specific keyword wording is changed. |
+| Highlights | `highlights.md` currently contains 3--5 highlights and is checked against the 85-character limit. | Upload as a separate editable file if required by the Elsevier system. |
+| LaTeX route | The generic article draft remains the editable pre-template source. | Convert to Elsevier `elsarticle` only after the authors confirm DKE as the target. |
+| Research data statement | The manuscript states that raw third-party data are not redistributed and that full numerical audit requires an external artifact release. | Add the real artifact URL or DOI before final upload. |
+| Submission checklist | The project already tracks corresponding-author details, uploaded files, reference consistency, permissions, and artifact release status. | Complete all checklist fields inside the live submission system. |
+
 ## Candidate Matrix
 
 | Candidate | Publisher evidence | Fit to IAD-Risk | Pre-submission action |

@@ -511,6 +511,15 @@ def test_check_target_journal_shortlist_accepts_complete_shortlist() -> None:
             "Domain backup: Scientometrics.",
             "## Candidate Matrix",
             "## Template and File Implications",
+            "## Data & Knowledge Engineering Preflight",
+            "Official guide rechecked: 2026-06-18",
+            "Status: provisional preparation only.",
+            "The current anonymous author placeholder is compatible with single anonymized review preparation.",
+            "The current abstract is checked against a 250-word limit.",
+            "keywords.md currently contains 1--7 semicolon-separated keywords.",
+            "highlights.md currently contains 3--5 highlights and is checked against the 85-character limit.",
+            "Convert to Elsevier `elsarticle` only after confirmation.",
+            "Add the real artifact URL or DOI before final upload.",
         ]
     )
 
@@ -529,6 +538,30 @@ def test_check_target_journal_shortlist_rejects_missing_boundary() -> None:
 
     assert any("Rank-sensitive labels" in error for error in errors)
     assert any("must be reconfirmed" in error for error in errors)
+
+
+def test_check_target_journal_shortlist_rejects_missing_dke_preflight() -> None:
+    """验证目标期刊候选清单缺少DKE官方预检时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    shortlist_text = "\n".join(
+        [
+            "# Target Journal Shortlist",
+            "This is not a final submission record.",
+            "Rank-sensitive labels must be reconfirmed before final upload.",
+            "Primary practical target: Data & Knowledge Engineering.",
+            "Stretch target: Information Systems.",
+            "Domain backup: Scientometrics.",
+            "## Candidate Matrix",
+            "## Template and File Implications",
+        ]
+    )
+
+    errors = module.check_target_journal_shortlist(shortlist_text)
+
+    assert any("Data & Knowledge Engineering Preflight" in error for error in errors)
+    assert any("Official guide rechecked" in error for error in errors)
+    assert any("Elsevier `elsarticle`" in error for error in errors)
 
 
 def test_check_artifact_release_manifest_template_accepts_complete_template() -> None:
