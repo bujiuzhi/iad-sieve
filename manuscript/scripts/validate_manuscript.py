@@ -2096,7 +2096,18 @@ def check_cover_letter(cover_letter_text: str) -> list[str]:
         "artifact-release instructions",
         "manifests and checksums",
     ]
-    return [f"cover letter missing required statement: {marker}" for marker in required_markers if marker not in cover_letter_text]
+    errors = [f"cover letter missing required statement: {marker}" for marker in required_markers if marker not in cover_letter_text]
+    subjective_fit_markers = [
+        "We believe",
+        "we believe",
+        "I believe",
+    ]
+    errors.extend(
+        f"cover letter contains subjective fit language: {marker}"
+        for marker in subjective_fit_markers
+        if marker in cover_letter_text
+    )
+    return errors
 
 
 def check_submission_material_quantitative_summary(highlights_text: str, cover_letter_text: str) -> list[str]:

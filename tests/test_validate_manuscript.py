@@ -2632,6 +2632,31 @@ def test_check_cover_letter_rejects_missing_artifact_release_boundary() -> None:
     assert any("artifact-release instructions" in error for error in errors)
 
 
+def test_check_cover_letter_rejects_subjective_fit_language() -> None:
+    """验证 cover letter 不应使用主观适配措辞。"""
+
+    module = _load_validate_manuscript_module()
+    cover_letter_text = "\n".join(
+        [
+            "Dear Editor,",
+            "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication.",
+            "The manuscript is not under consideration elsewhere.",
+            "All listed authors have approved the submitted version.",
+            "The authors declare no competing interests.",
+            "The repository does not redistribute raw third-party data.",
+            "full experimental outputs are not redistributed in Git.",
+            "The repository includes artifact-release instructions.",
+            "Released artifacts should include manifests and checksums.",
+            "We believe the paper is relevant to readers interested in scholarly data integration.",
+        ]
+    )
+
+    errors = module.check_cover_letter(cover_letter_text)
+
+    assert any("subjective fit language" in error for error in errors)
+    assert any("We believe" in error for error in errors)
+
+
 def test_check_submission_material_quantitative_summary_accepts_scoped_highlights() -> None:
     """验证投稿摘要材料接受带范围边界的 highlights 量化表述。"""
 
