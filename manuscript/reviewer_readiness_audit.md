@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 75.
+Completed audit cycles: 76.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.
 
@@ -698,6 +698,14 @@ Outcome: pass for Related Work decision-semantics clarification; blocked for str
 This gate checks whether the Related Work section makes the novelty boundary visible without relying on a citation list alone. The main manuscript now states that end-to-end entity resolution, neural matching, scientific representation learning, and open metadata benchmarks assign different decision roles to relatedness. IAD-Risk is positioned more narrowly: relatedness is interpreted only after the pair schema records whether the signal is identity evidence, agenda evidence, or agenda-non-identity stress evidence.
 
 The reviewer-facing boundary is contribution clarity, not a stronger empirical claim. The edit explains why the paper is not merely a new encoder or a new threshold over existing embeddings: the merge gate treats high relatedness as an auditable input whose role can be positive, negative, or deferred, not as a direct merge decision. This connects IAD-Bench to HNFMR while preserving the existing limits on broad method ranking, same-scope superiority, and human-gold label claims.
+
+## Audit Cycle 76: Mechanism Ablation Acceptance Protocol Gate
+
+Outcome: pass for Mechanism ablation acceptance protocol; blocked for component-causality claims until the accepted ablation artifacts are released with checksum-bound prediction rows and logs.
+
+This gate checks whether the manuscript defines what counts as acceptable ablation evidence before using ablation outputs for causal interpretation. The main manuscript now states that no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold variants must share the same pair scope, split field, label stratum, and metric implementation, and use the same predeclared operating-point rule as the full IAD-Risk row. The supplementary material preserves the full acceptance protocol with the required variants, scope parity, decision trace, artifact binding, and interpretation rule.
+
+The reviewer-facing boundary is evaluation completeness discipline, not new empirical evidence. A future ablation run can support component-causality statements only if it releases prediction rows, threshold logs, same-work F1/FMR/HNFMR denominators, merge/block/defer decisions, configuration, command log, code commit, manifest entry, and checksums. Any result with a changed pair universe, threshold-selection source, or prediction schema remains exploratory diagnostic evidence rather than an accepted ablation for causal interpretation.
 
 ## Minimum Gate Before Final Upload
 

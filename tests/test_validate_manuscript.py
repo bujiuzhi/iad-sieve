@@ -2917,6 +2917,40 @@ def test_check_statistical_interpretation_boundary_rejects_missing_significance_
     assert any("zero risk" in error for error in errors)
 
 
+def test_check_ablation_acceptance_boundary_accepts_protocol() -> None:
+    """验证主文包含消融验收边界时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Ablation Acceptance Boundary}",
+            "The variants use the same pair scope, split field, metric implementation, and predeclared operating-point rule.",
+            "The variants are no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold.",
+            "Each output releases prediction rows, threshold logs, denominator records.",
+            "The denominator records cover same-work F1, FMR, and HNFMR.",
+            "The release includes checksum-bound configuration files.",
+            "Otherwise the result is exploratory diagnostic evidence rather than an accepted ablation.",
+        ]
+    )
+
+    errors = module.check_ablation_acceptance_boundary(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_ablation_acceptance_boundary_rejects_missing_protocol() -> None:
+    """验证缺少消融验收边界时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\subsection{Ablation Acceptance Boundary}"
+
+    errors = module.check_ablation_acceptance_boundary(manuscript_text)
+
+    assert any("no-risk-gate" in error for error in errors)
+    assert any("checksum-bound configuration files" in error for error in errors)
+    assert any("exploratory diagnostic evidence" in error for error in errors)
+
+
 def test_check_experiment_reporting_supplementary_boundaries_accepts_complete_tables() -> None:
     """验证补充材料包含迁移后的实验报告边界表时可通过检查。"""
 
@@ -2925,13 +2959,25 @@ def test_check_experiment_reporting_supplementary_boundaries_accepts_complete_ta
         [
             r"\section{Uncertainty and Ablation Requirements}",
             r"\label{tab:threshold-uncertainty-protocol}",
+            r"\label{tab:ablation-acceptance-protocol}",
             r"\label{tab:statistical-interpretation-boundary}",
             "Threshold and uncertainty reporting protocol.",
+            "Ablation acceptance protocol.",
             "Merge thresholds.",
             "Metric uncertainty.",
             "Risk metrics.",
             "Ablation claims.",
             "Artifact audit.",
+            "Required variants.",
+            "no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold.",
+            "Scope parity.",
+            "same pair scope, split field, label stratum, and metric implementation.",
+            "Decision trace.",
+            "prediction rows, threshold logs, same-work F1/FMR/HNFMR denominators.",
+            "Artifact binding.",
+            "configuration, command log, random seed when applicable, code commit, manifest entry, and checksum.",
+            "Interpretation rule.",
+            "changed pair universe, threshold-selection source, or prediction schema.",
             "Statistical interpretation boundary.",
             "Point estimates.",
             "Confidence intervals.",
@@ -2958,6 +3004,7 @@ def test_check_experiment_reporting_supplementary_boundaries_rejects_missing_tab
     errors = module.check_experiment_reporting_supplementary_boundaries(supplementary_text)
 
     assert any("threshold-uncertainty-protocol" in error for error in errors)
+    assert any("ablation-acceptance-protocol" in error for error in errors)
     assert any("statistical-interpretation-boundary" in error for error in errors)
     assert any("bootstrap_intervals" in error for error in errors)
 
@@ -5348,7 +5395,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 75.",
+            "Completed audit cycles: 76.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -5959,6 +6006,12 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "not merely a new encoder or a new threshold over existing embeddings",
             "positive, negative, or deferred",
             "connects IAD-Bench to HNFMR",
+            "## Audit Cycle 76: Mechanism Ablation Acceptance Protocol Gate",
+            "Mechanism ablation acceptance protocol",
+            "no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold",
+            "same pair scope, split field, label stratum, and metric implementation",
+            "prediction rows, threshold logs, same-work F1/FMR/HNFMR denominators",
+            "changed pair universe, threshold-selection source, or prediction schema",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -5977,7 +6030,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 75",
+        "Completed audit cycles: 76",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -5988,7 +6041,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 75" in error for error in errors)
+    assert any("Completed audit cycles: 76" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

@@ -706,6 +706,25 @@ Artifact audit & Tie each numerical table to predictions, configs, logs, checksu
 \end{table}
 
 \begin{table}[H]
+\caption{Ablation acceptance protocol. The protocol defines when a component-ablation output is strong enough to support causal interpretation rather than exploratory diagnosis.}
+\label{tab:ablation-acceptance-protocol}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{2pt}
+\begin{tabular}{L{0.18\linewidth}L{0.34\linewidth}L{0.38\linewidth}}
+\toprule
+Requirement & Accepted evidence & Rejected interpretation \\
+\midrule
+Required variants & no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold outputs are all present. & Component causality from only one removed head or one threshold sweep. \\
+Scope parity & Each variant uses the same pair scope, split field, label stratum, and metric implementation as the full IAD-Risk row. & Comparing a full-scope baseline with a held-out ablation as if they shared a denominator. \\
+Decision trace & Each variant releases prediction rows, threshold logs, same-work F1/FMR/HNFMR denominators, and merge/block/defer decisions. & Reporting only aggregate metrics without row-level decisions and denominator records. \\
+Artifact binding & Each variant records configuration, command log, random seed when applicable, code commit, manifest entry, and checksum. & Treating unversioned local runs as auditable ablation evidence. \\
+Interpretation rule & Accepted variants may support component-causality statements within the released scope. & Variants with changed pair universe, threshold-selection source, or prediction schema remain exploratory diagnostics. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
 \caption{Statistical interpretation boundary for the Open-v2 evidence snapshot. The table states how reported numbers may be read before interval and significance artifacts are released.}
 \label{tab:statistical-interpretation-boundary}
 \centering

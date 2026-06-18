@@ -2187,6 +2187,31 @@ def check_statistical_interpretation_boundary(manuscript_text: str) -> list[str]
     ]
 
 
+def check_ablation_acceptance_boundary(manuscript_text: str) -> list[str]:
+    """Check whether the manuscript defines accepted ablation evidence.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing ablation-acceptance markers.
+    """
+    required_markers = [
+        r"\subsection{Ablation Acceptance Boundary}",
+        "same pair scope, split field, metric implementation, and predeclared operating-point rule",
+        "no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold",
+        "prediction rows, threshold logs, denominator records",
+        "same-work F1, FMR, and HNFMR",
+        "checksum-bound configuration files",
+        "exploratory diagnostic evidence rather than an accepted ablation",
+    ]
+    return [
+        f"ablation acceptance boundary missing marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
+
+
 def check_experiment_reporting_supplementary_boundaries(supplementary_text: str) -> list[str]:
     """Check whether moved experiment-reporting boundary tables are in the supplement.
 
@@ -2199,13 +2224,25 @@ def check_experiment_reporting_supplementary_boundaries(supplementary_text: str)
     required_markers = [
         r"\section{Uncertainty and Ablation Requirements}",
         r"\label{tab:threshold-uncertainty-protocol}",
+        r"\label{tab:ablation-acceptance-protocol}",
         r"\label{tab:statistical-interpretation-boundary}",
         "Threshold and uncertainty reporting protocol",
+        "Ablation acceptance protocol",
         "Merge thresholds",
         "Metric uncertainty",
         "Risk metrics",
         "Ablation claims",
         "Artifact audit",
+        "Required variants",
+        "no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold",
+        "Scope parity",
+        "same pair scope, split field, label stratum, and metric implementation",
+        "Decision trace",
+        "prediction rows, threshold logs, same-work F1/FMR/HNFMR denominators",
+        "Artifact binding",
+        "configuration, command log, random seed when applicable, code commit, manifest entry, and checksum",
+        "Interpretation rule",
+        "changed pair universe, threshold-selection source, or prediction schema",
         "Statistical interpretation boundary",
         "Point estimates",
         "Confidence intervals",
@@ -3561,7 +3598,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 75",
+        "Completed audit cycles: 76",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3708,6 +3745,12 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 73: Author Guide and Template Requirement Confirmation Gate",
         "Audit Cycle 74: Author Identity Material Traceability Gate",
         "Audit Cycle 75: Closest-Work Decision-Semantics Gate",
+        "Audit Cycle 76: Mechanism Ablation Acceptance Protocol Gate",
+        "Mechanism ablation acceptance protocol",
+        "no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold",
+        "same pair scope, split field, label stratum, and metric implementation",
+        "prediction rows, threshold logs, same-work F1/FMR/HNFMR denominators",
+        "changed pair universe, threshold-selection source, or prediction schema",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
         "scoring-algorithm table-density reduction",
@@ -5304,6 +5347,7 @@ def main() -> int:
     errors.extend(check_metric_formula_boundary(manuscript_text, supplementary_text))
     errors.extend(check_threshold_uncertainty_reporting(manuscript_text))
     errors.extend(check_statistical_interpretation_boundary(manuscript_text))
+    errors.extend(check_ablation_acceptance_boundary(manuscript_text))
     errors.extend(check_threshold_sensitivity_status(manuscript_text, supplementary_text))
     errors.extend(check_baseline_scope_alignment(manuscript_text))
     errors.extend(check_baseline_inclusion_rationale(manuscript_text))
