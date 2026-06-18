@@ -144,6 +144,16 @@ The pair-to-cluster lockdown prevents pair-level metrics from being read as clus
 
 The first-screen materials carry the same boundary. The cover letter states that the manuscript does not claim cluster-level deployment quality without cluster artifacts. The highlights state that cluster-level claims require artifact-backed audits. The conclusion states that cluster-level artifact audits are future validation requirements before broad method ranking. This keeps cover letter, highlights, and conclusion aligned with the pair-to-cluster evidence boundary in the main manuscript.
 
+## Audit Cycle 9: Artifact Row-Level Result Audit
+
+Outcome: pass for release-template and validator coverage; blocked for final numerical audit until the external artifact release is populated and linked.
+
+This cycle checks whether the external result package can support a row-by-row reviewer audit of the main Open-v2 result table. The release validator now treats `open_v2_main_results` as a schema-bearing artifact rather than a generic file: `tables/open_v2_main_results.csv` must include per-row denominator counts, per-row threshold source, and scope label used in the main table. This prevents a release from passing only because the CSV exists and has a matching checksum.
+
+The reviewer-facing interpretation is narrow. A valid `open_v2_main_results` file lets reviewers trace each reported row to its denominator, operating-point source, and evaluated scope. It does not by itself establish broad method ranking, confidence intervals, threshold stability, component causality, human-gold validation, or cluster-level deployment quality. Those stronger claims remain gated by the optional artifact rows and their checksums.
+
+The mandatory command for this gate is `python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release`. The gate should be run after `populate_artifact_release.py` and `finalize_artifact_release.py`, because the finalizer refreshes manifest SHA256 values and `validate_artifact_release.py` checks both checksums and the `open_v2_main_results` row-level schema.
+
 ## Minimum Gate Before Final Upload
 
 The manuscript should not be uploaded to a journal system until all of the following are true:

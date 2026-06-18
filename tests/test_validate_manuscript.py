@@ -3009,6 +3009,12 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "cannot_link_audit",
             "cover letter, highlights, and conclusion",
             "artifact-backed audits",
+            "## Audit Cycle 9: Artifact Row-Level Result Audit",
+            "open_v2_main_results",
+            "per-row denominator counts",
+            "per-row threshold source",
+            "scope label used in the main table",
+            "validate_artifact_release.py",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload",
@@ -3108,6 +3114,30 @@ def test_check_reviewer_readiness_audit_rejects_missing_pair_cluster_lockdown() 
     assert any("Pair-to-Cluster Claim Lockdown" in error for error in errors)
     assert any("cluster_metric_summary" in error for error in errors)
     assert any("cannot_link_audit" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_artifact_row_level_audit() -> None:
+    """验证审稿准备度审计必须覆盖 artifact 主结果表行级审计。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Audit Cycle 9: Artifact Row-Level Result Audit",
+        "open_v2_main_results",
+        "per-row denominator counts",
+        "per-row threshold source",
+        "scope label used in the main table",
+        "validate_artifact_release.py",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Artifact Row-Level Result Audit" in error for error in errors)
+    assert any("open_v2_main_results" in error for error in errors)
+    assert any("per-row denominator counts" in error for error in errors)
+    assert any("per-row threshold source" in error for error in errors)
+    assert any("scope label used in the main table" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_final_gate() -> None:
