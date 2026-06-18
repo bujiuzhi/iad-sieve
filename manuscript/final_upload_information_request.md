@@ -12,6 +12,7 @@ Repository URL and commit binding: keep the source `repository_reference` fields
 | --- | --- | --- |
 | Target journal | `submission`, `target_preparation`, `target_journal_template_bound`, `final_upload_checklist.target_journal_selected`, `final_upload_checklist.article_type_confirmed`, `final_upload_checklist.review_mode_confirmed`, `final_upload_checklist.target_journal_template_applied` | Target-journal template source and live submission system |
 | Author list | `authors`, `author_contributions.roles`, `final_upload_checklist.author_metadata_completed` | Final title page and live submission system |
+| Author biographies and photographs | `final_upload_checklist.author_biographies_and_photos_ready` | DKE/Elsevier biography text and photograph upload files, if requested |
 | Corresponding author | `corresponding_author`, `final_upload_checklist.corresponding_author_completed` | Final title page, cover letter, and live submission system |
 | Funding statement | `funding`, `statements`, `final_upload_checklist.funding_statement_text_ready` | Manuscript declarations and live submission system |
 | Author contribution statement | `author_contributions`, `final_upload_checklist.contribution_statement_complete` | Manuscript declarations and live submission system |
@@ -38,6 +39,14 @@ For each author, provide the final Author order, name, affiliation, email, ORCID
 | Author order | Name | Affiliation | Email | ORCID | Contribution roles |
 | --- | --- | --- | --- | --- | --- |
 | 1 |  |  |  |  |  |
+
+## Author biographies and photographs
+
+For the DKE/Elsevier route, provide a short biography and a passport-type photograph for each author when requested by the live submission system.
+
+| Author order | Biography text ready | Photograph file path | Editable biography file, if required |
+| --- | --- | --- | --- |
+| 1 |  |  |  |
 
 ## Corresponding author
 
@@ -155,6 +164,7 @@ For each author, select the applicable CRediT roles and then draft the final aut
 - review_mode_confirmed:
 - target_journal_template_applied:
 - author_metadata_completed:
+- author_biographies_and_photos_ready:
 - corresponding_author_completed:
 - funding_statement_text_ready:
 - contribution_statement_complete:

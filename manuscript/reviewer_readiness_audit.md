@@ -1,6 +1,6 @@
 # Reviewer Readiness Audit
 
-Updated: 2026-06-18
+Updated: 2026-06-19
 
 ## Scope
 
@@ -10,13 +10,13 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 20.
+Completed audit cycles: 21.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, artifact release README completeness, artifact release commit validity, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release README completeness, artifact release commit validity, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.
 
-Non-code external inputs still required: author metadata, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.
+Non-code external inputs still required: author metadata, DKE author biography and photograph materials if that route is selected, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.
 
 Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.
 
@@ -42,6 +42,7 @@ Next revision trigger: repeat the editorial desk check after target-journal temp
 | First-screen submission materials may drift in claim scope. | Medium | Title, abstract, conclusion, cover letter, highlights, and keywords are checked for editorial claim alignment around the same problem, method, evidence snapshot, and claim boundary. | Re-run the editorial alignment gate after template conversion or journal-specific cover-letter edits. |
 | Live submission-system text may drift from source files. | Medium | The final-upload information request and submission-system checklist require title, abstract, keywords, and highlights to be copied from source files and previewed in the live submission system. | Mark `submission_system_files_verified` true only after these fields match `main.tex`, `keywords.md`, and `highlights.md` in the live system. |
 | Generative AI declaration may be missing or inconsistent with the publisher policy. | Medium | Submission metadata, final-upload information request, target-journal shortlist, and submission-system checklist now require AI-tool use status, author responsibility confirmation, AI authorship exclusion, and machine-generated figure/artwork status. | Complete the final journal-specific declaration wording and keep it consistent across the manuscript, metadata, and live submission system. |
+| DKE author biographies and photographs may be missing at upload. | Medium | The target-journal shortlist, final-upload information request, submission metadata, and submission-system checklist now track author biographies and passport-type photographs as DKE-specific final-upload materials. | Collect author-approved biography text and photograph files after author order is confirmed and keep them out of anonymous preflight packages. |
 | Test fixtures may be mistaken for current Q2/B evidence. | Medium | The manuscript and audit package distinguish fixture-level code-path checks from live result artifacts and final-upload metadata. | Treat test fixtures, example summaries, and generated fixture rows as validator coverage only unless they are regenerated from current live artifacts, current commit metadata, and the selected target-journal route. |
 | Reproducibility depends on files outside Git. | Medium | Fixture rebuild, public-source commands, artifact manifest template, and checksums policy are documented. | Publish the L3 artifact release and link it in submission metadata. |
 | Final upload may mismatch journal template or system fields. | High | A submission-system checklist records file, metadata, PDF, artifact, source-archive, and template-binding checks. | Confirm target journal, set `target_journal_template_bound`, rebuild the final template source and PDFs, and verify the live system fields. |
@@ -257,11 +258,19 @@ This cycle prevents test fixtures from being mistaken for current manuscript evi
 
 The reviewer-facing boundary is strict: fixture rows can support software reliability and reproducibility-path claims, but they cannot be cited as scientific result evidence or final-upload readiness evidence. A Q2/B or final-upload claim requires live outputs regenerated from the current repository commit, tied to the selected target-journal route, and linked to the external artifact release and final `submission_metadata.yml`.
 
+## Audit Cycle 21: DKE Author Biography and Photograph Gate
+
+Outcome: pass for checklist and metadata-validator coverage; blocked for final upload until author-approved biography text and photograph files are collected when the DKE route is selected.
+
+This cycle checks a non-scientific but submission-critical DKE requirement. The publisher guide requests a short biography for each author and a passport-type photograph as a separate figure. The current anonymous preflight package must not include these identity-bearing files, but the final-upload workflow must collect them after author order and corresponding-author details are confirmed.
+
+The reviewer-facing boundary is administrative rather than evidential. Author biographies and photographs do not strengthen the method, experiments, or reproducibility claims. They are tracked because missing author-material files can block or delay journal-system upload even when the manuscript PDF, source archive, and artifact release are otherwise ready.
+
 ## Minimum Gate Before Final Upload
 
 The manuscript should not be uploaded to a journal system until all of the following are true:
 
-1. `submission_metadata.yml` contains the selected target journal, `target_journal_template_bound: true`, and completed author metadata.
+1. `submission_metadata.yml` contains the selected target journal, `target_journal_template_bound: true`, completed author metadata, and author biography/photo readiness when the selected route requires it.
 2. `main.tex` or the selected journal source is converted to the selected journal template and rebuilt.
 3. `supplementary_material.tex` is rebuilt after any final source edits.
 4. The artifact release has a real URL or DOI, validates against its checksum file, and records the same repository commit used by the final manuscript package.

@@ -425,6 +425,7 @@ def write_manifest(
             "target journal document class",
             "journal-specific reference style",
             "author metadata",
+            "author biographies and photographs",
             "artifact release linked",
         ]
     else:
@@ -444,6 +445,7 @@ def write_manifest(
             "target journal document class",
             "journal-specific reference style",
             "author metadata",
+            "author biographies and photographs",
         ]
     manifest = {
         "package_name": "iad-risk-dke-preflight-package" if dke_preflight else "iad-risk-submission-package",

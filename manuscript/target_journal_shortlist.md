@@ -1,6 +1,6 @@
 # Target Journal Shortlist
 
-Updated: 2026-06-18
+Updated: 2026-06-19
 
 ## Selection Boundary
 
@@ -26,7 +26,7 @@ Rationale: Scientometrics is a strong thematic fit for scholarly metadata and sc
 
 Status: provisional preparation only; final upload metadata remains incomplete until author confirmation.
 
-Official guide rechecked: 2026-06-18.
+Official guide rechecked: 2026-06-19.
 
 | Requirement area | DKE preparation status | Remaining action before final upload |
 | --- | --- | --- |
@@ -38,21 +38,22 @@ Official guide rechecked: 2026-06-18.
 | LaTeX route | The generic article draft remains the editable pre-template source. | Convert to Elsevier `elsarticle` only after the authors confirm DKE as the target. |
 | Research data statement | The manuscript states that raw third-party data are not redistributed and that full numerical audit requires an external artifact release. | Add the real artifact URL or DOI before final upload. |
 | Generative AI declaration | Elsevier author guidance requires AI-tool use in manuscript preparation to be declared when applicable and prohibits listing AI tools as authors. | Fill the final generative AI declaration only after authors confirm the exact tool-use status and statement wording. |
+| Author biographies and photographs | DKE author guidance requests a short biography of each author and a passport-type photograph as a separate figure in editable form. | Collect author-approved biographies and photographs before final upload if DKE remains the selected route. |
 | Submission checklist | The project already tracks corresponding-author details, uploaded files, reference consistency, permissions, and artifact release status. | Complete all checklist fields inside the live submission system. |
 
 ## Official Source Audit
 
 This audit records the publisher-facing constraints that determine the next manuscript pass. It does not replace author confirmation of institutional rankings, journal class, or final submission-system fields.
 
-Official source snapshot date: 2026-06-18.
+Official source snapshot date: 2026-06-19.
 
-- DKE guide verified: 2026-06-18.
+- DKE guide verified: 2026-06-19.
 - Information Systems guide verified: 2026-06-18.
 - Scientometrics guide verified: 2026-06-18.
 
 | Candidate | Officially verified constraints | Project implication |
 | --- | --- | --- |
-| Data & Knowledge Engineering | Elsevier lists 6.4 CiteScore and 2.6 Impact Factor, describes the journal as covering data engineering, knowledge engineering, and their interface, and uses single anonymized review. The author guide requests editable source files, supports LaTeX, limits the abstract to 250 words, requires 1--7 keywords, encourages 3--5 highlights with a maximum of 85 characters each, applies research-data deposit/linking or an explanatory data statement, requires a CRediT author contribution statement, and requires a generative AI declaration when AI tools were used in manuscript preparation. | Keep DKE as the primary practical route. The current DKE package is a preflight artifact only; final upload still needs author metadata, target-template binding, a CRediT author contribution statement, a generative AI declaration decision, and a real artifact URL or DOI. |
+| Data & Knowledge Engineering | Elsevier lists 6.4 CiteScore and 2.6 Impact Factor, describes the journal as covering data engineering, knowledge engineering, and their interface, and uses single anonymized review. The author guide requests editable source files, supports LaTeX, limits the abstract to 250 words, requires 1--7 keywords, encourages 3--5 highlights with a maximum of 85 characters each, applies research-data deposit/linking or an explanatory data statement, requires a CRediT author contribution statement, requires a generative AI declaration when AI tools were used in manuscript preparation, and requests short author biographies plus passport-type photographs. | Keep DKE as the primary practical route. The current DKE package is a preflight artifact only; final upload still needs author metadata, target-template binding, a CRediT author contribution statement, author biographies and photographs, a generative AI declaration decision, and a real artifact URL or DOI. |
 | Information Systems | Elsevier lists 9.8 CiteScore and 3.4 Impact Factor. Its scope covers data-intensive applications, data models, algorithms, data mining/machine learning, information retrieval with structured data, web semantics, scientific computing, and data science. The guide emphasizes serious experimentation and reproducibility for systems papers, uses single anonymized review, follows the same editable-source, abstract, keyword, highlight, research-data, CRediT, and generative AI declaration requirements as the Elsevier route, and states that the Information Systems data statement is required at submission. | Treat this as a stretch route. Do not target it until the L3 artifact release, same-scope baseline files, threshold logs, stronger reproducibility evidence, final data statement wording, and generative AI declaration wording are complete. |
 | Scientometrics | Springer identifies the journal as covering quantitative aspects of the science of science, communication in science, and science policy, and reports a 2024 Impact Factor of 3.5. The journal uses single-blind review, requests title-page author information, recommends ORCID, requires a 150--250 word abstract and 4--6 keywords, allows LaTeX for mathematical content, requires a data availability statement for original research, and states that large-language-model use should be documented while copy-editing-only tool use does not need declaration. | Keep it as a domain backup. Selecting this route would require a stronger science-of-science framing, de-anonymized title-page metadata, Springer formatting, a repository or artifact link that supports the data availability statement, and target-specific AI-use wording. |
 
@@ -66,6 +67,7 @@ The shortlist uses official publisher pages only to decide manuscript preparatio
 | Elsevier review model and title-page rules | Treat the anonymous package as a preflight package; prepare real author metadata for final upload. | Confirm whether the live system requests single anonymized or anonymous files at the upload step. |
 | Elsevier abstract, keyword, highlight, source-file, and data-statement rules | Keep the abstract within 250 words, keywords within 1--7 entries, highlights within 3--5 bullets and 85 characters, and source files editable. | Re-run the manuscript and submission-package validators after any template or metadata edit. |
 | Elsevier author contribution rules | Require the final author list to support a CRediT author contribution statement before upload. | Fill `submission_metadata.yml`, `final_upload_information_request.md`, and the live submission system with author-order-specific contribution roles. |
+| DKE author biography and photograph request | Treat short biographies and passport-type photographs as DKE-specific final-upload materials rather than anonymous preflight files. | Collect author-approved biographies and image files after author order is confirmed. |
 | Generative AI policy | Elsevier requires disclosure when AI tools are used in manuscript preparation and prohibits AI authorship; Springer requires large-language-model use to be documented but exempts copy-editing-only tool use. | Fill the generative AI declaration status, author review confirmation, AI authorship exclusion, and any target-specific statement text before final upload. |
 | Scientometrics title-page, abstract, keyword, and data availability rules | Keep Scientometrics as a domain backup that would need Springer formatting, 150--250 word abstract, 4--6 keywords, and a stronger science-of-science interpretation. | Confirm Springer submission fields and decide whether a domain-facing rewrite is worth the effort. |
 | Artifact and data availability requirements | Keep external artifact release as a final-upload blocker rather than a cosmetic repository link. | Add a real artifact URL or DOI and validate checksums before citing result artifacts. |
@@ -88,8 +90,9 @@ If the selected target is an Elsevier journal, the next manuscript pass should:
 4. Keep highlights as a separate editable file with 3--5 bullets and no bullet over 85 characters.
 5. Upload editable source files rather than relying on PDF alone.
 6. Provide title page, author names, affiliations, and corresponding-author contact details.
-7. Prepare data availability and artifact-release statements before final upload.
-8. Prepare the generative AI declaration or no-use statement required by the live system.
+7. Prepare short author biographies and passport-type photographs if the live DKE/Elsevier route requires them.
+8. Prepare data availability and artifact-release statements before final upload.
+9. Prepare the generative AI declaration or no-use statement required by the live system.
 
 If the selected target is Scientometrics, the next manuscript pass should:
 

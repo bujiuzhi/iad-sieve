@@ -12,7 +12,7 @@ target_preparation:
   stretch_candidate: "Information Systems"
   domain_backup_candidate: "Scientometrics"
   provisional_target_status: "dke_preflight_ready_pending_author_confirmation"
-  dke_official_guide_rechecked: "2026-06-18"
+  dke_official_guide_rechecked: "2026-06-19"
   ranking_confirmation_required_before_final_upload: true
   selected_target_requires_author_confirmation: true
   dke_preflight:
@@ -21,6 +21,7 @@ target_preparation:
     keyword_count_checked: true
     highlight_count_and_length_checked: true
     elsarticle_conversion_pending_author_confirmation: true
+    author_biography_and_photo_required_before_upload: true
     artifact_release_required_before_upload: true
 
 authors: []
@@ -95,6 +96,7 @@ final_upload_checklist:
   review_mode_confirmed: false
   target_journal_template_applied: false
   author_metadata_completed: false
+  author_biographies_and_photos_ready: false
   corresponding_author_completed: false
   funding_statement_text_ready: false
   contribution_statement_complete: false

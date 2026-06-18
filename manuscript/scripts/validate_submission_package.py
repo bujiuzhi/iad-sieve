@@ -272,8 +272,12 @@ def check_manifest_text(manifest_text: str, dke_preflight: bool = False, final_u
             errors.append("submission_manifest.json must record that no target journal template is bound")
     elif "target journal document class" not in journal_template.get("final_upload_requirements", []):
         errors.append("submission_manifest.json missing target journal document class final-upload requirement")
-    elif final_upload and "artifact release linked" not in journal_template.get("final_upload_requirements", []):
-        errors.append("submission_manifest.json missing artifact release linked final-upload requirement")
+    if isinstance(journal_template, dict) and final_upload:
+        final_upload_requirements = journal_template.get("final_upload_requirements", [])
+        if "artifact release linked" not in final_upload_requirements:
+            errors.append("submission_manifest.json missing artifact release linked final-upload requirement")
+        if "author biographies and photographs" not in final_upload_requirements:
+            errors.append("submission_manifest.json missing author biographies and photographs final-upload requirement")
     if dke_preflight and journal_template.get("dke_elsevier_preflight_included") is not True:
         errors.append("submission_manifest.json must record DKE/Elsevier preflight inclusion")
     reproducibility_level = manifest.get("reproducibility_level")
