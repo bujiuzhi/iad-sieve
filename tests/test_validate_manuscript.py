@@ -291,6 +291,41 @@ def test_check_operating_point_disclosure_rejects_missing_threshold_boundary() -
     assert any("post-hoc best test thresholds" in error for error in errors)
 
 
+def test_check_threshold_sensitivity_status_accepts_bounded_claim() -> None:
+    """验证阈值敏感性边界完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Threshold Sensitivity Evidence Status}",
+            r"\label{tab:threshold-sensitivity-status}",
+            "Threshold stability is treated as an audit requirement.",
+            "It is not as an unsupported robustness claim.",
+            "A stronger claim requires the same prediction files.",
+            "It also requires predefined threshold ranges.",
+            "The threshold grid is not reported as primary evidence.",
+            "The package needs Per-threshold F1, FMR, HNFMR.",
+            "The manuscript supports fixed-threshold control, not threshold-stable ranking across all operating points.",
+        ]
+    )
+
+    errors = module.check_threshold_sensitivity_status(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_threshold_sensitivity_status_rejects_unbounded_claim() -> None:
+    """验证缺少阈值敏感性 artifact 边界时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\subsection{Threshold Sensitivity Evidence Status}"
+
+    errors = module.check_threshold_sensitivity_status(manuscript_text)
+
+    assert any("same prediction files" in error for error in errors)
+    assert any("not threshold-stable ranking" in error for error in errors)
+
+
 def test_check_baseline_scope_alignment_accepts_reported_result_scope() -> None:
     """验证 baseline 描述与主结果表范围一致时可通过检查。"""
 

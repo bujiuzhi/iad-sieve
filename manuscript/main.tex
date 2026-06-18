@@ -376,6 +376,29 @@ IAD-Risk transformer variants & $p_{\mathrm{work}}$, $p_{\mathrm{ani}}$, and $p_
 \end{tabular}
 \end{table}
 
+\subsection{Threshold Sensitivity Evidence Status}
+
+Threshold stability is treated as an audit requirement, not as an unsupported robustness claim. The current Open-v2 table reports fixed operating points and therefore supports the mechanism interpretation under those operating points. A stronger statement that the method is stable across thresholds would require a threshold grid computed from the same prediction files, predefined threshold ranges, metric summaries for each setting, and checksums in the released artifact manifest.
+
+\begin{table}[H]
+\caption{Threshold sensitivity evidence status. The table separates the current fixed-threshold claim from the additional artifact evidence required for threshold-stability claims.}
+\label{tab:threshold-sensitivity-status}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.24\linewidth}L{0.33\linewidth}L{0.33\linewidth}}
+\toprule
+Audit item & Current manuscript status & Required artifact before stronger claim \\
+\midrule
+Fixed operating point & Reported through the operating-point disclosure table and tied to validation or default thresholds. & Configuration file recording $\tau_w$, $\tau_a$, $\tau_r$, baseline thresholds, and selection source. \\
+Threshold grid & The threshold grid is not reported as primary evidence in the current manuscript. & Sensitivity table generated from the same prediction files over predefined threshold ranges. \\
+Metric stability & Interpreted only for the reported operating points. & Per-threshold F1, FMR, HNFMR, pair counts, random seeds, and command logs. \\
+Artifact manifest & Required for numerical audit but not included in Git. & Manifest and checksums that bind prediction files, summaries, thresholds, and code commit. \\
+Reviewer interpretation & Supports fixed-threshold false-merge control, not threshold-stable ranking across all operating points. & Stronger threshold-stability wording only after the released artifact contains the grid evidence. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Baselines}
 
 The main table reports two scientific representation cosine baselines and one supervised pair-classifier baseline: SciNCL cosine, SPECTER2 adapter cosine, and RoBERTa pair classification. These rows are evaluated through the same pair schema so that same-work F1 and hard-negative false-merge rate can be interpreted without mixing label strengths. Other repository baseline utilities are not used as primary manuscript evidence unless their metric summaries, prediction files, thresholds, and checksums are included in the released artifact package.

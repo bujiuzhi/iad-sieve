@@ -51,6 +51,7 @@ REQUIRED_SECTIONS = [
     r"\subsection{Split and Leakage Controls}",
     r"\subsection{Threshold Selection and Uncertainty Reporting}",
     r"\subsection{Operating Point Disclosure}",
+    r"\subsection{Threshold Sensitivity Evidence Status}",
     r"\subsection{Claim-Evidence Boundary for Result Interpretation}",
     r"\subsection{Result Audit Trail}",
     r"\subsection{Scope Compatibility of the Open-v2 Table}",
@@ -359,6 +360,33 @@ def check_operating_point_disclosure(manuscript_text: str) -> list[str]:
         "Prediction file, model JSON, thresholds, and checksums",
     ]
     return [f"operating point disclosure missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+
+
+def check_threshold_sensitivity_status(manuscript_text: str) -> list[str]:
+    """Check whether threshold sensitivity claims are bounded by artifact evidence.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing threshold-sensitivity markers.
+    """
+    required_markers = [
+        r"\subsection{Threshold Sensitivity Evidence Status}",
+        r"\label{tab:threshold-sensitivity-status}",
+        "Threshold stability is treated as an audit requirement",
+        "not as an unsupported robustness claim",
+        "same prediction files",
+        "predefined threshold ranges",
+        "not reported as primary evidence",
+        "Per-threshold F1, FMR, HNFMR",
+        "not threshold-stable ranking across all operating points",
+    ]
+    return [
+        f"threshold sensitivity evidence status missing marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
 
 
 def check_baseline_scope_alignment(manuscript_text: str) -> list[str]:
@@ -898,6 +926,7 @@ def main() -> int:
     errors.extend(check_error_taxonomy(manuscript_text))
     errors.extend(check_validity_threats(manuscript_text))
     errors.extend(check_operating_point_disclosure(manuscript_text))
+    errors.extend(check_threshold_sensitivity_status(manuscript_text))
     errors.extend(check_baseline_scope_alignment(manuscript_text))
     errors.extend(check_split_leakage_controls(manuscript_text))
     errors.extend(check_scope_compatibility(manuscript_text))
