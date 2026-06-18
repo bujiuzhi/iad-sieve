@@ -10,9 +10,9 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 11.
+Completed audit cycles: 12.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, live submission-system text consistency, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, live submission-system text consistency, Git-only fixture reproducibility, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.
 
@@ -183,6 +183,14 @@ This cycle checks whether the text entered into the journal system remains synch
 
 The reviewer-facing boundary is practical rather than scientific. A clean PDF is not enough if the submission system displays stale or manually edited first-screen text. Therefore `submission_system_files_verified` should remain false until title, abstract, keywords, highlights, uploaded files, and live system preview all match the final source package.
 
+## Audit Cycle 12: Git-Only Fixture Reproducibility Gate
+
+Outcome: pass for no-network code-path evidence; blocked for full numerical reproduction until the external artifact release is populated and linked.
+
+This cycle checks whether the public repository can demonstrate executable data-processing paths without committing raw third-party data or full experiment outputs. The required command is `python manuscript/scripts/verify_fixture_rebuild.py`, which rebuilds DeepMatcher, SciRepEval-style, OpenAlex/OpenCitations, and assembled IAD-Bench fixture outputs in a temporary directory. The companion public-release command is `python scripts/check_public_release.py`, which verifies that `data/`, `outputs/`, caches, credentials, and large local artifacts remain outside the public package.
+
+The reviewer-facing boundary is explicit. Passing the fixture rebuild proves that the data adapters, CLI entry points, schema contracts, and IAD-Bench assembly path execute on small public fixtures. It does not prove the Open-v2 numerical table, threshold choices, model predictions, or bootstrap intervals. Those result-level claims remain tied to the L2/L3 public-source rebuild or external artifact release with manifests and checksums.
+
 ## Minimum Gate Before Final Upload
 
 The manuscript should not be uploaded to a journal system until all of the following are true:
@@ -192,7 +200,9 @@ The manuscript should not be uploaded to a journal system until all of the follo
 3. `supplementary_material.tex` is rebuilt after any final source edits.
 4. The artifact release has a real URL or DOI, validates against its checksum file, and records the same repository commit used by the final manuscript package.
 5. The funding statement text, author contribution statement, permissions statement, data/code availability statement, and journal-specific research data statement are complete and consistent with the live submission system, with CRediT roles covering every listed author and with the repository URL, repository commit, and artifact URL or DOI embedded in the availability statements.
-6. `python manuscript/scripts/validate_manuscript.py --strict-latex` passes.
-7. `python manuscript/scripts/validate_submission_package.py --final-upload` passes.
-8. `submission_system_checklist.md` has been checked against the live journal system; the selected journal template matches the final manuscript source; and the title, abstract, keywords, highlights, uploaded files, and live system preview have been verified against the final source package.
-9. The Q2/B acceptance gate is either fully ready or the manuscript title, abstract, cover letter, and conclusion avoid any Q2/B-complete or broad-superiority wording.
+6. `python manuscript/scripts/verify_fixture_rebuild.py` passes from the public source tree without requiring raw third-party data.
+7. `python scripts/check_public_release.py` passes and confirms that `data/`, `outputs/`, caches, credentials, and large local artifacts are outside the public package.
+8. `python manuscript/scripts/validate_manuscript.py --strict-latex` passes.
+9. `python manuscript/scripts/validate_submission_package.py --final-upload` passes.
+10. `submission_system_checklist.md` has been checked against the live journal system; the selected journal template matches the final manuscript source; and the title, abstract, keywords, highlights, uploaded files, and live system preview have been verified against the final source package.
+11. The Q2/B acceptance gate is either fully ready or the manuscript title, abstract, cover letter, and conclusion avoid any Q2/B-complete or broad-superiority wording.
