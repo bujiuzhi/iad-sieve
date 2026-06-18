@@ -1327,6 +1327,7 @@ def check_target_journal_shortlist(shortlist_text: str) -> list[str]:
         "Domain backup: Scientometrics",
         "Candidate Matrix",
         "Template and File Implications",
+        "Source-to-Decision Audit",
         "Data & Knowledge Engineering Preflight",
         "Official guide rechecked: 2026-06-18",
         "provisional preparation only",
@@ -1337,6 +1338,10 @@ def check_target_journal_shortlist(shortlist_text: str) -> list[str]:
         "85-character limit",
         "Elsevier `elsarticle`",
         "real artifact URL or DOI",
+        "Metrics are screening signals, not ranking proof",
+        "Review model and author metadata rules determine anonymization",
+        "Data statement and artifact link requirements determine final-upload blockers",
+        "Recheck publisher pages on submission day",
         "not a final submission record",
         "must be reconfirmed",
     ]

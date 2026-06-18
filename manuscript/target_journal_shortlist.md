@@ -49,6 +49,18 @@ This audit records the publisher-facing constraints that determine the next manu
 | Information Systems | Elsevier lists 9.8 CiteScore and 3.4 Impact Factor. Its scope covers data-intensive applications, data models, algorithms, data mining/machine learning, information retrieval with structured data, web semantics, scientific computing, and data science. The guide emphasizes serious experimentation and reproducibility for systems papers, uses single anonymized review, and follows the same editable-source, abstract, keyword, highlight, and data-statement requirements as the Elsevier route. | Treat this as a stretch route. Do not target it until the L3 artifact release, same-scope baseline files, threshold logs, and stronger reproducibility evidence are complete. |
 | Scientometrics | Springer identifies the journal as covering quantitative aspects of the science of science, communication in science, and science policy, and reports a 2024 Impact Factor of 3.5. The journal uses single-blind review, requests title-page author information, recommends ORCID, requires a 150--250 word abstract and 4--6 keywords, allows LaTeX for mathematical content, and requires a data availability statement for original research. | Keep it as a domain backup. Selecting this route would require a stronger science-of-science framing, de-anonymized title-page metadata, Springer formatting, and a repository or artifact link that supports the data availability statement. |
 
+## Source-to-Decision Audit
+
+The shortlist uses official publisher pages only to decide manuscript preparation steps. Metrics are screening signals, not ranking proof, and rank-sensitive labels still require institutional confirmation before upload. Review model and author metadata rules determine anonymization. Data statement and artifact link requirements determine final-upload blockers. Recheck publisher pages on submission day because journal metrics, review policies, and formatting instructions can change without notice.
+
+| Source fact class | Current decision use | Submission-day check |
+| --- | --- | --- |
+| DKE and Information Systems scope statements | Keep the paper framed around data engineering, knowledge engineering, entity matching, benchmark contracts, and reproducible data processing. | Confirm that the selected journal scope still covers data-intensive methods and knowledge/data engineering. |
+| Elsevier review model and title-page rules | Treat the anonymous package as a preflight package; prepare real author metadata for final upload. | Confirm whether the live system requests single anonymized or anonymous files at the upload step. |
+| Elsevier abstract, keyword, highlight, source-file, and data-statement rules | Keep the abstract within 250 words, keywords within 1--7 entries, highlights within 3--5 bullets and 85 characters, and source files editable. | Re-run the manuscript and submission-package validators after any template or metadata edit. |
+| Scientometrics title-page, abstract, keyword, and data availability rules | Keep Scientometrics as a domain backup that would need Springer formatting, 150--250 word abstract, 4--6 keywords, and a stronger science-of-science interpretation. | Confirm Springer submission fields and decide whether a domain-facing rewrite is worth the effort. |
+| Artifact and data availability requirements | Keep external artifact release as a final-upload blocker rather than a cosmetic repository link. | Add a real artifact URL or DOI and validate checksums before citing result artifacts. |
+
 ## Candidate Matrix
 
 | Candidate | Publisher evidence | Fit to IAD-Risk | Pre-submission action |
