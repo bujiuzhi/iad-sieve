@@ -2556,6 +2556,10 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
             "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
             "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
+            "open_v2_main_results",
+            "per-row denominator counts",
+            "per-row threshold source",
+            "scope label used in the main table",
             "## DKE/Elsevier Preflight Package Checks",
             "python manuscript/scripts/build_submission_package.py --dke-preflight",
             "python manuscript/scripts/validate_submission_package.py --dke-preflight",
@@ -2834,6 +2838,27 @@ def test_check_submission_system_checklist_rejects_missing_artifact_release_chec
 
     assert any("Artifact Release Package Checks" in error for error in errors)
     assert any("validate_artifact_release.py" in error for error in errors)
+
+
+def test_check_submission_system_checklist_rejects_missing_artifact_row_schema_checks() -> None:
+    """验证投稿系统清单必须覆盖主结果表行级 schema 检查。"""
+
+    module = _load_validate_manuscript_module()
+    checklist_text = Path("manuscript/submission_system_checklist.md").read_text(encoding="utf-8")
+    for marker in [
+        "open_v2_main_results",
+        "per-row denominator counts",
+        "per-row threshold source",
+        "scope label used in the main table",
+    ]:
+        checklist_text = checklist_text.replace(marker, "")
+
+    errors = module.check_submission_system_checklist(checklist_text)
+
+    assert any("open_v2_main_results" in error for error in errors)
+    assert any("per-row denominator counts" in error for error in errors)
+    assert any("per-row threshold source" in error for error in errors)
+    assert any("scope label used in the main table" in error for error in errors)
 
 
 def test_check_submission_system_checklist_rejects_missing_declaration_gate_fields() -> None:

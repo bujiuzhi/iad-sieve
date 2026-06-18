@@ -37,7 +37,8 @@ Before linking an external artifact release, verify:
 6. `python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release` passes.
 7. `manifest.json` records the release commit, source-tree cleanliness, required artifact IDs, claim boundaries, and SHA256 values for required artifacts.
 8. `checksums.sha256` covers every release file except itself and matches the file contents.
-9. The release excludes `data/`, `outputs/`, cache files, credentials, raw third-party files, and model checkpoints.
+9. `open_v2_main_results` resolves to `tables/open_v2_main_results.csv` with per-row denominator counts, per-row threshold source, and scope label used in the main table.
+10. The release excludes `data/`, `outputs/`, cache files, credentials, raw third-party files, and model checkpoints.
 
 ## DKE/Elsevier Preflight Package Checks
 
