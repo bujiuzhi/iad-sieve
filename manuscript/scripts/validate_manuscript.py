@@ -1607,6 +1607,10 @@ def check_openv2_result_table_scope_labels(manuscript_text: str) -> list[str]:
     errors: list[str] = []
     if len(header) < 2 or header[1] != "Scope type":
         errors.append("Open-v2 result table must use Scope type as the second column")
+    if len(header) < 4 or header[3] != "Denom. audit":
+        errors.append("Open-v2 result table must include Denom. audit as the fourth column")
+    if "Denom. audit column" not in table_text or r"\texttt{open\_v2\_main\_results}" not in table_text:
+        errors.append("Open-v2 result table caption must bind denominator audit to open_v2_main_results")
     expected_scopes = {
         "SciNCL cosine": "Full Open-v2",
         "SPECTER2 adapter cosine": "Full Open-v2",
@@ -1624,6 +1628,12 @@ def check_openv2_result_table_scope_labels(manuscript_text: str) -> list[str]:
         if actual_scope != expected_scope:
             errors.append(
                 f"Open-v2 result row {system_name} must use scope type {expected_scope}; found {actual_scope or '<missing>'}"
+            )
+        denominator_audit = row[3] if len(row) > 3 else ""
+        if denominator_audit != "Artifact row":
+            errors.append(
+                f"Open-v2 result row {system_name} must mark Denom. audit as Artifact row; "
+                f"found {denominator_audit or '<missing>'}"
             )
     return errors
 

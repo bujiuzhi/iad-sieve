@@ -808,20 +808,20 @@ Threshold-stability claims & \path{threshold_sensitivity_grid}, \path{threshold_
 \subsection{Main Open-v2 Results}
 
 \begin{table}[H]
-\caption{Open-v2 evidence snapshot. Lower false-merge rate is better. Rows are reported only when supported by current output summaries; the scope type column marks whether a row uses the full available Open-v2 scope or the held-out Open-v2 test scope.}
+\caption{Open-v2 evidence snapshot. Lower false-merge rate is better. Rows are reported only when supported by current output summaries; the scope type column marks whether a row uses the full available Open-v2 scope or the held-out Open-v2 test scope. The Denom. audit column means that same-work F1, FMR, and HNFMR denominators must be present in the corresponding \texttt{open\_v2\_main\_results} artifact row before numerical audit.}
 \label{tab:openv2-results}
 \centering
 \footnotesize
-\setlength{\tabcolsep}{2pt}
-\begin{tabular}{@{}L{0.27\linewidth}L{0.13\linewidth}L{0.08\linewidth}rrr@{}}
+\setlength{\tabcolsep}{1.5pt}
+\begin{tabular}{@{}L{0.22\linewidth}L{0.12\linewidth}rL{0.15\linewidth}rrr@{}}
 \toprule
-System & Scope type & Pairs & F1 $\uparrow$ & FMR $\downarrow$ & HNFMR $\downarrow$ \\
+System & Scope type & Pairs & Denom. audit & F1 $\uparrow$ & FMR $\downarrow$ & HNFMR $\downarrow$ \\
 \midrule
-SciNCL cosine & Full Open-v2 & 10415 & 0.054 & 0.785 & 0.790 \\
-SPECTER2 adapter cosine & Full Open-v2 & 10415 & 0.044 & 0.999 & 0.999 \\
-RoBERTa pair classifier & Full Open-v2 & 10415 & 0.825 & 0.001 & 0.0001 \\
-IAD-Risk (SciNCL) & Held-out test & 1042 & 0.980 & 0.001 & 0.000 \\
-IAD-Risk (SPECTER2) & Held-out test & 1042 & 0.980 & 0.001 & 0.000 \\
+SciNCL cosine & Full Open-v2 & 10415 & Artifact row & 0.054 & 0.785 & 0.790 \\
+SPECTER2 adapter cosine & Full Open-v2 & 10415 & Artifact row & 0.044 & 0.999 & 0.999 \\
+RoBERTa pair classifier & Full Open-v2 & 10415 & Artifact row & 0.825 & 0.001 & 0.0001 \\
+IAD-Risk (SciNCL) & Held-out test & 1042 & Artifact row & 0.980 & 0.001 & 0.000 \\
+IAD-Risk (SPECTER2) & Held-out test & 1042 & Artifact row & 0.980 & 0.001 & 0.000 \\
 \bottomrule
 \end{tabular}
 \end{table}
