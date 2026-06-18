@@ -473,6 +473,30 @@ def check_funding_statement(metadata_text: str) -> list[str]:
     return ["funding statement is missing"]
 
 
+def check_submission_statement_fields(metadata_text: str) -> list[str]:
+    """Check whether final-upload metadata declares required submission statements.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages for missing journal declaration statements.
+    """
+    statements = parse_mapping_section(metadata_text, "statements")
+    required_fields = {
+        "originality": "originality statement is missing",
+        "author_approval": "author approval statement is missing",
+        "competing_interests": "competing interests statement is missing",
+        "ethics": "ethics statement is missing",
+        "data_code_availability": "data/code availability statement is missing",
+    }
+    return [
+        message
+        for field_name, message in required_fields.items()
+        if not statements.get(field_name, "")
+    ]
+
+
 def check_final_upload_cover_letter_text(cover_letter_text: str, metadata_text: str) -> list[str]:
     """Check final-upload cover letter target and artifact boundaries.
 
@@ -548,6 +572,7 @@ def check_final_upload_metadata_text(metadata_text: str) -> list[str]:
         for message in check_corresponding_author_matches_author_rows(metadata_text)
     )
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_funding_statement(metadata_text))
+    errors.extend(f"final upload metadata unresolved: {message}" for message in check_submission_statement_fields(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_artifact_release_link(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_final_upload_review_mode(metadata_text))
     return sorted(set(errors))
