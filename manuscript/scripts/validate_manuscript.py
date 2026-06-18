@@ -1660,6 +1660,8 @@ def check_cover_letter(cover_letter_text: str) -> list[str]:
         "All listed authors have approved",
         "no competing interests",
         "raw third-party data",
+        "full experimental outputs are not redistributed in Git",
+        "artifact-release instructions",
         "manifests and checksums",
     ]
     return [f"cover letter missing required statement: {marker}" for marker in required_markers if marker not in cover_letter_text]

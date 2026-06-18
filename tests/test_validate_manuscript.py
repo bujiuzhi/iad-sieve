@@ -1610,6 +1610,8 @@ def test_check_cover_letter_accepts_required_submission_statements() -> None:
             "All listed authors have approved the submitted version.",
             "The authors declare no competing interests.",
             "The repository does not redistribute raw third-party data.",
+            "full experimental outputs are not redistributed in Git.",
+            "The repository includes artifact-release instructions.",
             "Released artifacts should include manifests and checksums.",
         ]
     )
@@ -1629,6 +1631,28 @@ def test_check_cover_letter_rejects_missing_submission_statements() -> None:
 
     assert any("not under consideration elsewhere" in error for error in errors)
     assert any("no competing interests" in error for error in errors)
+
+
+def test_check_cover_letter_rejects_missing_artifact_release_boundary() -> None:
+    """验证 cover letter 缺少完整实验输出和 artifact release 边界时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    cover_letter_text = "\n".join(
+        [
+            "Dear Editor,",
+            "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication.",
+            "The manuscript is not under consideration elsewhere.",
+            "All listed authors have approved the submitted version.",
+            "The authors declare no competing interests.",
+            "The repository does not redistribute raw third-party data.",
+            "Released artifacts should include manifests and checksums.",
+        ]
+    )
+
+    errors = module.check_cover_letter(cover_letter_text)
+
+    assert any("full experimental outputs are not redistributed in Git" in error for error in errors)
+    assert any("artifact-release instructions" in error for error in errors)
 
 
 def test_check_editorial_claim_alignment_accepts_consistent_submission_materials() -> None:
