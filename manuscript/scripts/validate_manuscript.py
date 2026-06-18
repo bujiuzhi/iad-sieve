@@ -753,6 +753,35 @@ def check_method_feature_contract(manuscript_text: str) -> list[str]:
     return [f"method feature contract missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
 
 
+def check_method_pipeline_figure(manuscript_text: str) -> list[str]:
+    """Check whether the method section includes the IAD-Risk pipeline figure.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing pipeline figure markers.
+    """
+    required_markers = [
+        r"\subsection{Overview}",
+        r"\ref{fig:iad-risk-pipeline}",
+        r"\begin{figure}",
+        "Candidate",
+        "record pair",
+        "Identity and",
+        "agenda evidence",
+        "Work, agenda",
+        "ANI heads",
+        "Risk-aware",
+        "merge gate",
+        "Merge, block",
+        "or defer",
+        r"\caption{IAD-Risk pipeline",
+        r"\label{fig:iad-risk-pipeline}",
+    ]
+    return [f"method pipeline figure missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+
+
 def check_design_alternative_boundaries(manuscript_text: str) -> list[str]:
     """Check whether the method explains why simpler alternatives are insufficient.
 
@@ -2194,6 +2223,7 @@ def main() -> int:
     errors.extend(check_iad_bench_document_schema_contract(manuscript_text))
     errors.extend(check_iad_bench_pair_schema_contract(manuscript_text))
     errors.extend(check_method_feature_contract(manuscript_text))
+    errors.extend(check_method_pipeline_figure(manuscript_text))
     errors.extend(check_design_alternative_boundaries(manuscript_text))
     errors.extend(check_related_work_positioning(manuscript_text))
     errors.extend(check_error_taxonomy(manuscript_text))

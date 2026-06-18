@@ -603,6 +603,43 @@ def test_check_method_feature_contract_rejects_missing_feature_boundary() -> Non
     assert any("different-identifier conflicts" in error for error in errors)
 
 
+def test_check_method_pipeline_figure_accepts_complete_figure() -> None:
+    """验证 IAD-Risk 方法流程图完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Overview}",
+            r"Figure~\ref{fig:iad-risk-pipeline} summarizes the workflow.",
+            r"\begin{figure}[H]",
+            "Candidate\\\\record pair",
+            "Identity and\\\\agenda evidence",
+            "Work, agenda,\\\\ANI heads",
+            "Risk-aware\\\\merge gate",
+            "Merge, block,\\\\or defer",
+            r"\caption{IAD-Risk pipeline. The framework separates identity evidence from agenda evidence.}",
+            r"\label{fig:iad-risk-pipeline}",
+            r"\end{figure}",
+        ]
+    )
+
+    errors = module.check_method_pipeline_figure(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_method_pipeline_figure_rejects_missing_visual_contract() -> None:
+    """验证 IAD-Risk 方法流程图缺少关键节点时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\subsection{Overview} The method is described in prose only."
+
+    errors = module.check_method_pipeline_figure(manuscript_text)
+
+    assert any("fig:iad-risk-pipeline" in error for error in errors)
+    assert any("Risk-aware" in error for error in errors)
+
+
 def test_check_design_alternative_boundaries_accepts_complete_boundaries() -> None:
     """验证设计替代项和拒绝边界完整时可通过检查。"""
 
