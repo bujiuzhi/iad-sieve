@@ -1581,6 +1581,13 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "do_not_answer_as_claim",
             "safe response scope",
             "must-not-claim boundary",
+            "## Audit Cycle 7: Journal Fit and Novelty Desk Check",
+            "desk-rejection risk",
+            "target-journal scope fit",
+            "novelty beyond ordinary entity matching",
+            "Data & Knowledge Engineering",
+            "Information Systems",
+            "Scientometrics",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload",
@@ -1674,6 +1681,79 @@ def test_check_reviewer_readiness_audit_rejects_missing_rebuttal_boundary() -> N
     assert any("Reviewer Rebuttal Boundary" in error for error in errors)
     assert any("ready_to_answer" in error for error in errors)
     assert any("must-not-claim boundary" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_journal_fit_novelty_cycle() -> None:
+    """验证审稿准备度审计缺少期刊适配和新颖性桌面初筛时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = "\n".join(
+        [
+            "# Reviewer Readiness Audit",
+            "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
+            "## Audit Dimensions",
+            "Contribution",
+            "Writing clarity",
+            "Experimental strength",
+            "Evaluation completeness",
+            "Method design soundness",
+            "## Reviewer Risk Register",
+            "Silver hard negatives may not be true non-identity labels.",
+            "Threshold results may be sensitive.",
+            "Confidence intervals and statistical significance may be overread.",
+            "The current manuscript reports point estimates and reserves bootstrap intervals.",
+            "No statistical significance claim is made.",
+            "Reproducibility depends on files outside Git.",
+            "## Claim-Evidence Check",
+            "## Adversarial Self-Review Matrix",
+            "`pass`, `needs revision`, and `needs new experiment` are strict status values.",
+            "Contribution self-review",
+            "Writing clarity self-review",
+            "Experimental strength self-review",
+            "Evaluation completeness self-review",
+            "Method design soundness self-review",
+            "The stronger package requires same-scope prediction files.",
+            "It also requires artifact-backed ablations.",
+            "## Reviewer Response Matrix",
+            "This matrix anticipates likely reviewer questions.",
+            "A reviewer may ask about identity-agenda confusion.",
+            "The response discusses silver hard negatives.",
+            "The table is a scope-bounded evidence snapshot.",
+            "It presents RoBERTa as a strong baseline.",
+            "The current evidence is mechanism-consistent.",
+            "The repository supports fixture-level code reproduction.",
+            "## Audit Cycle 1: Claim Discipline",
+            "## Audit Cycle 2: Submission Readiness",
+            "## Audit Cycle 3: Q2/B Acceptance Gate",
+            "remote reproducibility",
+            "strong model matrix",
+            "model superiority",
+            "innovation depth",
+            "novelty and prior-art positioning",
+            "claim lockdown",
+            "## Audit Cycle 4: Final Package Hygiene",
+            "anonymous package hygiene",
+            "## Audit Cycle 5: Editorial Desk Check",
+            "title, abstract, conclusion, cover letter, highlights, and keywords",
+            "editorial claim alignment",
+            "author email addresses, ORCID values, personal account URLs, local absolute paths, and tool-generated process notes",
+            "## Audit Cycle 6: Reviewer Rebuttal Boundary",
+            "ready_to_answer",
+            "limited_answer",
+            "do_not_answer_as_claim",
+            "safe response scope",
+            "must-not-claim boundary",
+            "## Minimum Gate Before Final Upload",
+            "The Q2/B acceptance gate is either fully ready.",
+            "python manuscript/scripts/validate_submission_package.py --final-upload",
+        ]
+    )
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Journal Fit and Novelty Desk Check" in error for error in errors)
+    assert any("desk-rejection risk" in error for error in errors)
+    assert any("target-journal scope fit" in error for error in errors)
 
 
 def test_check_cover_letter_accepts_required_submission_statements() -> None:

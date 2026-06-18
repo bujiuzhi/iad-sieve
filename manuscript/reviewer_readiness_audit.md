@@ -116,6 +116,14 @@ This cycle separates reviewer questions that can be answered from the current ma
 | The result cannot be fully reproduced from Git alone. | `limited_answer` | Distinguish fixture-level code reproduction from L2/L3 artifact reproduction. | Do not imply full numerical audit until the external artifact release URL or DOI, manifest, and checksums are available. |
 | The paper is ready for final upload. | `do_not_answer_as_claim` | State that the anonymous pre-submission package validates, but final upload is still gated. | Do not state final-upload readiness until target journal, author metadata, final PDFs, live system fields, and artifact release link are complete. |
 
+## Audit Cycle 7: Journal Fit and Novelty Desk Check
+
+Outcome: pass for a conservative Data & Knowledge Engineering route; blocked for a stronger Information Systems or broad Q2/B claim until artifact-backed evidence is complete.
+
+This cycle checks desk-rejection risk before final template binding. The current target-journal scope fit is strongest for Data & Knowledge Engineering because the manuscript is framed around data engineering, knowledge engineering, entity matching, benchmark contracts, and reproducible data-processing. Information Systems remains a stretch route because it would require a stronger same-scope experimental package, released prediction files, threshold logs, and broader systems-oriented evidence. Scientometrics remains a domain backup because it would require stronger science-of-science interpretation and manual-validation evidence.
+
+The novelty beyond ordinary entity matching should be stated as a bounded combination of identity-agenda confusion, HNFMR, label-strength-aware IAD-Bench construction, and risk-aware merge gating. This positioning is stronger than presenting another similarity scorer, but it must not be inflated into broad method superiority, SOTA ranking, or universal scholarly deduplication coverage. The practical decision is therefore to keep the DKE route active, treat Information Systems as blocked until the L3 artifact package and stronger baselines are complete, and treat Scientometrics as a backup that would need a domain-facing rewrite.
+
 ## Minimum Gate Before Final Upload
 
 The manuscript should not be uploaded to a journal system until all of the following are true:
