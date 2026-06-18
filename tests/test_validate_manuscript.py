@@ -136,6 +136,8 @@ def test_check_final_upload_information_request_rejects_missing_credit_roles() -
             "Ethics statement",
             "Data and code availability statement",
             "Artifact release URL or DOI",
+            "Source artifact directory path for preflight",
+            "Source artifact preflight command passed",
             "Artifact release directory path for final validation",
             "Artifact release manifest",
             "Live submission-system fields",
@@ -225,6 +227,23 @@ def test_check_final_upload_information_request_rejects_missing_artifact_dir_val
 
     assert any("validate_submission_package.py --final-upload --artifact-dir" in error for error in errors)
     assert any("Artifact release directory path for final validation" in error for error in errors)
+
+
+def test_check_final_upload_information_request_rejects_missing_source_artifact_preflight() -> None:
+    """验证最终上传信息表必须记录 source artifact 预检查路径与结果。"""
+
+    module = _load_validate_manuscript_module()
+    request_text = Path("manuscript/final_upload_information_request.md").read_text(encoding="utf-8")
+    for marker in [
+        "Source artifact directory path for preflight",
+        "Source artifact preflight command passed",
+    ]:
+        request_text = request_text.replace(marker, "")
+
+    errors = module.check_final_upload_information_request(request_text)
+
+    assert any("Source artifact directory path for preflight" in error for error in errors)
+    assert any("Source artifact preflight command passed" in error for error in errors)
 
 
 def test_check_final_upload_information_request_rejects_missing_text_consistency() -> None:
@@ -2872,6 +2891,7 @@ def test_check_artifact_release_manifest_template_accepts_complete_template() ->
                 {"artifact_id": "cannot_link_audit"},
             ],
             "minimum_validation_commands": [
+                "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts --preflight-only",
                 "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
                 "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
                 "sha256sum -c checksums.sha256",
@@ -2992,6 +3012,7 @@ def test_check_artifact_release_manifest_template_rejects_missing_cluster_claim_
                 {"artifact_id": "threshold_sensitivity_grid"},
             ],
             "minimum_validation_commands": [
+                "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts --preflight-only",
                 "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
                 "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
                 "sha256sum -c checksums.sha256",
@@ -3063,6 +3084,7 @@ def test_check_artifact_release_manifest_template_rejects_missing_conditional_cl
                 {"artifact_id": "cannot_link_audit"},
             ],
             "minimum_validation_commands": [
+                "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts --preflight-only",
                 "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
                 "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
                 "sha256sum -c checksums.sha256",
@@ -3115,6 +3137,8 @@ def test_check_artifact_release_readme_template_accepts_complete_template() -> N
             "reports/",
             "logs/",
             "## Minimum Validation Commands",
+            "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts --preflight-only",
+            "checks required source artifact files before anything is copied",
             "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
             "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
             "sha256sum -c checksums.sha256",
@@ -3466,13 +3490,16 @@ def test_check_artifact_release_populator_accepts_required_markers() -> None:
             "import logging",
             "POPULATION_LOG_PATH = \"logs/artifact_population_log.jsonl\"",
             "def populate_artifact_release(",
+            "def preflight_source_artifacts(",
             "def build_copy_plan(",
             "def copy_planned_artifacts(",
             "def write_population_log(",
             "def finalize_release(",
             "--source-dir",
             "--mapping",
+            "--preflight-only",
             "--skip-finalize",
+            "without copying, logging, or finalizing",
             "missing required source artifact files",
         ]
     )
@@ -3491,6 +3518,7 @@ def test_check_artifact_release_populator_rejects_missing_mapping_entry() -> Non
     errors = module.check_artifact_release_populator(script_text)
 
     assert any("--mapping" in error for error in errors)
+    assert any("--preflight-only" in error for error in errors)
     assert any("build_copy_plan" in error for error in errors)
 
 
@@ -3518,6 +3546,8 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "Artifact release manifest",
             "## Artifact Release Package Checks",
             "python manuscript/scripts/build_artifact_release_skeleton.py --output-dir /path/to/release --repository-commit",
+            "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts --preflight-only",
+            "checks required source artifact files before anything is copied",
             "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
             "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
             "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
@@ -3726,6 +3756,8 @@ def test_check_submission_system_checklist_rejects_missing_publisher_declaration
             "Artifact release manifest",
             "## Artifact Release Package Checks",
             "python manuscript/scripts/build_artifact_release_skeleton.py --output-dir /path/to/release --repository-commit",
+            "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts --preflight-only",
+            "checks required source artifact files before anything is copied",
             "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
             "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
             "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
@@ -3779,6 +3811,8 @@ def test_check_submission_system_checklist_rejects_missing_cover_letter_customiz
             "Artifact release manifest",
             "## Artifact Release Package Checks",
             "python manuscript/scripts/build_artifact_release_skeleton.py --output-dir /path/to/release --repository-commit",
+            "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts --preflight-only",
+            "checks required source artifact files before anything is copied",
             "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
             "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
             "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
@@ -3838,6 +3872,8 @@ def test_check_submission_system_checklist_rejects_missing_source_archive_checks
             "Artifact release manifest",
             "## Artifact Release Package Checks",
             "python manuscript/scripts/build_artifact_release_skeleton.py --output-dir /path/to/release --repository-commit",
+            "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts --preflight-only",
+            "checks required source artifact files before anything is copied",
             "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
             "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
             "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
@@ -4021,6 +4057,8 @@ def test_check_submission_system_checklist_rejects_missing_declaration_gate_fiel
             "Artifact release manifest",
             "## Artifact Release Package Checks",
             "python manuscript/scripts/build_artifact_release_skeleton.py --output-dir /path/to/release --repository-commit",
+            "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts --preflight-only",
+            "checks required source artifact files before anything is copied",
             "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
             "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
             "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
@@ -4095,8 +4133,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 39.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
+            "Completed audit cycles: 40.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -4227,6 +4265,16 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "argparse command discovery",
             "tracked source contract",
             "Git-only reviewers can discover the CLI",
+            "## Audit Cycle 40: Artifact Source Preflight Gate",
+            "source artifact completeness preflight coverage",
+            "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts --preflight-only",
+            "checks required source artifact paths",
+            "optional mapping paths",
+            "without copying files",
+            "artifact_population_log.jsonl",
+            "source-package readiness",
+            "row-level schemas",
+            "validate_submission_package.py --final-upload --artifact-dir /path/to/release",
             "## Audit Cycle 10: Final Template Binding and System Metadata Gate",
             "target_journal_template_bound",
             "target_journal_template_applied",
@@ -4425,7 +4473,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 39",
+        "Completed audit cycles: 40",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -4436,7 +4484,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 39" in error for error in errors)
+    assert any("Completed audit cycles: 40" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -4660,6 +4708,33 @@ def test_check_reviewer_readiness_audit_rejects_missing_cli_entrypoint_traceabil
     assert any("src/iad_sieve" in error for error in errors)
     assert any("python -m iad_sieve.cli --help" in error for error in errors)
     assert any("tracked source contract" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_artifact_source_preflight_gate() -> None:
+    """验证审稿准备度审计必须覆盖 source artifact 预检查门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Audit Cycle 40: Artifact Source Preflight Gate",
+        "source artifact completeness preflight coverage",
+        "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts --preflight-only",
+        "checks required source artifact paths",
+        "optional mapping paths",
+        "without copying files",
+        "artifact_population_log.jsonl",
+        "source-package readiness",
+        "row-level schemas",
+        "validate_submission_package.py --final-upload --artifact-dir /path/to/release",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Artifact Source Preflight Gate" in error for error in errors)
+    assert any("--preflight-only" in error for error in errors)
+    assert any("artifact_population_log.jsonl" in error for error in errors)
+    assert any("row-level schemas" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_package_pdf_freshness_gate() -> None:

@@ -252,3 +252,46 @@ def test_populate_artifact_release_rejects_missing_required_source_file(tmp_path
     message = str(exc_info.value)
     assert "missing required source artifact files" in message
     assert "open_v2_main_results" in message
+
+
+def test_preflight_source_artifacts_checks_required_files_without_writing(tmp_path) -> None:
+    """验证 source artifact preflight 只检查文件计划且不写入 release。"""
+
+    artifact_dir = tmp_path / "artifact_release"
+    source_dir = tmp_path / "source_artifacts"
+    _build_skeleton(artifact_dir)
+    _write_source_artifacts(source_dir)
+    populator = _load_module("populate_artifact_release", POPULATE_SCRIPT_PATH)
+
+    planned_rows = populator.preflight_source_artifacts(
+        artifact_dir=artifact_dir,
+        source_dir=source_dir,
+        mapping_path=None,
+    )
+
+    planned_ids = {row["artifact_id"] for row in planned_rows}
+    assert "open_v2_main_results" in planned_ids
+    assert "iad_risk_predictions" in planned_ids
+    assert not (artifact_dir / "tables" / "open_v2_main_results.csv").exists()
+    assert not (artifact_dir / "logs" / "artifact_population_log.jsonl").exists()
+
+
+def test_preflight_source_artifacts_rejects_missing_required_source_file(tmp_path) -> None:
+    """验证 source artifact preflight 会拒绝缺失的必需文件。"""
+
+    artifact_dir = tmp_path / "artifact_release"
+    source_dir = tmp_path / "source_artifacts"
+    _build_skeleton(artifact_dir)
+    _write_source_artifacts(source_dir, skip_artifact_id="iad_risk_predictions")
+    populator = _load_module("populate_artifact_release", POPULATE_SCRIPT_PATH)
+
+    with pytest.raises(ValueError) as exc_info:
+        populator.preflight_source_artifacts(
+            artifact_dir=artifact_dir,
+            source_dir=source_dir,
+            mapping_path=None,
+        )
+
+    message = str(exc_info.value)
+    assert "missing required source artifact files" in message
+    assert "iad_risk_predictions" in message

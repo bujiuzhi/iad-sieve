@@ -46,6 +46,11 @@ def parse_arguments() -> argparse.Namespace:
         default=None,
         help="Optional JSON mapping from artifact_id to source-relative path.",
     )
+    parser.add_argument(
+        "--preflight-only",
+        action="store_true",
+        help="Check required source artifact files without copying, logging, or finalizing.",
+    )
     parser.add_argument("--release-status", default="release_candidate", help="Release status passed to finalizer.")
     parser.add_argument("--skip-finalize", action="store_true", help="Copy files without finalizing manifest/checksums.")
     parser.add_argument("--log-level", default="INFO", help="Logging level.")
@@ -334,6 +339,34 @@ def populate_artifact_release(
     return copied_rows
 
 
+def preflight_source_artifacts(
+    artifact_dir: Path,
+    source_dir: Path,
+    mapping_path: Path | None = None,
+) -> list[dict[str, str]]:
+    """Check source artifact files against the release manifest without writing files.
+
+    参数:
+        artifact_dir: Artifact release scaffold directory containing manifest.json.
+        source_dir: Directory containing generated source artifact files.
+        mapping_path: Optional artifact ID mapping JSON path.
+
+    返回:
+        list[dict[str, str]]: Planned artifact rows that would be copied by population.
+
+    异常:
+        FileNotFoundError: Raised when source or artifact directories are missing.
+        ValueError: Raised when required source artifacts are missing or paths are unsafe.
+        OSError: Raised when the mapping or manifest cannot be read.
+    """
+    if not artifact_dir.is_dir():
+        raise FileNotFoundError(f"artifact release directory missing: {artifact_dir}")
+    if not source_dir.is_dir():
+        raise FileNotFoundError(f"source artifact directory missing: {source_dir}")
+    mapping = load_mapping(mapping_path)
+    return build_copy_plan(artifact_dir, source_dir, mapping)
+
+
 def main() -> int:
     """Run artifact release population.
 
@@ -346,6 +379,14 @@ def main() -> int:
     args = parse_arguments()
     logging.basicConfig(level=getattr(logging, str(args.log_level).upper(), logging.INFO), format="%(levelname)s %(message)s")
     try:
+        if args.preflight_only:
+            planned_rows = preflight_source_artifacts(
+                artifact_dir=Path(args.artifact_dir).resolve(),
+                source_dir=Path(args.source_dir).resolve(),
+                mapping_path=Path(args.mapping).resolve() if args.mapping else None,
+            )
+            LOGGER.info("Artifact source preflight passed with %d planned file(s): %s", len(planned_rows), args.source_dir)
+            return 0
         copied_rows = populate_artifact_release(
             artifact_dir=Path(args.artifact_dir).resolve(),
             source_dir=Path(args.source_dir).resolve(),

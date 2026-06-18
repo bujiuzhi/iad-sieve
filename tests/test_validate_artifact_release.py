@@ -280,6 +280,7 @@ def _write_complete_release(artifact_dir: Path, release_status: str = "release_c
         "required_directories": ["configs", "tables", "predictions", "reports", "logs"],
         "required_artifacts": required_artifacts,
         "minimum_validation_commands": [
+            "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts --preflight-only",
             "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
             "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
             "sha256sum -c checksums.sha256",

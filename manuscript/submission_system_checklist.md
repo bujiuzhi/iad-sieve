@@ -32,14 +32,15 @@ Before linking an external artifact release, verify:
 
 1. `python manuscript/scripts/build_artifact_release_skeleton.py --output-dir /path/to/release --repository-commit <commit>` creates the release scaffold before artifact files are copied.
 2. The release directory contains `README.md`, `manifest.json`, `checksums.sha256`, `configs/`, `tables/`, `predictions/`, `reports/`, and `logs/`.
-3. `python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts` copies generated result files from the source artifact directory.
-4. Required tables, predictions, reports, configs, and logs have replaced all skeleton placeholders.
-5. `python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release` refreshes `manifest.json` and `checksums.sha256`.
-6. `python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release` passes.
-7. `manifest.json` records the release commit, source-tree cleanliness, required artifact IDs, claim boundaries, and SHA256 values for required artifacts.
-8. `checksums.sha256` covers every release file except itself and matches the file contents.
-9. `open_v2_main_results` resolves to `tables/open_v2_main_results.csv` with per-row denominator counts, per-row threshold source, scope label used in the main table, automatic merge count, block count, defer count, automatic merge coverage, defer rate, and capacity-normalized review load.
-10. `iad_risk_predictions`, `representation_baseline_scores`, and `supervised_baseline_predictions` resolve to JSONL files with `pair_id`, `source_document_id`, `target_document_id`, expected labels, label strength, hard-negative level, split identifiers, score or probability fields, `threshold_value` where applicable, threshold source, and `merge_prediction`.
+3. `python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts --preflight-only` checks required source artifact files before anything is copied.
+4. `python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts` copies generated result files from the source artifact directory.
+5. Required tables, predictions, reports, configs, and logs have replaced all skeleton placeholders.
+6. `python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release` refreshes `manifest.json` and `checksums.sha256`.
+7. `python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release` passes.
+8. `manifest.json` records the release commit, source-tree cleanliness, required artifact IDs, claim boundaries, and SHA256 values for required artifacts.
+9. `checksums.sha256` covers every release file except itself and matches the file contents.
+10. `open_v2_main_results` resolves to `tables/open_v2_main_results.csv` with per-row denominator counts, per-row threshold source, scope label used in the main table, automatic merge count, block count, defer count, automatic merge coverage, defer rate, and capacity-normalized review load.
+11. `iad_risk_predictions`, `representation_baseline_scores`, and `supervised_baseline_predictions` resolve to JSONL files with `pair_id`, `source_document_id`, `target_document_id`, expected labels, label strength, hard-negative level, split identifiers, score or probability fields, `threshold_value` where applicable, threshold source, and `merge_prediction`.
 11. `threshold_selection_logs` resolves to a JSONL file with system, threshold_name, `threshold_value`, selection_split, selection_metric, selection_rule, applied_scope, and `score_field`.
 12. The release excludes `data/`, `outputs/`, cache files, credentials, raw third-party files, and model checkpoints.
 

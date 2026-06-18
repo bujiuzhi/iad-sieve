@@ -125,6 +125,8 @@ For each author, select the applicable CRediT roles and then draft the final aut
 ## Artifact release
 
 - Artifact release URL or DOI:
+- Source artifact directory path for preflight:
+- Source artifact preflight command passed:
 - Artifact release directory path for final validation:
 - Artifact release manifest:
 - `checksums.sha256` validation status:

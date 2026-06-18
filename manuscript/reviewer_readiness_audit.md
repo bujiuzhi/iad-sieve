@@ -10,9 +10,9 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 39.
+Completed audit cycles: 40.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.
 
@@ -409,6 +409,14 @@ Outcome: pass for Git-only command discovery and source entry-point binding; blo
 This gate checks whether a reviewer can locate the executable project entry point from tracked source files before running fixture rebuilds or artifact commands. The main manuscript now states that the package source lives under `src/iad_sieve`, that `pyproject.toml` exposes `iad-sieve = iad_sieve.cli:main`, and that `python -m iad_sieve.cli --help` verifies argparse command discovery from the repository. The manuscript validator also checks these markers against the tracked source contract rather than treating the data-availability wording as an unverified prose claim.
 
 The reviewer-facing boundary is executable traceability. This gate proves that Git-only reviewers can discover the CLI, inspect the package entry point, and run fixture-level rebuild commands without raw third-party data. It does not prove the Open-v2 numerical table, threshold choices, prediction files, bootstrap intervals, workload metrics, ablations, or cluster-level artifacts; those remain tied to the L2/L3 public-source rebuild or the external artifact release with manifests and checksums.
+
+## Audit Cycle 40: Artifact Source Preflight Gate
+
+Outcome: pass for source artifact completeness preflight coverage; blocked for final numerical audit until the source artifacts are populated, copied, finalized, checksum-validated, and publicly linked.
+
+This gate checks whether the artifact workflow can fail early before copying incomplete result files into a release scaffold. The artifact release workflow now requires `python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts --preflight-only` before the ordinary populate, finalize, and validate commands. The preflight reuses the release manifest copy plan, checks required source artifact paths and optional mapping paths, and returns without copying files, writing `artifact_population_log.jsonl`, or running finalization.
+
+The reviewer-facing boundary is source-package readiness. A passing preflight means the source artifact directory contains the required files named by the release manifest and that path mappings are safe. It does not prove row-level schemas, checksums, source-control commit binding, public accessibility, or numerical correctness; those remain enforced by `finalize_artifact_release.py`, `validate_artifact_release.py`, `validate_submission_package.py --final-upload --artifact-dir /path/to/release`, and the final artifact URL or DOI.
 
 ## Minimum Gate Before Final Upload
 
