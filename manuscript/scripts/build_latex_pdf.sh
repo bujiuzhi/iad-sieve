@@ -26,3 +26,7 @@ python scripts/check_latex_warnings.py \
   --log build/logs/main.log \
   --log build/logs/supplementary_material.log \
   --log build/logs/elsevier_draft.log
+python scripts/check_pdf_rendering.py \
+  --pdf build/iad-risk-manuscript-latex.pdf \
+  --pdf build/iad-risk-supplementary-material.pdf \
+  --pdf build/iad-risk-manuscript-elsevier.pdf

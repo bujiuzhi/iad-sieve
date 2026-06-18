@@ -22,6 +22,7 @@
 | `scripts/validate_artifact_release.py` | 外部结果 artifact release 校验 |
 | `scripts/build_elsevier_draft.py` | Elsevier/DKE 预转换稿生成脚本 |
 | `scripts/check_latex_warnings.py` | LaTeX 构建日志与严重版面警告校验 |
+| `scripts/check_pdf_rendering.py` | PDF 抽样渲染与空白页/黑页校验 |
 | `scripts/build_latex_pdf.sh` | 正式 PDF 构建脚本 |
 | `build/iad-risk-manuscript-latex.pdf` | 主稿 PDF |
 | `build/iad-risk-manuscript-elsevier.tex` | DKE/Elsevier 匿名预转换 LaTeX 源 |
@@ -38,6 +39,7 @@ python manuscript/scripts/validate_submission_package.py
 python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release
 ./manuscript/scripts/build_latex_pdf.sh
 python manuscript/scripts/check_latex_warnings.py
+python manuscript/scripts/check_pdf_rendering.py
 python manuscript/scripts/build_elsevier_draft.py
 python manuscript/scripts/build_submission_package.py --dke-preflight
 python manuscript/scripts/validate_submission_package.py --dke-preflight

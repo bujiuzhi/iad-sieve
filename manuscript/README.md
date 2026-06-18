@@ -28,6 +28,7 @@ manuscript/
     validate_artifact_release.py
     build_elsevier_draft.py
     check_latex_warnings.py
+    check_pdf_rendering.py
     build_latex_pdf.sh
   build/
     iad-risk-manuscript-latex.pdf
@@ -45,7 +46,7 @@ cd manuscript
 ./scripts/build_latex_pdf.sh
 ```
 
-构建脚本会同步生成主稿 PDF、补充材料 PDF、DKE/Elsevier 预转换 PDF，并在 `build/logs/` 下写入本地构建日志。`scripts/check_latex_warnings.py` 会拒绝严重 overfull hbox、未定义引用、未定义参考文献和致命 TeX 错误。
+构建脚本会同步生成主稿 PDF、补充材料 PDF、DKE/Elsevier 预转换 PDF，并在 `build/logs/` 下写入本地构建日志。`scripts/check_latex_warnings.py` 会拒绝严重 overfull hbox、未定义引用、未定义参考文献和致命 TeX 错误；`scripts/check_pdf_rendering.py` 会抽样渲染 PDF 页面，拒绝空白页、黑页和渲染失败。
 
 稿件校验：
 
