@@ -11,6 +11,7 @@ import argparse
 import hashlib
 import json
 import logging
+import re
 import shutil
 from pathlib import Path
 from typing import Any
@@ -25,6 +26,7 @@ REQUIRED_DIRECTORIES = ("configs", "tables", "predictions", "reports", "logs")
 SKELETON_RELEASE_STATUS = "skeleton_pending_artifacts"
 TEMPLATE_RELEASE_STATUS = "template_pending_external_artifact"
 ARTIFACT_SHA256_PLACEHOLDER = "fill-after-artifact-export"
+COMMIT_PATTERN = re.compile(r"^[0-9a-f]{7,40}$", re.IGNORECASE)
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -109,6 +111,8 @@ def validate_repository_commit(repository_commit: str) -> str:
     commit = repository_commit.strip()
     if not commit or commit == "fill-with-release-commit":
         raise ValueError("repository commit must be a real commit identifier")
+    if not COMMIT_PATTERN.fullmatch(commit):
+        raise ValueError("repository commit must be a 7 to 40 character hexadecimal Git commit")
     return commit
 
 

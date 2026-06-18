@@ -272,6 +272,24 @@ def test_validate_artifact_release_rejects_template_status_and_placeholder_commi
     assert any("repository.commit" in error for error in errors)
 
 
+def test_validate_artifact_release_rejects_malformed_repository_commit(tmp_path) -> None:
+    """验证 artifact release manifest 的提交号必须是 Git SHA。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    manifest_path = artifact_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["repository"]["commit"] = "not-a-commit"
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    _refresh_checksums(artifact_dir)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("repository.commit" in error for error in errors)
+    assert any("hexadecimal Git commit" in error for error in errors)
+
+
 def test_validate_artifact_release_rejects_skeleton_status(tmp_path) -> None:
     """验证真实 release 不得保留骨架生成状态。"""
 

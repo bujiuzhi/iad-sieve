@@ -208,3 +208,20 @@ def test_finalize_artifact_release_restores_required_validation_command(tmp_path
     validation_text = "\n".join(finalized_manifest["minimum_validation_commands"])
     assert "python manuscript/scripts/finalize_artifact_release.py --artifact-dir" in validation_text
     assert validator.validate_artifact_release(artifact_dir, MANIFEST_TEMPLATE_PATH) == []
+
+
+def test_build_artifact_release_skeleton_rejects_malformed_repository_commit(tmp_path) -> None:
+    """验证 artifact release 骨架生成器拒绝非 Git SHA 提交号。"""
+
+    skeleton_builder = _load_module("build_artifact_release_skeleton", SKELETON_SCRIPT_PATH)
+
+    with pytest.raises(ValueError) as exc_info:
+        skeleton_builder.build_artifact_release_skeleton(
+            output_dir=tmp_path / "artifact_release",
+            manifest_template_path=MANIFEST_TEMPLATE_PATH,
+            readme_template_path=README_TEMPLATE_PATH,
+            repository_commit="not-a-commit",
+            force=False,
+        )
+
+    assert "hexadecimal Git commit" in str(exc_info.value)

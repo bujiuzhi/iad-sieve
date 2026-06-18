@@ -100,6 +100,7 @@ FORBIDDEN_NAME_FRAGMENTS = {
 }
 FORBIDDEN_MODEL_SUFFIXES = {".ckpt", ".onnx", ".pt", ".pth", ".safetensors"}
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
+COMMIT_PATTERN = re.compile(r"^[0-9a-f]{7,40}$", re.IGNORECASE)
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -346,6 +347,8 @@ def check_repository_fields(manifest: dict[str, Any]) -> list[str]:
     commit = str(repository.get("commit", "")).strip()
     if not commit or commit == "fill-with-release-commit":
         errors.append("manifest.json repository.commit must record the release commit")
+    elif not COMMIT_PATTERN.fullmatch(commit):
+        errors.append("manifest.json repository.commit must be a 7 to 40 character hexadecimal Git commit")
     if not repository.get("branch"):
         errors.append("manifest.json repository.branch is empty")
     if repository.get("source_tree_clean") is not True:

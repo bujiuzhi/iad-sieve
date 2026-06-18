@@ -10,9 +10,9 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 14.
+Completed audit cycles: 15.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, source-control commit binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, artifact release commit validity, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, source-control commit binding, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.
 
@@ -206,6 +206,14 @@ Outcome: pass for manifest-level commit traceability; blocked for final upload u
 This cycle checks whether a submission package can be traced back to the exact source revision used to build it. The submission package manifest records a `source_control` object with `repository_commit`, `repository_branch`, `worktree_dirty`, and `tracked_state`. This gives reviewers and editors a concrete commit anchor for the LaTeX source, package checksums, and data-processing code without embedding local absolute paths or author-identifying repository URLs in anonymous packages.
 
 The final-upload boundary is stricter than anonymous preflight. When source-control metadata is available, final-upload validation checks that the manifest `repository_commit` matches `submission_metadata.yml` and that `worktree_dirty` is false. A mismatch means the package was not rebuilt from the committed source state named in the availability statement, and the final upload must be regenerated before submission.
+
+## Audit Cycle 15: Artifact Release Commit Validity Gate
+
+Outcome: pass for commit-format validator coverage; blocked for final upload until the external artifact release names the same committed source revision as the final manuscript package.
+
+This cycle checks whether the external result release can be tied to a real source revision rather than a placeholder or free-form label. The artifact release skeleton builder and validator require `repository.commit` to be a 7 to 40 character hexadecimal Git commit. This applies both when creating a release scaffold and when validating a populated release directory.
+
+The reviewer-facing boundary is narrow. A syntactically valid commit makes the artifact manifest auditable, but it does not prove that all result files were generated from that commit. That stronger guarantee still requires checksums, command logs, prediction files, threshold logs, and the final manuscript metadata to reference the same repository commit and artifact URL or DOI.
 
 ## Minimum Gate Before Final Upload
 
