@@ -2591,6 +2591,10 @@ def check_keywords(keywords_text: str) -> list[str]:
     errors: list[str] = []
     if not 1 <= len(keywords) <= 7:
         errors.append(f"keywords has {len(keywords)} entries; expected 1 to 7")
+    required_keywords = ["hard-negative false-merge rate"]
+    for required_keyword in required_keywords:
+        if required_keyword not in keywords:
+            errors.append(f"keywords missing required term: {required_keyword}")
     for keyword in keywords:
         word_count = len(keyword.split())
         if word_count > 5:

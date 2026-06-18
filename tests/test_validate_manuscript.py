@@ -347,7 +347,8 @@ def test_check_keywords_accepts_semicolon_separated_terms() -> None:
     keywords_text = (
         "# Keywords\n\n"
         "scholarly entity matching; work deduplication; identity-agenda disentanglement; "
-        "false-merge risk; provenance-aware evaluation; scientific document representation"
+        "hard-negative false-merge rate; false-merge risk; provenance-aware evaluation; "
+        "scientific document representation"
     )
 
     errors = module.check_keywords(keywords_text)
@@ -364,6 +365,21 @@ def test_check_keywords_rejects_too_many_terms() -> None:
     errors = module.check_keywords(keywords_text)
 
     assert any("expected 1 to 7" in error for error in errors)
+
+
+def test_check_keywords_rejects_missing_hard_negative_metric() -> None:
+    """验证关键词必须包含核心 HNFMR 指标名称。"""
+
+    module = _load_validate_manuscript_module()
+    keywords_text = (
+        "# Keywords\n\n"
+        "scholarly entity matching; work deduplication; identity-agenda disentanglement; "
+        "false-merge risk; provenance-aware evaluation; scientific document representation"
+    )
+
+    errors = module.check_keywords(keywords_text)
+
+    assert any("hard-negative false-merge rate" in error for error in errors)
 
 
 def test_check_keywords_rejects_long_keyword() -> None:
