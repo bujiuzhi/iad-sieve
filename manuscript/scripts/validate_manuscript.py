@@ -451,6 +451,34 @@ def check_contribution_evidence_summary(manuscript_text: str) -> list[str]:
     ]
 
 
+def check_motivating_failure_case(manuscript_text: str) -> list[str]:
+    """Check whether the introduction includes a concrete identity-agenda failure case.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing motivating failure-case markers.
+    """
+    required_markers = [
+        r"\subsection{Motivating Failure Case}",
+        r"\label{tab:motivating-failure-case}",
+        "same task or benchmark",
+        "different contribution",
+        "high semantic similarity",
+        "unsafe automatic merge",
+        "same-work identity evidence",
+        "agenda relatedness is not identity evidence",
+        "illustrative failure case, not a prevalence estimate",
+        "HNFMR",
+    ]
+    return [
+        f"motivating failure case missing marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
+
+
 def check_openv2_benchmark_composition(manuscript_text: str) -> list[str]:
     """Check whether the manuscript states Open-v2 evidence composition and boundaries.
 
@@ -2358,6 +2386,7 @@ def main() -> int:
     errors.extend(check_abstract_quantitative_evidence(manuscript_text))
     errors.extend(check_abstract_length(manuscript_text))
     errors.extend(check_contribution_evidence_summary(manuscript_text))
+    errors.extend(check_motivating_failure_case(manuscript_text))
     errors.extend(check_openv2_benchmark_composition(manuscript_text))
     errors.extend(check_iad_bench_document_schema_contract(manuscript_text))
     errors.extend(check_iad_bench_pair_schema_contract(manuscript_text))

@@ -366,6 +366,42 @@ def test_check_contribution_evidence_summary_rejects_missing_boundary() -> None:
     assert any("not a broad method-ranking claim" in error for error in errors)
 
 
+def test_check_motivating_failure_case_accepts_complete_example() -> None:
+    """验证引言中包含具体身份-议题混淆失败案例时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Motivating Failure Case}",
+            r"\label{tab:motivating-failure-case}",
+            "The pair shares the same task or benchmark.",
+            "The records make a different contribution.",
+            "A representation model may assign high semantic similarity.",
+            "The merge would be an unsafe automatic merge.",
+            "A safe decision needs same-work identity evidence.",
+            "The section states that agenda relatedness is not identity evidence.",
+            "The table is an illustrative failure case, not a prevalence estimate.",
+            "The example motivates HNFMR.",
+        ]
+    )
+
+    errors = module.check_motivating_failure_case(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_motivating_failure_case_rejects_missing_example_boundary() -> None:
+    """验证失败案例缺少边界说明时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\subsection{Motivating Failure Case}"
+
+    errors = module.check_motivating_failure_case(manuscript_text)
+
+    assert any("same task or benchmark" in error for error in errors)
+    assert any("illustrative failure case, not a prevalence estimate" in error for error in errors)
+
+
 def test_check_openv2_benchmark_composition_accepts_complete_composition() -> None:
     """验证 Open-v2 组成表包含数量、用途和边界时可通过检查。"""
 

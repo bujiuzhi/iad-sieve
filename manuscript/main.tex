@@ -34,6 +34,27 @@ The central challenge is that topical similarity is not identity evidence. Two p
 
 We formulate this failure mode as identity-agenda confusion. Identity refers to whether two records denote the same scholarly work. Agenda refers to whether two records discuss the same research problem, benchmark, method family, or citation community. Existing entity matching methods \citep{fellegi1969record,mudgal2018deep,li2020ditto} typically optimize pair classification, while scholarly document representation methods optimize semantic relatedness. Neither objective alone forces the model to learn that same-agenda pairs can be high-risk non-identities.
 
+\subsection{Motivating Failure Case}
+
+A simple failure case makes the distinction concrete. Consider two scholarly records that share the same task or benchmark and use similar terminology, but report a different contribution, model variant, or experimental claim. A scientific representation model may assign high semantic similarity because the records are close in topic space. For work deduplication, however, the safe decision is to avoid an unsafe automatic merge: without DOI agreement, version evidence, or other same-work identity evidence, the pair should be deferred or blocked rather than merged. The point is that agenda relatedness is not identity evidence; it is a risk condition that should be handled explicitly by HNFMR-style evaluation.
+
+\begin{table}[H]
+\caption{Motivating failure case for identity-agenda confusion. The example is an illustrative failure case, not a prevalence estimate.}
+\label{tab:motivating-failure-case}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.25\linewidth}L{0.30\linewidth}L{0.35\linewidth}}
+\toprule
+Observed pair signal & Agenda interpretation & Merge-safety interpretation \\
+\midrule
+Same task or benchmark with overlapping technical terms. & The records are related and may receive high semantic similarity. & Relatedness alone is insufficient for automatic same-work identity. \\
+Different contribution, model variant, or experimental claim. & The papers can still belong to one research agenda. & The pair requires same-work identity evidence before merging. \\
+No shared DOI, version marker, or clear publication lineage. & A relatedness model may still rank the pair highly. & Treating the pair as an automatic merge is an unsafe automatic merge and contributes to HNFMR. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 We propose IAD-Risk, a risk-aware identity-agenda disentanglement framework for scholarly work deduplication. IAD-Risk learns separate relation signals for same-work identity, same-agenda relatedness, and agenda-non-identity hard negatives, then derives a false-merge risk score from these signals. A pair is eligible for automatic merging only when identity evidence is sufficiently strong and agenda-non-identity risk remains below a merge threshold. This selective decision rule turns deduplication from a high-recall similarity problem into a risk-calibrated safety problem.
 
 The paper makes three contributions. First, it defines identity-agenda confusion as a targeted failure mode in scholarly entity matching and introduces hard-negative false-merge rate as a safety metric. Second, it presents IAD-Bench, a provenance-aware benchmark contract that keeps gold, proxy, silver, and human-reviewed labels separate. Third, it evaluates IAD-Risk under the same pair contract used by representation and entity-matching baselines, while keeping clustering and artifact-audit interfaces as reproducible extensions rather than unsupported primary evidence. The current evidence supports targeted false-merge suppression under stratified evaluation; it does not support a broad method-ranking claim or a claim that silver labels replace human gold.
