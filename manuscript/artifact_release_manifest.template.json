@@ -45,25 +45,25 @@
       "artifact_id": "iad_risk_predictions",
       "required": true,
       "expected_location": "predictions/iad_risk_transformer_predictions.jsonl",
-      "claim_support": "Held-out IAD-Risk merge decisions, thresholds, relation-head scores, and split identifiers."
+      "claim_support": "Held-out IAD-Risk merge decisions with system, pair_id, source_document_id, target_document_id, expected labels, label strength, hard-negative level, split identifiers, relation-head scores, work_threshold, agenda_block_threshold, risk_threshold, threshold source, and merge_prediction."
     },
     {
       "artifact_id": "representation_baseline_scores",
       "required": true,
       "expected_location": "predictions/representation_baseline_scores.jsonl",
-      "claim_support": "Full-pair SciNCL and SPECTER2 score files used for false-merge risk comparison."
+      "claim_support": "Full-pair SciNCL and SPECTER2 score files with system, pair_id, source_document_id, target_document_id, expected labels, label strength, hard-negative level, split identifiers, normalized score, score_field, threshold_value, threshold source, and merge_prediction."
     },
     {
       "artifact_id": "supervised_baseline_predictions",
       "required": true,
       "expected_location": "predictions/roberta_pair_classifier_predictions.jsonl",
-      "claim_support": "Supervised pair-classifier baseline predictions under the same pair schema."
+      "claim_support": "Supervised pair-classifier baseline predictions under the same pair schema with system, pair_id, source_document_id, target_document_id, expected labels, label strength, hard-negative level, split identifiers, match_probability, threshold_value, threshold source, and merge_prediction."
     },
     {
       "artifact_id": "threshold_selection_logs",
       "required": true,
       "expected_location": "logs/threshold_selection_logs.jsonl",
-      "claim_support": "Operating-point selection source, threshold values, and validation/test separation."
+      "claim_support": "Operating-point selection source with system, threshold_name, threshold_value, selection_split, selection_metric, selection_rule, applied_scope, score_field, and validation/test separation."
     },
     {
       "artifact_id": "iad_bench_split_summary",

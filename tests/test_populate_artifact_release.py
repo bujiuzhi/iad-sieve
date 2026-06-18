@@ -24,6 +24,105 @@ OPEN_V2_MAIN_RESULTS_CSV = "\n".join(
 ) + "\n"
 
 
+def _jsonl_row(row: dict) -> str:
+    """序列化单行 JSONL 测试记录。
+
+    参数:
+        row: 测试记录。
+
+    返回:
+        str: 单行 JSONL 文本。
+    """
+    return json.dumps(row, sort_keys=True) + "\n"
+
+
+def _required_artifact_content(artifact_id: str) -> str:
+    """生成满足 release schema 的最小 artifact 内容。
+
+    参数:
+        artifact_id: Artifact ID。
+
+    返回:
+        str: 测试 artifact 文件内容。
+    """
+    if artifact_id == "open_v2_main_results":
+        return OPEN_V2_MAIN_RESULTS_CSV
+    if artifact_id == "iad_risk_predictions":
+        return _jsonl_row(
+            {
+                "system": "iad_risk_transformer",
+                "pair_id": "p1",
+                "source_document_id": "d1",
+                "target_document_id": "d2",
+                "expected_label": 0,
+                "expected_agenda_label": 1,
+                "label_strength": "silver",
+                "hard_negative_level": "high",
+                "split": "test",
+                "p_same_work": 0.42,
+                "p_same_agenda": 0.91,
+                "p_agenda_non_identity": 0.88,
+                "p_false_merge_risk": 0.88,
+                "work_threshold": 0.5,
+                "agenda_block_threshold": 0.5,
+                "risk_threshold": 0.5,
+                "threshold_source": "model_config",
+                "merge_prediction": 0,
+            }
+        )
+    if artifact_id == "representation_baseline_scores":
+        return _jsonl_row(
+            {
+                "system": "scincl_cosine_open_v2",
+                "pair_id": "p1",
+                "source_document_id": "d1",
+                "target_document_id": "d2",
+                "expected_label": 0,
+                "expected_agenda_label": 1,
+                "label_strength": "silver",
+                "hard_negative_level": "high",
+                "split": "test",
+                "score": 0.93,
+                "score_field": "score",
+                "threshold_value": 0.9,
+                "threshold_source": "threshold_selection_logs",
+                "merge_prediction": 1,
+            }
+        )
+    if artifact_id == "supervised_baseline_predictions":
+        return _jsonl_row(
+            {
+                "system": "roberta_pair_open_v2",
+                "pair_id": "p1",
+                "source_document_id": "d1",
+                "target_document_id": "d2",
+                "expected_label": 0,
+                "expected_agenda_label": 1,
+                "label_strength": "silver",
+                "hard_negative_level": "high",
+                "split": "test",
+                "match_probability": 0.87,
+                "threshold_value": 0.8,
+                "threshold_source": "threshold_selection_logs",
+                "merge_prediction": 1,
+            }
+        )
+    if artifact_id == "threshold_selection_logs":
+        return _jsonl_row(
+            {
+                "system": "scincl_cosine_open_v2",
+                "threshold_name": "automatic_merge",
+                "threshold_value": 0.9,
+                "selection_split": "dev",
+                "selection_metric": "f1_under_fmr_constraint",
+                "selection_rule": "maximize_f1_subject_to_fmr",
+                "applied_scope": "open_v2_test",
+                "score_field": "score",
+            }
+        )
+    return _jsonl_row({"artifact_id": artifact_id, "status": "present"})
+
+
 def _load_module(module_name: str, script_path: Path):
     """加载指定脚本模块。
 
@@ -92,9 +191,9 @@ def _write_source_artifacts(source_dir: Path, skip_artifact_id: str | None = Non
         if row["artifact_id"] == skip_artifact_id:
             continue
         if row["artifact_id"] == "open_v2_main_results":
-            _write_file(source_dir / row["expected_location"], OPEN_V2_MAIN_RESULTS_CSV)
+            _write_file(source_dir / row["expected_location"], _required_artifact_content(row["artifact_id"]))
         else:
-            _write_file(source_dir / row["expected_location"], f"{row['artifact_id']}\n")
+            _write_file(source_dir / row["expected_location"], _required_artifact_content(row["artifact_id"]))
     _write_file(source_dir / "configs" / "model_config.json", '{"seed": 7}\n')
 
 

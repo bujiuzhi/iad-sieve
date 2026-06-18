@@ -973,6 +973,11 @@ def check_result_claim_boundary(manuscript_text: str, supplementary_text: str) -
         "defer count",
         "automatic merge coverage",
         "defer rate",
+        "pair/document IDs",
+        "score or probability fields",
+        "threshold name",
+        "selection split",
+        "selection metric",
         r"\path{open_v2_main_results}",
         r"\path{iad_bench_split_summary}",
         r"\path{representation_baseline_scores}",
@@ -1005,6 +1010,11 @@ def check_result_claim_boundary(manuscript_text: str, supplementary_text: str) -
         "defer count",
         "automatic merge coverage",
         "defer rate",
+        "row-auditable",
+        "pair_id",
+        "normalized score",
+        "match_probability",
+        "selection_rule",
         r"\path{threshold_sensitivity_grid}",
         r"\path{cluster_metric_summary}",
         r"\path{cannot_link_audit}",
@@ -2007,6 +2017,70 @@ def check_artifact_release_manifest_template(template_text: str) -> list[str]:
                     "artifact release manifest template open_v2_main_results "
                     f"claim_support missing marker: {marker}"
                 )
+    claim_support_markers_by_artifact = {
+        "iad_risk_predictions": [
+            "pair_id",
+            "source_document_id",
+            "target_document_id",
+            "expected labels",
+            "label strength",
+            "hard-negative level",
+            "split identifiers",
+            "relation-head scores",
+            "work_threshold",
+            "agenda_block_threshold",
+            "risk_threshold",
+            "threshold source",
+            "merge_prediction",
+        ],
+        "representation_baseline_scores": [
+            "pair_id",
+            "source_document_id",
+            "target_document_id",
+            "expected labels",
+            "label strength",
+            "hard-negative level",
+            "split identifiers",
+            "normalized score",
+            "score_field",
+            "threshold_value",
+            "threshold source",
+            "merge_prediction",
+        ],
+        "supervised_baseline_predictions": [
+            "pair_id",
+            "source_document_id",
+            "target_document_id",
+            "expected labels",
+            "label strength",
+            "hard-negative level",
+            "split identifiers",
+            "match_probability",
+            "threshold_value",
+            "threshold source",
+            "merge_prediction",
+        ],
+        "threshold_selection_logs": [
+            "threshold_name",
+            "threshold_value",
+            "selection_split",
+            "selection_metric",
+            "selection_rule",
+            "applied_scope",
+            "score_field",
+        ],
+    }
+    for artifact_id, markers in claim_support_markers_by_artifact.items():
+        artifact_row = artifact_rows_by_id.get(artifact_id)
+        if not isinstance(artifact_row, dict):
+            continue
+        claim_support = str(artifact_row.get("claim_support", ""))
+        for marker in markers:
+            if marker not in claim_support:
+                errors.append(
+                    "artifact release manifest template "
+                    f"{artifact_id} claim_support missing marker: {marker}"
+                )
 
     validation_commands = template.get("minimum_validation_commands")
     if not isinstance(validation_commands, list):
@@ -2121,9 +2195,23 @@ def check_artifact_release_readme_template(readme_text: str) -> list[str]:
         "automatic merge coverage",
         "defer rate",
         "iad_risk_predictions",
+        "relation-head scores",
+        "work_threshold",
+        "agenda_block_threshold",
+        "risk_threshold",
+        "merge_prediction",
         "representation_baseline_scores",
+        "normalized score",
+        "score_field",
+        "threshold_value",
         "supervised_baseline_predictions",
+        "match_probability",
         "threshold_selection_logs",
+        "threshold_name",
+        "selection_split",
+        "selection_metric",
+        "selection_rule",
+        "applied_scope",
         "iad_bench_split_summary",
         "Conditional Claim Artifacts",
         "confidence_intervals_claimed",
@@ -2177,6 +2265,19 @@ def check_manuscript_package_docs(readme_text: str, manifest_text: str) -> list[
         "defer count",
         "automatic merge coverage",
         "defer rate",
+        "iad_risk_predictions",
+        "representation_baseline_scores",
+        "supervised_baseline_predictions",
+        "threshold_selection_logs",
+        "pair_id",
+        "source_document_id",
+        "target_document_id",
+        "label strength",
+        "hard-negative level",
+        "split identifiers",
+        "score_field",
+        "threshold_value",
+        "merge_prediction",
         "final_upload_information_request.md",
         "Author list",
         "Corresponding author",

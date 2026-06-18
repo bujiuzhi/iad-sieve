@@ -55,6 +55,113 @@ def _sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _jsonl_row(row: dict) -> str:
+    """序列化单行 JSONL 测试记录。
+
+    参数:
+        row: 测试记录。
+
+    返回:
+        str: 单行 JSONL 文本。
+    """
+    return json.dumps(row, sort_keys=True) + "\n"
+
+
+def _required_artifact_content(artifact_id: str) -> str:
+    """生成满足 release schema 的最小 artifact 内容。
+
+    参数:
+        artifact_id: Artifact ID。
+
+    返回:
+        str: 测试 artifact 文件内容。
+    """
+    if artifact_id == "open_v2_main_results":
+        return (
+            "\n".join(
+                [
+                    "system,scope_type,same_work_f1,fmr,hnfmr,same_work_f1_denominator,fmr_denominator,hnfmr_denominator,threshold_source,automatic_merge_count,block_count,defer_count,automatic_merge_coverage,defer_rate",
+                    "IAD-Risk,Open-v2,0.61,0.08,0.12,100,200,50,threshold_selection_logs,64,120,16,0.32,0.08",
+                ]
+            )
+            + "\n"
+        )
+    if artifact_id == "iad_risk_predictions":
+        return _jsonl_row(
+            {
+                "system": "iad_risk_transformer",
+                "pair_id": "p1",
+                "source_document_id": "d1",
+                "target_document_id": "d2",
+                "expected_label": 0,
+                "expected_agenda_label": 1,
+                "label_strength": "silver",
+                "hard_negative_level": "high",
+                "split": "test",
+                "p_same_work": 0.42,
+                "p_same_agenda": 0.91,
+                "p_agenda_non_identity": 0.88,
+                "p_false_merge_risk": 0.88,
+                "work_threshold": 0.5,
+                "agenda_block_threshold": 0.5,
+                "risk_threshold": 0.5,
+                "threshold_source": "model_config",
+                "merge_prediction": 0,
+            }
+        )
+    if artifact_id == "representation_baseline_scores":
+        return _jsonl_row(
+            {
+                "system": "scincl_cosine_open_v2",
+                "pair_id": "p1",
+                "source_document_id": "d1",
+                "target_document_id": "d2",
+                "expected_label": 0,
+                "expected_agenda_label": 1,
+                "label_strength": "silver",
+                "hard_negative_level": "high",
+                "split": "test",
+                "score": 0.93,
+                "score_field": "score",
+                "threshold_value": 0.9,
+                "threshold_source": "threshold_selection_logs",
+                "merge_prediction": 1,
+            }
+        )
+    if artifact_id == "supervised_baseline_predictions":
+        return _jsonl_row(
+            {
+                "system": "roberta_pair_open_v2",
+                "pair_id": "p1",
+                "source_document_id": "d1",
+                "target_document_id": "d2",
+                "expected_label": 0,
+                "expected_agenda_label": 1,
+                "label_strength": "silver",
+                "hard_negative_level": "high",
+                "split": "test",
+                "match_probability": 0.87,
+                "threshold_value": 0.8,
+                "threshold_source": "threshold_selection_logs",
+                "merge_prediction": 1,
+            }
+        )
+    if artifact_id == "threshold_selection_logs":
+        return _jsonl_row(
+            {
+                "system": "scincl_cosine_open_v2",
+                "threshold_name": "automatic_merge",
+                "threshold_value": 0.9,
+                "selection_split": "dev",
+                "selection_metric": "f1_under_fmr_constraint",
+                "selection_rule": "maximize_f1_subject_to_fmr",
+                "applied_scope": "open_v2_test",
+                "score_field": "score",
+            }
+        )
+    return _jsonl_row({"artifact_id": artifact_id, "status": "present"})
+
+
 def _complete_readme_text() -> str:
     """生成包含必需复现说明的测试 README。
 
@@ -103,19 +210,7 @@ def _write_complete_release(artifact_dir: Path, release_status: str = "release_c
     _write_file(artifact_dir / "README.md", _complete_readme_text())
     _write_file(artifact_dir / "configs" / "model_config.json", '{"seed": 7}\n')
     for artifact_id, relative_path in artifact_locations.items():
-        if artifact_id == "open_v2_main_results":
-            _write_file(
-                artifact_dir / relative_path,
-                "\n".join(
-                    [
-                        "system,scope_type,same_work_f1,fmr,hnfmr,same_work_f1_denominator,fmr_denominator,hnfmr_denominator,threshold_source,automatic_merge_count,block_count,defer_count,automatic_merge_coverage,defer_rate",
-                        "IAD-Risk,Open-v2,0.61,0.08,0.12,100,200,50,threshold_selection_logs,64,120,16,0.32,0.08",
-                    ]
-                )
-                + "\n",
-            )
-        else:
-            _write_file(artifact_dir / relative_path, f"{artifact_id}\n")
+        _write_file(artifact_dir / relative_path, _required_artifact_content(artifact_id))
 
     required_artifacts = [
         {
@@ -261,6 +356,24 @@ def test_validate_artifact_release_rejects_open_v2_results_without_row_audit_col
     assert any("threshold_source" in error for error in errors)
     assert any("automatic_merge_coverage" in error for error in errors)
     assert any("defer_rate" in error for error in errors)
+
+
+def test_validate_artifact_release_rejects_prediction_jsonl_without_row_audit_fields(tmp_path) -> None:
+    """验证 prediction JSONL 缺少行级审计字段时会被拒绝。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    _write_file(artifact_dir / "predictions" / "iad_risk_transformer_predictions.jsonl", _jsonl_row({"pair_id": "p1"}))
+    _refresh_manifest_artifact_checksums(artifact_dir)
+    _refresh_checksums(artifact_dir)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("iad_risk_predictions JSONL line 1" in error for error in errors)
+    assert any("p_same_work" in error for error in errors)
+    assert any("merge_prediction" in error for error in errors)
+    assert any("threshold_source" in error for error in errors)
 
 
 def test_validate_artifact_release_rejects_missing_checksum_entry(tmp_path) -> None:

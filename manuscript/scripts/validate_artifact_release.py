@@ -60,6 +60,69 @@ OPEN_V2_MAIN_RESULTS_REQUIRED_COLUMNS = {
     "automatic_merge_coverage",
     "defer_rate",
 }
+JSONL_REQUIRED_FIELDS_BY_ARTIFACT = {
+    "iad_risk_predictions": {
+        "system",
+        "pair_id",
+        "source_document_id",
+        "target_document_id",
+        "expected_label",
+        "expected_agenda_label",
+        "label_strength",
+        "hard_negative_level",
+        "split",
+        "p_same_work",
+        "p_same_agenda",
+        "p_agenda_non_identity",
+        "p_false_merge_risk",
+        "work_threshold",
+        "agenda_block_threshold",
+        "risk_threshold",
+        "threshold_source",
+        "merge_prediction",
+    },
+    "representation_baseline_scores": {
+        "system",
+        "pair_id",
+        "source_document_id",
+        "target_document_id",
+        "expected_label",
+        "expected_agenda_label",
+        "label_strength",
+        "hard_negative_level",
+        "split",
+        "score",
+        "score_field",
+        "threshold_value",
+        "threshold_source",
+        "merge_prediction",
+    },
+    "supervised_baseline_predictions": {
+        "system",
+        "pair_id",
+        "source_document_id",
+        "target_document_id",
+        "expected_label",
+        "expected_agenda_label",
+        "label_strength",
+        "hard_negative_level",
+        "split",
+        "match_probability",
+        "threshold_value",
+        "threshold_source",
+        "merge_prediction",
+    },
+    "threshold_selection_logs": {
+        "system",
+        "threshold_name",
+        "threshold_value",
+        "selection_split",
+        "selection_metric",
+        "selection_rule",
+        "applied_scope",
+        "score_field",
+    },
+}
 EXPECTED_FALSE_DATA_POLICY_FIELDS = {
     "raw_third_party_data_included",
     "model_checkpoints_included",
@@ -417,6 +480,64 @@ def check_open_v2_main_results_schema(csv_path: Path) -> list[str]:
     ]
 
 
+def _missing_jsonl_required_fields(row: dict[str, Any], required_fields: set[str]) -> list[str]:
+    """Return required JSONL fields that are absent or empty.
+
+    参数:
+        row: Parsed JSONL row.
+        required_fields: Fields required by the artifact schema.
+
+    返回:
+        list[str]: Missing or empty field names.
+    """
+    missing_fields: list[str] = []
+    for field in sorted(required_fields):
+        value = row.get(field)
+        if field not in row or value is None or (isinstance(value, str) and not value.strip()):
+            missing_fields.append(field)
+    return missing_fields
+
+
+def check_jsonl_required_fields(jsonl_path: Path, artifact_id: str, required_fields: set[str]) -> list[str]:
+    """Check row-level required fields in a JSONL artifact.
+
+    参数:
+        jsonl_path: JSONL artifact path.
+        artifact_id: Manifest artifact identifier.
+        required_fields: Required row fields.
+
+    返回:
+        list[str]: Error messages for invalid JSONL rows.
+    """
+    errors: list[str] = []
+    row_count = 0
+    try:
+        with jsonl_path.open("r", encoding="utf-8") as file_handle:
+            for line_number, line in enumerate(file_handle, start=1):
+                if not line.strip():
+                    continue
+                row_count += 1
+                try:
+                    row = json.loads(line)
+                except json.JSONDecodeError as exc:
+                    errors.append(f"{artifact_id} JSONL line {line_number} is invalid JSON: {exc}")
+                    continue
+                if not isinstance(row, dict):
+                    errors.append(f"{artifact_id} JSONL line {line_number} must contain a JSON object")
+                    continue
+                missing_fields = _missing_jsonl_required_fields(row, required_fields)
+                for field in missing_fields:
+                    errors.append(f"{artifact_id} JSONL line {line_number} missing row-level audit field: {field}")
+                if len(errors) >= 20:
+                    errors.append(f"{artifact_id} JSONL schema check stopped after 20 errors")
+                    return errors
+    except OSError as exc:
+        return [f"{artifact_id} JSONL cannot be read: {exc}"]
+    if row_count == 0:
+        errors.append(f"{artifact_id} JSONL is empty")
+    return errors
+
+
 def check_manifest_artifacts(
     manifest: dict[str, Any],
     template: dict[str, Any] | None,
@@ -494,6 +615,20 @@ def check_manifest_artifacts(
             and (artifact_dir / open_v2_location).is_file()
         ):
             errors.extend(check_open_v2_main_results_schema(artifact_dir / open_v2_location))
+
+    for artifact_id, required_fields in sorted(JSONL_REQUIRED_FIELDS_BY_ARTIFACT.items()):
+        artifact_row = artifact_rows.get(artifact_id)
+        if not isinstance(artifact_row, dict):
+            continue
+        artifact_location = str(artifact_row.get("expected_location", "")).strip()
+        artifact_location_path = Path(artifact_location)
+        if (
+            artifact_location
+            and not artifact_location_path.is_absolute()
+            and ".." not in artifact_location_path.parts
+            and (artifact_dir / artifact_location).is_file()
+        ):
+            errors.extend(check_jsonl_required_fields(artifact_dir / artifact_location, artifact_id, required_fields))
 
     claim_boundaries = manifest.get("claim_boundaries")
     if isinstance(claim_boundaries, dict):

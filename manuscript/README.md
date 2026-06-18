@@ -109,6 +109,8 @@ python manuscript/scripts/validate_submission_package.py --dke-preflight
 
 `open_v2_main_results` 是主结果表对应的外部 artifact。其 CSV 需要包含 per-row denominator counts、per-row threshold source、scope label used in the main table、automatic merge count、block count、defer count、automatic merge coverage 和 defer rate；否则只能说明文件存在，不能支持主结果表逐行审计。
 
+`iad_risk_predictions`、`representation_baseline_scores`、`supervised_baseline_predictions` 和 `threshold_selection_logs` 是主结果表的行级复核入口。预测与分数 JSONL 至少需要包含 `pair_id`、`source_document_id`、`target_document_id`、expected labels、label strength、hard-negative level、split identifiers、`score_field` 或概率字段、`threshold_value`、threshold source 和 `merge_prediction`；阈值日志至少需要包含 system、threshold_name、`threshold_value`、selection_split、selection_metric、selection_rule、applied_scope 和 `score_field`。缺少这些字段时，外部 artifact 只能证明文件存在，不能支持 L3 result audit。
+
 `final_upload_information_request.md` 汇总正式上传前必须由作者确认或提供的外部输入，包括 Author list、Corresponding author、Funding statement、Author contribution statement、Permissions statement、Artifact release URL or DOI 和 Live submission-system fields。该文件不作为期刊上传附件；它用于防止在稿件、投稿信或 `submission_metadata.yml` 中填入未确认信息。
 
 `submission_system_checklist.md` 记录最终上传到期刊系统前需要核对的文件、元数据、PDF 和 artifact release 项。该文件用于最终上传前检查，不作为当前预投稿包附件。

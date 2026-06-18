@@ -45,9 +45,13 @@ python scripts/check_public_release.py
 - open_v2_main_results
   - tables/open_v2_main_results.csv must include per-row denominator counts, per-row threshold source, scope label used in the main table, automatic merge count, block count, defer count, automatic merge coverage, and defer rate.
 - iad_risk_predictions
+  - predictions/iad_risk_transformer_predictions.jsonl must include system, pair_id, source_document_id, target_document_id, expected labels, label strength, hard-negative level, split identifiers, relation-head scores, work_threshold, agenda_block_threshold, risk_threshold, threshold source, and merge_prediction.
 - representation_baseline_scores
+  - predictions/representation_baseline_scores.jsonl must include system, pair_id, source_document_id, target_document_id, expected labels, label strength, hard-negative level, split identifiers, normalized score, score_field, threshold_value, threshold source, and merge_prediction.
 - supervised_baseline_predictions
+  - predictions/roberta_pair_classifier_predictions.jsonl must include system, pair_id, source_document_id, target_document_id, expected labels, label strength, hard-negative level, split identifiers, match_probability, threshold_value, threshold source, and merge_prediction.
 - threshold_selection_logs
+  - logs/threshold_selection_logs.jsonl must include system, threshold_name, threshold_value, selection_split, selection_metric, selection_rule, applied_scope, and score_field.
 - iad_bench_split_summary
 - cluster_metric_summary
 - cannot_link_audit

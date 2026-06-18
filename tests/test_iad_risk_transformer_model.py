@@ -218,6 +218,11 @@ def test_write_iad_risk_transformer_outputs_writes_split_summaries(tmp_path) -> 
     assert {row["eval_split"] for row in summary_rows} == {"all", "train", "dev", "test"}
     assert summary_rows[0]["evidence_layer"] == "iad_risk_model"
     assert prediction_rows
+    assert prediction_rows[0]["system"] == "iad_risk_transformer"
+    assert prediction_rows[0]["work_threshold"] == 0.5
+    assert prediction_rows[0]["agenda_block_threshold"] == 0.5
+    assert prediction_rows[0]["risk_threshold"] == 0.5
+    assert prediction_rows[0]["threshold_source"] == "model_config"
 
 
 def test_train_iad_risk_transformer_model_cli_writes_outputs(tmp_path) -> None:

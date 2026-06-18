@@ -574,6 +574,11 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
             "Each row records defer count.",
             "Each row records automatic merge coverage.",
             "Each row records defer rate.",
+            "Prediction JSONL artifacts expose pair/document IDs.",
+            "Prediction JSONL artifacts expose score or probability fields.",
+            "Threshold logs expose threshold name.",
+            "Threshold logs expose selection split.",
+            "Threshold logs expose selection metric.",
             "The evidence does not support a broad method-ranking claim.",
             r"\label{tab:openv2-results}",
         ]
@@ -598,6 +603,11 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
             "The artifact package records defer count.",
             "The artifact package records automatic merge coverage.",
             "The artifact package records defer rate.",
+            "Prediction and threshold artifacts are row-auditable.",
+            "Prediction artifacts include pair_id.",
+            "Representation artifacts include normalized score.",
+            "Supervised artifacts include match_probability.",
+            "Threshold logs include selection_rule.",
             r"The package documents \path{threshold_sensitivity_grid}.",
             r"The package documents \path{cluster_metric_summary}.",
             r"The package documents \path{cannot_link_audit}.",
@@ -2555,10 +2565,38 @@ def test_check_artifact_release_manifest_template_accepts_complete_template() ->
                         "automatic merge count, block count, defer count, automatic merge coverage, and defer rate."
                     ),
                 },
-                {"artifact_id": "iad_risk_predictions"},
-                {"artifact_id": "representation_baseline_scores"},
-                {"artifact_id": "supervised_baseline_predictions"},
-                {"artifact_id": "threshold_selection_logs"},
+                {
+                    "artifact_id": "iad_risk_predictions",
+                    "claim_support": (
+                        "Held-out IAD-Risk rows with pair_id, source_document_id, target_document_id, "
+                        "expected labels, label strength, hard-negative level, split identifiers, "
+                        "relation-head scores, work_threshold, agenda_block_threshold, risk_threshold, "
+                        "threshold source, and merge_prediction."
+                    ),
+                },
+                {
+                    "artifact_id": "representation_baseline_scores",
+                    "claim_support": (
+                        "Representation baseline rows with pair_id, source_document_id, target_document_id, "
+                        "expected labels, label strength, hard-negative level, split identifiers, normalized score, "
+                        "score_field, threshold_value, threshold source, and merge_prediction."
+                    ),
+                },
+                {
+                    "artifact_id": "supervised_baseline_predictions",
+                    "claim_support": (
+                        "Supervised baseline rows with pair_id, source_document_id, target_document_id, "
+                        "expected labels, label strength, hard-negative level, split identifiers, match_probability, "
+                        "threshold_value, threshold source, and merge_prediction."
+                    ),
+                },
+                {
+                    "artifact_id": "threshold_selection_logs",
+                    "claim_support": (
+                        "Threshold rows with threshold_name, threshold_value, selection_split, "
+                        "selection_metric, selection_rule, applied_scope, and score_field."
+                    ),
+                },
                 {"artifact_id": "iad_bench_split_summary"},
                 {"artifact_id": "bootstrap_intervals"},
                 {"artifact_id": "ablation_suite"},
@@ -2828,9 +2866,23 @@ def test_check_artifact_release_readme_template_accepts_complete_template() -> N
             "automatic merge coverage",
             "defer rate",
             "iad_risk_predictions",
+            "relation-head scores",
+            "work_threshold",
+            "agenda_block_threshold",
+            "risk_threshold",
+            "merge_prediction",
             "representation_baseline_scores",
+            "normalized score",
+            "score_field",
+            "threshold_value",
             "supervised_baseline_predictions",
+            "match_probability",
             "threshold_selection_logs",
+            "threshold_name",
+            "selection_split",
+            "selection_metric",
+            "selection_rule",
+            "applied_scope",
             "iad_bench_split_summary",
             "cluster_metric_summary",
             "cannot_link_audit",
@@ -2928,6 +2980,19 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
         "defer count",
         "automatic merge coverage",
         "defer rate",
+        "iad_risk_predictions",
+        "representation_baseline_scores",
+        "supervised_baseline_predictions",
+        "threshold_selection_logs",
+        "pair_id",
+        "source_document_id",
+        "target_document_id",
+        "label strength",
+        "hard-negative level",
+        "split identifiers",
+        "score_field",
+        "threshold_value",
+        "merge_prediction",
         "final_upload_information_request.md",
         "Author list",
         "Corresponding author",
@@ -2945,6 +3010,11 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
     assert any("scope label used in the main table" in error for error in errors)
     assert any("automatic merge coverage" in error for error in errors)
     assert any("defer rate" in error for error in errors)
+    assert any("iad_risk_predictions" in error for error in errors)
+    assert any("threshold_selection_logs" in error for error in errors)
+    assert any("pair_id" in error for error in errors)
+    assert any("score_field" in error for error in errors)
+    assert any("merge_prediction" in error for error in errors)
     assert any("final_upload_information_request.md" in error for error in errors)
     assert any("Author list" in error for error in errors)
     assert any("Corresponding author" in error for error in errors)

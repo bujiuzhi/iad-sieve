@@ -664,15 +664,21 @@ def _prediction_rows(model: dict, relations: list[dict]) -> list[dict]:
         预测记录列表。
     """
     rows: list[dict] = []
+    merge_policy = model.get("merge_policy", {})
     for relation in relations:
         prediction = predict_with_iad_risk_transformer_model(model, relation)
         rows.append(
             {
+                "system": model.get("system_name", "iad_risk_transformer"),
                 "source_document_id": relation.get("source_document_id", ""),
                 "target_document_id": relation.get("target_document_id", ""),
                 "expected_label": relation.get("expected_label", ""),
                 "expected_agenda_label": relation.get("expected_agenda_label", ""),
                 **_prediction_metadata(relation),
+                "work_threshold": merge_policy.get("work_threshold", 0.5),
+                "agenda_block_threshold": merge_policy.get("agenda_block_threshold", 0.5),
+                "risk_threshold": merge_policy.get("risk_threshold", 0.5),
+                "threshold_source": merge_policy.get("threshold_source", "model_config"),
                 **prediction,
             }
         )
