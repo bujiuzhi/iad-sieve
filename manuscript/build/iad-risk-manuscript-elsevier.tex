@@ -866,6 +866,57 @@ IAD-Risk (SPECTER2) & Held-out test & 1042 & Artifact row & 0.980 & 0.001 & 0.00
 \end{tabular}
 \end{table}
 
+Figure~\ref{fig:openv2-safety-profile} visualizes the same Open-v2 evidence as Table~\ref{tab:openv2-results}. The figure is intended as a mechanism-evidence profile: it makes the hard-negative false-merge exposure of single-space representation baselines visible while keeping the full-scope and held-out test rows separated.
+
+\begin{figure}[H]
+\centering
+\scriptsize
+\resizebox{0.98\linewidth}{!}{%
+\begin{tikzpicture}[
+  x=1cm,
+  y=1cm,
+  system/.style={anchor=east, align=right, text width=3.6cm},
+  fbar/.style={fill=blue!35, draw=blue!60!black},
+  hbar/.style={fill=red!25, draw=red!60!black},
+  guide/.style={draw=gray!45},
+  value/.style={anchor=west}
+]
+\node[anchor=west] at (4.05,0.70) {Same-work F1 $\uparrow$};
+\node[anchor=west] at (8.05,0.70) {HNFMR $\downarrow$};
+\draw[guide] (4.05,0.42) -- (7.05,0.42);
+\draw[guide] (8.05,0.42) -- (11.05,0.42);
+\node[system] at (3.65,0.00) {SciNCL cosine\\{\scriptsize Full Open-v2}};
+\draw[fbar] (4.05,-0.15) rectangle ++(0.16,0.30);
+\node[value] at (4.26,0.00) {0.054};
+\draw[hbar] (8.05,-0.15) rectangle ++(2.37,0.30);
+\node[value] at (10.47,0.00) {0.790};
+\node[system] at (3.65,-0.90) {SPECTER2 adapter\\{\scriptsize Full Open-v2}};
+\draw[fbar] (4.05,-1.05) rectangle ++(0.13,0.30);
+\node[value] at (4.23,-0.90) {0.044};
+\draw[hbar] (8.05,-1.05) rectangle ++(3.00,0.30);
+\node[value] at (11.10,-0.90) {0.999};
+\node[system] at (3.65,-1.80) {RoBERTa classifier\\{\scriptsize Full Open-v2}};
+\draw[fbar] (4.05,-1.95) rectangle ++(2.48,0.30);
+\node[value] at (6.58,-1.80) {0.825};
+\draw[hbar] (8.05,-1.95) rectangle ++(0.01,0.30);
+\node[value] at (8.11,-1.80) {0.0001};
+\draw[guide, dashed] (0.15,-2.35) -- (11.40,-2.35);
+\node[system] at (3.65,-2.75) {IAD-Risk (SciNCL)\\{\scriptsize Held-out test}};
+\draw[fbar] (4.05,-2.90) rectangle ++(2.94,0.30);
+\node[value] at (7.04,-2.75) {0.980};
+\draw[hbar] (8.05,-2.90) rectangle ++(0.00,0.30);
+\node[value] at (8.11,-2.75) {0.000};
+\node[system] at (3.65,-3.65) {IAD-Risk (SPECTER2)\\{\scriptsize Held-out test}};
+\draw[fbar] (4.05,-3.80) rectangle ++(2.94,0.30);
+\node[value] at (7.04,-3.65) {0.980};
+\draw[hbar] (8.05,-3.80) rectangle ++(0.00,0.30);
+\node[value] at (8.11,-3.65) {0.000};
+\end{tikzpicture}
+}
+\caption{Open-v2 mechanism-evidence profile. The bars visualize Table~\ref{tab:openv2-results} without changing its interpretation boundary: full Open-v2 rows and held-out test rows remain scope-labeled, and the figure supports the false-merge-control reading rather than a same-scope comparative ranking.}
+\label{fig:openv2-safety-profile}
+\end{figure}
+
 The Open-v2 evidence shows why identity-agenda disentanglement is necessary. Single-space scientific representation baselines preserve topical relatedness, but their merge threshold can produce high false-merge rates on OpenAlex silver hard negatives. IAD-Risk transformer variants keep high same-work F1 on the held-out Open-v2 test split while suppressing hard-negative false merges. RoBERTa pair classification is a strong baseline and narrows the gap substantially; therefore the paper does not make broad superiority claims. Instead, the main result is that relation heads plus an explicit risk score provide a transparent and controllable mechanism for false-merge suppression.
 
 \subsection{Result Interpretation Guardrails}
