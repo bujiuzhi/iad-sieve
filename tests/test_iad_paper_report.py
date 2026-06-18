@@ -128,7 +128,11 @@ def test_build_iad_paper_report_aggregates_gold_proxy_weak_and_external_rows(tmp
         [
             {
                 "variant": "without_agenda_non_identity",
+                "protocol_variant": "no-ANI-head",
+                "protocol_required": True,
+                "accepted_for_component_causality": True,
                 "metric_target": "same_work_false_merge",
+                "threshold_source": "predeclared_cli_argument",
                 "weak_label_count": 5,
                 "precision": 0.5,
                 "recall": 1.0,
@@ -221,6 +225,13 @@ def test_build_iad_paper_report_aggregates_gold_proxy_weak_and_external_rows(tmp
     assert any(row["rq"] == "RQ1" and row["evidence_layer"] == "external_baseline" for row in rows)
     assert any(row["rq"] == "RQ2" and row["evidence_layer"] == "iad_classifier_training" for row in rows)
     assert any(row["rq"] == "RQ3" and row["evidence_layer"] == "iad_ablation" and row["system"] == "without_agenda_non_identity" for row in rows)
+    assert any(
+        row["rq"] == "RQ3"
+        and row["evidence_layer"] == "iad_ablation"
+        and row["protocol_variant"] == "no-ANI-head"
+        and row["threshold_source"] == "predeclared_cli_argument"
+        for row in rows
+    )
     assert any(row["rq"] == "RQ1" and row["evidence_layer"] == "iad_bench_provenance" for row in rows)
     assert any(row["rq"] == "RQ2" and row["evidence_layer"] == "iad_bench_provenance" for row in rows)
     assert any(row["rq"] == "RQ3" and row["evidence_layer"] == "iad_risk_model" for row in rows)

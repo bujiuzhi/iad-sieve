@@ -19,6 +19,8 @@ def _relation(
     agenda_non_identity_score: float,
     false_merge_risk: float,
     expected_agenda_label: int | None = None,
+    conflict_score: float = 0.0,
+    cannot_link: bool = False,
 ) -> dict:
     """构造测试关系记录。
 
@@ -31,6 +33,8 @@ def _relation(
         agenda_non_identity_score: 同议题非同身份分数。
         false_merge_risk: 误合并风险分数。
         expected_agenda_label: 可选 same_agenda 标签。
+        conflict_score: 显式冲突分数。
+        cannot_link: 是否提供 cannot-link 标记。
 
     返回:
         关系记录。
@@ -48,7 +52,8 @@ def _relation(
         "full_similarity": agenda_score,
         "title_similarity": identity_score,
         "first_author_match": 1.0 if identity_score >= 0.9 else 0.0,
-        "conflict_score": 0.0,
+        "conflict_score": conflict_score,
+        "cannot_link": cannot_link,
     }
     if expected_agenda_label is not None:
         record["expected_agenda_label"] = expected_agenda_label
@@ -73,6 +78,48 @@ def test_run_iad_ablation_suite_shows_agenda_gate_reduces_false_merge() -> None:
     assert no_agenda_gate["false_positive"] == 1
     assert no_agenda_gate["false_merge_rate"] > full["false_merge_rate"]
     assert agenda_row["recall"] == 1.0
+
+
+def test_run_iad_ablation_suite_emits_protocol_variants() -> None:
+    """验证消融套件输出稿件验收协议要求的变体标记。"""
+    relations = [
+        _relation("a", "b", 1, 0.95, 0.90, 0.05, 0.05, expected_agenda_label=1),
+        _relation("c", "d", 0, 0.93, 0.92, 0.80, 0.10, expected_agenda_label=1),
+        _relation("e", "f", 0, 0.91, 0.20, 0.05, 0.05, conflict_score=0.80),
+    ]
+
+    rows = run_iad_ablation_suite(relations, identity_threshold=0.9, agenda_block_threshold=0.6, false_merge_risk_threshold=0.5)
+    protocol_rows = [row for row in rows if row.get("protocol_required")]
+    protocol_variants = {row["protocol_variant"] for row in protocol_rows}
+
+    assert protocol_variants == {"no-risk-gate", "no-ANI-head", "single-space", "no-cannot-link", "post-hoc-threshold"}
+    assert all(row["requires_prediction_rows"] for row in protocol_rows)
+    assert all(row["protocol_scope_rule"] == "same_input_pair_scope_and_split_required" for row in protocol_rows)
+    assert next(row for row in protocol_rows if row["protocol_variant"] == "post-hoc-threshold")[
+        "threshold_source"
+    ] == "post_hoc_labeled_sweep"
+    assert next(row for row in protocol_rows if row["protocol_variant"] == "post-hoc-threshold")[
+        "accepted_for_component_causality"
+    ] is False
+
+
+def test_run_iad_ablation_suite_no_cannot_link_exposes_conflict_merge() -> None:
+    """验证移除 cannot-link 阻断会暴露冲突 pair 的误合并。"""
+    relations = [
+        _relation("a", "b", 1, 0.95, 0.90, 0.05, 0.05),
+        _relation("c", "d", 0, 0.93, 0.20, 0.05, 0.05, conflict_score=0.80),
+    ]
+
+    rows = run_iad_ablation_suite(relations, identity_threshold=0.9, agenda_block_threshold=0.6, false_merge_risk_threshold=0.5)
+
+    full = next(row for row in rows if row["variant"] == "iad_full" and row["metric_target"] == "same_work_false_merge")
+    no_cannot_link = next(
+        row for row in rows if row["protocol_variant"] == "no-cannot-link" and row["metric_target"] == "same_work_false_merge"
+    )
+
+    assert full["false_positive"] == 0
+    assert no_cannot_link["false_positive"] == 1
+    assert no_cannot_link["false_merge_rate"] > full["false_merge_rate"]
 
 
 def test_run_iad_ablation_suite_skips_missing_labels() -> None:
@@ -115,7 +162,10 @@ def test_run_iad_ablation_suite_cli_writes_outputs(tmp_path) -> None:
 
     assert rows
     assert (output_dir / "iad_ablation_summary.csv").exists()
-    assert "# IAD-Sieve Ablation Suite" in (output_dir / "iad_ablation_report.md").read_text(encoding="utf-8")
+    report_text = (output_dir / "iad_ablation_report.md").read_text(encoding="utf-8")
+    assert "# IAD-Sieve Ablation Suite" in report_text
+    assert "protocol_variant" in report_text
+    assert any(row["protocol_variant"] == "no-ANI-head" for row in rows)
 
 
 def test_run_iad_ablation_suite_cli_accepts_multiple_relation_files(tmp_path) -> None:

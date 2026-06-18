@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 76.
+Completed audit cycles: 77.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.
 
@@ -83,7 +83,7 @@ This matrix anticipates likely reviewer questions and maps each answer to manusc
 | Are the result rows comparable if pair scopes differ? | Interpret the table as a scope-bounded evidence snapshot rather than a single comparative ranking. | Scope compatibility table, operating-point disclosure, and result audit trail. | Do not claim broad method ranking until same released prediction scope is available. |
 | Does the method beat strong supervised baselines? | Present RoBERTa as a strong baseline and keep the main claim at transparent false-merge control. | Main Open-v2 results, baseline section, and claim-evidence boundary. | Do not claim SOTA or universal superiority. |
 | Are the reported differences statistically significant? | Treat the Open-v2 values as point estimates for a fixed evidence snapshot. | Statistical interpretation boundary and supplementary uncertainty requirements. | Do not claim confidence intervals, significance, or interval-supported ranking until bootstrap and test artifacts are released. |
-| Is the mechanism causal without full ablation output? | State that current evidence is mechanism-consistent and that causal ablation claims require artifacts. | Mechanism evidence table and supplementary uncertainty and ablation requirements. | Do not claim completed component causality before no-gate, no-ANI, and single-space variants are released. |
+| Is the mechanism causal without full ablation output? | State that current evidence is mechanism-consistent and that causal ablation claims require artifacts. | Mechanism evidence table and supplementary uncertainty and ablation requirements. | Do not claim completed component causality before no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold protocol variants are released with accepted artifacts. |
 | Can readers reproduce the reported numbers without raw data in Git? | Separate fixture-level code reproduction from L2/L3 result-level artifact reproduction. | Data and Code Availability, supplementary reproduction levels, artifact manifest template, and checksums policy. | Do not imply full numerical audit without external artifact release. |
 
 ## Audit Cycle 1: Claim Discipline
@@ -706,6 +706,14 @@ Outcome: pass for Mechanism ablation acceptance protocol; blocked for component-
 This gate checks whether the manuscript defines what counts as acceptable ablation evidence before using ablation outputs for causal interpretation. The main manuscript now states that no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold variants must share the same pair scope, split field, label stratum, and metric implementation, and use the same predeclared operating-point rule as the full IAD-Risk row. The supplementary material preserves the full acceptance protocol with the required variants, scope parity, decision trace, artifact binding, and interpretation rule.
 
 The reviewer-facing boundary is evaluation completeness discipline, not new empirical evidence. A future ablation run can support component-causality statements only if it releases prediction rows, threshold logs, same-work F1/FMR/HNFMR denominators, merge/block/defer decisions, configuration, command log, code commit, manifest entry, and checksums. Any result with a changed pair universe, threshold-selection source, or prediction schema remains exploratory diagnostic evidence rather than an accepted ablation for causal interpretation.
+
+## Audit Cycle 77: Ablation CLI Protocol-Variant Alignment Gate
+
+Outcome: pass for ablation CLI protocol-variant alignment; blocked for completed causal ablation claims until real same-scope ablation artifacts are released.
+
+This gate checks whether the executable ablation command can emit the same manuscript-facing variant names used by the ablation acceptance protocol. The `run-iad-ablation-suite` output now preserves the legacy `variant` field while adding `protocol_variant` values for no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold. The output also records whether a row is protocol-required, whether it can be accepted for component-causality interpretation, the threshold source, and whether prediction rows are required before using the row as artifact-backed evidence.
+
+The reviewer-facing boundary is code-to-manuscript traceability, not new experimental strength. The post-hoc-threshold row is flagged with `post_hoc_labeled_sweep` and is retained as a threshold-overfitting diagnostic, not as standalone causal evidence. A future causal interpretation still requires same-scope prediction rows, threshold logs, denominators, merge/block/defer decisions, command logs, commit identifiers, manifests, and checksums.
 
 ## Minimum Gate Before Final Upload
 

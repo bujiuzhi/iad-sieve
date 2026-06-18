@@ -699,7 +699,7 @@ Item & Reporting purpose & Interpretation role \\
 Merge thresholds & Record $\tau_w$, $\tau_a$, $\tau_r$, validation source, and fixed operating point. & Prevents post-hoc threshold selection on the test set. \\
 Metric uncertainty & Report bootstrap intervals when prediction files and resampling logs are present in the artifact package. & Distinguishes stable effects from small numerical differences. \\
 Risk metrics & Always report FMR and HNFMR with same-work F1. & Prevents a high F1 score from hiding unsafe hard-negative merges. \\
-Ablation claims & Claim component causality only when no-risk-gate, no-ANI, and single-space variants are present. & Separates mechanism-consistent evidence from complete causal ablation evidence. \\
+Ablation claims & Claim component causality only when protocol-variant outputs for no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold are present. & Separates mechanism-consistent evidence from complete causal ablation evidence. \\
 Artifact audit & Tie each numerical table to predictions, configs, logs, checksums, and commit identifiers. & Makes result-level reproduction possible without committing raw data. \\
 \bottomrule
 \end{tabular}
@@ -715,11 +715,11 @@ Artifact audit & Tie each numerical table to predictions, configs, logs, checksu
 \toprule
 Requirement & Accepted evidence & Rejected interpretation \\
 \midrule
-Required variants & no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold outputs are all present. & Component causality from only one removed head or one threshold sweep. \\
+Required variants & no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold outputs are all present in the \texttt{protocol\_variant} field. & Component causality from only one removed head or one threshold sweep. \\
 Scope parity & Each variant uses the same pair scope, split field, label stratum, and metric implementation as the full IAD-Risk row. & Comparing a full-scope baseline with a held-out ablation as if they shared a denominator. \\
 Decision trace & Each variant releases prediction rows, threshold logs, same-work F1/FMR/HNFMR denominators, and merge/block/defer decisions. & Reporting only aggregate metrics without row-level decisions and denominator records. \\
 Artifact binding & Each variant records configuration, command log, random seed when applicable, code commit, manifest entry, and checksum. & Treating unversioned local runs as auditable ablation evidence. \\
-Interpretation rule & Accepted variants may support component-causality statements within the released scope. & Variants with changed pair universe, threshold-selection source, or prediction schema remain exploratory diagnostics. \\
+Interpretation rule & Accepted non-post-hoc variants may support component-causality statements within the released scope. & Variants with changed pair universe, threshold-selection source, prediction schema, or post-hoc threshold selection remain exploratory diagnostics. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -846,7 +846,7 @@ Validity dimension & Main risk & Current mitigation & Remaining boundary \\
 Construct validity & Silver hard negatives may contain metadata noise. & Label strength is preserved; silver rows remain stress-test evidence. & Not a replacement for manual non-identity gold. \\
 Internal validity & Threshold choice or split leakage can inflate metrics. & Operating points, split fields, and pair-leakage audits are required. & Numerical claims need released predictions and logs. \\
 External validity & Open-v2 may not cover every source, topic, or version policy. & Claims are tied to Open-v2 and source-heldout evidence boundaries. & Broad deployment requires domain-diverse validation. \\
-Conclusion validity & HNFMR evidence may be mistaken for full causality. & Ablation requirements precede component-level causal claims. & Complete causality requires no-gate, no-ANI, and single-space variants. \\
+Conclusion validity & HNFMR evidence may be mistaken for full causality. & Ablation requirements precede component-level causal claims. & Complete causality requires no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold protocol variants. \\
 Reproducibility & Raw data and large predictions are not stored in Git. & Public commands, fixtures, manifests, checksums, and artifact rules are provided. & Full numeric audit requires L2/L3 artifacts. \\
 Operational validity & Pair errors can propagate through transitive merges. & Risk gating and cannot-link-aware clustering are described. & Cluster guarantees need complete cannot-link coverage. \\
 \bottomrule
@@ -857,7 +857,7 @@ Result packages that report confidence intervals should include bootstrap output
 
 Threshold-stability claims should be tied to a released threshold-sensitivity grid generated from the same prediction files as the main tables. The grid should report threshold ranges, selected operating points, pair counts, same-work F1, FMR, HNFMR, random seeds, command logs, and checksums. Without this file, the manuscript should discuss only the fixed operating points reported in the main table.
 
-Mechanism claims should be tied to explicit ablation outputs. The repository provides \emph{run-iad-ablation-suite} for comparing full IAD-Risk decisions with variants that remove risk gating, agenda-non-identity blocking, or single-space separation. Without those outputs, the main manuscript should keep the mechanism claim at the level of stratified HNFMR evidence rather than claiming a complete ablation study.
+Mechanism claims should be tied to explicit ablation outputs. The repository provides \emph{run-iad-ablation-suite} for comparing full IAD-Risk decisions with protocol variants that remove risk gating, agenda-non-identity blocking, single-space separation, cannot-link blocking, or replace the fixed operating point with a post-hoc threshold diagnostic. The summary files expose the manuscript-facing names in \texttt{protocol\_variant}; the post-hoc-threshold row is retained as a threshold-overfitting diagnostic and not as standalone causal evidence. Without those outputs, the main manuscript should keep the mechanism claim at the level of stratified HNFMR evidence rather than claiming a complete ablation study.
 
 Cluster-level claims should be tied to artifacts generated after the pair decisions are converted into connected components. A defensible package should include cluster assignments, a cluster metric summary, a cannot-link audit, and command logs for the merge policy. Without those outputs, pair-level FMR and HNFMR should not be interpreted as proof that cluster-level contamination has been reduced or eliminated.
 
@@ -924,7 +924,7 @@ Mechanism question & Current evidence & Interpretation boundary \\
 \midrule
 Does topical relatedness create merge risk? & Representation baselines show high false-merge rates on OpenAlex silver hard negatives. & Supports a targeted failure mode, not a universal prevalence estimate. \\
 Does explicit risk gating suppress hard-negative merges? & IAD-Risk transformer variants keep low HNFMR under the reported Open-v2 split. & Supports the reported contract and thresholds; transfer must be rechecked on new source mixes. \\
-Is the gain caused by each IAD-Risk component? & The current manuscript reports mechanism-consistent HNFMR evidence. & A full causal claim requires ablations removing risk gating, ANI supervision, and single-space separation. \\
+Is the gain caused by each IAD-Risk component? & The current manuscript reports mechanism-consistent HNFMR evidence. & A full causal claim requires protocol-variant outputs for no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold diagnostics. \\
 Can cluster-level contamination be eliminated? & The method supports cannot-link-aware constrained union-find. & Guarantees require sufficient cannot-link coverage and cluster-level artifact audits. \\
 \bottomrule
 \end{tabular}

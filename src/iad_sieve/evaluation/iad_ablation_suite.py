@@ -13,9 +13,16 @@ from iad_sieve.utils.io_utils import ensure_directory, write_records
 LOGGER = logging.getLogger(__name__)
 PREFERRED_FIELDS = [
     "variant",
+    "protocol_variant",
+    "protocol_required",
+    "accepted_for_component_causality",
     "metric_target",
     "description",
+    "threshold_source",
+    "protocol_scope_rule",
+    "requires_prediction_rows",
     "identity_threshold",
+    "selected_identity_threshold",
     "agenda_block_threshold",
     "false_merge_risk_threshold",
     "agenda_threshold",
@@ -28,6 +35,13 @@ PREFERRED_FIELDS = [
     "false_positive",
     "false_negative",
 ]
+PROTOCOL_VARIANT_BY_INTERNAL_VARIANT = {
+    "without_false_merge_risk": "no-risk-gate",
+    "without_agenda_non_identity": "no-ANI-head",
+    "dense_single_space": "single-space",
+    "without_cannot_link": "no-cannot-link",
+    "post_hoc_threshold": "post-hoc-threshold",
+}
 
 
 def _as_float(record: dict, field: str) -> float:
@@ -71,6 +85,41 @@ def _agenda_score(record: dict) -> float:
     return _as_float(record, "agenda_score") if "agenda_score" in record else _as_float(record, "topic_score")
 
 
+def _as_bool(record: dict, field: str) -> bool:
+    """安全读取布尔字段。
+
+    参数:
+        record: 输入记录。
+        field: 字段名。
+
+    返回:
+        字段是否表示真值。
+    """
+    value = record.get(field, False)
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return bool(value)
+    return str(value).strip().lower() in {"1", "true", "yes", "y"}
+
+
+def _has_cannot_link_evidence(record: dict) -> bool:
+    """判断关系记录是否包含 cannot-link 证据。
+
+    参数:
+        record: 关系记录。
+
+    返回:
+        True 表示存在不能自动合并的显式冲突或 cannot-link 证据。
+    """
+    relation_type = str(record.get("relation_type", ""))
+    if relation_type in {"same_topic_non_duplicate", "agenda_non_identity"}:
+        return True
+    if _as_bool(record, "cannot_link") or _as_bool(record, "cannot_link_flag"):
+        return True
+    return _as_float(record, "conflict_score") >= 0.50
+
+
 def _same_work_prediction(
     record: dict,
     variant: str,
@@ -95,12 +144,17 @@ def _same_work_prediction(
     identity_pass = _identity_score(record) >= identity_threshold
     agenda_gate_pass = _as_float(record, "agenda_non_identity_score") < agenda_block_threshold
     risk_gate_pass = _as_float(record, "false_merge_risk") < false_merge_risk_threshold
+    cannot_link_pass = not _has_cannot_link_evidence(record)
     if variant == "iad_full":
-        return 1 if identity_pass and agenda_gate_pass and risk_gate_pass else 0
+        return 1 if identity_pass and agenda_gate_pass and risk_gate_pass and cannot_link_pass else 0
     if variant == "without_agenda_non_identity":
-        return 1 if identity_pass and risk_gate_pass else 0
+        return 1 if identity_pass and risk_gate_pass and cannot_link_pass else 0
     if variant == "without_false_merge_risk":
-        return 1 if identity_pass and agenda_gate_pass else 0
+        return 1 if identity_pass and agenda_gate_pass and cannot_link_pass else 0
+    if variant == "without_cannot_link":
+        return 1 if identity_pass and agenda_gate_pass and risk_gate_pass else 0
+    if variant == "post_hoc_threshold":
+        return 1 if identity_pass and agenda_gate_pass and risk_gate_pass and cannot_link_pass else 0
     if variant == "identity_only":
         return 1 if identity_pass else 0
     if variant == "dense_single_space":
@@ -108,6 +162,51 @@ def _same_work_prediction(
     if variant == "title_author_rule":
         return 1 if _as_float(record, "title_similarity") >= 0.99 and _as_float(record, "first_author_match") >= 1.0 else 0
     return 0
+
+
+def _post_hoc_identity_threshold(labels: list[int], relations: list[dict]) -> float:
+    """使用已标注行选择事后最优 identity 阈值。
+
+    参数:
+        labels: same_work 标签。
+        relations: 与标签一一对应的关系记录。
+
+    返回:
+        在已标注行上事后选择的 identity 阈值。
+    """
+    if not relations:
+        return 1.0
+    candidates = sorted({_identity_score(relation) for relation in relations}, reverse=True)
+    best_threshold = candidates[0]
+    best_key: tuple[float, float, float] | None = None
+    for threshold in candidates:
+        predictions = [1 if _identity_score(relation) >= threshold else 0 for relation in relations]
+        metrics = calculate_binary_metrics(labels, predictions)
+        key = (-float(metrics["false_merge_rate"]), float(metrics["f1"]), threshold)
+        if best_key is None or key > best_key:
+            best_key = key
+            best_threshold = threshold
+    return best_threshold
+
+
+def _protocol_fields(variant: str) -> dict:
+    """生成消融验收协议字段。
+
+    参数:
+        variant: 内部消融变体名称。
+
+    返回:
+        与稿件消融验收协议对应的审计字段。
+    """
+    protocol_variant = PROTOCOL_VARIANT_BY_INTERNAL_VARIANT.get(variant, "")
+    return {
+        "protocol_variant": protocol_variant,
+        "protocol_required": bool(protocol_variant),
+        "accepted_for_component_causality": bool(protocol_variant and variant != "post_hoc_threshold"),
+        "threshold_source": "post_hoc_labeled_sweep" if variant == "post_hoc_threshold" else "predeclared_cli_argument",
+        "protocol_scope_rule": "same_input_pair_scope_and_split_required" if protocol_variant else "",
+        "requires_prediction_rows": bool(protocol_variant),
+    }
 
 
 def _same_agenda_prediction(record: dict, variant: str, agenda_threshold: float, dense_threshold: float) -> int:
@@ -158,16 +257,28 @@ def _evaluate_same_work_variant(
     """
     labeled_relations = [relation for relation in relations if "expected_label" in relation]
     labels = [int(relation["expected_label"]) for relation in labeled_relations]
+    selected_identity_threshold = identity_threshold
+    if variant == "post_hoc_threshold":
+        selected_identity_threshold = _post_hoc_identity_threshold(labels, labeled_relations)
     predictions = [
-        _same_work_prediction(relation, variant, identity_threshold, agenda_block_threshold, false_merge_risk_threshold, dense_threshold)
+        _same_work_prediction(
+            relation,
+            variant,
+            selected_identity_threshold,
+            agenda_block_threshold,
+            false_merge_risk_threshold,
+            dense_threshold,
+        )
         for relation in labeled_relations
     ]
     metrics = calculate_binary_metrics(labels, predictions)
     return {
         "variant": variant,
+        **_protocol_fields(variant),
         "metric_target": "same_work_false_merge",
         "description": description,
         "identity_threshold": identity_threshold,
+        "selected_identity_threshold": selected_identity_threshold,
         "agenda_block_threshold": agenda_block_threshold,
         "false_merge_risk_threshold": false_merge_risk_threshold,
         "agenda_threshold": agenda_threshold,
@@ -207,9 +318,11 @@ def _evaluate_same_agenda_variant(
     metrics = calculate_binary_metrics(labels, predictions)
     return {
         "variant": variant,
+        **_protocol_fields(variant),
         "metric_target": "same_agenda_proxy",
         "description": description,
         "identity_threshold": identity_threshold,
+        "selected_identity_threshold": identity_threshold,
         "agenda_block_threshold": agenda_block_threshold,
         "false_merge_risk_threshold": false_merge_risk_threshold,
         "agenda_threshold": agenda_threshold,
@@ -243,8 +356,10 @@ def run_iad_ablation_suite(
         "iad_full": "identity、agenda_non_identity 和 false_merge_risk 门控全部启用",
         "without_agenda_non_identity": "移除 agenda_non_identity 门控，检验同议题误合并风险",
         "without_false_merge_risk": "移除 false_merge_risk 门控，检验风险约束贡献",
+        "without_cannot_link": "移除 cannot-link 阻断，检验显式冲突证据贡献",
         "identity_only": "只使用 identity_score 阈值",
         "dense_single_space": "只使用单一 full_similarity 阈值",
+        "post_hoc_threshold": "在已标注评估行上事后选择 identity 阈值，仅作阈值过拟合诊断",
         "title_author_rule": "标题高度一致且第一作者一致的传统规则",
     }
     same_agenda_variants = {
@@ -334,7 +449,19 @@ def _write_markdown(path: Path, rows: list[dict]) -> None:
     返回:
         无。
     """
-    fields = ["variant", "metric_target", "weak_label_count", "precision", "recall", "f1", "false_merge_rate", "description"]
+    fields = [
+        "variant",
+        "protocol_variant",
+        "metric_target",
+        "threshold_source",
+        "accepted_for_component_causality",
+        "weak_label_count",
+        "precision",
+        "recall",
+        "f1",
+        "false_merge_rate",
+        "description",
+    ]
     lines = [
         "# IAD-Sieve Ablation Suite",
         "",

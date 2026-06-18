@@ -17,6 +17,9 @@ PREFERRED_FIELDS = [
     "evidence_layer",
     "source_file",
     "system",
+    "protocol_variant",
+    "protocol_required",
+    "accepted_for_component_causality",
     "metric_target",
     "baseline_family",
     "execution_mode",
@@ -153,6 +156,12 @@ def _normalize_metric_row(row: dict, rq: str, evidence_layer: str, source_path: 
     }
     for field in [
         "threshold",
+        "protocol_variant",
+        "protocol_required",
+        "accepted_for_component_causality",
+        "threshold_source",
+        "protocol_scope_rule",
+        "requires_prediction_rows",
         "baseline_family",
         "execution_mode",
         "eval_split",
