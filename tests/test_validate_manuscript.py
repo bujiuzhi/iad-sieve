@@ -748,6 +748,43 @@ def test_check_operational_net_benefit_boundary_rejects_missing_cost_boundary() 
     assert any("not a universal replacement" in error for error in errors)
 
 
+def test_check_version_identifier_policy_accepts_complete_boundary() -> None:
+    """验证版本和标识符合并边界完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Version and Identifier Boundary}",
+            r"\label{tab:version-identifier-boundary}",
+            "DOI, arXiv, and OpenAlex identifiers are used as identity cues.",
+            "publication-lineage evidence is still required for related records.",
+            "identifier agreement supports merge eligibility",
+            "identifier conflict creates cannot-link or defer evidence",
+            "preprint, conference, and journal versions require explicit handling",
+            "version policy must be declared before cluster-level merging",
+            "not every related version is automatically the same work",
+            "manual adjudication is required for ambiguous version boundaries",
+        ]
+    )
+
+    errors = module.check_version_identifier_policy(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_version_identifier_policy_rejects_missing_defer_boundary() -> None:
+    """验证版本和标识符合并边界缺少阻断或延迟规则时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\subsection{Version and Identifier Boundary}"
+
+    errors = module.check_version_identifier_policy(manuscript_text)
+
+    assert any("version and identifier boundary" in error for error in errors)
+    assert any("identifier conflict creates cannot-link or defer evidence" in error for error in errors)
+    assert any("manual adjudication" in error for error in errors)
+
+
 def test_check_method_pipeline_figure_accepts_complete_figure() -> None:
     """验证 IAD-Risk 方法流程图完整时可通过检查。"""
 

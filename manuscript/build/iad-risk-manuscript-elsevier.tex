@@ -345,6 +345,29 @@ Simple alternatives & Retain simple rules for low-risk bulk cleanup or identifie
 \end{tabular}
 \end{table}
 
+\subsection{Version and Identifier Boundary}
+
+Version and identifier evidence is treated as merge-policy input rather than as a post-hoc cleanup rule. DOI, arXiv, and OpenAlex identifiers provide strong identity cues when they agree, but publication-lineage evidence is still needed when records describe preprint, conference, and journal versions of related work. IAD-Risk therefore separates identifier agreement, identifier conflict, and uncertain version boundaries before applying cluster-level merging.
+
+\begin{table}[H]
+\caption{Version and identifier boundary for merge decisions. The policy prevents related scholarly versions or conflicting identifiers from being silently collapsed into one work identity.}
+\label{tab:version-identifier-boundary}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.23\linewidth}L{0.33\linewidth}L{0.34\linewidth}}
+\toprule
+Evidence condition & Operational policy & Boundary statement \\
+\midrule
+Identifier agreement & DOI, arXiv, or OpenAlex agreement is positive identity evidence when other metadata do not contradict it. & identifier agreement supports merge eligibility, but it does not replace source and metadata checks. \\
+Identifier conflict & Conflicting DOI, arXiv, or OpenAlex fields are treated as risk evidence before any automatic merge. & identifier conflict creates cannot-link or defer evidence unless an audit log resolves the conflict. \\
+Version relationship & Related preprint, conference, and journal versions require an explicit version policy. & not every related version is automatically the same work. \\
+Ambiguous lineage & When lineage cannot be established from identifiers and metadata, the pair is not forced into a merge. & manual adjudication is required for ambiguous version boundaries. \\
+Cluster propagation & Version decisions are recorded before transitive clustering. & version policy must be declared before cluster-level merging. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Failure-Control Rationale}
 
 IAD-Risk is designed as a failure-control framework rather than as another similarity scorer. Table~\ref{tab:failure-controls} summarizes how each design choice addresses a specific false-merge pathway. The table also states the remaining boundary for each control, because a safety mechanism should make its unsupported cases explicit.

@@ -868,6 +868,34 @@ def check_operational_net_benefit_boundary(manuscript_text: str) -> list[str]:
     ]
 
 
+def check_version_identifier_policy(manuscript_text: str) -> list[str]:
+    """Check whether the method states version and identifier merge boundaries.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing version/identifier boundary markers.
+    """
+    required_markers = [
+        r"\subsection{Version and Identifier Boundary}",
+        r"\label{tab:version-identifier-boundary}",
+        "DOI, arXiv, and OpenAlex identifiers",
+        "publication-lineage evidence",
+        "identifier agreement supports merge eligibility",
+        "identifier conflict creates cannot-link or defer evidence",
+        "preprint, conference, and journal versions",
+        "version policy must be declared before cluster-level merging",
+        "not every related version is automatically the same work",
+        "manual adjudication is required for ambiguous version boundaries",
+    ]
+    return [
+        f"version and identifier boundary missing marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
+
+
 def check_method_pipeline_figure(manuscript_text: str) -> list[str]:
     """Check whether the method section includes the IAD-Risk pipeline figure.
 
@@ -2511,6 +2539,7 @@ def main() -> int:
     errors.extend(check_method_feature_contract(manuscript_text))
     errors.extend(check_risk_score_design_rationale(manuscript_text))
     errors.extend(check_operational_net_benefit_boundary(manuscript_text))
+    errors.extend(check_version_identifier_policy(manuscript_text))
     errors.extend(check_method_pipeline_figure(manuscript_text))
     errors.extend(check_design_alternative_boundaries(manuscript_text))
     errors.extend(check_related_work_positioning(manuscript_text))
