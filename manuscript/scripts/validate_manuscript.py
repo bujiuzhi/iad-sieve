@@ -979,6 +979,34 @@ def check_baseline_scope_alignment(manuscript_text: str) -> list[str]:
     return errors
 
 
+def check_baseline_fairness_controls(manuscript_text: str) -> list[str]:
+    """Check whether baseline comparisons state fairness controls.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing baseline fairness markers.
+    """
+    required_markers = [
+        r"\subsection{Baseline Fairness Controls}",
+        r"\label{tab:baseline-fairness-controls}",
+        "same IAD-Bench pair records",
+        "same train/dev/test split field",
+        "validation-selected operating points",
+        "same-work F1, FMR, and HNFMR",
+        "same metric implementation",
+        "not predictive features",
+        "same-scope released prediction files",
+        "not be read as a single leaderboard",
+    ]
+    return [
+        f"baseline fairness controls missing marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
+
+
 def check_split_leakage_controls(manuscript_text: str) -> list[str]:
     """Check whether evaluation split and leakage boundaries are stated.
 
@@ -2346,6 +2374,7 @@ def main() -> int:
     errors.extend(check_statistical_interpretation_boundary(manuscript_text))
     errors.extend(check_threshold_sensitivity_status(manuscript_text))
     errors.extend(check_baseline_scope_alignment(manuscript_text))
+    errors.extend(check_baseline_fairness_controls(manuscript_text))
     errors.extend(check_split_leakage_controls(manuscript_text))
     errors.extend(check_scope_compatibility(manuscript_text))
     errors.extend(check_extended_protocol_boundary(manuscript_text))

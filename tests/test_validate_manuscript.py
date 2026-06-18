@@ -897,6 +897,42 @@ def test_check_baseline_scope_alignment_rejects_unreported_primary_baselines() -
     assert any("single-space union baselines" in error for error in errors)
 
 
+def test_check_baseline_fairness_controls_accepts_complete_controls() -> None:
+    """验证 baseline 公平比较控制完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Baseline Fairness Controls}",
+            r"\label{tab:baseline-fairness-controls}",
+            "All baselines consume the same IAD-Bench pair records.",
+            "Each row uses the same train/dev/test split field when training is required.",
+            "Threshold-sensitive rows use validation-selected operating points.",
+            "All systems report same-work F1, FMR, and HNFMR from the same metric implementation.",
+            "Label source, provenance, and split identifiers are audit fields, not predictive features.",
+            "A stricter ranking requires same-scope released prediction files.",
+            "The table should not be read as a single leaderboard.",
+        ]
+    )
+
+    errors = module.check_baseline_fairness_controls(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_baseline_fairness_controls_rejects_missing_protocol_markers() -> None:
+    """验证 baseline 公平比较缺少关键协议时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\subsection{Baseline Fairness Controls}"
+
+    errors = module.check_baseline_fairness_controls(manuscript_text)
+
+    assert any("baseline-fairness-controls" in error for error in errors)
+    assert any("same IAD-Bench pair records" in error for error in errors)
+    assert any("not predictive features" in error for error in errors)
+
+
 def test_check_extended_protocol_boundary_accepts_follow_up_protocol_scope() -> None:
     """验证 Open-v3/source-heldout 作为后续协议边界时可通过检查。"""
 

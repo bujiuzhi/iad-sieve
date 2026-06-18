@@ -548,6 +548,29 @@ Reviewer interpretation & Supports fixed-threshold false-merge control, not thre
 
 The main table reports two scientific representation cosine baselines and one supervised pair-classifier baseline: SciNCL cosine, SPECTER2 adapter cosine, and RoBERTa pair classification. These rows are evaluated through the same pair schema so that same-work F1 and hard-negative false-merge rate can be interpreted without mixing label strengths. Other repository baseline utilities are not used as primary manuscript evidence unless their metric summaries, prediction files, thresholds, and checksums are included in the released artifact package.
 
+\subsection{Baseline Fairness Controls}
+
+Baseline comparison is controlled through the pair contract rather than through a broad leaderboard claim. All baselines consume the same IAD-Bench pair records for the row scope being reported, and each row uses the same train/dev/test split field when training is required. Threshold-sensitive rows use validation-selected operating points before held-out reporting. All systems report same-work F1, FMR, and HNFMR from the same metric implementation.
+
+\begin{table}[H]
+\caption{Baseline fairness controls for the Open-v2 evidence snapshot. The controls make the reported comparison auditable while preserving the scope boundary of each row family.}
+\label{tab:baseline-fairness-controls}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.23\linewidth}L{0.35\linewidth}L{0.32\linewidth}}
+\toprule
+Control & Application in the reported table & Reviewer-facing boundary \\
+\midrule
+Input rows & Baselines use the same IAD-Bench pair records within each reported row scope. & A stricter ranking requires same-scope released prediction files for all rows. \\
+Split use & Trainable rows use the same train/dev/test split field; non-trainable representation rows are reported as fixed score baselines. & Different available scopes should not be read as a single leaderboard. \\
+Threshold selection & Threshold-sensitive rows use validation-selected operating points or recorded fixed thresholds. & Post-hoc test-threshold selection is not used for the reported claims. \\
+Feature boundary & Label source, provenance, and split identifiers are audit fields, not predictive features. & Provenance can explain evidence strength but cannot be used as a shortcut feature. \\
+Metric implementation & All systems report same-work F1, FMR, and HNFMR from the same metric implementation. & Metric comparability does not remove the need for released predictions and checksums. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Implementation and Reproducibility}
 
 All reported systems are evaluated through the same pair-level schema, split field, and metric implementation. Threshold-sensitive baselines select merge thresholds on validation evidence and are then evaluated on held-out evidence. The main metrics are same-work F1 on gold identity pairs, ordinary false-merge rate, and HNFMR on agenda-level hard negatives. Rows with different pair counts in Table~\ref{tab:openv2-results} should therefore be read as evidence for the same mechanism under different available result scopes, not as a single leaderboard.
