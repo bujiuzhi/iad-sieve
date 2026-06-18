@@ -81,6 +81,7 @@ REQUIRED_SECTIONS = [
     r"\section{Experiments}",
     r"\subsection{Split and Leakage Controls}",
     r"\subsection{Threshold Selection and Uncertainty Reporting}",
+    r"\subsection{Decision-to-Metric Mapping}",
     r"\subsection{Statistical Interpretation Boundary}",
     r"\subsection{Operating Point Disclosure}",
     r"\subsection{Selective Decision Coverage Boundary}",
@@ -1057,6 +1058,31 @@ def check_selective_decision_coverage_boundary(manuscript_text: str) -> list[str
     ]
     return [
         f"selective decision coverage boundary missing marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
+
+
+def check_decision_metric_mapping(manuscript_text: str) -> list[str]:
+    """Check whether selective decisions are mapped to reported metrics.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing decision-to-metric mapping markers.
+    """
+    required_markers = [
+        r"\subsection{Decision-to-Metric Mapping}",
+        r"\label{tab:decision-metric-mapping}",
+        "automatic merge is the positive decision",
+        "block and defer are non-merge decisions",
+        "Deferred same-work pairs reduce recall",
+        "FMR and HNFMR count only automatic merges among non-identity rows",
+        "coverage and defer rate must be reported separately",
+    ]
+    return [
+        f"decision-to-metric mapping missing marker: {marker}"
         for marker in required_markers
         if marker not in manuscript_text
     ]
@@ -2744,6 +2770,7 @@ def main() -> int:
     errors.extend(check_data_code_availability_boundary(manuscript_text))
     errors.extend(check_operating_point_disclosure(manuscript_text))
     errors.extend(check_selective_decision_coverage_boundary(manuscript_text))
+    errors.extend(check_decision_metric_mapping(manuscript_text))
     errors.extend(check_statistical_interpretation_boundary(manuscript_text))
     errors.extend(check_threshold_sensitivity_status(manuscript_text))
     errors.extend(check_baseline_scope_alignment(manuscript_text))

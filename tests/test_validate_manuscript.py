@@ -1006,6 +1006,44 @@ def test_check_selective_decision_coverage_boundary_rejects_missing_defer_bounda
     assert any("all-pair automatic resolution" in error for error in errors)
 
 
+def test_check_decision_metric_mapping_accepts_complete_mapping() -> None:
+    """验证选择性决策到评价指标的映射完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_decision_metric_mapping", None)
+    assert callable(checker)
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Decision-to-Metric Mapping}",
+            r"\label{tab:decision-metric-mapping}",
+            "automatic merge is the positive decision",
+            "block and defer are non-merge decisions",
+            "Deferred same-work pairs reduce recall",
+            "FMR and HNFMR count only automatic merges among non-identity rows",
+            "coverage and defer rate must be reported separately",
+        ]
+    )
+
+    errors = checker(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_decision_metric_mapping_rejects_missing_defer_mapping() -> None:
+    """验证缺少 defer 到指标映射时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_decision_metric_mapping", None)
+    assert callable(checker)
+    manuscript_text = r"\subsection{Decision-to-Metric Mapping}"
+
+    errors = checker(manuscript_text)
+
+    assert any("block and defer are non-merge decisions" in error for error in errors)
+    assert any("Deferred same-work pairs reduce recall" in error for error in errors)
+    assert any("FMR and HNFMR count only automatic merges" in error for error in errors)
+
+
 def test_check_threshold_sensitivity_status_accepts_bounded_claim() -> None:
     """验证阈值敏感性边界完整时可通过检查。"""
 

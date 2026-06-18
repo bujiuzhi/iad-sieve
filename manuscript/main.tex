@@ -497,6 +497,27 @@ RQ4 & Gold/proxy/silver strata & Split metrics & Provenance-aware robustness \\
 
 Same-work F1 is computed on pairs whose identity labels come from the gold layer. Ordinary false-merge rate (FMR) is the fraction of non-identity pairs that the system marks for automatic merging. Hard-negative false-merge rate (HNFMR) is the same error measured only on agenda-level hard negatives, where topic or citation evidence is high but identity evidence is negative. Reporting both FMR and HNFMR separates general matching errors from the specific identity-agenda confusion that this paper studies.
 
+\subsection{Decision-to-Metric Mapping}
+
+The reported metrics treat the selective merge decision as a pair-level prediction. In this mapping, automatic merge is the positive decision, while block and defer are non-merge decisions. Deferred same-work pairs reduce recall in same-work F1, so a system cannot improve F1 by deferring positive identity pairs without penalty. FMR and HNFMR count only automatic merges among non-identity rows, while coverage and defer rate must be reported separately before operational automation claims are made.
+
+\begin{table}[H]
+\caption{Decision-to-metric mapping for selective merge outputs. The mapping prevents block and defer decisions from being hidden inside false-merge metrics.}
+\label{tab:decision-metric-mapping}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.22\linewidth}L{0.31\linewidth}L{0.37\linewidth}}
+\toprule
+Decision output & Metric treatment & Interpretation boundary \\
+\midrule
+Merge & Positive prediction for same-work F1; counted as an error for FMR/HNFMR when the label is non-identity. & Measures automatic merge behavior under the fixed operating point. \\
+Block & Non-merge prediction. & Suppresses false merges but does not count as resolving a positive same-work pair. \\
+Defer & Non-merge prediction. & Protects against unsafe automatic decisions but shifts the case to review and lowers recall when the pair is truly same-work. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Threshold Selection and Uncertainty Reporting}
 
 Threshold-sensitive systems are evaluated under a fixed selection protocol rather than by choosing the best test threshold after observing results. Merge thresholds are selected on validation evidence when validation rows are available; otherwise, the default implementation threshold is reported as a fixed operating point. The test split is then used only for final metric reporting. This protocol is necessary because a small threshold change can alter FMR and HNFMR more strongly than it alters same-work F1.
