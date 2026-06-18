@@ -82,6 +82,7 @@ REQUIRED_SECTIONS = [
     r"\subsection{Split and Leakage Controls}",
     r"\subsection{Threshold Selection and Uncertainty Reporting}",
     r"\subsection{Decision-to-Metric Mapping}",
+    r"\subsection{Metric Formula Boundary}",
     r"\subsection{Statistical Interpretation Boundary}",
     r"\subsection{Operating Point Disclosure}",
     r"\subsection{Selective Decision Coverage Boundary}",
@@ -1083,6 +1084,33 @@ def check_decision_metric_mapping(manuscript_text: str) -> list[str]:
     ]
     return [
         f"decision-to-metric mapping missing marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
+
+
+def check_metric_formula_boundary(manuscript_text: str) -> list[str]:
+    """Check whether reported metrics define formulas and denominators.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing metric-formula boundary markers.
+    """
+    required_markers = [
+        r"\subsection{Metric Formula Boundary}",
+        r"\label{tab:metric-formula-boundary}",
+        "TP",
+        "FP",
+        "FN",
+        r"$2TP/(2TP+FP+FN)$",
+        "FMR denominator is all non-identity rows in the evaluated scope",
+        "HNFMR denominator is the agenda-level hard-negative subset",
+        "missing labels are not silently added to denominators",
+    ]
+    return [
+        f"metric formula boundary missing marker: {marker}"
         for marker in required_markers
         if marker not in manuscript_text
     ]
@@ -2771,6 +2799,7 @@ def main() -> int:
     errors.extend(check_operating_point_disclosure(manuscript_text))
     errors.extend(check_selective_decision_coverage_boundary(manuscript_text))
     errors.extend(check_decision_metric_mapping(manuscript_text))
+    errors.extend(check_metric_formula_boundary(manuscript_text))
     errors.extend(check_statistical_interpretation_boundary(manuscript_text))
     errors.extend(check_threshold_sensitivity_status(manuscript_text))
     errors.extend(check_baseline_scope_alignment(manuscript_text))

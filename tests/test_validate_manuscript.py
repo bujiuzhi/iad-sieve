@@ -1044,6 +1044,46 @@ def test_check_decision_metric_mapping_rejects_missing_defer_mapping() -> None:
     assert any("FMR and HNFMR count only automatic merges" in error for error in errors)
 
 
+def test_check_metric_formula_boundary_accepts_complete_formula_table() -> None:
+    """验证评价指标公式和分母边界完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_metric_formula_boundary", None)
+    assert callable(checker)
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Metric Formula Boundary}",
+            r"\label{tab:metric-formula-boundary}",
+            "TP",
+            "FP",
+            "FN",
+            r"$2TP/(2TP+FP+FN)$",
+            "FMR denominator is all non-identity rows in the evaluated scope.",
+            "HNFMR denominator is the agenda-level hard-negative subset.",
+            "Rows excluded by missing labels are not silently added to denominators.",
+        ]
+    )
+
+    errors = checker(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_metric_formula_boundary_rejects_missing_denominators() -> None:
+    """验证缺少指标分母说明时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_metric_formula_boundary", None)
+    assert callable(checker)
+    manuscript_text = r"\subsection{Metric Formula Boundary}"
+
+    errors = checker(manuscript_text)
+
+    assert any("FMR denominator" in error for error in errors)
+    assert any("HNFMR denominator" in error for error in errors)
+    assert any("missing labels" in error for error in errors)
+
+
 def test_check_threshold_sensitivity_status_accepts_bounded_claim() -> None:
     """验证阈值敏感性边界完整时可通过检查。"""
 

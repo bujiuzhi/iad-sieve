@@ -524,6 +524,27 @@ Defer & Non-merge prediction. & Protects against unsafe automatic decisions but 
 \end{tabular}
 \end{table}
 
+\subsection{Metric Formula Boundary}
+
+The metric formulas use the selective merge output after thresholding. Let TP denote same-work pairs that are automatically merged, FP denote non-identity pairs that are automatically merged, and FN denote same-work pairs that are blocked or deferred. Same-work F1 is computed as $2TP/(2TP+FP+FN)$ on the gold identity evaluation rows. FMR denominator is all non-identity rows in the evaluated scope, while HNFMR denominator is the agenda-level hard-negative subset. Rows excluded by missing labels are not silently added to denominators; they remain outside the corresponding metric until a valid label stratum is available.
+
+\begin{table}[H]
+\caption{Metric formula boundary. Each metric is tied to a denominator and a label stratum so that missing labels, deferrals, and hard-negative rows are not mixed silently.}
+\label{tab:metric-formula-boundary}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.20\linewidth}L{0.34\linewidth}L{0.36\linewidth}}
+\toprule
+Metric & Formula or denominator & Boundary \\
+\midrule
+Same-work F1 & $2TP/(2TP+FP+FN)$ over gold identity rows. & Defer and block decisions on true same-work rows enter FN. \\
+FMR & Automatic merges among all non-identity rows divided by all non-identity rows in the evaluated scope. & Measures unsafe automatic merges, not manual-review workload. \\
+HNFMR & Automatic merges among agenda-level hard negatives divided by the agenda-level hard-negative subset. & Measures identity-agenda false merges under the hard-negative stratum. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Threshold Selection and Uncertainty Reporting}
 
 Threshold-sensitive systems are evaluated under a fixed selection protocol rather than by choosing the best test threshold after observing results. Merge thresholds are selected on validation evidence when validation rows are available; otherwise, the default implementation threshold is reported as a fixed operating point. The test split is then used only for final metric reporting. This protocol is necessary because a small threshold change can alter FMR and HNFMR more strongly than it alters same-work F1.
