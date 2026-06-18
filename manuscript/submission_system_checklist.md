@@ -94,7 +94,7 @@ Before upload, verify:
 2. `python manuscript/scripts/build_submission_package.py --final-upload` writes `repository_url`, `repository_commit`, and `repository_branch` into the package copy of `submission_metadata.yml`.
 3. The package copy is bound to `git remote origin`, `git rev-parse HEAD`, and the current branch.
 4. `submission_manifest.json` records the same `repository_commit` as the package copy of `submission_metadata.yml`.
-5. `python manuscript/scripts/validate_submission_package.py --final-upload` passes after the package is built.
+5. `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes after the package is built and the external artifact release is finalized.
 
 ## Final Metadata Checks
 

@@ -102,7 +102,7 @@ def test_check_final_upload_information_request_rejects_missing_credit_roles() -
             "Submission metadata mapping",
             "After the authors complete this form",
             "`submission_metadata.yml`, `cover_letter.md`, and the live submission system",
-            "python manuscript/scripts/validate_submission_package.py --final-upload",
+            "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
             "Primary `submission_metadata.yml` target",
             "Additional file or system target",
             "`submission`, `target_preparation`, `target_journal_template_bound`, `final_upload_checklist.target_journal_selected`",
@@ -133,6 +133,7 @@ def test_check_final_upload_information_request_rejects_missing_credit_roles() -
             "Ethics statement",
             "Data and code availability statement",
             "Artifact release URL or DOI",
+            "Artifact release directory path for final validation",
             "Artifact release manifest",
             "Live submission-system fields",
             "Final title page",
@@ -204,6 +205,23 @@ def test_check_final_upload_information_request_rejects_legacy_checklist_names()
     assert any("submission_system_files_verified" in error for error in errors)
     assert any("first_screen_claim_lockdown_confirmed" in error for error in errors)
     assert any("artifact_release_prepared_or_linked" in error for error in errors)
+
+
+def test_check_final_upload_information_request_rejects_missing_artifact_dir_validation() -> None:
+    """验证最终上传信息表必须要求 artifact release 路径参与最终包校验。"""
+
+    module = _load_validate_manuscript_module()
+    request_text = Path("manuscript/final_upload_information_request.md").read_text(encoding="utf-8")
+    request_text = request_text.replace(
+        "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
+        "python manuscript/scripts/validate_submission_package.py --final-upload",
+    )
+    request_text = request_text.replace("Artifact release directory path for final validation", "Artifact release path")
+
+    errors = module.check_final_upload_information_request(request_text)
+
+    assert any("validate_submission_package.py --final-upload --artifact-dir" in error for error in errors)
+    assert any("Artifact release directory path for final validation" in error for error in errors)
 
 
 def test_check_final_upload_information_request_rejects_missing_text_consistency() -> None:
@@ -3316,6 +3334,8 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "The package copy of `submission_metadata.yml` is bound to git remote origin.",
             "The package copy is bound to git rev-parse HEAD.",
             "`submission_manifest.json` records the same `repository_commit` as the package copy.",
+            "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
+            "The external artifact release is finalized before final-upload package validation.",
             "## Live Submission Text Checks",
             "Title, abstract, keywords, and highlights are copied from the current source files.",
             "The title and abstract match `main.tex` after journal-template conversion.",
@@ -3610,6 +3630,23 @@ def test_check_submission_system_checklist_rejects_missing_source_archive_checks
     assert any("generated zip files" in error for error in errors)
 
 
+def test_check_submission_system_checklist_rejects_missing_artifact_dir_final_upload_validation() -> None:
+    """验证投稿系统清单必须要求最终包校验绑定 artifact release 目录。"""
+
+    module = _load_validate_manuscript_module()
+    checklist_text = Path("manuscript/submission_system_checklist.md").read_text(encoding="utf-8")
+    checklist_text = checklist_text.replace(
+        "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
+        "python manuscript/scripts/validate_submission_package.py --final-upload",
+    )
+    checklist_text = checklist_text.replace("external artifact release is finalized", "artifact release exists")
+
+    errors = module.check_submission_system_checklist(checklist_text)
+
+    assert any("validate_submission_package.py --final-upload --artifact-dir" in error for error in errors)
+    assert any("external artifact release is finalized" in error for error in errors)
+
+
 def test_check_submission_system_checklist_rejects_missing_artifact_release_checks() -> None:
     """验证投稿系统清单缺少 artifact release 校验命令时会被拒绝。"""
 
@@ -3805,9 +3842,9 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 26.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
-            "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.",
+            "Completed audit cycles: 27.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
+            "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
             "## Audit Dimensions",
@@ -4031,9 +4068,14 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "artifact manifest",
             "submission_metadata.yml",
             "repository_commit",
+            "## Audit Cycle 27: Final-Upload Artifact-Dir Instruction Consistency Gate",
+            "final-upload instruction coverage",
+            "final_upload_information_request.md",
+            "submission_system_checklist.md",
+            "older command without `--artifact-dir`",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
-            "python manuscript/scripts/validate_submission_package.py --final-upload",
+            "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
         ]
     )
 
@@ -4049,7 +4091,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 26",
+        "Completed audit cycles: 27",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -4060,7 +4102,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 26" in error for error in errors)
+    assert any("Completed audit cycles: 27" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -4144,7 +4186,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_pair_cluster_lockdown() 
             "Scientometrics",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
-            "python manuscript/scripts/validate_submission_package.py --final-upload",
+            "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
         ]
     )
 
@@ -4397,6 +4439,27 @@ def test_check_reviewer_readiness_audit_rejects_missing_final_package_artifact_c
     assert any("submission_metadata.yml" in error for error in errors)
 
 
+def test_check_reviewer_readiness_audit_rejects_missing_artifact_dir_instruction_gate() -> None:
+    """验证审稿准备度审计必须覆盖最终上传 artifact-dir 指令一致性门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Audit Cycle 27: Final-Upload Artifact-Dir Instruction Consistency Gate",
+        "final-upload instruction coverage",
+        "final_upload_information_request.md",
+        "submission_system_checklist.md",
+        "older command without `--artifact-dir`",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Final-Upload Artifact-Dir Instruction Consistency Gate" in error for error in errors)
+    assert any("final_upload_information_request.md" in error for error in errors)
+    assert any("submission_system_checklist.md" in error for error in errors)
+
+
 def test_check_reviewer_readiness_audit_rejects_missing_final_upload_source_control_package_gate() -> None:
     """验证审稿准备度审计必须覆盖正式上传包内 source-control 绑定门禁。"""
 
@@ -4578,7 +4641,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_rebuttal_boundary() -> N
             "author email addresses, ORCID values, personal account URLs, local absolute paths, and development process notes",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
-            "python manuscript/scripts/validate_submission_package.py --final-upload",
+            "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
         ]
     )
 
@@ -4658,7 +4721,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_revision_trigger_registe
             "Scientometrics",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
-            "python manuscript/scripts/validate_submission_package.py --final-upload",
+            "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
         ]
     )
 
@@ -4731,7 +4794,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_journal_fit_novelty_cycl
             "must-not-claim boundary",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
-            "python manuscript/scripts/validate_submission_package.py --final-upload",
+            "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
         ]
     )
 

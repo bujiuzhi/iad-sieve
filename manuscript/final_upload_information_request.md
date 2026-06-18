@@ -4,7 +4,7 @@ This file records external information that must be provided by the authors befo
 
 ## Submission metadata mapping
 
-After the authors complete this form, copy the confirmed values into `submission_metadata.yml`, `cover_letter.md`, and the live submission system before running `python manuscript/scripts/validate_submission_package.py --final-upload`.
+After the authors complete this form, copy the confirmed values into `submission_metadata.yml`, `cover_letter.md`, and the live submission system before running `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release`.
 
 Repository URL and commit binding: keep the source `repository_reference` fields blank until final upload unless the target journal explicitly requires them in the source metadata. The final-upload package builder reads `git remote origin`, `git rev-parse HEAD`, and the current branch, then writes `repository_url`, `repository_commit`, `repository_branch`, and the matching data/code availability wording into the package copy of `submission_metadata.yml`. This avoids a self-referential Git commit value in the tracked source file while keeping the final package manifest and package metadata aligned.
 
@@ -125,6 +125,7 @@ For each author, select the applicable CRediT roles and then draft the final aut
 ## Artifact release
 
 - Artifact release URL or DOI:
+- Artifact release directory path for final validation:
 - Artifact release manifest:
 - `checksums.sha256` validation status:
 - `open_v2_main_results` row-level schema validated:

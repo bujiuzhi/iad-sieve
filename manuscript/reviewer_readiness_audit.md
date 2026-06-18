@@ -10,9 +10,9 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 26.
+Completed audit cycles: 27.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.
 
@@ -176,7 +176,7 @@ Outcome: pass for validator coverage; blocked for final upload until the selecte
 
 This cycle checks whether final-upload readiness is coupled to the selected journal template rather than only to a generated PDF. The submission metadata, final-upload checklist, and submission-system checklist require `target_journal_template_bound`, `target_journal_template_applied`, rebuilt main and supplementary PDFs after template conversion, and a source archive rebuilt after template conversion. The gate prevents a template-independent PDF or DKE/Elsevier preflight package from being treated as final upload evidence.
 
-The reviewer-facing boundary is narrow. Template binding is a publication-format and submission-system consistency gate; it does not strengthen the scientific evidence. The manuscript should not be uploaded until the selected journal template matches the final manuscript source, `python manuscript/scripts/validate_submission_package.py --final-upload` passes, and the cover letter, metadata, and availability statements all name the same target journal and artifact release.
+The reviewer-facing boundary is narrow. Template binding is a publication-format and submission-system consistency gate; it does not strengthen the scientific evidence. The manuscript should not be uploaded until the selected journal template matches the final manuscript source, `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, and the cover letter, metadata, and availability statements all name the same target journal and artifact release.
 
 ## Audit Cycle 11: Live Submission Text Consistency Gate
 
@@ -305,6 +305,14 @@ Outcome: pass for submission-package validator coverage; blocked for final uploa
 This cycle links the final manuscript package to the external result release. The submission package validator now accepts an optional artifact release directory in final-upload mode, reads the artifact `manifest.json`, and checks that artifact manifest `repository.commit` matches `submission_metadata.yml` field `repository_commit` and, when available, `submission_manifest.json` source-control commit. This prevents a final-upload package from naming one source revision while the external artifact release names another.
 
 The reviewer-facing boundary remains traceability. Passing the package-artifact commit gate means the final source package and external result release share the same source anchor; it does not prove numerical correctness unless the artifact release itself validates, its checksums pass, and the prediction, threshold, metric, and command-log artifacts were generated from the same final source revision.
+
+## Audit Cycle 27: Final-Upload Artifact-Dir Instruction Consistency Gate
+
+Outcome: pass for final-upload instruction coverage; blocked for final upload until the real artifact release directory is available.
+
+This cycle removes a workflow inconsistency introduced by the stronger package-artifact binding gate. The final-upload information request and submission-system checklist now both instruct authors to run `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release`, and the final-upload information request collects the artifact release directory path used for that validation. The manuscript validator also rejects these documents if they revert to the older command without `--artifact-dir`.
+
+The reviewer-facing boundary is procedural. This gate ensures that authors do not accidentally validate only the manuscript package while skipping the external artifact commit binding. It does not replace artifact release validation, target-journal template binding, live submission-system checks, or the external artifact URL or DOI.
 
 ## Minimum Gate Before Final Upload
 
