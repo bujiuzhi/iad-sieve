@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 47.
+Completed audit cycles: 48.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -473,6 +473,14 @@ Outcome: pass for mixed-scope comparison table-density reduction; blocked for br
 This gate checks whether the Open-v2 scope compatibility matrix belongs in the main result section. The main manuscript now states that the Open-v2 table is a scope-bounded evidence table, not a single comparative ranking, and that full pair-scope representation baselines and held-out IAD-Risk rows support a mechanistic comparison rather than a broad ranking. The supplementary material preserves the full scope compatibility matrix with row-family scopes, supported interpretations, and unsupported stronger comparisons.
 
 The reviewer-facing boundary is mixed-scope interpretation clarity without main-text table overload. The edit keeps the main result section focused on the conservative false-merge-control claim while the validator still requires the supplementary scope compatibility matrix and the explicit stronger-comparison boundary.
+
+## Audit Cycle 48: Result Interpretation Guardrails Density Gate
+
+Outcome: pass for result-interpretation table-density reduction; blocked for stronger result readings until same-scope prediction files, interval estimates, threshold-stability evidence, and artifact checksums are released.
+
+This gate checks whether the Open-v2 result interpretation guardrails matrix is needed in the main result section. The main manuscript now states the direct reading boundary in prose: Scope type labels separate full available Open-v2 rows from held-out Open-v2 test rows, scope labels prevent ranking interpretation, and the supported reading is mechanism-oriented rather than a broad method-superiority claim. The supplementary material preserves the full result interpretation guardrails table with row-family readings and unsupported readings.
+
+The reviewer-facing boundary is result-reading clarity without main-text table overload. The edit keeps the main result section focused on the Open-v2 evidence snapshot while the validator still requires the supplementary guardrails table, unsupported-reading boundary, scope labels, and threshold-stability or zero-risk limits.
 
 ## Minimum Gate Before Final Upload
 

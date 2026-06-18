@@ -2395,10 +2395,7 @@ def test_check_result_interpretation_guardrails_accepts_complete_boundaries() ->
     manuscript_text = "\n".join(
         [
             r"\subsection{Result Interpretation Guardrails}",
-            r"\label{tab:result-interpretation-guardrails}",
-            "The table separates Directly supported reading.",
-            "It also separates Mechanism-supported reading.",
-            "It explicitly lists Unsupported reading.",
+            "The full result interpretation guardrails table is reported in the supplementary material.",
             "The main result table includes Scope type.",
             "It distinguishes full available Open-v2 scope.",
             "It distinguishes held-out Open-v2 test scope.",
@@ -2411,8 +2408,24 @@ def test_check_result_interpretation_guardrails_accepts_complete_boundaries() ->
             "The table is not evidence of threshold stability or zero risk.",
         ]
     )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Claim-Evidence Matrix}",
+            r"\label{tab:result-interpretation-guardrails}",
+            "Result interpretation guardrails for the Open-v2 evidence snapshot.",
+            "The table separates Directly supported reading.",
+            "It also provides a mechanism-supported reading.",
+            "It explicitly lists Unsupported reading.",
+            "Representation baselines.",
+            "RoBERTa pair classifier.",
+            "IAD-Risk transformer variants.",
+            "The rows are not a claim of broad method superiority.",
+            "The table is not a same-scope comparative ranking.",
+            "The table is not evidence of threshold stability or zero risk.",
+        ]
+    )
 
-    errors = module.check_result_interpretation_guardrails(manuscript_text)
+    errors = module.check_result_interpretation_guardrails(manuscript_text, supplementary_text)
 
     assert errors == []
 
@@ -2422,11 +2435,13 @@ def test_check_result_interpretation_guardrails_rejects_missing_unsupported_read
 
     module = _load_validate_manuscript_module()
     manuscript_text = r"\subsection{Result Interpretation Guardrails}"
+    supplementary_text = r"\section{Claim-Evidence Matrix}"
 
-    errors = module.check_result_interpretation_guardrails(manuscript_text)
+    errors = module.check_result_interpretation_guardrails(manuscript_text, supplementary_text)
 
     assert any("Unsupported reading" in error for error in errors)
     assert any("not a same-scope comparative ranking" in error for error in errors)
+    assert any("result-interpretation-guardrails" in error for error in errors)
 
 
 def test_check_result_interpretation_guardrails_rejects_missing_scope_type_labels() -> None:
@@ -2436,10 +2451,7 @@ def test_check_result_interpretation_guardrails_rejects_missing_scope_type_label
     manuscript_text = "\n".join(
         [
             r"\subsection{Result Interpretation Guardrails}",
-            r"\label{tab:result-interpretation-guardrails}",
-            "Directly supported reading",
-            "Mechanism-supported reading",
-            "Unsupported reading",
+            "The full result interpretation guardrails table is reported in the supplementary material.",
             "The representation rows test false-merge exposure.",
             "The RoBERTa row is a strong supervised comparator.",
             "The IAD-Risk rows test split-held-out risk gating.",
@@ -2448,8 +2460,24 @@ def test_check_result_interpretation_guardrails_rejects_missing_scope_type_label
             "The table is not evidence of threshold stability or zero risk.",
         ]
     )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Claim-Evidence Matrix}",
+            r"\label{tab:result-interpretation-guardrails}",
+            "Result interpretation guardrails for the Open-v2 evidence snapshot.",
+            "Directly supported reading.",
+            "mechanism-supported reading.",
+            "Unsupported reading.",
+            "Representation baselines.",
+            "RoBERTa pair classifier.",
+            "IAD-Risk transformer variants.",
+            "The result is not a claim of broad method superiority.",
+            "The table is not a same-scope comparative ranking.",
+            "The table is not evidence of threshold stability or zero risk.",
+        ]
+    )
 
-    errors = module.check_result_interpretation_guardrails(manuscript_text)
+    errors = module.check_result_interpretation_guardrails(manuscript_text, supplementary_text)
 
     assert any("Scope type" in error for error in errors)
     assert any("full available Open-v2 scope" in error for error in errors)
@@ -4486,7 +4514,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 47.",
+            "Completed audit cycles: 48.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -4844,6 +4872,13 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "row-family scopes",
             "mixed-scope interpretation clarity without main-text table overload",
             "explicit stronger-comparison boundary",
+            "## Audit Cycle 48: Result Interpretation Guardrails Density Gate",
+            "result-interpretation table-density reduction",
+            "stronger result readings",
+            "full result interpretation guardrails table",
+            "row-family readings",
+            "result-reading clarity without main-text table overload",
+            "threshold-stability or zero-risk limits",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -4862,7 +4897,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 47",
+        "Completed audit cycles: 48",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -4873,7 +4908,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 47" in error for error in errors)
+    assert any("Completed audit cycles: 48" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

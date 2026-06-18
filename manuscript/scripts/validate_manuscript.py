@@ -1858,21 +1858,19 @@ def check_baseline_supplementary_tables(supplementary_text: str) -> list[str]:
     ]
 
 
-def check_result_interpretation_guardrails(manuscript_text: str) -> list[str]:
+def check_result_interpretation_guardrails(manuscript_text: str, supplementary_text: str) -> list[str]:
     """Check whether the main result table states allowed and unsupported readings.
 
     参数:
         manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
 
     返回:
         list[str]: Error messages for missing result-interpretation guardrails.
     """
-    required_markers = [
+    required_main_markers = [
         r"\subsection{Result Interpretation Guardrails}",
-        r"\label{tab:result-interpretation-guardrails}",
-        "Directly supported reading",
-        "Mechanism-supported reading",
-        "Unsupported reading",
+        "full result interpretation guardrails table is reported in the supplementary material",
         "Scope type",
         "full available Open-v2 scope",
         "held-out Open-v2 test scope",
@@ -1884,11 +1882,31 @@ def check_result_interpretation_guardrails(manuscript_text: str) -> list[str]:
         "not a same-scope comparative ranking",
         "not evidence of threshold stability or zero risk",
     ]
-    return [
-        f"result interpretation guardrails missing marker: {marker}"
-        for marker in required_markers
+    required_supplementary_markers = [
+        r"\section{Claim-Evidence Matrix}",
+        r"\label{tab:result-interpretation-guardrails}",
+        "Result interpretation guardrails for the Open-v2 evidence snapshot",
+        "Directly supported reading",
+        "Unsupported reading",
+        "mechanism-supported reading",
+        "Representation baselines",
+        "RoBERTa pair classifier",
+        "IAD-Risk transformer variants",
+        "not a claim of broad method superiority",
+        "not a same-scope comparative ranking",
+        "not evidence of threshold stability or zero risk",
+    ]
+    errors = [
+        f"result interpretation guardrails missing manuscript marker: {marker}"
+        for marker in required_main_markers
         if marker not in manuscript_text
     ]
+    errors.extend(
+        f"result interpretation guardrails missing supplementary marker: {marker}"
+        for marker in required_supplementary_markers
+        if marker not in supplementary_text
+    )
+    return errors
 
 
 def extract_latex_table_by_label(manuscript_text: str, table_label: str) -> str:
@@ -2999,7 +3017,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 47",
+        "Completed audit cycles: 48",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3104,6 +3122,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 45: Result Artifact Crosswalk Density Gate",
         "Audit Cycle 46: Manual Validation Boundary Density Gate",
         "Audit Cycle 47: Scope Compatibility Matrix Density Gate",
+        "Audit Cycle 48: Result Interpretation Guardrails Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
         "method-writing clarity",
@@ -3205,6 +3224,12 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "row-family scopes",
         "mixed-scope interpretation clarity without main-text table overload",
         "explicit stronger-comparison boundary",
+        "result-interpretation table-density reduction",
+        "stronger result readings",
+        "full result interpretation guardrails table",
+        "row-family readings",
+        "result-reading clarity without main-text table overload",
+        "threshold-stability or zero-risk limits",
         "remote reproducibility",
         "strong model matrix",
         "model superiority",
@@ -4357,7 +4382,7 @@ def main() -> int:
     errors.extend(check_baseline_inclusion_rationale(manuscript_text))
     errors.extend(check_baseline_fairness_controls(manuscript_text))
     errors.extend(check_baseline_supplementary_tables(supplementary_text))
-    errors.extend(check_result_interpretation_guardrails(manuscript_text))
+    errors.extend(check_result_interpretation_guardrails(manuscript_text, supplementary_text))
     errors.extend(check_openv2_result_table_scope_labels(manuscript_text))
     errors.extend(check_manual_validation_boundary(manuscript_text))
     errors.extend(check_split_leakage_controls(manuscript_text))

@@ -776,25 +776,7 @@ The Open-v2 evidence shows why identity-agenda disentanglement is necessary. Sin
 
 \subsection{Result Interpretation Guardrails}
 
-Table~\ref{tab:result-interpretation-guardrails} states how the Open-v2 table should be read before external artifact release and same-scope prediction files are available. The main result table includes Scope type labels to distinguish full available Open-v2 scope rows from held-out Open-v2 test scope rows. Scope labels prevent ranking interpretation when row families are supported by different available prediction scopes. The intended interpretation is mechanism-oriented; the table labels this as a Mechanism-supported reading rather than a ranking-oriented reading.
-
-\begin{table}[H]
-\caption{Result interpretation guardrails for the Open-v2 evidence snapshot. The table separates direct evidence, mechanism-supported reading, and unsupported reading.}
-\label{tab:result-interpretation-guardrails}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{L{0.24\linewidth}L{0.30\linewidth}L{0.36\linewidth}}
-\toprule
-Result row family & Directly supported reading & Unsupported reading \\
-\midrule
-Representation baselines & The representation rows test false-merge exposure when one-space scientific relatedness is used as merge evidence. & They do not define the best possible representation-threshold system under a fully tuned, same-scope comparative ranking. \\
-RoBERTa pair classifier & The RoBERTa row is a strong supervised comparator that shows pair classification can suppress many hard-negative merges. & It is not a component-level explanation of identity-agenda risk control. \\
-IAD-Risk transformer variants & The IAD-Risk rows test split-held-out risk gating with explicit identity, agenda, and ANI signals. & The rows are not a claim of broad method superiority without same-scope predictions, intervals, and artifact checksums. \\
-Whole table & The table gives a mechanism-supported reading that semantic relatedness alone can be unsafe and risk gating can block hard-negative merges in the reported setting. & The table is not a same-scope comparative ranking and is not evidence of threshold stability or zero risk. \\
-\bottomrule
-\end{tabular}
-\end{table}
+The full result interpretation guardrails table is reported in the supplementary material. The Open-v2 table should be read before external artifact release and same-scope prediction files are available. The main result table includes Scope type labels to distinguish full available Open-v2 scope rows from held-out Open-v2 test scope rows. Scope labels prevent ranking interpretation when row families are supported by different available prediction scopes. The intended interpretation is mechanism-oriented: representation rows test false-merge exposure, the RoBERTa row is a strong supervised comparator, and IAD-Risk rows test split-held-out risk gating with explicit identity, agenda, and ANI signals. The table is not a claim of broad method superiority, not a same-scope comparative ranking, and not evidence of threshold stability or zero risk.
 
 \subsection{Manual Validation Boundary}
 
