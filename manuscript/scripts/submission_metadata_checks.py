@@ -475,6 +475,13 @@ def check_final_upload_cover_letter_text(cover_letter_text: str, metadata_text: 
             "final upload cover letter unresolved: "
             f"cover letter missing article type: {expected_article_type}"
         )
+    corresponding_author = parse_mapping_section(metadata_text, "corresponding_author")
+    corresponding_author_name = corresponding_author.get("name", "")
+    if corresponding_author_name and corresponding_author_name not in cover_letter_text:
+        errors.append(
+            "final upload cover letter unresolved: "
+            f"cover letter missing corresponding author name: {corresponding_author_name}"
+        )
     if "Dear Editor," in cover_letter_text:
         errors.append("final upload cover letter unresolved: cover letter uses generic editor greeting")
     if "Anonymous Authors" in cover_letter_text:
