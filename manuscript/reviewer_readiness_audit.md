@@ -10,9 +10,9 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 13.
+Completed audit cycles: 14.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, source-control commit binding, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.
 
@@ -198,6 +198,14 @@ Outcome: pass for package-level validator coverage; blocked for final upload unt
 This cycle checks whether the generated submission package can detect stale compiled files rather than relying on manual rebuild discipline. The package validator now compares packaged PDFs against their packaged source dependencies: the main PDF is checked against `main.tex` and `references.bib`, the supplementary PDF is checked against `supplementary_material.tex`, and the DKE/Elsevier preflight PDF is checked against `iad-risk-manuscript-elsevier.tex`, `keywords.md`, and `references.bib`. If a packaged PDF is older than any required source dependency, the package must be rejected with the action boundary: rebuild PDF before packaging.
 
 The reviewer-facing boundary is procedural but important. A passing package validation shows that the packaged PDFs are not older than the included source files and bibliography. It does not prove final journal-template correctness, author metadata completeness, external artifact availability, or stronger empirical evidence. Those remain gated by template binding, final-upload metadata, artifact release validation, and the Q2/B evidence checks.
+
+## Audit Cycle 14: Source-Control Manifest Binding Gate
+
+Outcome: pass for manifest-level commit traceability; blocked for final upload until the final package is rebuilt from the submitted repository commit.
+
+This cycle checks whether a submission package can be traced back to the exact source revision used to build it. The submission package manifest records a `source_control` object with `repository_commit`, `repository_branch`, `worktree_dirty`, and `tracked_state`. This gives reviewers and editors a concrete commit anchor for the LaTeX source, package checksums, and data-processing code without embedding local absolute paths or author-identifying repository URLs in anonymous packages.
+
+The final-upload boundary is stricter than anonymous preflight. When source-control metadata is available, final-upload validation checks that the manifest `repository_commit` matches `submission_metadata.yml` and that `worktree_dirty` is false. A mismatch means the package was not rebuilt from the committed source state named in the availability statement, and the final upload must be regenerated before submission.
 
 ## Minimum Gate Before Final Upload
 

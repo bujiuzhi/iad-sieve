@@ -104,6 +104,24 @@ def _write_dke_preflight_files(manuscript_root: Path) -> None:
     _write_file(manuscript_root / "build" / "iad-risk-manuscript-elsevier.pdf", b"%PDF-1.5 dke\n")
 
 
+def _clean_source_control_state(commit: str = "abcdef1234567890") -> dict:
+    """构造测试用 Git 源状态。
+
+    参数:
+        commit: 仓库提交号。
+
+    返回:
+        dict: 投稿包 manifest 使用的 source_control 字段。
+    """
+    return {
+        "available": True,
+        "repository_commit": commit,
+        "repository_branch": "main",
+        "worktree_dirty": False,
+        "tracked_state": "clean",
+    }
+
+
 def _write_unresolved_submission_metadata(manuscript_root: Path) -> None:
     """写入未完成正式投稿信息的元数据。
 
@@ -474,6 +492,13 @@ def test_build_submission_package_writes_manifest_checksums_and_zip(tmp_path) ->
     assert "target journal document class" in manifest["journal_template"]["final_upload_requirements"]
     assert manifest["reproducibility_level"]["raw_data_distribution"] == "excluded"
     assert manifest["claim_boundary"]["no_broad_method_ranking"] is True
+    assert set(manifest["source_control"]) == {
+        "available",
+        "repository_commit",
+        "repository_branch",
+        "worktree_dirty",
+        "tracked_state",
+    }
     assert len(manifest["files"]) == 9
     assert any(row["role"] == "main_pdf" for row in manifest["files"])
     assert any(row["role"] == "submission_metadata" for row in manifest["files"])
@@ -521,6 +546,26 @@ def test_build_submission_package_accepts_final_upload_with_filled_metadata(tmp_
     assert manifest["anonymization"]["author_status"] == "provided_for_final_upload"
     assert manifest["journal_template"]["target_journal_bound"] is True
     assert "artifact release linked" in manifest["journal_template"]["final_upload_requirements"]
+
+
+def test_build_submission_package_records_clean_source_control_state(tmp_path, monkeypatch) -> None:
+    """验证投稿包 manifest 记录可复核的 Git 提交锚点。"""
+
+    module = _load_submission_package_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    monkeypatch.setattr(module, "collect_source_control_state", lambda _: _clean_source_control_state())
+
+    module.build_submission_package(manuscript_root, output_dir, zip_path)
+    manifest = json.loads((output_dir / "submission_manifest.json").read_text(encoding="utf-8"))
+
+    assert manifest["source_control"]["available"] is True
+    assert manifest["source_control"]["repository_commit"] == "abcdef1234567890"
+    assert manifest["source_control"]["repository_branch"] == "main"
+    assert manifest["source_control"]["worktree_dirty"] is False
+    assert manifest["source_control"]["tracked_state"] == "clean"
 
 
 def test_build_submission_package_rejects_dke_final_upload_without_elsevier_files(tmp_path) -> None:
@@ -787,6 +832,68 @@ def test_validate_submission_package_accepts_final_upload_with_filled_metadata(t
     errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True)
 
     assert errors == []
+
+
+def test_validate_submission_package_rejects_manifest_without_source_control(tmp_path) -> None:
+    """验证投稿包 manifest 缺少 source_control 字段时会被拒绝。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    builder.build_submission_package(manuscript_root, output_dir, zip_path)
+    manifest_path = output_dir / "submission_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest.pop("source_control")
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False), encoding="utf-8")
+
+    errors = validator.validate_package_directory(output_dir)
+
+    assert any("source_control" in error for error in errors)
+
+
+def test_validate_submission_package_rejects_final_upload_commit_mismatch(tmp_path, monkeypatch) -> None:
+    """验证正式上传包的 Git 提交号必须匹配投稿元数据。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_final_upload_metadata(manuscript_root)
+    _write_final_upload_cover_letter(manuscript_root)
+    monkeypatch.setattr(builder, "collect_source_control_state", lambda _: _clean_source_control_state("bbbbbbbbbbbbbbbb"))
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
+    errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True)
+
+    assert any("source_control commit bbbbbbbbbbbbbbbb" in error for error in errors)
+    assert any("repository_commit abcdef1234567890" in error for error in errors)
+
+
+def test_validate_submission_package_rejects_final_upload_dirty_source_control(tmp_path, monkeypatch) -> None:
+    """验证正式上传包不能来自 dirty 工作区。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_final_upload_metadata(manuscript_root)
+    _write_final_upload_cover_letter(manuscript_root)
+    dirty_state = _clean_source_control_state()
+    dirty_state["worktree_dirty"] = True
+    dirty_state["tracked_state"] = "dirty"
+    monkeypatch.setattr(builder, "collect_source_control_state", lambda _: dirty_state)
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
+    errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True)
+
+    assert any("source_control worktree_dirty must be false" in error for error in errors)
 
 
 def test_validate_submission_package_rejects_dke_final_upload_without_elsevier_profile(tmp_path) -> None:

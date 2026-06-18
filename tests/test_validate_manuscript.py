@@ -3496,8 +3496,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 13.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, and stronger evidence gates.",
+            "Completed audit cycles: 14.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, source-control commit binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, target-journal confirmation, funding statement, author contribution statement, permissions statement, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -3611,6 +3611,14 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "supplementary PDF",
             "DKE/Elsevier preflight PDF",
             "rebuild PDF before packaging",
+            "## Audit Cycle 14: Source-Control Manifest Binding Gate",
+            "source_control",
+            "repository_commit",
+            "repository_branch",
+            "worktree_dirty",
+            "tracked_state",
+            "matches `submission_metadata.yml`",
+            "final package is rebuilt from the submitted repository commit",
             "data/",
             "outputs/",
             "## Minimum Gate Before Final Upload",
@@ -3631,7 +3639,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 13",
+        "Completed audit cycles: 14",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -3642,7 +3650,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 13" in error for error in errors)
+    assert any("Completed audit cycles: 14" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -3855,6 +3863,31 @@ def test_check_reviewer_readiness_audit_rejects_missing_package_pdf_freshness_ga
     assert any("packaged PDFs" in error for error in errors)
     assert any("DKE/Elsevier preflight PDF" in error for error in errors)
     assert any("rebuild PDF before packaging" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_source_control_manifest_gate() -> None:
+    """验证审稿准备度审计必须覆盖 source-control manifest 绑定门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Audit Cycle 14: Source-Control Manifest Binding Gate",
+        "source_control",
+        "repository_commit",
+        "repository_branch",
+        "worktree_dirty",
+        "tracked_state",
+        "matches `submission_metadata.yml`",
+        "final package is rebuilt from the submitted repository commit",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Source-Control Manifest Binding Gate" in error for error in errors)
+    assert any("source_control" in error for error in errors)
+    assert any("repository_commit" in error for error in errors)
+    assert any("worktree_dirty" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_final_gate() -> None:

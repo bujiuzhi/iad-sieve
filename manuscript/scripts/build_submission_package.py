@@ -12,6 +12,7 @@ import argparse
 import hashlib
 import json
 import logging
+import subprocess
 import shutil
 import sys
 import zipfile
@@ -149,6 +150,65 @@ def copy_submission_files(manuscript_root: Path, output_dir: Path, dke_preflight
     return records
 
 
+def run_git_command(repository_root: Path, arguments: list[str]) -> str | None:
+    """Run a Git command and return stripped stdout.
+
+    参数:
+        repository_root: Directory from which Git should be executed.
+        arguments: Git command arguments after the `git` executable.
+
+    返回:
+        str | None: Command stdout when Git succeeds, otherwise None.
+    """
+    try:
+        result = subprocess.run(
+            ["git", *arguments],
+            cwd=repository_root,
+            capture_output=True,
+            check=False,
+            text=True,
+            timeout=5,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        LOGGER.warning("source-control metadata unavailable from git command %s: %s", arguments, exc)
+        return None
+    if result.returncode != 0:
+        LOGGER.warning("source-control metadata command failed with exit %s: %s", result.returncode, arguments)
+        return None
+    return result.stdout.strip()
+
+
+def collect_source_control_state(manuscript_root: Path) -> dict:
+    """Collect Git source-control state for the generated package manifest.
+
+    参数:
+        manuscript_root: Manuscript root directory.
+
+    返回:
+        dict: Source-control metadata without local absolute paths.
+    """
+    repository_root = manuscript_root.parent
+    repository_commit = run_git_command(repository_root, ["rev-parse", "HEAD"])
+    repository_branch = run_git_command(repository_root, ["rev-parse", "--abbrev-ref", "HEAD"]) if repository_commit else None
+    porcelain_status = run_git_command(repository_root, ["status", "--porcelain"]) if repository_commit else None
+    if not repository_commit:
+        return {
+            "available": False,
+            "repository_commit": "",
+            "repository_branch": "",
+            "worktree_dirty": None,
+            "tracked_state": "unavailable",
+        }
+    worktree_dirty = bool(porcelain_status)
+    return {
+        "available": True,
+        "repository_commit": repository_commit,
+        "repository_branch": repository_branch or "",
+        "worktree_dirty": worktree_dirty,
+        "tracked_state": "dirty" if worktree_dirty else "clean",
+    }
+
+
 def check_final_upload_metadata(manuscript_root: Path, dke_preflight: bool = False) -> list[str]:
     """Check whether submission metadata is ready for final journal upload.
 
@@ -189,7 +249,13 @@ def check_final_upload_cover_letter(manuscript_root: Path) -> list[str]:
     return check_final_upload_cover_letter_text(cover_letter_text, metadata_text)
 
 
-def write_manifest(output_dir: Path, records: list[dict], dke_preflight: bool = False, final_upload: bool = False) -> Path:
+def write_manifest(
+    output_dir: Path,
+    records: list[dict],
+    dke_preflight: bool = False,
+    final_upload: bool = False,
+    source_control: dict | None = None,
+) -> Path:
     """Write a JSON submission manifest.
 
     参数:
@@ -197,6 +263,7 @@ def write_manifest(output_dir: Path, records: list[dict], dke_preflight: bool = 
         records: Manifest file records.
         dke_preflight: Whether the package includes DKE/Elsevier provisional files.
         final_upload: Whether the package is a final journal upload preflight package.
+        source_control: Git source-control metadata for the packaged source state.
 
     返回:
         Path: Manifest path.
@@ -253,6 +320,14 @@ def write_manifest(output_dir: Path, records: list[dict], dke_preflight: bool = 
             "no_broad_method_ranking": True,
             "no_human_gold_claim_for_silver_labels": True,
             "manual_validation_required_for_stronger_label_precision": True,
+        },
+        "source_control": source_control
+        or {
+            "available": False,
+            "repository_commit": "",
+            "repository_branch": "",
+            "worktree_dirty": None,
+            "tracked_state": "unavailable",
         },
         "files": records,
         "excluded": [
@@ -339,7 +414,8 @@ def build_submission_package(
             raise ValueError("; ".join(final_upload_errors))
     remove_existing_output(output_dir, zip_path)
     records = copy_submission_files(manuscript_root, output_dir, dke_preflight)
-    manifest_path = write_manifest(output_dir, records, dke_preflight, final_upload)
+    source_control = collect_source_control_state(manuscript_root)
+    manifest_path = write_manifest(output_dir, records, dke_preflight, final_upload, source_control)
     checksum_path = write_checksums(output_dir)
     archive_path = create_zip_archive(output_dir, zip_path) if zip_path else None
     summary = {

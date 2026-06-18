@@ -23,9 +23,11 @@ SCRIPT_ROOT = Path(__file__).resolve().parent
 if str(SCRIPT_ROOT) not in sys.path:
     sys.path.insert(0, str(SCRIPT_ROOT))
 from submission_metadata_checks import (
+    COMMIT_PATTERN,
     DKE_ELSEVIER_FILE_REQUIREMENT_ERROR,
     check_final_upload_cover_letter_text as check_structured_final_upload_cover_letter_text,
     check_final_upload_metadata_text as check_structured_final_upload_metadata_text,
+    scalar_value,
     target_journal_requires_elsevier_files,
 )
 
@@ -82,6 +84,7 @@ EXPECTED_MANIFEST_TOP_LEVEL_FIELDS = {
     "journal_template",
     "reproducibility_level",
     "claim_boundary",
+    "source_control",
     "files",
     "excluded",
 }
@@ -279,6 +282,22 @@ def check_manifest_text(manifest_text: str, dke_preflight: bool = False, final_u
     claim_boundary = manifest.get("claim_boundary")
     if not isinstance(claim_boundary, dict) or claim_boundary.get("no_broad_method_ranking") is not True:
         errors.append("submission_manifest.json must record the no broad method-ranking claim boundary")
+    source_control = manifest.get("source_control")
+    if not isinstance(source_control, dict):
+        errors.append("submission_manifest.json must record source_control metadata")
+    else:
+        source_required_fields = {"available", "repository_commit", "repository_branch", "worktree_dirty", "tracked_state"}
+        missing_source_fields = source_required_fields - set(source_control)
+        if missing_source_fields:
+            errors.append(f"submission_manifest.json source_control missing fields: {sorted(missing_source_fields)}")
+        if source_control.get("available") is True:
+            repository_commit = str(source_control.get("repository_commit", ""))
+            if not COMMIT_PATTERN.fullmatch(repository_commit):
+                errors.append("submission_manifest.json source_control repository_commit is invalid")
+            if source_control.get("tracked_state") not in {"clean", "dirty"}:
+                errors.append("submission_manifest.json source_control tracked_state must be clean or dirty")
+        elif source_control.get("available") is not False:
+            errors.append("submission_manifest.json source_control available must be true or false")
     file_rows = manifest.get("files")
     if not isinstance(file_rows, list):
         return ["submission_manifest.json missing files list"]
@@ -297,6 +316,37 @@ def check_manifest_text(manifest_text: str, dke_preflight: bool = False, final_u
         package_path = row.get("package_path")
         if package_path not in expected_files(dke_preflight):
             errors.append(f"submission_manifest.json has unexpected package_path: {package_path}")
+    return errors
+
+
+def check_final_upload_source_control_binding(manifest_text: str, metadata_text: str, location: str) -> list[str]:
+    """Check final-upload binding between package Git state and submission metadata.
+
+    参数:
+        manifest_text: Submission manifest JSON text.
+        metadata_text: Submission metadata YAML text.
+        location: Human-readable package location.
+
+    返回:
+        list[str]: Error messages for source-control binding drift.
+    """
+    try:
+        manifest = json.loads(manifest_text)
+    except json.JSONDecodeError:
+        return []
+    source_control = manifest.get("source_control")
+    if not isinstance(source_control, dict) or source_control.get("available") is not True:
+        return []
+    errors: list[str] = []
+    manifest_commit = str(source_control.get("repository_commit", ""))
+    metadata_commit = scalar_value(metadata_text, "repository_commit")
+    if metadata_commit and manifest_commit and metadata_commit != manifest_commit:
+        errors.append(
+            f"{location} final-upload source_control commit {manifest_commit} "
+            f"does not match submission_metadata.yml repository_commit {metadata_commit}"
+        )
+    if source_control.get("worktree_dirty") is True:
+        errors.append(f"{location} final-upload source_control worktree_dirty must be false")
     return errors
 
 
@@ -521,6 +571,14 @@ def validate_package_directory(package_dir: Path, final_upload: bool = False, dk
             errors.extend(check_final_upload_metadata_text(metadata_text))
             if target_journal_requires_elsevier_files(metadata_text) and not dke_preflight:
                 errors.append(DKE_ELSEVIER_FILE_REQUIREMENT_ERROR)
+            if manifest_path.exists():
+                errors.extend(
+                    check_final_upload_source_control_binding(
+                        manifest_path.read_text(encoding="utf-8"),
+                        metadata_text,
+                        str(package_dir),
+                    )
+                )
             if cover_letter_path.exists():
                 errors.extend(check_final_upload_cover_letter_text(cover_letter_path.read_text(encoding="utf-8"), metadata_text))
             else:
@@ -622,6 +680,7 @@ def validate_zip_archive(
                 errors.extend(check_final_upload_metadata_text(metadata_text))
                 if target_journal_requires_elsevier_files(metadata_text) and not dke_preflight:
                     errors.append(DKE_ELSEVIER_FILE_REQUIREMENT_ERROR)
+                errors.extend(check_final_upload_source_control_binding(manifest_text, metadata_text, "zip archive"))
                 try:
                     cover_letter_text = archive.read(f"{package_root_name}/cover_letter.md").decode("utf-8")
                 except KeyError as exc:
