@@ -29,6 +29,9 @@ Repository URL and commit binding: keep the source `repository_reference` fields
 - Article type:
 - Review mode:
 - Journal template:
+- Selected author-guide source:
+- Selected author-guide rechecked date:
+- Selected template requirements confirmed:
 - Submission system URL:
 - Rechecked author-guide date:
 - Institutional ranking/category source checked:

@@ -204,6 +204,9 @@ def _write_final_upload_metadata(manuscript_root: Path) -> None:
                 "  author_metadata_required_before_final_upload: true",
                 "",
                 "target_preparation:",
+                '  selected_author_guide_source: "official journal guide for authors"',
+                '  selected_author_guide_rechecked_date: "2026-06-19"',
+                "  selected_template_requirements_confirmed: true",
                 "  ranking_confirmation_required_before_final_upload: true",
                 "  ranking_confirmation_completed: true",
                 '  ranking_confirmation_source: "institutional ranking system"',
@@ -373,6 +376,9 @@ def _write_dke_final_upload_metadata(manuscript_root: Path) -> None:
                 "  author_metadata_required_before_final_upload: true",
                 "",
                 "target_preparation:",
+                '  selected_author_guide_source: "official journal guide for authors"',
+                '  selected_author_guide_rechecked_date: "2026-06-19"',
+                "  selected_template_requirements_confirmed: true",
                 "  ranking_confirmation_required_before_final_upload: true",
                 "  ranking_confirmation_completed: true",
                 '  ranking_confirmation_source: "institutional ranking system"',
@@ -1248,6 +1254,43 @@ def test_validate_submission_package_rejects_missing_target_ranking_confirmation
     assert any("ranking/category confirmation source is missing" in error for error in errors)
     assert any("ranking/category confirmation checked date is missing" in error for error in errors)
     assert any("selected target journal author confirmation is incomplete" in error for error in errors)
+
+
+def test_validate_submission_package_rejects_missing_author_guide_confirmation(tmp_path) -> None:
+    """验证正式上传包校验拒绝缺失的作者指南和模板要求确认。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    artifact_dir = tmp_path / "artifact_release"
+    _write_required_manuscript_files(manuscript_root)
+    _write_final_upload_metadata(manuscript_root)
+    _write_final_upload_cover_letter(manuscript_root)
+    _write_artifact_release_manifest(artifact_dir)
+    metadata_path = manuscript_root / "submission_metadata.yml"
+    metadata_text = metadata_path.read_text(encoding="utf-8")
+    metadata_text = metadata_text.replace(
+        '  selected_author_guide_source: "official journal guide for authors"',
+        '  selected_author_guide_source: ""',
+    )
+    metadata_text = metadata_text.replace(
+        '  selected_author_guide_rechecked_date: "2026-06-19"',
+        '  selected_author_guide_rechecked_date: ""',
+    )
+    metadata_text = metadata_text.replace(
+        "  selected_template_requirements_confirmed: true",
+        "  selected_template_requirements_confirmed: false",
+    )
+    metadata_path.write_text(metadata_text, encoding="utf-8")
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path)
+    errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True, artifact_dir=artifact_dir)
+
+    assert any("selected author guide source is missing" in error for error in errors)
+    assert any("selected author guide rechecked date is missing" in error for error in errors)
+    assert any("selected template requirements confirmation is incomplete" in error for error in errors)
 
 
 def test_validate_submission_package_rejects_missing_live_system_verification(tmp_path) -> None:

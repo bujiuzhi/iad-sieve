@@ -104,18 +104,19 @@ Before upload, verify:
 
 1. The selected target journal and article type match the submission system.
 2. `target_journal_template_bound` is true and the selected journal template matches the final manuscript source.
-3. `ranking_confirmation_completed`, `ranking_confirmation_source`, `ranking_confirmation_checked_date`, and `selected_target_author_confirmed` are complete before final upload.
-4. For single-anonymized routes such as DKE and Information Systems, the final title page and submission-system fields include author identities; the anonymous package is only a preflight package.
-5. The author list, order, affiliations, ORCID values, and corresponding author match the title page.
-6. The funding statement text is completed and matches the manuscript and submission system.
-7. The author contribution statement is completed and matches the final author list.
-8. The permissions statement records whether third-party material permission is not required or lists the permission files needed by the journal.
-9. The generative AI declaration statement is complete and matches the selected journal's live submission field.
-10. Author biographies and photographs are ready when the selected DKE/Elsevier route requests them.
-11. The competing-interest statement, data/code availability statement, and ethics statement are consistent across the manuscript and system fields.
-12. The artifact release URL or DOI resolves publicly or according to the journal's access policy, and the artifact manifest `publication.public_access_status` records that public access state.
-13. `live_submission_system_verified` and `final_upload_package_verified_against_system` are true only after the live submission system preview and final package contents match the current source package.
-14. The manuscript does not claim human gold labels, broad method superiority, or threshold stability unless the corresponding artifact evidence exists.
+3. `selected_author_guide_source`, `selected_author_guide_rechecked_date`, and `selected_template_requirements_confirmed` are complete before final upload.
+4. `ranking_confirmation_completed`, `ranking_confirmation_source`, `ranking_confirmation_checked_date`, and `selected_target_author_confirmed` are complete before final upload.
+5. For single-anonymized routes such as DKE and Information Systems, the final title page and submission-system fields include author identities; the anonymous package is only a preflight package.
+6. The author list, order, affiliations, ORCID values, and corresponding author match the title page.
+7. The funding statement text is completed and matches the manuscript and submission system.
+8. The author contribution statement is completed and matches the final author list.
+9. The permissions statement records whether third-party material permission is not required or lists the permission files needed by the journal.
+10. The generative AI declaration statement is complete and matches the selected journal's live submission field.
+11. Author biographies and photographs are ready when the selected DKE/Elsevier route requests them.
+12. The competing-interest statement, data/code availability statement, and ethics statement are consistent across the manuscript and system fields.
+13. The artifact release URL or DOI resolves publicly or according to the journal's access policy, and the artifact manifest `publication.public_access_status` records that public access state.
+14. `live_submission_system_verified` and `final_upload_package_verified_against_system` are true only after the live submission system preview and final package contents match the current source package.
+15. The manuscript does not claim human gold labels, broad method superiority, or threshold stability unless the corresponding artifact evidence exists.
 
 ## Live Submission Text Checks
 

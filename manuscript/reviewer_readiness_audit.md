@@ -10,13 +10,13 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 72.
+Completed audit cycles: 73.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.
 
-Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal and ranking/category status are author-confirmed from an authorized source, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.
+Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.
 
-Non-code external inputs still required: author metadata, DKE author biography and photograph materials if that route is selected, target-journal confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.
+Non-code external inputs still required: author metadata, DKE author biography and photograph materials if that route is selected, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.
 
 Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.
 
@@ -675,11 +675,19 @@ This gate checks whether `submission_system_files_verified` alone is enough to p
 
 The reviewer-facing boundary is operational traceability, not scientific evidence strengthening. A passing live-system verification gate shows that the uploaded materials and live submission preview match the source package; it does not create author declarations, target-ranking confirmation, artifact release access, or stronger empirical evidence.
 
+## Audit Cycle 73: Author Guide and Template Requirement Confirmation Gate
+
+Outcome: pass for final-upload author-guide and template-requirement gate implementation; blocked for final upload until the authors record the selected journal's author-guide source, author-guide recheck date, and template-requirement confirmation.
+
+This gate checks whether `target_journal_template_bound` and `target_journal_template_applied` alone are enough to prove template readiness. They are not. The final-upload metadata validator now also requires `target_preparation.selected_author_guide_source`, `target_preparation.selected_author_guide_rechecked_date`, and `target_preparation.selected_template_requirements_confirmed` before a final-upload package can pass. These fields bind the target-template decision to a specific author-guide source and a concrete recheck date.
+
+The reviewer-facing boundary is formatting and submission-policy traceability. A passing author-guide gate shows that the authors checked the selected journal's current instructions before final upload; it does not prove institutional ranking status, author declarations, live submission-system consistency, artifact access, or stronger scientific evidence.
+
 ## Minimum Gate Before Final Upload
 
 The manuscript should not be uploaded to a journal system until all of the following are true:
 
-1. `submission_metadata.yml` contains the selected target journal, author-confirmed ranking/category status with source and checked date, `target_journal_template_bound: true`, completed author metadata, and author biography/photo readiness when the selected route requires it.
+1. `submission_metadata.yml` contains the selected target journal, selected author-guide source and recheck date, confirmed template requirements, author-confirmed ranking/category status with source and checked date, `target_journal_template_bound: true`, completed author metadata, and author biography/photo readiness when the selected route requires it.
 2. `main.tex` or the selected journal source is converted to the selected journal template and rebuilt.
 3. `supplementary_material.tex` is rebuilt after any final source edits.
 4. The artifact release has a real URL or DOI, validates against its checksum file, records the same repository commit used by the final manuscript package in both `README.md` and `manifest.json`, and stores the same public URL or DOI plus a public access status in the artifact manifest publication object.

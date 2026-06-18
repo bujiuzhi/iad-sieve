@@ -483,6 +483,16 @@ def check_target_preparation_confirmation(metadata_text: str) -> list[str]:
     if not row:
         return ["target preparation section is missing"]
 
+    if not row.get("selected_author_guide_source", "").strip():
+        errors.append("selected author guide source is missing")
+    author_guide_date = row.get("selected_author_guide_rechecked_date", "").strip()
+    if not author_guide_date:
+        errors.append("selected author guide rechecked date is missing")
+    elif DATE_PATTERN.fullmatch(author_guide_date) is None:
+        errors.append("selected author guide rechecked date is invalid")
+    if row.get("selected_template_requirements_confirmed", "").lower() != "true":
+        errors.append("selected template requirements confirmation is incomplete")
+
     ranking_required = row.get("ranking_confirmation_required_before_final_upload", "").lower()
     if ranking_required != "true":
         errors.append("ranking/category confirmation requirement is missing")
