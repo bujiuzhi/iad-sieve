@@ -110,6 +110,8 @@ Open scholarly metadata benchmarks & Public metadata, citation, and topic signal
 \end{tabular}
 \end{table}
 
+This positioning narrows the novelty claim. IAD-Risk is not a replacement for end-to-end entity resolution workflows; it inserts a risk-aware relation layer into scholarly matching when agenda relatedness can make automatic merges unsafe. It is also not a leaderboard over all neural matching methods; the reported comparisons test the merge-safety framing under the available Open-v2 evidence snapshot. Finally, IAD-Bench does not claim that OpenAlex/OpenCitations silver evidence is human gold, but uses those rows as provenance-marked stress evidence for agenda-level false-merge risk.
+
 \section{Problem Formulation}
 
 Let $d_i$ and $d_j$ be two scholarly records. The target identity label $y^{I}_{ij}$ indicates whether the records describe the same scholarly work. The agenda label $y^{A}_{ij}$ indicates whether the records discuss a related research agenda. A hard negative is a pair with high agenda evidence but negative identity evidence:

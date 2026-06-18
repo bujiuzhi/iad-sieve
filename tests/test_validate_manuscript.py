@@ -2247,6 +2247,30 @@ def test_check_artifact_release_readme_template_rejects_missing_release_boundari
     assert any("cluster_metric_summary" in error for error in errors)
 
 
+def test_check_related_work_positioning_rejects_missing_novelty_boundaries() -> None:
+    """验证 Related Work 必须说明最接近工作的创新边界。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\label{tab:closest-work-positioning}",
+            "Positioning against the closest lines of work",
+            "End-to-end entity resolution systems",
+            "Neural entity matching",
+            "Scientific document representations",
+            "Open scholarly metadata benchmarks",
+            "false-merge risk gates",
+            "gold, proxy, and silver strata",
+        ]
+    )
+
+    errors = module.check_related_work_positioning(manuscript_text)
+
+    assert any("not a replacement for end-to-end entity resolution workflows" in error for error in errors)
+    assert any("not a leaderboard over all neural matching methods" in error for error in errors)
+    assert any("OpenAlex/OpenCitations silver evidence is human gold" in error for error in errors)
+
+
 def test_check_data_processing_pipeline_document_accepts_reproducible_pipeline() -> None:
     """验证数据处理文档保留无数据提交时的可复现处理入口。"""
 

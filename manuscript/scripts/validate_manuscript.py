@@ -2140,6 +2140,10 @@ def check_related_work_positioning(manuscript_text: str) -> list[str]:
         "Open scholarly metadata benchmarks",
         "false-merge risk gates",
         "gold, proxy, and silver strata",
+        "not a replacement for end-to-end entity resolution workflows",
+        "not a leaderboard over all neural matching methods",
+        "does not claim that OpenAlex/OpenCitations silver evidence is human gold",
+        "merge-safety framing",
     ]
     return [f"related work positioning missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
 
