@@ -513,6 +513,23 @@ def check_submission_statement_fields(metadata_text: str) -> list[str]:
     ]
 
 
+def check_research_data_statement(metadata_text: str) -> list[str]:
+    """Check whether target-specific research data statement metadata is present.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages for missing target-specific research data statement fields.
+    """
+    target_journal = scalar_value(metadata_text, "target_journal").strip().lower()
+    statements = parse_mapping_section(metadata_text, "statements")
+    research_data_statement = statements.get("research_data_statement", "")
+    if target_journal == "information systems" and not research_data_statement:
+        return ["research data statement is missing for Information Systems"]
+    return []
+
+
 def check_author_contribution_statement(metadata_text: str) -> list[str]:
     """Check whether final-upload metadata declares author contributions.
 
@@ -640,6 +657,7 @@ def check_final_upload_metadata_text(metadata_text: str) -> list[str]:
     )
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_funding_statement(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_submission_statement_fields(metadata_text))
+    errors.extend(f"final upload metadata unresolved: {message}" for message in check_research_data_statement(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_author_contribution_statement(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_permissions_statement(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_artifact_release_link(metadata_text))

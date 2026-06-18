@@ -37,6 +37,7 @@ statements:
   competing_interests: "The authors declare no competing interests."
   ethics: "This study uses public scholarly metadata and benchmark-style record linkage data; it does not involve human participants, clinical records, private user behavior, or sensitive personal information."
   data_code_availability: "The repository provides source code, small public fixtures, schema contracts, build scripts, and artifact-release instructions. Raw third-party data and full experimental outputs are not redistributed in Git."
+  research_data_statement: ""
 
 funding:
   no_external_funding_declared: false

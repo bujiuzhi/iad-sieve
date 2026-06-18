@@ -2745,6 +2745,7 @@ def check_submission_metadata(metadata_text: str) -> list[str]:
         "corresponding_author:",
         "competing_interests:",
         "data_code_availability:",
+        "research_data_statement:",
         "author_contributions:",
         "credit_taxonomy_required_before_final_upload: true",
         "contribution_statement:",
