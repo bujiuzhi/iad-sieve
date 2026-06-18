@@ -108,6 +108,7 @@ REQUIRED_SECTIONS = [
 ]
 REQUIRED_SUPPLEMENT_SECTIONS = [
     r"\section{Scope}",
+    r"\section{Closest-Work Positioning}",
     r"\section{Reproduction Levels}",
     r"\section{IAD-Bench Schema Contracts}",
     r"\section{Environment Setup}",
@@ -3228,18 +3229,19 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
     ]
 
 
-def check_related_work_positioning(manuscript_text: str) -> list[str]:
+def check_related_work_positioning(manuscript_text: str, supplementary_text: str) -> list[str]:
     """Check whether related work includes closest-work positioning.
 
     参数:
         manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
 
     返回:
         list[str]: Error messages for missing related-work positioning markers.
     """
-    required_markers = [
-        r"\label{tab:closest-work-positioning}",
-        "Positioning against the closest lines of work",
+    required_main_markers = [
+        r"\section{Related Work}",
+        "complete positioning matrix is reported in the supplementary material",
         "End-to-end entity resolution systems",
         "Neural entity matching",
         "Scientific document representations",
@@ -3251,7 +3253,32 @@ def check_related_work_positioning(manuscript_text: str) -> list[str]:
         "does not claim that OpenAlex/OpenCitations silver evidence is human gold",
         "merge-safety framing",
     ]
-    return [f"related work positioning missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+    required_supplement_markers = [
+        r"\section{Closest-Work Positioning}",
+        r"\label{tab:closest-work-positioning}",
+        "Positioning against the closest lines of work",
+        "Line of work",
+        "Primary optimization target",
+        "Limitation for scholarly deduplication",
+        "IAD-Risk distinction",
+        "End-to-end entity resolution systems",
+        "Neural entity matching",
+        "Scientific document representations",
+        "Open scholarly metadata benchmarks",
+        "false-merge risk gates",
+        "gold, proxy, and silver strata",
+    ]
+    errors = [
+        f"related work positioning missing main-text marker: {marker}"
+        for marker in required_main_markers
+        if marker not in manuscript_text
+    ]
+    errors.extend(
+        f"related work positioning missing supplementary marker: {marker}"
+        for marker in required_supplement_markers
+        if marker not in supplementary_text
+    )
+    return errors
 
 
 def check_error_taxonomy(manuscript_text: str) -> list[str]:
@@ -4134,7 +4161,7 @@ def main() -> int:
     errors.extend(check_method_pipeline_figure(manuscript_text))
     errors.extend(check_scoring_merge_algorithm(manuscript_text))
     errors.extend(check_design_alternative_boundaries(manuscript_text))
-    errors.extend(check_related_work_positioning(manuscript_text))
+    errors.extend(check_related_work_positioning(manuscript_text, supplementary_text))
     errors.extend(check_error_taxonomy(manuscript_text))
     errors.extend(check_validity_threats(manuscript_text))
     errors.extend(check_claim_interpretation_boundary(manuscript_text))

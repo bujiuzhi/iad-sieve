@@ -92,23 +92,7 @@ Scientific document representation methods are strong baselines because they int
 
 Scientific language resources and open scholarly metadata make reproducible benchmark construction possible, but they do not remove the need for provenance-aware evaluation. SciBERT shows that domain-specific pretraining on scientific text improves scientific NLP tasks \citep{beltagy2019scibert}, and S2ORC provides metadata, abstracts, references, and structured full text for many open-access papers \citep{lo2019s2orc}. OpenAlex provides a large open index of scholarly works and concepts \citep{priem2022openalex}, while OpenCitations provides open citation data \citep{heibi2019opencitations}. IAD-Bench uses these resources to construct same-work, same-agenda, and agenda-non-identity evidence, but separates gold, proxy, and silver labels so that citation or topic proximity is never presented as human identity gold.
 
-\begin{table}[H]
-\caption{Positioning against the closest lines of work. IAD-Risk differs by treating agenda relatedness as a risk signal for merge decisions rather than as direct identity evidence.}
-\label{tab:closest-work-positioning}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{L{0.18\linewidth}L{0.24\linewidth}L{0.26\linewidth}L{0.24\linewidth}}
-\toprule
-Line of work & Primary optimization target & Limitation for scholarly deduplication & IAD-Risk distinction \\
-\midrule
-End-to-end entity resolution systems & Blocking, matching, labeling, and deployment workflows. & Workflow abstractions do not separate topical relatedness from work identity. & Adds identity-agenda semantics and false-merge risk gates inside matching. \\
-Neural entity matching & Pair-level same-entity classification from tuple or text encoders. & Strong text similarity can still link different papers in one agenda. & Trains same-work, same-agenda, and agenda-non-identity heads with provenance-aware masking. \\
-Scientific document representations & Citation-informed or contrastive scientific relatedness embeddings. & Relatedness embeddings support retrieval but are unsafe as direct merge evidence. & Uses representation similarity as candidate and agenda evidence, then blocks risky merges. \\
-Open scholarly metadata benchmarks & Public metadata, citation, and topic signals for scalable evaluation. & Topic or citation proximity is silver evidence, not human identity gold. & Reports gold, proxy, and silver strata separately and ties claims to label strength. \\
-\bottomrule
-\end{tabular}
-\end{table}
+The closest-work comparison spans End-to-end entity resolution systems, Neural entity matching, Scientific document representations, and Open scholarly metadata benchmarks; the complete positioning matrix is reported in the supplementary material. The main distinction is the combination of false-merge risk gates with gold, proxy, and silver strata for merge-safety framing.
 
 This positioning narrows the novelty claim to four auditable differences. First, the paper treats identity-agenda confusion as a false-merge safety failure rather than as generic semantic relatedness. Second, it evaluates that failure with HNFMR so that agenda-level hard negatives are not hidden inside aggregate pair accuracy. Third, IAD-Bench records label strength and provenance so that gold identity labels, proxy agenda evidence, and silver stress evidence remain separate. Fourth, IAD-Risk turns agenda relatedness into risk evidence through explicit relation heads and a merge gate. IAD-Risk is not a replacement for end-to-end entity resolution workflows, and it is also not a comparative ranking over all neural matching methods; the reported comparisons test the merge-safety framing under the available Open-v2 evidence snapshot. Finally, IAD-Bench does not claim that OpenAlex/OpenCitations silver evidence is human gold, but uses those rows as provenance-marked stress evidence for agenda-level false-merge risk.
 

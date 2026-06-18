@@ -426,6 +426,14 @@ This gate checks whether schema-contract details make the main manuscript harder
 
 The reviewer-facing boundary is readability without loss of reproducibility. Moving the detailed schema tables out of the main text reduces table density and improves first-pass readability, but it does not relax the schema contract. The validator now checks both the main-text field summary and the supplementary schema tables so that reviewers can still audit fixture rebuilding, public-source rebuilding, and artifact validation against the same required fields.
 
+## Audit Cycle 42: Related-Work Positioning Density Gate
+
+Outcome: pass for Related Work table-density reduction; blocked for final numerical audit until the external artifact release remains populated, finalized, checksum-validated, and publicly linked.
+
+This gate checks whether the closest-work positioning matrix interrupts the Related Work narrative. The main manuscript now states the four closest work families and the novelty boundary in prose, while the supplementary material preserves the full positioning table with optimization targets, limitations, and IAD-Risk distinctions.
+
+The reviewer-facing boundary is novelty clarity without table overload. The edit keeps the Related Work section focused on mechanism differences rather than table scanning, while the validator still requires both the main-text novelty boundary and the supplementary positioning matrix.
+
 ## Minimum Gate Before Final Upload
 
 The manuscript should not be uploaded to a journal system until all of the following are true:

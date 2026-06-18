@@ -20,6 +20,28 @@
 
 This supplementary material documents the reproducibility boundary for the manuscript ``IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication.'' It is intended to accompany the main manuscript, not to replace the project repository or the final artifact release. The repository contains executable code, fixture data, schema contracts, and build scripts; large third-party raw data, model checkpoints, and full experimental outputs are kept outside Git and must be distributed through an artifact release when numerical result reproduction is required.
 
+\section{Closest-Work Positioning}
+
+The main manuscript summarizes the novelty boundary in prose. Table~\ref{tab:closest-work-positioning} keeps the full closest-work positioning matrix auditable without interrupting the Related Work narrative.
+
+\begin{table}[H]
+\caption{Positioning against the closest lines of work. IAD-Risk differs by treating agenda relatedness as a risk signal for merge decisions rather than as direct identity evidence.}
+\label{tab:closest-work-positioning}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.18\linewidth}L{0.24\linewidth}L{0.26\linewidth}L{0.24\linewidth}}
+\toprule
+Line of work & Primary optimization target & Limitation for scholarly deduplication & IAD-Risk distinction \\
+\midrule
+End-to-end entity resolution systems & Blocking, matching, labeling, and deployment workflows. & Workflow abstractions do not separate topical relatedness from work identity. & Adds identity-agenda semantics and false-merge risk gates inside matching. \\
+Neural entity matching & Pair-level same-entity classification from tuple or text encoders. & Strong text similarity can still link different papers in one agenda. & Trains same-work, same-agenda, and agenda-non-identity heads with provenance-aware masking. \\
+Scientific document representations & Citation-informed or contrastive scientific relatedness embeddings. & Relatedness embeddings support retrieval but are unsafe as direct merge evidence. & Uses representation similarity as candidate and agenda evidence, then blocks risky merges. \\
+Open scholarly metadata benchmarks & Public metadata, citation, and topic signals for scalable evaluation. & Topic or citation proximity is silver evidence, not human identity gold. & Reports gold, proxy, and silver strata separately and ties claims to label strength. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Reproduction Levels}
 
 \begin{table}[h]

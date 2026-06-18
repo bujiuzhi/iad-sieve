@@ -3424,14 +3424,35 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
     assert any("Artifact release URL or DOI" in error for error in errors)
 
 
-def test_check_related_work_positioning_rejects_missing_novelty_boundaries() -> None:
-    """验证 Related Work 必须说明最接近工作的创新边界。"""
+def test_check_related_work_positioning_accepts_main_text_and_supplementary_matrix() -> None:
+    """验证 Related Work 正文和补充材料共同保留创新边界时可通过检查。"""
 
     module = _load_validate_manuscript_module()
     manuscript_text = "\n".join(
         [
+            r"\section{Related Work}",
+            "The complete positioning matrix is reported in the supplementary material.",
+            "End-to-end entity resolution systems",
+            "Neural entity matching",
+            "Scientific document representations",
+            "Open scholarly metadata benchmarks",
+            "false-merge risk gates",
+            "gold, proxy, and silver strata",
+            "The method is not a replacement for end-to-end entity resolution workflows.",
+            "It is not a comparative ranking over all neural matching methods.",
+            "It does not claim that OpenAlex/OpenCitations silver evidence is human gold.",
+            "The evidence supports the merge-safety framing.",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Closest-Work Positioning}",
             r"\label{tab:closest-work-positioning}",
             "Positioning against the closest lines of work",
+            "Line of work",
+            "Primary optimization target",
+            "Limitation for scholarly deduplication",
+            "IAD-Risk distinction",
             "End-to-end entity resolution systems",
             "Neural entity matching",
             "Scientific document representations",
@@ -3441,7 +3462,46 @@ def test_check_related_work_positioning_rejects_missing_novelty_boundaries() -> 
         ]
     )
 
-    errors = module.check_related_work_positioning(manuscript_text)
+    errors = module.check_related_work_positioning(manuscript_text, supplementary_text)
+
+    assert errors == []
+
+
+def test_check_related_work_positioning_rejects_missing_novelty_boundaries() -> None:
+    """验证 Related Work 必须说明最接近工作的创新边界。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\section{Related Work}",
+            "The complete positioning matrix is reported in the supplementary material.",
+            "End-to-end entity resolution systems",
+            "Neural entity matching",
+            "Scientific document representations",
+            "Open scholarly metadata benchmarks",
+            "false-merge risk gates",
+            "gold, proxy, and silver strata",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Closest-Work Positioning}",
+            r"\label{tab:closest-work-positioning}",
+            "Positioning against the closest lines of work",
+            "Line of work",
+            "Primary optimization target",
+            "Limitation for scholarly deduplication",
+            "IAD-Risk distinction",
+            "End-to-end entity resolution systems",
+            "Neural entity matching",
+            "Scientific document representations",
+            "Open scholarly metadata benchmarks",
+            "false-merge risk gates",
+            "gold, proxy, and silver strata",
+        ]
+    )
+
+    errors = module.check_related_work_positioning(manuscript_text, supplementary_text)
 
     assert any("not a replacement for end-to-end entity resolution workflows" in error for error in errors)
     assert any("not a comparative ranking over all neural matching methods" in error for error in errors)
