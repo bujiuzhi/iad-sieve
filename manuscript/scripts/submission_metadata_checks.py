@@ -30,6 +30,11 @@ AUTHOR_VISIBLE_REVIEW_JOURNALS = {
     "information systems": "Information Systems",
     "scientometrics": "Scientometrics",
 }
+ELSEVIER_TARGET_JOURNALS = {
+    "data & knowledge engineering",
+    "information systems",
+}
+DKE_ELSEVIER_FILE_REQUIREMENT_ERROR = "DKE/Elsevier final upload requires DKE/Elsevier source and PDF files"
 FINAL_UPLOAD_TRUE_FIELDS = {
     "target_journal_template_bound": "target journal template is not bound",
     "target_journal_selected": "target journal checklist item is incomplete",
@@ -339,6 +344,19 @@ def check_final_upload_review_mode(metadata_text: str) -> list[str]:
         journal_name = AUTHOR_VISIBLE_REVIEW_JOURNALS[normalized_target]
         return [f"review mode must include final author identities for {journal_name}"]
     return []
+
+
+def target_journal_requires_elsevier_files(metadata_text: str) -> bool:
+    """Return whether the selected target journal needs Elsevier package files.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        bool: True when final upload should include DKE/Elsevier source and PDF files.
+    """
+    target_journal = scalar_value(metadata_text, "target_journal")
+    return target_journal.strip().lower() in ELSEVIER_TARGET_JOURNALS
 
 
 def check_final_upload_cover_letter_text(cover_letter_text: str, metadata_text: str) -> list[str]:

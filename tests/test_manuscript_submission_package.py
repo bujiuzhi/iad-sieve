@@ -235,6 +235,90 @@ def _write_final_upload_cover_letter(manuscript_root: Path) -> None:
     )
 
 
+def _write_dke_final_upload_metadata(manuscript_root: Path) -> None:
+    """写入满足 DKE 正式上传门禁的投稿元数据。
+
+    参数:
+        manuscript_root: 临时稿件目录。
+
+    返回:
+        无。
+    """
+    _write_file(
+        manuscript_root / "submission_metadata.yml",
+        "\n".join(
+            [
+                "submission:",
+                '  title: "IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication"',
+                '  article_type: "research_article"',
+                '  review_mode: "single_anonymized_author_visible_final_upload"',
+                '  target_journal: "Data & Knowledge Engineering"',
+                "  target_journal_template_bound: true",
+                "  author_metadata_required_before_final_upload: true",
+                "",
+                "authors:",
+                '  - name: "Example Author"',
+                '    affiliation: "Example University"',
+                '    email: "author@example.edu"',
+                '    orcid: "0000-0002-1825-0097"',
+                "",
+                "corresponding_author:",
+                '  name: "Example Author"',
+                '  affiliation: "Example University"',
+                '  email: "author@example.edu"',
+                '  orcid: "0000-0002-1825-0097"',
+                "",
+                "artifact_boundary:",
+                '  artifact_release_url: "https://doi.org/10.0000/example"',
+                '  artifact_release_doi: "10.0000/example"',
+                "",
+                "final_upload_checklist:",
+                "  target_journal_selected: true",
+                "  target_journal_template_applied: true",
+                "  author_metadata_completed: true",
+                "  corresponding_author_completed: true",
+                "  manuscript_pdf_rebuilt_after_template: true",
+                "  supplementary_pdf_rebuilt_after_template: true",
+                "  submission_system_files_verified: true",
+                "  artifact_release_prepared_or_linked: true",
+            ]
+        )
+        + "\n",
+    )
+
+
+def _write_dke_final_upload_cover_letter(manuscript_root: Path) -> None:
+    """写入满足 DKE 正式上传门禁的投稿信。
+
+    参数:
+        manuscript_root: 临时稿件目录。
+
+    返回:
+        无。
+    """
+    _write_file(
+        manuscript_root / "cover_letter.md",
+        "\n".join(
+            [
+                "# Cover Letter",
+                "",
+                "Dear Editors of Data & Knowledge Engineering,",
+                "",
+                "We submit the manuscript titled "
+                '"IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication" '
+                "for consideration as a research article in Data & Knowledge Engineering.",
+                "The final-upload manuscript uses the selected Elsevier template and author-visible title page.",
+                "The artifact release URL or DOI is recorded in submission_metadata.yml and supports result-level review.",
+                "",
+                "Sincerely,",
+                "",
+                "Example Author",
+            ]
+        )
+        + "\n",
+    )
+
+
 def _write_malformed_final_upload_metadata(manuscript_root: Path) -> None:
     """写入结构不完整的正式上传元数据。
 
@@ -358,6 +442,23 @@ def test_build_submission_package_accepts_final_upload_with_filled_metadata(tmp_
     assert manifest["anonymization"]["author_status"] == "provided_for_final_upload"
     assert manifest["journal_template"]["target_journal_bound"] is True
     assert "artifact release linked" in manifest["journal_template"]["final_upload_requirements"]
+
+
+def test_build_submission_package_rejects_dke_final_upload_without_elsevier_files(tmp_path) -> None:
+    """验证 DKE 正式上传包必须包含 Elsevier/DKE 源文件。"""
+
+    module = _load_submission_package_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_dke_final_upload_metadata(manuscript_root)
+    _write_dke_final_upload_cover_letter(manuscript_root)
+
+    with pytest.raises(ValueError) as exc_info:
+        module.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
+
+    assert "DKE/Elsevier final upload requires DKE/Elsevier source and PDF files" in str(exc_info.value)
 
 
 def test_build_submission_package_rejects_generic_final_upload_cover_letter(tmp_path) -> None:
@@ -563,6 +664,24 @@ def test_validate_submission_package_accepts_final_upload_with_filled_metadata(t
     errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True)
 
     assert errors == []
+
+
+def test_validate_submission_package_rejects_dke_final_upload_without_elsevier_profile(tmp_path) -> None:
+    """验证 DKE 正式上传校验拒绝缺少 DKE/Elsevier profile 的包。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_dke_final_upload_metadata(manuscript_root)
+    _write_dke_final_upload_cover_letter(manuscript_root)
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path)
+    errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True)
+
+    assert any("DKE/Elsevier final upload requires DKE/Elsevier source and PDF files" in error for error in errors)
 
 
 def test_validate_submission_package_rejects_final_upload_manifest_with_anonymous_stage(tmp_path) -> None:

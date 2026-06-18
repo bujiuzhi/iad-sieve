@@ -23,7 +23,12 @@ MANUSCRIPT_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_ROOT = Path(__file__).resolve().parent
 if str(SCRIPT_ROOT) not in sys.path:
     sys.path.insert(0, str(SCRIPT_ROOT))
-from submission_metadata_checks import check_final_upload_cover_letter_text, check_final_upload_metadata_text
+from submission_metadata_checks import (
+    DKE_ELSEVIER_FILE_REQUIREMENT_ERROR,
+    check_final_upload_cover_letter_text,
+    check_final_upload_metadata_text,
+    target_journal_requires_elsevier_files,
+)
 
 DEFAULT_OUTPUT_DIR = MANUSCRIPT_ROOT / "build" / "submission_package"
 DEFAULT_ZIP_PATH = MANUSCRIPT_ROOT / "build" / "iad-risk-submission-package.zip"
@@ -144,11 +149,12 @@ def copy_submission_files(manuscript_root: Path, output_dir: Path, dke_preflight
     return records
 
 
-def check_final_upload_metadata(manuscript_root: Path) -> list[str]:
+def check_final_upload_metadata(manuscript_root: Path, dke_preflight: bool = False) -> list[str]:
     """Check whether submission metadata is ready for final journal upload.
 
     参数:
         manuscript_root: Manuscript root directory.
+        dke_preflight: Whether the package includes DKE/Elsevier source and PDF files.
 
     返回:
         list[str]: Error messages for unresolved final-upload metadata.
@@ -157,7 +163,10 @@ def check_final_upload_metadata(manuscript_root: Path) -> list[str]:
     if not metadata_path.exists():
         return ["missing submission_metadata.yml for final upload"]
     metadata_text = metadata_path.read_text(encoding="utf-8")
-    return check_final_upload_metadata_text(metadata_text)
+    errors = check_final_upload_metadata_text(metadata_text)
+    if target_journal_requires_elsevier_files(metadata_text) and not dke_preflight:
+        errors.append(DKE_ELSEVIER_FILE_REQUIREMENT_ERROR)
+    return errors
 
 
 def check_final_upload_cover_letter(manuscript_root: Path) -> list[str]:
@@ -324,7 +333,7 @@ def build_submission_package(
         ValueError: Raised when final-upload metadata is unresolved.
     """
     if final_upload:
-        final_upload_errors = check_final_upload_metadata(manuscript_root)
+        final_upload_errors = check_final_upload_metadata(manuscript_root, dke_preflight)
         final_upload_errors.extend(check_final_upload_cover_letter(manuscript_root))
         if final_upload_errors:
             raise ValueError("; ".join(final_upload_errors))

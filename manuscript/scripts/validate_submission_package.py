@@ -23,8 +23,10 @@ SCRIPT_ROOT = Path(__file__).resolve().parent
 if str(SCRIPT_ROOT) not in sys.path:
     sys.path.insert(0, str(SCRIPT_ROOT))
 from submission_metadata_checks import (
+    DKE_ELSEVIER_FILE_REQUIREMENT_ERROR,
     check_final_upload_cover_letter_text as check_structured_final_upload_cover_letter_text,
     check_final_upload_metadata_text as check_structured_final_upload_metadata_text,
+    target_journal_requires_elsevier_files,
 )
 
 DEFAULT_PACKAGE_DIR = MANUSCRIPT_ROOT / "build" / "submission_package"
@@ -476,6 +478,8 @@ def validate_package_directory(package_dir: Path, final_upload: bool = False, dk
         if metadata_path.exists():
             metadata_text = metadata_path.read_text(encoding="utf-8")
             errors.extend(check_final_upload_metadata_text(metadata_text))
+            if target_journal_requires_elsevier_files(metadata_text) and not dke_preflight:
+                errors.append(DKE_ELSEVIER_FILE_REQUIREMENT_ERROR)
             if cover_letter_path.exists():
                 errors.extend(check_final_upload_cover_letter_text(cover_letter_path.read_text(encoding="utf-8"), metadata_text))
             else:
@@ -575,6 +579,8 @@ def validate_zip_archive(
                 except KeyError as exc:
                     return errors + [f"zip archive missing submission_metadata.yml for final upload: {exc}"]
                 errors.extend(check_final_upload_metadata_text(metadata_text))
+                if target_journal_requires_elsevier_files(metadata_text) and not dke_preflight:
+                    errors.append(DKE_ELSEVIER_FILE_REQUIREMENT_ERROR)
                 try:
                     cover_letter_text = archive.read(f"{package_root_name}/cover_letter.md").decode("utf-8")
                 except KeyError as exc:
