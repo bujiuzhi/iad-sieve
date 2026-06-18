@@ -91,6 +91,44 @@ REQUIRED_ABLATION_PROTOCOL_VARIANTS = {
     "no-cannot-link",
     "post-hoc-threshold",
 }
+MANUAL_VALIDATION_SLICE_REQUIRED_COLUMNS = {
+    "pair_id",
+    "source_document_id",
+    "target_document_id",
+    "manual_validation_stratum",
+    "reviewer_1_code",
+    "reviewer_2_code",
+    "reviewer_1_label",
+    "reviewer_2_label",
+    "adjudicated_label",
+    "reviewer_blinding_confirmed",
+    "model_score_hidden",
+    "merge_decision_hidden",
+    "adjudication_status",
+    "adjudication_rationale",
+    "pair_level_notes",
+    "agreement_status",
+}
+MANUAL_VALIDATION_REQUIRED_STRATA = {
+    "silver_hard_negative",
+    "high_score_false_merge_candidate",
+    "blocked_or_deferred",
+    "model_disagreement",
+    "version_boundary",
+    "identifier_conflict",
+    "sparse_metadata",
+}
+MANUAL_VALIDATION_ALLOWED_LABELS = {
+    "same_work",
+    "agenda_non_identity",
+    "unrelated",
+    "version_boundary",
+    "uncertain",
+}
+MANUAL_VALIDATION_ALLOWED_AGREEMENT_STATUSES = {"agreement", "disagreement"}
+MANUAL_VALIDATION_ALLOWED_ADJUDICATION_STATUSES = {"agreement_confirmed", "adjudicated"}
+MANUAL_VALIDATION_MIN_ROWS = 500
+MANUAL_VALIDATION_MAX_ROWS = 1000
 JSONL_REQUIRED_FIELDS_BY_ARTIFACT = {
     "iad_risk_predictions": {
         "system",
@@ -629,6 +667,108 @@ def check_ablation_suite_schema(csv_path: Path) -> list[str]:
     return errors
 
 
+def check_manual_validation_slice_schema(csv_path: Path) -> list[str]:
+    """Check manual-validation slice columns, strata coverage, and review protocol fields.
+
+    参数:
+        csv_path: Path to reports/manual_validation_slice.csv.
+
+    返回:
+        list[str]: Error messages for missing protocol evidence or invalid rows.
+    """
+    try:
+        with csv_path.open("r", encoding="utf-8", newline="") as file_handle:
+            reader = csv.DictReader(file_handle)
+            header = [column.strip() for column in (reader.fieldnames or []) if column and column.strip()]
+            rows = [{str(key).strip(): value for key, value in raw_row.items() if key is not None} for raw_row in reader]
+    except OSError as exc:
+        return [f"manual_validation_slice CSV cannot be read: {exc}"]
+    if not header:
+        return ["manual_validation_slice CSV is empty or missing a header row"]
+
+    errors: list[str] = []
+    actual_columns = set(header)
+    missing_columns = MANUAL_VALIDATION_SLICE_REQUIRED_COLUMNS - actual_columns
+    for column in sorted(missing_columns):
+        errors.append(f"manual_validation_slice CSV missing protocol audit column: {column}")
+    if missing_columns:
+        return errors
+
+    row_count = len(rows)
+    if row_count == 0:
+        return ["manual_validation_slice CSV has no data rows"]
+    if not MANUAL_VALIDATION_MIN_ROWS <= row_count <= MANUAL_VALIDATION_MAX_ROWS:
+        errors.append(
+            "manual_validation_slice CSV row count must be between "
+            f"{MANUAL_VALIDATION_MIN_ROWS} and {MANUAL_VALIDATION_MAX_ROWS}; found {row_count}"
+        )
+
+    present_strata = {str(row.get("manual_validation_stratum", "")).strip() for row in rows}
+    missing_strata = MANUAL_VALIDATION_REQUIRED_STRATA - present_strata
+    if missing_strata:
+        errors.append(f"manual_validation_slice CSV missing required strata: {sorted(missing_strata)}")
+
+    reviewer_codes: set[str] = set()
+    required_text_fields = [
+        "pair_id",
+        "source_document_id",
+        "target_document_id",
+        "manual_validation_stratum",
+        "reviewer_1_code",
+        "reviewer_2_code",
+        "reviewer_1_label",
+        "reviewer_2_label",
+        "adjudicated_label",
+        "adjudication_status",
+        "adjudication_rationale",
+        "pair_level_notes",
+        "agreement_status",
+    ]
+    required_true_fields = ["reviewer_blinding_confirmed", "model_score_hidden", "merge_decision_hidden"]
+    for line_number, row in enumerate(rows, start=2):
+        for field in required_text_fields:
+            if not str(row.get(field, "")).strip():
+                errors.append(f"manual_validation_slice CSV line {line_number} missing required value: {field}")
+
+        reviewer_1_code = str(row.get("reviewer_1_code", "")).strip()
+        reviewer_2_code = str(row.get("reviewer_2_code", "")).strip()
+        if reviewer_1_code:
+            reviewer_codes.add(reviewer_1_code)
+        if reviewer_2_code:
+            reviewer_codes.add(reviewer_2_code)
+        if reviewer_1_code and reviewer_2_code and reviewer_1_code == reviewer_2_code:
+            errors.append(f"manual_validation_slice CSV line {line_number} must use two independent reviewer codes")
+
+        stratum = str(row.get("manual_validation_stratum", "")).strip()
+        if stratum and stratum not in MANUAL_VALIDATION_REQUIRED_STRATA:
+            errors.append(f"manual_validation_slice CSV line {line_number} has unknown manual_validation_stratum: {stratum}")
+
+        for label_field in ["reviewer_1_label", "reviewer_2_label", "adjudicated_label"]:
+            label_value = str(row.get(label_field, "")).strip()
+            if label_value and label_value not in MANUAL_VALIDATION_ALLOWED_LABELS:
+                errors.append(f"manual_validation_slice CSV line {line_number} has unknown {label_field}: {label_value}")
+
+        for field in required_true_fields:
+            if not _csv_truthy(row.get(field)):
+                errors.append(f"manual_validation_slice CSV line {line_number} must set {field}=true")
+
+        agreement_status = str(row.get("agreement_status", "")).strip()
+        if agreement_status and agreement_status not in MANUAL_VALIDATION_ALLOWED_AGREEMENT_STATUSES:
+            errors.append(f"manual_validation_slice CSV line {line_number} has unknown agreement_status: {agreement_status}")
+        adjudication_status = str(row.get("adjudication_status", "")).strip()
+        if adjudication_status and adjudication_status not in MANUAL_VALIDATION_ALLOWED_ADJUDICATION_STATUSES:
+            errors.append(f"manual_validation_slice CSV line {line_number} has unknown adjudication_status: {adjudication_status}")
+        if agreement_status == "disagreement" and adjudication_status != "adjudicated":
+            errors.append(f"manual_validation_slice CSV line {line_number} disagreement rows must set adjudication_status=adjudicated")
+        if len(errors) >= 30:
+            errors.append("manual_validation_slice CSV schema check stopped after 30 errors")
+            return errors
+
+    if len(reviewer_codes) < 2:
+        errors.append("manual_validation_slice CSV must include at least two distinct reviewer codes")
+    return errors
+
+
 def _missing_jsonl_required_fields(row: dict[str, Any], required_fields: set[str]) -> list[str]:
     """Return required JSONL fields that are absent or empty.
 
@@ -790,6 +930,18 @@ def check_manifest_artifacts(
             and (artifact_dir / ablation_location).is_file()
         ):
             errors.extend(check_ablation_suite_schema(artifact_dir / ablation_location))
+
+    manual_validation_row = artifact_rows.get("manual_validation_slice")
+    if isinstance(manual_validation_row, dict):
+        manual_validation_location = str(manual_validation_row.get("expected_location", "")).strip()
+        manual_validation_location_path = Path(manual_validation_location)
+        if (
+            manual_validation_location
+            and not manual_validation_location_path.is_absolute()
+            and ".." not in manual_validation_location_path.parts
+            and (artifact_dir / manual_validation_location).is_file()
+        ):
+            errors.extend(check_manual_validation_slice_schema(artifact_dir / manual_validation_location))
 
     claim_boundaries = manifest.get("claim_boundaries")
     if isinstance(claim_boundaries, dict):

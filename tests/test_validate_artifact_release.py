@@ -264,6 +264,111 @@ def _add_ablation_suite_artifact(artifact_dir: Path, csv_content: str | None = N
     _refresh_checksums(artifact_dir)
 
 
+def _complete_manual_validation_slice_csv(row_count: int = 500, omitted_strata: set[str] | None = None) -> str:
+    """生成满足人工验证协议 schema 的 CSV 内容。
+
+    参数:
+        row_count: 人工验证样本行数。
+        omitted_strata: 需要从测试样本中排除的 strata。
+
+    返回:
+        str: manual_validation_slice CSV 内容。
+    """
+    header = [
+        "pair_id",
+        "source_document_id",
+        "target_document_id",
+        "manual_validation_stratum",
+        "reviewer_1_code",
+        "reviewer_2_code",
+        "reviewer_1_label",
+        "reviewer_2_label",
+        "adjudicated_label",
+        "reviewer_blinding_confirmed",
+        "model_score_hidden",
+        "merge_decision_hidden",
+        "adjudication_status",
+        "adjudication_rationale",
+        "pair_level_notes",
+        "agreement_status",
+    ]
+    omitted_strata = omitted_strata or set()
+    strata = [
+        stratum
+        for stratum in [
+            "silver_hard_negative",
+            "high_score_false_merge_candidate",
+            "blocked_or_deferred",
+            "model_disagreement",
+            "version_boundary",
+            "identifier_conflict",
+            "sparse_metadata",
+        ]
+        if stratum not in omitted_strata
+    ]
+    label_cycle = ["same_work", "agenda_non_identity", "unrelated", "version_boundary", "uncertain"]
+    lines = [",".join(header)]
+    for index in range(row_count):
+        stratum = strata[index % len(strata)]
+        reviewer_1_label = label_cycle[index % len(label_cycle)]
+        agreement_status = "disagreement" if index % 5 == 0 else "agreement"
+        reviewer_2_label = reviewer_1_label if agreement_status == "agreement" else label_cycle[(index + 1) % len(label_cycle)]
+        adjudication_status = "adjudicated" if agreement_status == "disagreement" else "agreement_confirmed"
+        row = [
+            f"pair-{index:04d}",
+            f"source-{index:04d}",
+            f"target-{index:04d}",
+            stratum,
+            "reviewer_a",
+            "reviewer_b",
+            reviewer_1_label,
+            reviewer_2_label,
+            reviewer_1_label,
+            "true",
+            "true",
+            "true",
+            adjudication_status,
+            f"rationale-{index:04d}",
+            f"pair-note-{index:04d}",
+            agreement_status,
+        ]
+        lines.append(",".join(row))
+    return "\n".join(lines) + "\n"
+
+
+def _add_manual_validation_slice_artifact(
+    artifact_dir: Path,
+    csv_content: str | None = None,
+    human_claimed: bool = True,
+) -> None:
+    """向测试 release 添加 manual_validation_slice artifact。
+
+    参数:
+        artifact_dir: Release 目录。
+        csv_content: 可选 manual_validation_slice CSV 内容。
+        human_claimed: 是否打开 human_validation_claimed。
+
+    返回:
+        无。
+    """
+    manual_validation_path = artifact_dir / "reports" / "manual_validation_slice.csv"
+    _write_file(manual_validation_path, csv_content or _complete_manual_validation_slice_csv())
+    manifest_path = artifact_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["claim_boundaries"]["human_validation_claimed"] = human_claimed
+    manifest["required_artifacts"].append(
+        {
+            "artifact_id": "manual_validation_slice",
+            "required": human_claimed,
+            "expected_location": "reports/manual_validation_slice.csv",
+            "sha256": _sha256_file(manual_validation_path),
+            "claim_support": "Manual validation artifact with 500-1000 blinded adjudicated rows.",
+        }
+    )
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    _refresh_checksums(artifact_dir)
+
+
 def _complete_readme_text() -> str:
     """生成包含必需复现说明的测试 README。
 
@@ -672,3 +777,63 @@ def test_validate_artifact_release_rejects_post_hoc_ablation_as_component_causal
     errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
 
     assert any("post-hoc-threshold row must not be accepted for component causality" in error for error in errors)
+
+
+def test_validate_artifact_release_accepts_claimed_human_validation_with_protocol_slice(tmp_path) -> None:
+    """验证 human validation claim 只有在人工验证协议字段完整时通过。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    _add_manual_validation_slice_artifact(artifact_dir)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert errors == []
+
+
+def test_validate_artifact_release_rejects_manual_validation_slice_below_protocol_size(tmp_path) -> None:
+    """验证人工验证 slice 少于 500 行时会被拒绝。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    _add_manual_validation_slice_artifact(artifact_dir, _complete_manual_validation_slice_csv(row_count=499))
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("manual_validation_slice CSV row count must be between 500 and 1000" in error for error in errors)
+
+
+def test_validate_artifact_release_rejects_manual_validation_slice_missing_required_stratum(tmp_path) -> None:
+    """验证人工验证 slice 缺少必要 strata 时会被拒绝。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    csv_content = _complete_manual_validation_slice_csv(omitted_strata={"identifier_conflict"})
+    _add_manual_validation_slice_artifact(artifact_dir, csv_content)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("manual_validation_slice CSV missing required strata" in error for error in errors)
+    assert any("identifier_conflict" in error for error in errors)
+
+
+def test_validate_artifact_release_rejects_manual_validation_slice_without_blinding(tmp_path) -> None:
+    """验证人工验证 slice 缺少盲审确认时会被拒绝。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    invalid_csv = _complete_manual_validation_slice_csv().replace(
+        "pair-0000,source-0000,target-0000,silver_hard_negative,reviewer_a,reviewer_b,"
+        "same_work,agenda_non_identity,same_work,true,true,true,adjudicated,rationale-0000,pair-note-0000,disagreement",
+        "pair-0000,source-0000,target-0000,silver_hard_negative,reviewer_a,reviewer_b,"
+        "same_work,agenda_non_identity,same_work,false,true,true,adjudicated,rationale-0000,pair-note-0000,disagreement",
+    )
+    _add_manual_validation_slice_artifact(artifact_dir, invalid_csv)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("manual_validation_slice CSV line 2 must set reviewer_blinding_confirmed=true" in error for error in errors)

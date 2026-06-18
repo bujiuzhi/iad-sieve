@@ -110,7 +110,7 @@
       "artifact_id": "manual_validation_slice",
       "required": false,
       "expected_location": "reports/manual_validation_slice.csv",
-      "claim_support": "Human label-precision claims only if cited by the final manuscript."
+      "claim_support": "Human label-precision claims only if cited by the final manuscript. The CSV must contain a 500-1000 pair reviewed slice with manual_validation_stratum coverage for silver_hard_negative, high_score_false_merge_candidate, blocked_or_deferred, model_disagreement, version_boundary, identifier_conflict, and sparse_metadata; two independent reviewer codes through reviewer_1_code and reviewer_2_code; labels in reviewer_1_label, reviewer_2_label, and adjudicated_label; blinding fields reviewer_blinding_confirmed, model_score_hidden, and merge_decision_hidden; adjudication_status, adjudication_rationale, pair_level_notes, and agreement_status."
     },
     {
       "artifact_id": "cluster_metric_summary",

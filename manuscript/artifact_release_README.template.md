@@ -60,6 +60,8 @@ python scripts/check_public_release.py
   - logs/processing_run_log.jsonl must record command line, code commit, environment summary, random seed, start and finish timestamps, input manifest reference, output path, and exit status for each rebuild stage.
 - ablation_suite
   - reports/iad_ablation_suite.csv is required before component-causality claims. It must include protocol_variant rows for no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold, with protocol_required, accepted_for_component_causality, threshold_source, protocol_scope_rule, requires_prediction_rows, denominators, and false-merge metrics. The post-hoc-threshold row must use threshold_source=post_hoc_labeled_sweep and must not be treated as standalone component-causality evidence.
+- manual_validation_slice
+  - reports/manual_validation_slice.csv is required before human-validation claims. It must contain a 500-1000 pair reviewed slice with manual_validation_stratum coverage for silver_hard_negative, high_score_false_merge_candidate, blocked_or_deferred, model_disagreement, version_boundary, identifier_conflict, and sparse_metadata; two independent reviewer codes through reviewer_1_code and reviewer_2_code; labels in reviewer_1_label, reviewer_2_label, and adjudicated_label; blinding fields reviewer_blinding_confirmed, model_score_hidden, and merge_decision_hidden; adjudication_status, adjudication_rationale, pair_level_notes, and agreement_status.
 - cluster_metric_summary
 - cannot_link_audit
 

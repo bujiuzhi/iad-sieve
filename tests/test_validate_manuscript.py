@@ -4081,7 +4081,19 @@ def test_check_artifact_release_manifest_template_accepts_complete_template() ->
                         "post_hoc_labeled_sweep and must not be accepted as standalone component-causality evidence."
                     ),
                 },
-                {"artifact_id": "manual_validation_slice"},
+                {
+                    "artifact_id": "manual_validation_slice",
+                    "claim_support": (
+                        "Human label-precision claims only if cited by the final manuscript. The CSV must contain "
+                        "a 500-1000 pair reviewed slice with manual_validation_stratum coverage for "
+                        "silver_hard_negative, high_score_false_merge_candidate, blocked_or_deferred, "
+                        "model_disagreement, version_boundary, identifier_conflict, and sparse_metadata; "
+                        "two independent reviewer codes through reviewer_1_code and reviewer_2_code; labels in "
+                        "reviewer_1_label, reviewer_2_label, and adjudicated_label; blinding fields "
+                        "reviewer_blinding_confirmed, model_score_hidden, and merge_decision_hidden; "
+                        "adjudication_status, adjudication_rationale, pair_level_notes, and agreement_status."
+                    ),
+                },
                 {"artifact_id": "threshold_sensitivity_grid"},
                 {"artifact_id": "cluster_metric_summary"},
                 {"artifact_id": "cannot_link_audit"},
@@ -4416,6 +4428,29 @@ def test_check_artifact_release_readme_template_accepts_complete_template() -> N
             "false-merge metrics",
             "post_hoc_labeled_sweep",
             "standalone component-causality evidence",
+            "manual_validation_slice",
+            "500-1000 pair reviewed slice",
+            "manual_validation_stratum",
+            "silver_hard_negative",
+            "high_score_false_merge_candidate",
+            "blocked_or_deferred",
+            "model_disagreement",
+            "version_boundary",
+            "identifier_conflict",
+            "sparse_metadata",
+            "two independent reviewer codes",
+            "reviewer_1_code",
+            "reviewer_2_code",
+            "reviewer_1_label",
+            "reviewer_2_label",
+            "adjudicated_label",
+            "reviewer_blinding_confirmed",
+            "model_score_hidden",
+            "merge_decision_hidden",
+            "adjudication_status",
+            "adjudication_rationale",
+            "pair_level_notes",
+            "agreement_status",
             "cluster_metric_summary",
             "cannot_link_audit",
             "## Conditional Claim Artifacts",
@@ -5446,7 +5481,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 78.",
+            "Completed audit cycles: 79.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -6074,6 +6109,17 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "reports/iad_ablation_suite.csv",
             "missing protocol variants",
             "post-hoc-threshold row marked as component-causality evidence",
+            "## Audit Cycle 79: Manual Validation Artifact Release Schema Gate",
+            "manual-validation artifact release schema validation",
+            "reports/manual_validation_slice.csv",
+            "500-1000 pair reviewed slice",
+            "`manual_validation_stratum`",
+            "`reviewer_blinding_confirmed`",
+            "`adjudication_rationale`",
+            "`pair_level_notes`",
+            "`human_validation_claimed`",
+            "missing required strata",
+            "non-blinded reviewer rows",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -6092,7 +6138,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 78",
+        "Completed audit cycles: 79",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -6103,7 +6149,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 78" in error for error in errors)
+    assert any("Completed audit cycles: 79" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
