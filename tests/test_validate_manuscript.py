@@ -103,7 +103,7 @@ def test_check_final_upload_information_request_rejects_missing_credit_roles() -
             "python manuscript/scripts/validate_submission_package.py --final-upload",
             "Primary `submission_metadata.yml` target",
             "Additional file or system target",
-            "`submission`, `target_preparation`, `final_upload_checklist.target_journal_selected`",
+            "`submission`, `target_preparation`, `target_journal_template_bound`, `final_upload_checklist.target_journal_selected`",
             "`authors`, `author_contributions.roles`, `final_upload_checklist.author_metadata_completed`",
             "`corresponding_author`, `final_upload_checklist.corresponding_author_completed`",
             "`funding`, `statements`, `final_upload_checklist.funding_statement_text_ready`",
@@ -163,12 +163,14 @@ def test_check_final_upload_information_request_rejects_missing_metadata_mapping
         "`repository_reference`, `artifact_boundary`, `statements.research_data_statement`",
         "`repository_reference`",
     )
+    request_text = request_text.replace("target_journal_template_bound", "target_journal_template")
 
     errors = module.check_final_upload_information_request(request_text)
 
     assert any("Submission metadata mapping" in error for error in errors)
     assert any("Primary `submission_metadata.yml` target" in error for error in errors)
     assert any("statements.research_data_statement" in error for error in errors)
+    assert any("target_journal_template_bound" in error for error in errors)
 
 
 def test_check_final_upload_information_request_rejects_legacy_checklist_names() -> None:

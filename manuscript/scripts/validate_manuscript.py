@@ -353,7 +353,7 @@ def check_final_upload_information_request(request_text: str) -> list[str]:
         "python manuscript/scripts/validate_submission_package.py --final-upload",
         "Primary `submission_metadata.yml` target",
         "Additional file or system target",
-        "`submission`, `target_preparation`, `final_upload_checklist.target_journal_selected`",
+        "`submission`, `target_preparation`, `target_journal_template_bound`, `final_upload_checklist.target_journal_selected`",
         "`authors`, `author_contributions.roles`, `final_upload_checklist.author_metadata_completed`",
         "`corresponding_author`, `final_upload_checklist.corresponding_author_completed`",
         "`funding`, `statements`, `final_upload_checklist.funding_statement_text_ready`",
