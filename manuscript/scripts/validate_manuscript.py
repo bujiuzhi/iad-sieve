@@ -755,6 +755,7 @@ def check_submission_system_checklist(checklist_text: str) -> list[str]:
         "iad-risk-manuscript-elsevier.pdf",
         "does not complete the final-upload gate",
         "No `data/`, `outputs/`, cache, local connection, credential, or raw third-party file",
+        "author email addresses, ORCID values, personal account URLs, local absolute paths, or tool-generated process notes",
         "Target journal has not been author-confirmed",
         "Artifact release URL or DOI has not been created",
     ]

@@ -311,6 +311,60 @@ def test_validate_submission_package_accepts_generated_package(tmp_path) -> None
     assert errors == []
 
 
+def test_validate_submission_package_rejects_directory_text_hygiene_leaks(tmp_path) -> None:
+    """验证投稿包目录文本中出现本机路径和过程痕迹时会被拒绝。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path)
+    local_path_example = "/" + "Users" + "/reviewer/work/code/python/iad-sieve"
+    _write_file(
+        output_dir / "cover_letter.md",
+        f"Draft copied from {local_path_example}.\nCodex work record.\n",
+    )
+    builder.write_checksums(output_dir)
+    errors = validator.validate_package_directory(output_dir)
+
+    assert any("local macOS absolute path" in error for error in errors)
+    assert any("AI/tool trace" in error for error in errors)
+
+
+def test_validate_submission_package_rejects_anonymous_identity_leaks_in_zip(tmp_path) -> None:
+    """验证匿名投稿 zip 内出现邮箱、ORCID 和个人账号时会被拒绝。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path)
+    _write_file(
+        output_dir / "submission_metadata.yml",
+        "\n".join(
+            [
+                'corresponding_author_email: "author@example.edu"',
+                'orcid: "0000-0000-0000-0000"',
+                'repository: "https://github.com/bujiuzhi/iad-sieve"',
+            ]
+        )
+        + "\n",
+    )
+    builder.write_checksums(output_dir)
+    builder.create_zip_archive(output_dir, zip_path)
+    errors = validator.validate_zip_archive(zip_path)
+
+    assert any("email address in anonymous package" in error for error in errors)
+    assert any("ORCID in anonymous package" in error for error in errors)
+    assert any("personal repository URL in anonymous package" in error for error in errors)
+
+
 def test_validate_submission_package_accepts_dke_preflight_package(tmp_path) -> None:
     """验证投稿包校验器接受DKE预投稿包。"""
 

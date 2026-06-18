@@ -42,7 +42,7 @@ Before using the DKE/Elsevier preflight package, verify:
 1. `python manuscript/scripts/build_submission_package.py --dke-preflight` completes and writes `build/dke_preflight_package/`.
 2. `python manuscript/scripts/validate_submission_package.py --dke-preflight` passes.
 3. `build/iad-risk-dke-preflight-package.zip` contains `iad-risk-manuscript-elsevier.tex`, `iad-risk-manuscript-elsevier.pdf`, the generic LaTeX source files, submission text files, manifest, and checksums.
-4. The DKE/Elsevier preflight package remains anonymous and does not include `data/`, `outputs/`, raw third-party files, local caches, credentials, or artifact outputs.
+4. The DKE/Elsevier preflight package remains anonymous and does not include `data/`, `outputs/`, raw third-party files, local caches, credentials, artifact outputs, author emails, ORCID values, personal account URLs, local absolute paths, or tool-generated process notes.
 5. Passing the DKE/Elsevier preflight package check does not complete the final-upload gate; author metadata, target confirmation, live submission-system fields, and artifact release URL or DOI remain required.
 
 ## Final Metadata Checks
@@ -61,9 +61,10 @@ Before upload, verify:
 
 1. No `data/`, `outputs/`, cache, local connection, credential, or raw third-party file is inside the upload package.
 2. The uploaded source archive contains editable source files rather than only PDFs.
-3. The manuscript PDF opens correctly and has no unresolved references, missing citations, or clipped tables.
-4. The supplementary PDF opens correctly and has no stale text relative to `supplementary_material.tex`.
-5. The checksums in the artifact release validate before citing artifact files in the manuscript.
+3. Anonymous pre-submission packages contain no author email addresses, ORCID values, personal account URLs, local absolute paths, or tool-generated process notes.
+4. The manuscript PDF opens correctly and has no unresolved references, missing citations, or clipped tables.
+5. The supplementary PDF opens correctly and has no stale text relative to `supplementary_material.tex`.
+6. The checksums in the artifact release validate before citing artifact files in the manuscript.
 
 ## Current Blocking Items
 

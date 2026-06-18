@@ -751,6 +751,7 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "## Final Metadata Checks",
             "## File Hygiene Checks",
             "No `data/`, `outputs/`, cache, local connection, credential, or raw third-party file.",
+            "Anonymous packages contain no author email addresses, ORCID values, personal account URLs, local absolute paths, or tool-generated process notes.",
             "## Current Blocking Items",
             "Target journal has not been author-confirmed.",
             "Artifact release URL or DOI has not been created.",
@@ -772,6 +773,7 @@ def test_check_submission_system_checklist_rejects_missing_hygiene_boundary() ->
 
     assert any("File Hygiene Checks" in error for error in errors)
     assert any("raw third-party file" in error for error in errors)
+    assert any("author email addresses" in error for error in errors)
     assert any("Artifact release URL or DOI" in error for error in errors)
 
 
@@ -806,6 +808,7 @@ def test_check_submission_system_checklist_rejects_missing_artifact_release_chec
             "## Final Metadata Checks",
             "## File Hygiene Checks",
             "No `data/`, `outputs/`, cache, local connection, credential, or raw third-party file.",
+            "Anonymous packages contain no author email addresses, ORCID values, personal account URLs, local absolute paths, or tool-generated process notes.",
             "## Current Blocking Items",
             "Target journal has not been author-confirmed.",
             "Artifact release URL or DOI has not been created.",
@@ -840,6 +843,7 @@ def test_check_submission_system_checklist_rejects_missing_dke_preflight_package
             "## Final Metadata Checks",
             "## File Hygiene Checks",
             "No `data/`, `outputs/`, cache, local connection, credential, or raw third-party file.",
+            "Anonymous packages contain no author email addresses, ORCID values, personal account URLs, local absolute paths, or tool-generated process notes.",
             "## Current Blocking Items",
             "Target journal has not been author-confirmed.",
             "Artifact release URL or DOI has not been created.",
