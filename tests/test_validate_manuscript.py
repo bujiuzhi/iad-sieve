@@ -1783,6 +1783,97 @@ def test_check_result_interpretation_guardrails_rejects_missing_scope_type_label
     assert any("held-out Open-v2 test scope" in error for error in errors)
 
 
+def test_check_openv2_result_table_scope_labels_accepts_scoped_rows() -> None:
+    """验证 Open-v2 主结果表每一行含有正确 scope 类型时可通过。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_openv2_result_table_scope_labels", None)
+    assert callable(checker)
+    manuscript_text = r"""
+\begin{table}[H]
+\caption{Open-v2 evidence snapshot.}
+\label{tab:openv2-results}
+\centering
+\begin{tabular}{llllll}
+\toprule
+System & Scope type & Pairs & F1 $\uparrow$ & FMR $\downarrow$ & HNFMR $\downarrow$ \\
+\midrule
+SciNCL cosine & Full Open-v2 & 10415 & 0.054 & 0.785 & 0.790 \\
+SPECTER2 adapter cosine & Full Open-v2 & 10415 & 0.044 & 0.999 & 0.999 \\
+RoBERTa pair classifier & Full Open-v2 & 10415 & 0.825 & 0.001 & 0.0001 \\
+IAD-Risk (SciNCL) & Held-out test & 1042 & 0.980 & 0.001 & 0.000 \\
+IAD-Risk (SPECTER2) & Held-out test & 1042 & 0.980 & 0.001 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+"""
+
+    errors = checker(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_openv2_result_table_scope_labels_rejects_missing_scope_column() -> None:
+    """验证 Open-v2 主结果表缺少 Scope type 第二列时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_openv2_result_table_scope_labels", None)
+    assert callable(checker)
+    manuscript_text = r"""
+\begin{table}[H]
+\caption{Open-v2 evidence snapshot.}
+\label{tab:openv2-results}
+\centering
+\begin{tabular}{lllll}
+\toprule
+System & Pairs & F1 $\uparrow$ & FMR $\downarrow$ & HNFMR $\downarrow$ \\
+\midrule
+SciNCL cosine & 10415 & 0.054 & 0.785 & 0.790 \\
+SPECTER2 adapter cosine & 10415 & 0.044 & 0.999 & 0.999 \\
+RoBERTa pair classifier & 10415 & 0.825 & 0.001 & 0.0001 \\
+IAD-Risk (SciNCL) & 1042 & 0.980 & 0.001 & 0.000 \\
+IAD-Risk (SPECTER2) & 1042 & 0.980 & 0.001 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+"""
+
+    errors = checker(manuscript_text)
+
+    assert any("Scope type as the second column" in error for error in errors)
+    assert any("SciNCL cosine" in error and "Full Open-v2" in error for error in errors)
+
+
+def test_check_openv2_result_table_scope_labels_rejects_wrong_iad_scope() -> None:
+    """验证 IAD-Risk 结果行误写成 full scope 时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_openv2_result_table_scope_labels", None)
+    assert callable(checker)
+    manuscript_text = r"""
+\begin{table}[H]
+\caption{Open-v2 evidence snapshot.}
+\label{tab:openv2-results}
+\centering
+\begin{tabular}{llllll}
+\toprule
+System & Scope type & Pairs & F1 $\uparrow$ & FMR $\downarrow$ & HNFMR $\downarrow$ \\
+\midrule
+SciNCL cosine & Full Open-v2 & 10415 & 0.054 & 0.785 & 0.790 \\
+SPECTER2 adapter cosine & Full Open-v2 & 10415 & 0.044 & 0.999 & 0.999 \\
+RoBERTa pair classifier & Full Open-v2 & 10415 & 0.825 & 0.001 & 0.0001 \\
+IAD-Risk (SciNCL) & Full Open-v2 & 1042 & 0.980 & 0.001 & 0.000 \\
+IAD-Risk (SPECTER2) & Held-out test & 1042 & 0.980 & 0.001 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+"""
+
+    errors = checker(manuscript_text)
+
+    assert any("IAD-Risk (SciNCL)" in error and "Held-out test" in error for error in errors)
+
+
 def test_check_manual_validation_boundary_accepts_complete_boundary() -> None:
     """验证主文人工验证边界完整时可通过检查。"""
 

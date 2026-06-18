@@ -1465,6 +1465,88 @@ def check_result_interpretation_guardrails(manuscript_text: str) -> list[str]:
     ]
 
 
+def extract_latex_table_by_label(manuscript_text: str, table_label: str) -> str:
+    """Extract a LaTeX table environment by label.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+        table_label: LaTeX label text, including the ``tab:`` prefix.
+
+    返回:
+        str: Table environment text, or an empty string when the label is absent.
+    """
+    label_marker = rf"\label{{{table_label}}}"
+    label_position = manuscript_text.find(label_marker)
+    if label_position < 0:
+        return ""
+    table_start = manuscript_text.rfind(r"\begin{table}", 0, label_position)
+    table_end = manuscript_text.find(r"\end{table}", label_position)
+    if table_start < 0 or table_end < 0:
+        return ""
+    return manuscript_text[table_start : table_end + len(r"\end{table}")]
+
+
+def parse_latex_tabular_rows(table_text: str) -> list[list[str]]:
+    """Parse simple booktabs-style LaTeX table rows into cells.
+
+    参数:
+        table_text: LaTeX table source text.
+
+    返回:
+        list[list[str]]: Parsed rows, with cells stripped of row terminators and whitespace.
+    """
+    rows: list[list[str]] = []
+    for raw_line in table_text.splitlines():
+        line = raw_line.strip()
+        if "&" not in line or line.startswith("\\"):
+            continue
+        line = line.removesuffix(r"\\").strip()
+        rows.append([cell.strip() for cell in line.split("&")])
+    return rows
+
+
+def check_openv2_result_table_scope_labels(manuscript_text: str) -> list[str]:
+    """Check that each Open-v2 result row records its evaluation scope.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing or incorrect Open-v2 result-table scope labels.
+    """
+    if r"\label{tab:openv2-results}" not in manuscript_text:
+        return []
+    table_text = extract_latex_table_by_label(manuscript_text, "tab:openv2-results")
+    if not table_text:
+        return ["Open-v2 result table could not be extracted by label: tab:openv2-results"]
+    rows = parse_latex_tabular_rows(table_text)
+    if not rows:
+        return ["Open-v2 result table contains no parseable rows"]
+    header = rows[0]
+    errors: list[str] = []
+    if len(header) < 2 or header[1] != "Scope type":
+        errors.append("Open-v2 result table must use Scope type as the second column")
+    expected_scopes = {
+        "SciNCL cosine": "Full Open-v2",
+        "SPECTER2 adapter cosine": "Full Open-v2",
+        "RoBERTa pair classifier": "Full Open-v2",
+        "IAD-Risk (SciNCL)": "Held-out test",
+        "IAD-Risk (SPECTER2)": "Held-out test",
+    }
+    row_by_system = {row[0]: row for row in rows[1:] if row}
+    for system_name, expected_scope in expected_scopes.items():
+        row = row_by_system.get(system_name)
+        if row is None:
+            errors.append(f"Open-v2 result table missing result row: {system_name}")
+            continue
+        actual_scope = row[1] if len(row) > 1 else ""
+        if actual_scope != expected_scope:
+            errors.append(
+                f"Open-v2 result row {system_name} must use scope type {expected_scope}; found {actual_scope or '<missing>'}"
+            )
+    return errors
+
+
 def check_manual_validation_boundary(manuscript_text: str) -> list[str]:
     """Check whether the main manuscript states manual-validation limits for silver labels.
 
@@ -3146,6 +3228,7 @@ def main() -> int:
     errors.extend(check_baseline_inclusion_rationale(manuscript_text))
     errors.extend(check_baseline_fairness_controls(manuscript_text))
     errors.extend(check_result_interpretation_guardrails(manuscript_text))
+    errors.extend(check_openv2_result_table_scope_labels(manuscript_text))
     errors.extend(check_manual_validation_boundary(manuscript_text))
     errors.extend(check_split_leakage_controls(manuscript_text))
     errors.extend(check_scope_compatibility(manuscript_text))
