@@ -1113,6 +1113,10 @@ def test_check_result_interpretation_guardrails_accepts_complete_boundaries() ->
             "The table separates Directly supported reading.",
             "It also separates Mechanism-supported reading.",
             "It explicitly lists Unsupported reading.",
+            "The main result table includes Scope type.",
+            "It distinguishes full available Open-v2 scope.",
+            "It distinguishes held-out Open-v2 test scope.",
+            "Scope labels prevent leaderboard reading.",
             "The representation rows test false-merge exposure.",
             "The RoBERTa row is a strong supervised comparator.",
             "The IAD-Risk rows test split-held-out risk gating.",
@@ -1137,6 +1141,33 @@ def test_check_result_interpretation_guardrails_rejects_missing_unsupported_read
 
     assert any("Unsupported reading" in error for error in errors)
     assert any("not a same-scope leaderboard" in error for error in errors)
+
+
+def test_check_result_interpretation_guardrails_rejects_missing_scope_type_labels() -> None:
+    """验证主结果表缺少 scope 类型标签时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Result Interpretation Guardrails}",
+            r"\label{tab:result-interpretation-guardrails}",
+            "Directly supported reading",
+            "Mechanism-supported reading",
+            "Unsupported reading",
+            "The representation rows test false-merge exposure.",
+            "The RoBERTa row is a strong supervised comparator.",
+            "The IAD-Risk rows test split-held-out risk gating.",
+            "The result is not a claim of broad method superiority.",
+            "The table is not a same-scope leaderboard.",
+            "The table is not evidence of threshold stability or zero risk.",
+        ]
+    )
+
+    errors = module.check_result_interpretation_guardrails(manuscript_text)
+
+    assert any("Scope type" in error for error in errors)
+    assert any("full available Open-v2 scope" in error for error in errors)
+    assert any("held-out Open-v2 test scope" in error for error in errors)
 
 
 def test_check_manual_validation_boundary_accepts_complete_boundary() -> None:

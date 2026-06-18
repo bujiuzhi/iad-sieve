@@ -715,20 +715,20 @@ Threshold-stability claims & \path{threshold_sensitivity_grid}, \path{threshold_
 \subsection{Main Open-v2 Results}
 
 \begin{table}[H]
-\caption{Open-v2 evidence snapshot. Lower false-merge rate is better. Rows are reported only when supported by current output summaries; different pair counts indicate different available result scopes.}
+\caption{Open-v2 evidence snapshot. Lower false-merge rate is better. Rows are reported only when supported by current output summaries; the scope type column marks whether a row uses the full available Open-v2 scope or the held-out Open-v2 test scope.}
 \label{tab:openv2-results}
 \centering
-\small
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{L{0.36\linewidth}L{0.13\linewidth}rrr}
+\footnotesize
+\setlength{\tabcolsep}{2pt}
+\begin{tabular}{@{}L{0.27\linewidth}L{0.13\linewidth}L{0.08\linewidth}rrr@{}}
 \toprule
-System & Pairs & Same-work F1 $\uparrow$ & FMR $\downarrow$ & HNFMR $\downarrow$ \\
+System & Scope type & Pairs & F1 $\uparrow$ & FMR $\downarrow$ & HNFMR $\downarrow$ \\
 \midrule
-SciNCL cosine & 10415 & 0.054 & 0.785 & 0.790 \\
-SPECTER2 adapter cosine & 10415 & 0.044 & 0.999 & 0.999 \\
-RoBERTa pair classifier & 10415 & 0.825 & 0.001 & 0.0001 \\
-IAD-Risk transformer (SciNCL) & 1042 test & 0.980 & 0.001 & 0.000 \\
-IAD-Risk transformer (SPECTER2) & 1042 test & 0.980 & 0.001 & 0.000 \\
+SciNCL cosine & Full Open-v2 & 10415 & 0.054 & 0.785 & 0.790 \\
+SPECTER2 adapter cosine & Full Open-v2 & 10415 & 0.044 & 0.999 & 0.999 \\
+RoBERTa pair classifier & Full Open-v2 & 10415 & 0.825 & 0.001 & 0.0001 \\
+IAD-Risk (SciNCL) & Held-out test & 1042 & 0.980 & 0.001 & 0.000 \\
+IAD-Risk (SPECTER2) & Held-out test & 1042 & 0.980 & 0.001 & 0.000 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -737,7 +737,7 @@ The Open-v2 evidence shows why identity-agenda disentanglement is necessary. Sin
 
 \subsection{Result Interpretation Guardrails}
 
-Table~\ref{tab:result-interpretation-guardrails} states how the Open-v2 table should be read before external artifact release and same-scope prediction files are available. These guardrails are included because the table combines full-scope representation baselines, a strong supervised comparator, and held-out IAD-Risk rows. The intended interpretation is mechanism-oriented; the table labels this as a Mechanism-supported reading rather than a leaderboard-oriented reading.
+Table~\ref{tab:result-interpretation-guardrails} states how the Open-v2 table should be read before external artifact release and same-scope prediction files are available. The main result table includes Scope type labels to distinguish full available Open-v2 scope rows from held-out Open-v2 test scope rows. Scope labels prevent leaderboard reading when row families are supported by different available prediction scopes. The intended interpretation is mechanism-oriented; the table labels this as a Mechanism-supported reading rather than a leaderboard-oriented reading.
 
 \begin{table}[H]
 \caption{Result interpretation guardrails for the Open-v2 evidence snapshot. The table separates direct evidence, mechanism-supported reading, and unsupported reading.}
