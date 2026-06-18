@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 48.
+Completed audit cycles: 49.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -481,6 +481,14 @@ Outcome: pass for result-interpretation table-density reduction; blocked for str
 This gate checks whether the Open-v2 result interpretation guardrails matrix is needed in the main result section. The main manuscript now states the direct reading boundary in prose: Scope type labels separate full available Open-v2 rows from held-out Open-v2 test rows, scope labels prevent ranking interpretation, and the supported reading is mechanism-oriented rather than a broad method-superiority claim. The supplementary material preserves the full result interpretation guardrails table with row-family readings and unsupported readings.
 
 The reviewer-facing boundary is result-reading clarity without main-text table overload. The edit keeps the main result section focused on the Open-v2 evidence snapshot while the validator still requires the supplementary guardrails table, unsupported-reading boundary, scope labels, and threshold-stability or zero-risk limits.
+
+## Audit Cycle 49: Claim-Evidence Boundary Density Gate
+
+Outcome: pass for claim-evidence table-density reduction; blocked for final numerical audit until same-scope prediction files, interval estimates, manual-validation evidence, and artifact checksums are released.
+
+This gate checks whether the claim-evidence boundary table is needed in the main result section. The main manuscript now states the boundary in prose: identity-agenda confusion is supported only as a false-merge pathway, IAD-Risk support is bounded to the reported Open-v2 setting, IAD-Bench remains a provenance-aware evaluation contract, and repository-level reproduction does not by itself prove full numerical results without public source files or a released artifact package. The supplementary material preserves the full claim-evidence boundary table with required support and unsupported claim classes.
+
+The reviewer-facing boundary is claim-evidence clarity without main-text table overload. The edit keeps the main result section focused on the reported evidence snapshot while the validator still requires the supplementary claim-evidence boundary, including identity-agenda confusion, IAD-Risk support, IAD-Bench evidence, and repository-level reproduction limits.
 
 ## Minimum Gate Before Final Upload
 

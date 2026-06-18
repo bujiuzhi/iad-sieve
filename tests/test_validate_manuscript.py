@@ -658,8 +658,12 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
     manuscript_text = "\n".join(
         [
             r"\subsection{Claim-Evidence Boundary for Result Interpretation}",
-            r"\label{tab:claim-evidence-boundary-main}",
             r"\subsection{Result Audit Trail}",
+            "The full claim-evidence boundary table is reported in the supplementary material.",
+            "The identity-agenda confusion is supported only as a false-merge pathway.",
+            "IAD-Risk support is bounded to the reported Open-v2 setting.",
+            "IAD-Bench is a provenance-aware evaluation contract.",
+            "The repository-level reproduction does not by itself prove full numerical results.",
             "The complete row-family artifact crosswalk is reported in the supplementary material.",
             r"\path{open_v2_main_results}",
             r"\path{iad_bench_split_summary}",
@@ -709,6 +713,12 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
         [
             r"\section{Artifact Package Requirements}",
             r"\section{Claim-Evidence Matrix}",
+            r"\label{tab:claim-evidence-boundary-main}",
+            "Claim-evidence boundary used to interpret the reported results.",
+            "Identity-agenda confusion is a concrete false-merge pathway.",
+            "IAD-Risk reduces risky automatic merges in the reported setting.",
+            "IAD-Bench supports provenance-aware evaluation.",
+            "Repository-level reproduction is possible without committing raw data.",
             r"\label{tab:result-artifact-crosswalk}",
             "Result artifact crosswalk for the Open-v2 evidence snapshot.",
             "The released artifact package includes checksums.sha256.",
@@ -4514,7 +4524,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 48.",
+            "Completed audit cycles: 49.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -4879,6 +4889,15 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "row-family readings",
             "result-reading clarity without main-text table overload",
             "threshold-stability or zero-risk limits",
+            "## Audit Cycle 49: Claim-Evidence Boundary Density Gate",
+            "claim-evidence table-density reduction",
+            "full claim-evidence boundary table",
+            "identity-agenda confusion",
+            "IAD-Risk support",
+            "IAD-Bench",
+            "repository-level reproduction",
+            "claim-evidence clarity without main-text table overload",
+            "supplementary claim-evidence boundary",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -4897,7 +4916,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 48",
+        "Completed audit cycles: 49",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -4908,7 +4927,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 48" in error for error in errors)
+    assert any("Completed audit cycles: 49" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

@@ -427,6 +427,23 @@ Cluster-level quality is claimed only after pair-to-cluster audit. & \path{clust
 \end{table}
 
 \begin{table}[H]
+\caption{Claim-evidence boundary used to interpret the reported results. Each claim class is paired with the supporting evidence and the claims that are intentionally not made.}
+\label{tab:claim-evidence-boundary-main}
+\centering
+\small
+\begin{tabular}{L{0.24\linewidth}L{0.30\linewidth}L{0.34\linewidth}}
+\toprule
+Claim class & Required support & Boundary not claimed \\
+\midrule
+Identity-agenda confusion is a concrete false-merge pathway. & Hard-negative false-merge rate on agenda-level silver pairs, compared with single-space scientific representation baselines. & A prevalence estimate for all scholarly corpora. \\
+IAD-Risk reduces risky automatic merges in the reported setting. & Held-out Open-v2 IAD-Risk predictions, thresholds, metric summaries, and checksums. & A broad method-ranking claim or a claim that every source distribution is covered. \\
+IAD-Bench supports provenance-aware evaluation. & Pair schema fields for relation type, label source, label strength, provenance, split, and hard-negative level. & A claim that proxy or silver rows are human-gold labels. \\
+Repository-level reproduction is possible without committing raw data. & Public code, fixture tests, documented data-processing commands, manifest rules, and PDF build scripts. & Full numerical reproduction without public source files or a released artifact package. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
 \caption{Result interpretation guardrails for the Open-v2 evidence snapshot. The table separates direct evidence, mechanism-supported reading, and unsupported reading.}
 \label{tab:result-interpretation-guardrails}
 \centering
