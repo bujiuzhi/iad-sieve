@@ -1994,7 +1994,7 @@ def check_manual_validation_boundary(manuscript_text: str) -> list[str]:
     """
     required_markers = [
         r"\subsection{Manual Validation Boundary}",
-        r"\label{tab:manual-validation-boundary}",
+        "full manual validation boundary table is reported in the supplementary material",
         "Manual validation is not completed in the current manuscript package",
         "Silver hard negatives are stress-test evidence",
         "not human-gold non-identity labels",
@@ -2100,12 +2100,19 @@ def check_manual_validation_protocol(supplementary_text: str) -> list[str]:
     """
     required_markers = [
         r"\section{Manual Validation Protocol}",
+        r"\label{tab:manual-validation-boundary}",
+        r"\label{tab:manual-validation-protocol}",
+        "Manual validation boundary for interpreting silver hard negatives",
         "future evidence layer",
         "500--1,000 pairs",
+        "500--1,000 pair reviewed slice",
         "two independent reviewers",
         "blind to model scores",
         "adjudication log",
+        "agreement report",
+        "pair-level notes",
         "inter-annotator agreement",
+        "silver rows replace human-gold non-identity labels",
         "must not claim human gold",
     ]
     return [
@@ -2968,7 +2975,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 45",
+        "Completed audit cycles: 46",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3071,6 +3078,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 43: Method Design Boundary Density Gate",
         "Audit Cycle 44: Experiment Reporting Boundary Density Gate",
         "Audit Cycle 45: Result Artifact Crosswalk Density Gate",
+        "Audit Cycle 46: Manual Validation Boundary Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
         "method-writing clarity",
@@ -3160,6 +3168,12 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "public-source provenance requirements",
         "full result artifact crosswalk",
         "numerical-audit traceability without main-text table overload",
+        "manual-validation table-density reduction",
+        "final label-precision claims",
+        "full manual validation boundary table",
+        "full manual validation protocol table",
+        "label-evidence clarity without main-text table overload",
+        "human-gold wording limits",
         "remote reproducibility",
         "strong model matrix",
         "model superiority",

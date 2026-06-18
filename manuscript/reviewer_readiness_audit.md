@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 45.
+Completed audit cycles: 46.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -457,6 +457,14 @@ Outcome: pass for result-audit table-density reduction; blocked for final numeri
 This gate checks whether the Open-v2 result artifact crosswalk belongs in the main manuscript or the supplementary material. The main manuscript now states the row-level audit requirements, prediction-file requirements, threshold-log requirements, public-source provenance requirements, and L3 artifact boundary in prose, while the supplementary material preserves the full result artifact crosswalk with row-family artifact IDs.
 
 The reviewer-facing boundary is numerical-audit traceability without main-text table overload. The edit keeps the main result section focused on the Open-v2 evidence snapshot and its interpretation boundary, while the validator still requires the complete supplementary crosswalk and its required artifact IDs.
+
+## Audit Cycle 46: Manual Validation Boundary Density Gate
+
+Outcome: pass for manual-validation table-density reduction; blocked for final label-precision claims until a reviewed slice, adjudication log, agreement report, pair-level notes, and checksums are released.
+
+This gate checks whether the manual-validation boundary matrix is needed in the main result section. The main manuscript now states that manual validation is not completed, that silver hard negatives are stress-test evidence rather than human-gold non-identity labels, and that stronger label-precision claims require a 500--1,000 pair reviewed slice with blinded independent review and adjudication artifacts. The supplementary material preserves the full manual validation boundary table and the full manual validation protocol table.
+
+The reviewer-facing boundary is label-evidence clarity without main-text table overload. The edit keeps the Open-v2 result section focused on the reported evidence snapshot while the validator still requires the supplementary manual-validation boundary, protocol, reviewer process, adjudication artifacts, and human-gold wording limits.
 
 ## Minimum Gate Before Final Upload
 

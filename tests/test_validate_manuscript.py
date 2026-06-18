@@ -2585,7 +2585,7 @@ def test_check_manual_validation_boundary_accepts_complete_boundary() -> None:
     manuscript_text = "\n".join(
         [
             r"\subsection{Manual Validation Boundary}",
-            r"\label{tab:manual-validation-boundary}",
+            "The full manual validation boundary table is reported in the supplementary material.",
             "Manual validation is not completed in the current manuscript package.",
             "Silver hard negatives are stress-test evidence.",
             "They are not human-gold non-identity labels.",
@@ -2748,12 +2748,19 @@ def test_check_manual_validation_protocol_accepts_complete_protocol() -> None:
     supplementary_text = "\n".join(
         [
             r"\section{Manual Validation Protocol}",
+            r"\label{tab:manual-validation-boundary}",
+            r"\label{tab:manual-validation-protocol}",
+            "Manual validation boundary for interpreting silver hard negatives.",
             "Manual validation is a future evidence layer.",
             "The protocol samples 500--1,000 pairs.",
+            "A 500--1,000 pair reviewed slice is required.",
             "It uses two independent reviewers.",
             "Reviewers are blind to model scores.",
             "The release includes an adjudication log.",
+            "The release includes an agreement report.",
+            "The release includes pair-level notes.",
             "The artifact reports inter-annotator agreement.",
+            "The manuscript does not claim that silver rows replace human-gold non-identity labels.",
             "The manuscript must not claim human gold before the files exist.",
         ]
     )
@@ -2774,6 +2781,7 @@ def test_check_manual_validation_protocol_rejects_vague_manual_review() -> None:
     assert any("500--1,000 pairs" in error for error in errors)
     assert any("two independent reviewers" in error for error in errors)
     assert any("inter-annotator agreement" in error for error in errors)
+    assert any("manual-validation-boundary" in error for error in errors)
 
 
 def test_check_environment_setup_accepts_complete_setup() -> None:
@@ -4417,7 +4425,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 45.",
+            "Completed audit cycles: 46.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -4761,6 +4769,13 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "public-source provenance requirements",
             "full result artifact crosswalk",
             "numerical-audit traceability without main-text table overload",
+            "## Audit Cycle 46: Manual Validation Boundary Density Gate",
+            "manual-validation table-density reduction",
+            "final label-precision claims",
+            "full manual validation boundary table",
+            "full manual validation protocol table",
+            "label-evidence clarity without main-text table overload",
+            "human-gold wording limits",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -4779,7 +4794,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 45",
+        "Completed audit cycles: 46",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -4790,7 +4805,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 45" in error for error in errors)
+    assert any("Completed audit cycles: 46" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
