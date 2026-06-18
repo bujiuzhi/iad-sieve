@@ -418,6 +418,14 @@ This gate checks whether the artifact workflow can fail early before copying inc
 
 The reviewer-facing boundary is source-package readiness. A passing preflight means the source artifact directory contains the required files named by the release manifest and that path mappings are safe. It does not prove row-level schemas, checksums, source-control commit binding, public accessibility, or numerical correctness; those remain enforced by `finalize_artifact_release.py`, `validate_artifact_release.py`, `validate_submission_package.py --final-upload --artifact-dir /path/to/release`, and the final artifact URL or DOI.
 
+## Audit Cycle 41: Main-Text Schema Density Gate
+
+Outcome: pass for main-text schema-density reduction; blocked for final numerical audit until the external artifact release remains populated, finalized, checksum-validated, and publicly linked.
+
+This gate checks whether schema-contract details make the main manuscript harder to read than necessary for a journal reviewer. The main manuscript now summarizes the IAD-Bench document and pair fields in prose, while the supplementary material preserves the full document-schema and pair-schema tables with their field groups, interpretation roles, and HNFMR audit boundary.
+
+The reviewer-facing boundary is readability without loss of reproducibility. Moving the detailed schema tables out of the main text reduces table density and improves first-pass readability, but it does not relax the schema contract. The validator now checks both the main-text field summary and the supplementary schema tables so that reviewers can still audit fixture rebuilding, public-source rebuilding, and artifact validation against the same required fields.
+
 ## Minimum Gate Before Final Upload
 
 The manuscript should not be uploaded to a journal system until all of the following are true:

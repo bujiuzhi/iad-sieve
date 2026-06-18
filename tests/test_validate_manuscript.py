@@ -1171,19 +1171,19 @@ def test_check_iad_bench_document_schema_contract_accepts_complete_contract() ->
     manuscript_text = "\n".join(
         [
             r"\subsection{Document Schema Contract}",
-            r"\label{tab:iad-bench-document-schema}",
-            r"\texttt{document\_id}",
-            r"\texttt{source\_dataset}",
-            r"\texttt{title}",
-            r"\texttt{abstract}",
-            r"\texttt{authors}",
-            r"\texttt{year}",
-            r"\texttt{venue}",
-            r"\texttt{doi}",
-            r"\texttt{arxiv\_id}",
-            r"\texttt{openalex\_work\_id}",
-            r"\texttt{topics}",
-            r"\texttt{references}",
+            "The full document schema table is reported in the supplementary material.",
+            r"\path{document_id}",
+            r"\path{source_dataset}",
+            r"\path{title}",
+            r"\path{abstract}",
+            r"\path{authors}",
+            r"\path{year}",
+            r"\path{venue}",
+            r"\path{doi}",
+            r"\path{arxiv_id}",
+            r"\path{openalex_work_id}",
+            r"\path{topics}",
+            r"\path{references}",
             "Missing values are represented by empty strings, empty arrays, or null values.",
             "The schema can be audited without redistributing raw third-party files.",
         ]
@@ -1202,8 +1202,8 @@ def test_check_iad_bench_document_schema_contract_rejects_missing_fields() -> No
 
     errors = module.check_iad_bench_document_schema_contract(manuscript_text)
 
-    assert any("iad-bench-document-schema" in error for error in errors)
-    assert any("openalex\\_work\\_id" in error for error in errors)
+    assert any("full document schema table" in error for error in errors)
+    assert any("openalex_work_id" in error for error in errors)
     assert any("raw third-party files" in error for error in errors)
 
 
@@ -1214,19 +1214,19 @@ def test_check_iad_bench_pair_schema_contract_accepts_complete_contract() -> Non
     manuscript_text = "\n".join(
         [
             r"\subsection{Pair Schema Contract}",
-            r"\label{tab:iad-bench-pair-schema}",
-            r"\texttt{pair\_id}",
-            r"\texttt{source\_document\_id}",
-            r"\texttt{target\_document\_id}",
-            r"\texttt{relation\_label}",
-            r"\texttt{expected\_label}",
-            r"\texttt{expected\_agenda\_label}",
-            r"\texttt{label\_source}",
-            r"\texttt{label\_strength}",
-            r"\texttt{label\_provenance}",
-            r"\texttt{split}",
-            r"\texttt{hard\_negative\_level}",
-            "Separates same-work identity from agenda relatedness.",
+            "The full pair schema table is reported in the supplementary material.",
+            r"\path{pair_id}",
+            r"\path{source_document_id}",
+            r"\path{target_document_id}",
+            r"\path{relation_label}",
+            r"\path{expected_label}",
+            r"\path{expected_agenda_label}",
+            r"\path{label_source}",
+            r"\path{label_strength}",
+            r"\path{label_provenance}",
+            r"\path{split}",
+            r"\path{hard_negative_level}",
+            "The schema separates the binary same-work target from agenda relatedness.",
             "The schema identifies agenda-level hard negatives for HNFMR.",
         ]
     )
@@ -1244,9 +1244,47 @@ def test_check_iad_bench_pair_schema_contract_rejects_missing_fields() -> None:
 
     errors = module.check_iad_bench_pair_schema_contract(manuscript_text)
 
+    assert any("full pair schema table" in error for error in errors)
+    assert any("label_provenance" in error for error in errors)
+    assert any("hard_negative_level" in error for error in errors)
+
+
+def test_check_iad_bench_supplementary_schema_tables_accepts_complete_tables() -> None:
+    """验证补充材料包含完整 IAD-Bench schema 表时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    supplementary_text = "\n".join(
+        [
+            r"\section{IAD-Bench Schema Contracts}",
+            r"\label{tab:iad-bench-document-schema}",
+            r"\label{tab:iad-bench-pair-schema}",
+            "Record identity, Text and authorship, Bibliographic metadata, and Agenda context are listed.",
+            r"\texttt{document\_id}",
+            r"\texttt{openalex\_work\_id}",
+            r"\texttt{references}",
+            "Pair identity, Relation targets, Evidence source, and Evaluation control are listed.",
+            r"\texttt{pair\_id}",
+            r"\texttt{expected\_agenda\_label}",
+            r"\texttt{hard\_negative\_level}",
+            "Evaluation control identifies agenda-level hard negatives for HNFMR.",
+        ]
+    )
+
+    errors = module.check_iad_bench_supplementary_schema_tables(supplementary_text)
+
+    assert errors == []
+
+
+def test_check_iad_bench_supplementary_schema_tables_rejects_missing_table_labels() -> None:
+    """验证补充材料缺少 IAD-Bench schema 表标签时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    supplementary_text = r"\section{IAD-Bench Schema Contracts}"
+
+    errors = module.check_iad_bench_supplementary_schema_tables(supplementary_text)
+
+    assert any("iad-bench-document-schema" in error for error in errors)
     assert any("iad-bench-pair-schema" in error for error in errors)
-    assert any("label\\_provenance" in error for error in errors)
-    assert any("hard\\_negative\\_level" in error for error in errors)
 
 
 def test_check_citation_bibliography_alignment_accepts_matching_entries() -> None:

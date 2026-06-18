@@ -109,6 +109,7 @@ REQUIRED_SECTIONS = [
 REQUIRED_SUPPLEMENT_SECTIONS = [
     r"\section{Scope}",
     r"\section{Reproduction Levels}",
+    r"\section{IAD-Bench Schema Contracts}",
     r"\section{Environment Setup}",
     r"\section{No-Network Fixture Rebuild}",
     r"\section{Public-Source Rebuild}",
@@ -801,19 +802,19 @@ def check_iad_bench_pair_schema_contract(manuscript_text: str) -> list[str]:
     """
     required_markers = [
         r"\subsection{Pair Schema Contract}",
-        r"\label{tab:iad-bench-pair-schema}",
-        r"\texttt{pair\_id}",
-        r"\texttt{source\_document\_id}",
-        r"\texttt{target\_document\_id}",
-        r"\texttt{relation\_label}",
-        r"\texttt{expected\_label}",
-        r"\texttt{expected\_agenda\_label}",
-        r"\texttt{label\_source}",
-        r"\texttt{label\_strength}",
-        r"\texttt{label\_provenance}",
-        r"\texttt{split}",
-        r"\texttt{hard\_negative\_level}",
-        "Separates same-work identity from agenda relatedness",
+        "full pair schema table is reported in the supplementary material",
+        r"\path{pair_id}",
+        r"\path{source_document_id}",
+        r"\path{target_document_id}",
+        r"\path{relation_label}",
+        r"\path{expected_label}",
+        r"\path{expected_agenda_label}",
+        r"\path{label_source}",
+        r"\path{label_strength}",
+        r"\path{label_provenance}",
+        r"\path{split}",
+        r"\path{hard_negative_level}",
+        "separates the binary same-work target from agenda relatedness",
         "identifies agenda-level hard negatives for HNFMR",
     ]
     return [
@@ -834,19 +835,19 @@ def check_iad_bench_document_schema_contract(manuscript_text: str) -> list[str]:
     """
     required_markers = [
         r"\subsection{Document Schema Contract}",
-        r"\label{tab:iad-bench-document-schema}",
-        r"\texttt{document\_id}",
-        r"\texttt{source\_dataset}",
-        r"\texttt{title}",
-        r"\texttt{abstract}",
-        r"\texttt{authors}",
-        r"\texttt{year}",
-        r"\texttt{venue}",
-        r"\texttt{doi}",
-        r"\texttt{arxiv\_id}",
-        r"\texttt{openalex\_work\_id}",
-        r"\texttt{topics}",
-        r"\texttt{references}",
+        "full document schema table is reported in the supplementary material",
+        r"\path{document_id}",
+        r"\path{source_dataset}",
+        r"\path{title}",
+        r"\path{abstract}",
+        r"\path{authors}",
+        r"\path{year}",
+        r"\path{venue}",
+        r"\path{doi}",
+        r"\path{arxiv_id}",
+        r"\path{openalex_work_id}",
+        r"\path{topics}",
+        r"\path{references}",
         "Missing values are represented by empty strings, empty arrays, or null values",
         "without redistributing raw third-party files",
     ]
@@ -854,6 +855,42 @@ def check_iad_bench_document_schema_contract(manuscript_text: str) -> list[str]:
         f"IAD-Bench document schema contract missing marker: {marker}"
         for marker in required_markers
         if marker not in manuscript_text
+    ]
+
+
+def check_iad_bench_supplementary_schema_tables(supplementary_text: str) -> list[str]:
+    """Check whether supplementary material preserves full IAD-Bench schema tables.
+
+    参数:
+        supplementary_text: Supplementary LaTeX source.
+
+    返回:
+        list[str]: Error messages for missing schema-table markers.
+    """
+    required_markers = [
+        r"\section{IAD-Bench Schema Contracts}",
+        r"\label{tab:iad-bench-document-schema}",
+        r"\label{tab:iad-bench-pair-schema}",
+        "Record identity",
+        "Text and authorship",
+        "Bibliographic metadata",
+        "Agenda context",
+        r"\texttt{document\_id}",
+        r"\texttt{openalex\_work\_id}",
+        r"\texttt{references}",
+        "Pair identity",
+        "Relation targets",
+        "Evidence source",
+        "Evaluation control",
+        r"\texttt{pair\_id}",
+        r"\texttt{expected\_agenda\_label}",
+        r"\texttt{hard\_negative\_level}",
+        "identifies agenda-level hard negatives for HNFMR",
+    ]
+    return [
+        f"IAD-Bench supplementary schema table missing marker: {marker}"
+        for marker in required_markers
+        if marker not in supplementary_text
     ]
 
 
@@ -4086,6 +4123,7 @@ def main() -> int:
     errors.extend(check_openv2_benchmark_composition(manuscript_text))
     errors.extend(check_iad_bench_document_schema_contract(manuscript_text))
     errors.extend(check_iad_bench_pair_schema_contract(manuscript_text))
+    errors.extend(check_iad_bench_supplementary_schema_tables(supplementary_text))
     errors.extend(check_method_feature_contract(manuscript_text))
     errors.extend(check_training_objective_masking(manuscript_text))
     errors.extend(check_risk_score_design_rationale(manuscript_text))

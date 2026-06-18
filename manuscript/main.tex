@@ -171,47 +171,27 @@ Manual validation & Independent human review & External validation target \\
 
 \subsection{Document Schema Contract}
 
-IAD-Bench first standardizes each scholarly record before constructing pair evidence. Table~\ref{tab:iad-bench-document-schema} lists the document fields used by the manuscript. The contract keeps identity-bearing metadata, agenda-bearing metadata, and source provenance in one record so that downstream pair construction can be audited without redistributing raw third-party files.
-
-\begin{table}[H]
-\caption{IAD-Bench document schema contract. Missing values are represented by empty strings, empty arrays, or null values rather than by dropping required fields.}
-\label{tab:iad-bench-document-schema}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{L{0.22\linewidth}L{0.38\linewidth}L{0.30\linewidth}}
-\toprule
-Field group & Required fields & Interpretation role \\
-\midrule
-Record identity & \texttt{document\_id}, \texttt{source\_dataset} & Makes each standardized record traceable to its originating public source. \\
-Text and authorship & \texttt{title}, \texttt{abstract}, \texttt{authors} & Provides the textual and author evidence used by identity and agenda features. \\
-Bibliographic metadata & \texttt{year}, \texttt{venue}, \texttt{doi}, \texttt{arxiv\_id}, \texttt{openalex\_work\_id} & Supplies identifier and publication-context evidence for same-work decisions. \\
-Agenda context & \texttt{topics}, \texttt{references} & Supplies topical and citation evidence used for same-agenda and hard-negative construction. \\
-\bottomrule
-\end{tabular}
-\end{table}
+IAD-Bench first standardizes each scholarly record before constructing pair evidence. The document contract keeps identity-bearing metadata, agenda-bearing metadata, and source provenance in one record so that downstream pair construction can be audited without redistributing raw third-party files. The required fields are grouped as follows:
+\begin{itemize}
+\setlength{\itemsep}{0pt}
+\item record identity: \path{document_id} and \path{source_dataset};
+\item text and authorship: \path{title}, \path{abstract}, and \path{authors};
+\item bibliographic metadata: \path{year}, \path{venue}, \path{doi}, \path{arxiv_id}, and \path{openalex_work_id};
+\item agenda context: \path{topics} and \path{references}.
+\end{itemize}
+Missing values are represented by empty strings, empty arrays, or null values rather than by dropping required fields. The full document schema table is reported in the supplementary material.
 
 \subsection{Pair Schema Contract}
 
-IAD-Bench uses a pair schema that makes relation semantics and evidence strength auditable. Table~\ref{tab:iad-bench-pair-schema} lists the required fields used by the manuscript. The schema separates the binary same-work target from agenda relatedness, records the source and strength of each label, and keeps split and hard-negative metadata visible so that training, threshold selection, held-out reporting, and manual audit cannot be silently mixed.
-
-\begin{table}[H]
-\caption{IAD-Bench pair schema contract. The schema records identity labels, agenda labels, provenance, split assignment, and hard-negative status for each pair.}
-\label{tab:iad-bench-pair-schema}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{L{0.24\linewidth}L{0.34\linewidth}L{0.32\linewidth}}
-\toprule
-Field group & Required fields & Interpretation role \\
-\midrule
-Pair identity & \texttt{pair\_id}, \texttt{source\_document\_id}, \texttt{target\_document\_id} & Makes every row traceable to two standardized documents and prevents anonymous aggregate-only reporting. \\
-Relation targets & \texttt{relation\_label}, \texttt{expected\_label}, \texttt{expected\_agenda\_label} & Separates same-work identity from agenda relatedness before metrics are computed. \\
-Evidence source & \texttt{label\_source}, \texttt{label\_strength}, \texttt{label\_provenance} & Records whether a label is gold, proxy, silver, or human-audit evidence and what signals support it. \\
-Evaluation control & \texttt{split}, \texttt{hard\_negative\_level} & Controls train/dev/test/audit use and identifies agenda-level hard negatives for HNFMR. \\
-\bottomrule
-\end{tabular}
-\end{table}
+IAD-Bench uses a pair schema that makes relation semantics and evidence strength auditable. The required fields are grouped as follows:
+\begin{itemize}
+\setlength{\itemsep}{0pt}
+\item pair identity: \path{pair_id}, \path{source_document_id}, and \path{target_document_id};
+\item relation targets: \path{relation_label}, \path{expected_label}, and \path{expected_agenda_label};
+\item evidence source: \path{label_source}, \path{label_strength}, and \path{label_provenance};
+\item evaluation control: \path{split} and \path{hard_negative_level}.
+\end{itemize}
+The schema separates the binary same-work target from agenda relatedness, records the source and strength of each label, and keeps split and hard-negative metadata visible so that training, threshold selection, held-out reporting, and manual audit cannot be silently mixed. It also identifies agenda-level hard negatives for HNFMR. The full pair schema table is reported in the supplementary material.
 
 The Open-v2 benchmark variant used in the core evidence combines 415 DeepMatcher gold pairs with 10,000 OpenAlex-derived silver hard negatives, producing 10,415 pair records over 1,737 documents. The DeepMatcher component provides same-work gold labels, while the OpenAlex component stresses same-agenda non-identity behavior. This design is intentionally conservative: OpenAlex and OpenCitations are used to expose false-merge risk, not to replace human gold.
 
