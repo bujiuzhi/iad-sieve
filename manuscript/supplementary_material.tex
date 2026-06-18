@@ -163,12 +163,20 @@ The manifest should record the source data version, processing commands, depende
 
 \small
 \begin{verbatim}
+python manuscript/scripts/build_artifact_release_skeleton.py \
+  --output-dir /path/to/release \
+  --repository-commit <commit>
+python manuscript/scripts/populate_artifact_release.py \
+  --artifact-dir /path/to/release \
+  --source-dir /path/to/source-artifacts
+python manuscript/scripts/finalize_artifact_release.py \
+  --artifact-dir /path/to/release
 python manuscript/scripts/validate_artifact_release.py \
   --artifact-dir /path/to/release
 \end{verbatim}
 \normalsize
 
-This release validation command checks the manifest schema, required artifact files, required result identifiers, checksum coverage, repository commit metadata, claim-boundary flags, conditional claim artifacts, and exclusion of raw third-party data, caches, credentials, local outputs, and model checkpoints.
+The release preparation commands create a scaffold, copy generated result files from a source artifact directory, refresh manifest and checksum metadata, and then validate the final package. The validation command checks the manifest schema, required artifact files, required result identifiers, checksum coverage, repository commit metadata, claim-boundary flags, conditional claim artifacts, and exclusion of raw third-party data, caches, credentials, local outputs, and model checkpoints.
 
 The artifact manifest uses conditional claim flags so that optional stronger claims cannot be enabled without their evidence files. Confidence-interval claims require \path{bootstrap_intervals}; component-causality claims require \path{ablation_suite}; human-validation claims require \path{manual_validation_slice}; threshold-stability claims require \path{threshold_sensitivity_grid}; and broad method-ranking claims require the interval, validation, and threshold-grid artifacts together. If a conditional flag is set to true, the corresponding artifact row must be marked required and must include a file path and SHA256 checksum.
 

@@ -25,6 +25,7 @@ FORBIDDEN_RELEASE_STATUSES = {"template_pending_external_artifact", "skeleton_pe
 CHECKSUM_FILE_NAME = "checksums.sha256"
 ARTIFACT_SHA256_PLACEHOLDERS = {"", "fill-after-artifact-export", "fill-with-artifact-sha256"}
 REQUIRED_VALIDATION_COMMANDS = [
+    "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
     "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
     "sha256sum -c checksums.sha256",
     "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",

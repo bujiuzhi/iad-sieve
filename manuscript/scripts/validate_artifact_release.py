@@ -471,6 +471,7 @@ def check_manifest_structure(
         for command in [
             "sha256sum -c checksums.sha256",
             "python manuscript/scripts/validate_artifact_release.py --artifact-dir",
+            "python manuscript/scripts/populate_artifact_release.py --artifact-dir",
             "python manuscript/scripts/finalize_artifact_release.py --artifact-dir",
             "python manuscript/scripts/validate_manuscript.py --strict-latex",
             "python manuscript/scripts/verify_fixture_rebuild.py",

@@ -13,7 +13,8 @@
 ```text
 outputs/
   experiments/   # baseline、ablation、bootstrap 和误差分析结果
-  artifacts/     # 对外发布前的论文复现包
+  source_artifacts/  # 由实验流程整理出的 release 输入文件
+  artifacts/     # 对外发布前的 artifact release 目录
   models/        # 本地训练或下载的模型权重
   reports/       # 本地生成的表格、图和运行摘要
 ```
@@ -30,13 +31,23 @@ paper-artifacts/
   manifest.json
   checksums.sha256
   configs/
-  reports/
   tables/
-  figures/
+  predictions/
+  reports/
   logs/
 ```
 
 `manifest.json` 至少记录提交哈希、生成命令、输入数据版本、随机种子、依赖版本和每个文件的 SHA256。
+
+推荐流程：
+
+```bash
+python manuscript/scripts/build_artifact_release_skeleton.py --output-dir outputs/artifacts/iad-risk-release --repository-commit <commit>
+python manuscript/scripts/populate_artifact_release.py --artifact-dir outputs/artifacts/iad-risk-release --source-dir outputs/source_artifacts/<run-id>
+python manuscript/scripts/validate_artifact_release.py --artifact-dir outputs/artifacts/iad-risk-release
+```
+
+`outputs/source_artifacts/<run-id>` 应按 `manuscript/artifact_release_manifest.template.json` 的 `expected_location` 准备表格、预测、报告、配置和日志文件；如本地实验输出命名不同，应使用 `populate_artifact_release.py --mapping <mapping.json>` 显式声明 artifact ID 到源文件路径的映射。
 
 ## 提交规则
 

@@ -262,6 +262,9 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
             r"\section{Artifact Package Requirements}",
             r"\section{Claim-Evidence Matrix}",
             "The released artifact package includes checksums.sha256.",
+            "Reviewers can run python manuscript/scripts/build_artifact_release_skeleton.py.",
+            "Reviewers can run python manuscript/scripts/populate_artifact_release.py.",
+            "Reviewers can run python manuscript/scripts/finalize_artifact_release.py.",
             "Reviewers can run python manuscript/scripts/validate_artifact_release.py.",
             "The validator checks required result identifiers.",
             "The validator checks conditional claim artifacts.",
@@ -988,6 +991,7 @@ def test_check_artifact_release_manifest_template_accepts_complete_template() ->
                 {"artifact_id": "threshold_sensitivity_grid"},
             ],
             "minimum_validation_commands": [
+                "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
                 "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
                 "sha256sum -c checksums.sha256",
                 "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
@@ -1082,6 +1086,7 @@ def test_check_artifact_release_manifest_template_rejects_missing_conditional_cl
                 {"artifact_id": "manual_validation_slice"},
             ],
             "minimum_validation_commands": [
+                "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
                 "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
                 "sha256sum -c checksums.sha256",
                 "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
@@ -1131,6 +1136,7 @@ def test_check_artifact_release_readme_template_accepts_complete_template() -> N
             "reports/",
             "logs/",
             "## Minimum Validation Commands",
+            "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
             "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
             "sha256sum -c checksums.sha256",
             "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
@@ -1257,6 +1263,44 @@ def test_check_artifact_release_finalizer_rejects_missing_validator_call() -> No
     assert any("--skip-validate" in error for error in errors)
 
 
+def test_check_artifact_release_populator_accepts_required_markers() -> None:
+    """验证 artifact release 填充脚本包含 source 到 release 的桥接入口。"""
+
+    module = _load_validate_manuscript_module()
+    script_text = "\n".join(
+        [
+            "import argparse",
+            "import logging",
+            "POPULATION_LOG_PATH = \"logs/artifact_population_log.jsonl\"",
+            "def populate_artifact_release(",
+            "def build_copy_plan(",
+            "def copy_planned_artifacts(",
+            "def write_population_log(",
+            "def finalize_release(",
+            "--source-dir",
+            "--mapping",
+            "--skip-finalize",
+            "missing required source artifact files",
+        ]
+    )
+
+    errors = module.check_artifact_release_populator(script_text)
+
+    assert errors == []
+
+
+def test_check_artifact_release_populator_rejects_missing_mapping_entry() -> None:
+    """验证 artifact release 填充脚本缺少映射入口时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    script_text = "def populate_artifact_release():\n    pass\n"
+
+    errors = module.check_artifact_release_populator(script_text)
+
+    assert any("--mapping" in error for error in errors)
+    assert any("build_copy_plan" in error for error in errors)
+
+
 def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
     """验证投稿系统上传清单覆盖文件、元数据和阻断项时可通过。"""
 
@@ -1280,6 +1324,7 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "Artifact release manifest",
             "## Artifact Release Package Checks",
             "python manuscript/scripts/build_artifact_release_skeleton.py --output-dir /path/to/release --repository-commit",
+            "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
             "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
             "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
             "## DKE/Elsevier Preflight Package Checks",
