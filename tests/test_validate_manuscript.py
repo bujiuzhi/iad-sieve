@@ -120,7 +120,7 @@ def test_check_highlights_accepts_five_concise_bullets() -> None:
             "- Identity-agenda confusion causes risky scholarly work merges.",
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
-            "- Open-v2 baselines show HNFMR 0.790--0.999.",
+            "- Open-v2 scope-bounded evidence reports IAD-Risk HNFMR=0.000.",
             "- Fixtures and artifact rules support reproducible review.",
         ]
     )
@@ -155,6 +155,28 @@ def test_check_highlights_rejects_long_bullet() -> None:
 
     assert any("highlight is too long" in error for error in errors)
     assert any("exceeds 85 characters" in error for error in errors)
+
+
+def test_check_highlights_rejects_unscoped_hnfmr_numbers() -> None:
+    """验证含 HNFMR 数字的 highlight 必须说明证据范围。"""
+
+    module = _load_validate_manuscript_module()
+    highlights_text = "\n".join(
+        [
+            "# Highlights",
+            "",
+            "- Identity-agenda confusion causes risky scholarly work merges.",
+            "- IAD-Risk separates identity, agenda, and ANI evidence.",
+            "- IAD-Bench keeps gold, proxy, and silver labels separate.",
+            "- Baselines show HNFMR 0.790--0.999; IAD-Risk HNFMR=0.000.",
+            "- Fixtures and artifact rules support reproducible review.",
+        ]
+    )
+
+    errors = module.check_highlights(highlights_text)
+
+    assert any("HNFMR highlight must mention Open-v2" in error for error in errors)
+    assert any("scope" in error for error in errors)
 
 
 def test_check_keywords_accepts_semicolon_separated_terms() -> None:
@@ -2610,6 +2632,51 @@ def test_check_cover_letter_rejects_missing_artifact_release_boundary() -> None:
     assert any("artifact-release instructions" in error for error in errors)
 
 
+def test_check_submission_material_quantitative_summary_accepts_scoped_highlights() -> None:
+    """验证投稿摘要材料接受带范围边界的 highlights 量化表述。"""
+
+    module = _load_validate_manuscript_module()
+    highlights_text = "\n".join(
+        [
+            "- Identity-agenda confusion causes risky scholarly work merges.",
+            "- IAD-Risk separates identity, agenda, and ANI evidence.",
+            "- IAD-Bench keeps gold, proxy, and silver labels separate.",
+            "- Open-v2 scope-bounded evidence reports IAD-Risk HNFMR=0.000.",
+            "- Fixtures and artifact rules support reproducible review.",
+        ]
+    )
+    cover_letter_text = "\n".join(
+        [
+            "The manuscript reports an Open-v2 evidence snapshot.",
+            "Single-space scientific representation baselines show HNFMR 0.790--0.999 on the full pair scope.",
+            "IAD-Risk reports same-work F1=0.980 and HNFMR=0.000 on the held-out test scope.",
+        ]
+    )
+
+    errors = module.check_submission_material_quantitative_summary(highlights_text, cover_letter_text)
+
+    assert errors == []
+
+
+def test_check_submission_material_quantitative_summary_rejects_unscoped_highlights() -> None:
+    """验证投稿 highlights 的 HNFMR 数字缺少范围边界时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    highlights_text = "- IAD-Risk HNFMR=0.000."
+    cover_letter_text = "\n".join(
+        [
+            "The manuscript reports an Open-v2 evidence snapshot.",
+            "Single-space scientific representation baselines show HNFMR 0.790--0.999 on the full pair scope.",
+            "IAD-Risk reports same-work F1=0.980 and HNFMR=0.000 on the held-out test scope.",
+        ]
+    )
+
+    errors = module.check_submission_material_quantitative_summary(highlights_text, cover_letter_text)
+
+    assert any("highlights missing scoped quantitative evidence marker" in error for error in errors)
+    assert any("Open-v2 scope-bounded evidence" in error for error in errors)
+
+
 def test_check_editorial_claim_alignment_accepts_consistent_submission_materials() -> None:
     """验证首屏投稿材料主张一致时可通过检查。"""
 
@@ -2646,7 +2713,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
             "- Identity-agenda confusion causes risky scholarly work merges.",
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
-            "- Open-v2 baselines show HNFMR 0.790--0.999; IAD-Risk HNFMR=0.000.",
+            "- Open-v2 scope-bounded evidence reports IAD-Risk HNFMR=0.000.",
             "- Fixtures and artifact rules support reproducible review.",
         ]
     )

@@ -1988,6 +1988,12 @@ def check_highlights(highlights_text: str) -> list[str]:
         character_count = len(highlight)
         if character_count > 85:
             errors.append(f"highlight exceeds 85 characters ({character_count} characters): {line}")
+        if "HNFMR" in highlight and re.search(r"\d", highlight):
+            if "Open-v2" not in highlight or "scope" not in highlight.lower():
+                errors.append(
+                    "HNFMR highlight must mention Open-v2 and scope boundary when reporting numbers: "
+                    f"{line}"
+                )
     return errors
 
 
@@ -2103,14 +2109,19 @@ def check_submission_material_quantitative_summary(highlights_text: str, cover_l
     返回:
         list[str]: Error messages for missing quantitative submission markers.
     """
-    required_markers = [
+    highlight_required_markers = [
+        "Open-v2 scope-bounded evidence",
+        "IAD-Risk HNFMR=0.000",
+    ]
+    errors: list[str] = []
+    for marker in highlight_required_markers:
+        if marker not in highlights_text:
+            errors.append(f"highlights missing scoped quantitative evidence marker: {marker}")
+    cover_letter_quantitative_markers = [
         "HNFMR 0.790--0.999",
         "HNFMR=0.000",
     ]
-    errors: list[str] = []
-    for marker in required_markers:
-        if marker not in highlights_text:
-            errors.append(f"highlights missing quantitative evidence marker: {marker}")
+    for marker in cover_letter_quantitative_markers:
         if marker not in cover_letter_text:
             errors.append(f"cover letter missing quantitative evidence marker: {marker}")
     cover_letter_scope_markers = [
@@ -2209,7 +2220,7 @@ def check_editorial_claim_alignment(
                 "Identity-agenda confusion",
                 "IAD-Risk",
                 "IAD-Bench",
-                "HNFMR 0.790--0.999",
+                "Open-v2 scope-bounded evidence",
                 "IAD-Risk HNFMR=0.000",
                 "artifact rules",
             ],
