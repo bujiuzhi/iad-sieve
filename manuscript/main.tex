@@ -243,22 +243,35 @@ IAD-Risk converts scholarly deduplication into selective risk-aware matching. Gi
 \small
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[
-  node distance=0.45cm,
-  box/.style={draw, rounded corners, align=center, minimum height=0.8cm, text width=2.35cm},
+  node distance=0.5cm and 0.42cm,
+  source/.style={draw, rounded corners, fill=blue!8, align=center, minimum height=0.9cm, text width=2.45cm},
+  process/.style={draw, rounded corners, fill=green!8, align=center, minimum height=0.9cm, text width=2.45cm},
+  risk/.style={draw, rounded corners, fill=yellow!18, align=center, minimum height=0.9cm, text width=2.55cm},
+  output/.style={draw, rounded corners, fill=red!7, align=center, minimum height=0.9cm, text width=2.25cm},
+  audit/.style={draw, rounded corners, dashed, fill=gray!8, align=center, minimum height=0.75cm, text width=3.0cm},
   arrow/.style={-Latex, thick}
 ]
-\node[box] (pair) {Candidate\\record pair};
-\node[box, right=of pair] (evidence) {Identity and\\agenda evidence};
-\node[box, right=of evidence] (heads) {Work, agenda,\\ANI heads};
-\node[box, right=of heads] (gate) {Risk-aware\\merge gate};
-\node[box, right=of gate] (output) {Merge, block,\\or defer};
-\draw[arrow] (pair) -- (evidence);
+\node[source] (pair) {Candidate\\record pair};
+\node[source, right=of pair] (contract) {IAD-Bench\\provenance contract};
+\node[process, right=of contract] (evidence) {Identity and\\agenda evidence};
+\node[process, right=of evidence] (heads) {Work, agenda,\\ANI heads};
+\node[risk, right=of heads] (score) {False-merge\\risk score\\$p_{\mathrm{risk}}$};
+\node[risk, right=of score] (gate) {Risk-aware\\merge gate};
+\node[output, right=of gate] (decision) {Merge, block,\\or defer};
+\node[audit, below=of contract] (schema) {Label strength, split,\\and source audit fields};
+\node[audit, below=of score] (artifact) {Prediction, threshold,\\metric, checksum artifacts};
+\draw[arrow] (pair) -- (contract);
+\draw[arrow] (contract) -- (evidence);
 \draw[arrow] (evidence) -- (heads);
-\draw[arrow] (heads) -- (gate);
-\draw[arrow] (gate) -- (output);
+\draw[arrow] (heads) -- (score);
+\draw[arrow] (score) -- (gate);
+\draw[arrow] (gate) -- (decision);
+\draw[arrow] (contract) -- (schema);
+\draw[arrow] (heads) -- (artifact);
+\draw[arrow] (gate) -- (artifact);
 \end{tikzpicture}
 }
-\caption{IAD-Risk pipeline. The framework first separates identity evidence from agenda evidence, then predicts relation signals and derives a false-merge risk score before applying a conservative merge gate.}
+\caption{IAD-Risk pipeline. The framework first anchors each candidate pair in the IAD-Bench provenance contract, separates identity evidence from agenda evidence, predicts work, agenda, and ANI heads, derives a false-merge risk score, and then applies a conservative merge gate. Dashed audit nodes mark the schema fields and external artifacts required to reproduce prediction, threshold, metric, and checksum evidence.}
 \label{fig:iad-risk-pipeline}
 \end{figure}
 
