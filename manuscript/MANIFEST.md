@@ -65,6 +65,8 @@ python manuscript/scripts/validate_submission_package.py --dke-preflight
 
 `artifact_release_manifest.template.json` 和 `artifact_release_README.template.md` 用于准备正式 artifact release，不作为当前匿名预投稿包的替代物。`scripts/build_artifact_release_skeleton.py` 只生成外部 release 骨架；真实结果应从不纳入 Git 的 source artifact 目录通过 `scripts/populate_artifact_release.py` 填充。填入真实结果 artifact 后，应使用 `scripts/finalize_artifact_release.py` 刷新 manifest 和 checksum。正式上传前应创建公开链接，并用 `scripts/validate_artifact_release.py` 校验 release 目录。
 
+`open_v2_main_results` 是主结果表对应的外部结果 artifact。正式 artifact release 中的 CSV 必须包含 per-row denominator counts、per-row threshold source 和 scope label used in the main table，确保主结果表不是仅由文件名和 checksum 支撑，而是可按行追溯 denominator、阈值来源和评价范围。
+
 `submission_system_checklist.md` 用于正式上传前逐项核对文件、元数据、PDF 和 artifact release，不作为当前匿名预投稿包的替代物。
 
 `reviewer_readiness_audit.md` 用于记录投稿前审稿准备度、主要拒稿风险和最终上传门槛，不作为当前匿名预投稿包的替代物。

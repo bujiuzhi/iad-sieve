@@ -1847,6 +1847,33 @@ def check_artifact_release_readme_template(readme_text: str) -> list[str]:
     ]
 
 
+def check_manuscript_package_docs(readme_text: str, manifest_text: str) -> list[str]:
+    """Check whether manuscript package docs describe release-critical artifacts.
+
+    参数:
+        readme_text: Manuscript directory README Markdown text.
+        manifest_text: Manuscript MANIFEST Markdown text.
+
+    返回:
+        list[str]: Error messages for missing package documentation markers.
+    """
+    required_markers = [
+        "open_v2_main_results",
+        "per-row denominator counts",
+        "per-row threshold source",
+        "scope label used in the main table",
+    ]
+    errors: list[str] = []
+    for document_name, document_text in {
+        "manuscript README": readme_text,
+        "manuscript MANIFEST": manifest_text,
+    }.items():
+        for marker in required_markers:
+            if marker not in document_text:
+                errors.append(f"{document_name} missing package artifact schema marker: {marker}")
+    return errors
+
+
 def check_data_processing_pipeline_document(document_text: str) -> list[str]:
     """Check whether the repository documents data processing without committing raw data.
 
@@ -3024,6 +3051,11 @@ def main() -> int:
     errors.extend(check_target_journal_shortlist(target_journal_shortlist_text))
     errors.extend(check_artifact_release_manifest_template(artifact_release_template_text))
     errors.extend(check_artifact_release_readme_template(artifact_release_readme_template_text))
+    readme_path = ROOT / "README.md"
+    readme_text = readme_path.read_text(encoding="utf-8") if readme_path.exists() else ""
+    manifest_path = ROOT / "MANIFEST.md"
+    manifest_text = manifest_path.read_text(encoding="utf-8") if manifest_path.exists() else ""
+    errors.extend(check_manuscript_package_docs(readme_text, manifest_text))
     errors.extend(check_data_processing_pipeline_document(data_processing_pipeline_text))
     errors.extend(check_artifact_release_skeleton_builder(artifact_release_skeleton_builder_text))
     errors.extend(check_artifact_release_populator(artifact_release_populator_text))

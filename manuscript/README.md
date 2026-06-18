@@ -106,6 +106,8 @@ python manuscript/scripts/validate_submission_package.py --dke-preflight
 
 `artifact_release_manifest.template.json` 记录结果 artifact release 应包含的表格、预测、日志、校验命令和 claim boundary。`artifact_release_README.template.md` 是外部 artifact release 的 README 模板，说明目录结构、校验命令、数据边界和条件 claim artifact。`scripts/build_artifact_release_skeleton.py` 可从模板生成外部 release 骨架，但不会生成真实结果文件；真实结果应先由实验流程写入不纳入 Git 的 source artifact 目录，再由 `scripts/populate_artifact_release.py` 拷贝到 release 骨架。补齐真实 artifact 后，应使用 `scripts/finalize_artifact_release.py` 刷新 manifest 和 SHA256，再用 `scripts/validate_artifact_release.py` 校验 release 目录。正式上传前还应在 `submission_metadata.yml` 中填写 artifact 链接。
 
+`open_v2_main_results` 是主结果表对应的外部 artifact。其 CSV 需要包含 per-row denominator counts、per-row threshold source 和 scope label used in the main table；否则只能说明文件存在，不能支持主结果表逐行审计。
+
 `submission_system_checklist.md` 记录最终上传到期刊系统前需要核对的文件、元数据、PDF 和 artifact release 项。该文件用于最终上传前检查，不作为当前预投稿包附件。
 
 `reviewer_readiness_audit.md` 记录投稿前的审稿准备度、主要拒稿风险、证据边界和最终上传门槛。该文件用于质量控制，不作为最终投稿附件。

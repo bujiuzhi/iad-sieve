@@ -2411,6 +2411,41 @@ def test_check_artifact_release_readme_template_rejects_missing_release_boundari
     assert any("cluster_metric_summary" in error for error in errors)
 
 
+def test_check_manuscript_package_docs_accepts_result_row_schema() -> None:
+    """验证稿件目录说明覆盖主结果表行级 schema 时可通过。"""
+
+    module = _load_validate_manuscript_module()
+    readme_text = Path("manuscript/README.md").read_text(encoding="utf-8")
+    manifest_text = Path("manuscript/MANIFEST.md").read_text(encoding="utf-8")
+
+    errors = module.check_manuscript_package_docs(readme_text, manifest_text)
+
+    assert errors == []
+
+
+def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> None:
+    """验证稿件目录说明必须覆盖主结果表行级 schema。"""
+
+    module = _load_validate_manuscript_module()
+    readme_text = Path("manuscript/README.md").read_text(encoding="utf-8")
+    manifest_text = Path("manuscript/MANIFEST.md").read_text(encoding="utf-8")
+    for marker in [
+        "open_v2_main_results",
+        "per-row denominator counts",
+        "per-row threshold source",
+        "scope label used in the main table",
+    ]:
+        readme_text = readme_text.replace(marker, "")
+        manifest_text = manifest_text.replace(marker, "")
+
+    errors = module.check_manuscript_package_docs(readme_text, manifest_text)
+
+    assert any("open_v2_main_results" in error for error in errors)
+    assert any("per-row denominator counts" in error for error in errors)
+    assert any("per-row threshold source" in error for error in errors)
+    assert any("scope label used in the main table" in error for error in errors)
+
+
 def test_check_related_work_positioning_rejects_missing_novelty_boundaries() -> None:
     """验证 Related Work 必须说明最接近工作的创新边界。"""
 
