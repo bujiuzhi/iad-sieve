@@ -125,6 +125,9 @@ For each author, select the applicable CRediT roles and then draft the final aut
 ## Artifact release
 
 - Artifact release URL or DOI:
+- Artifact manifest `publication.artifact_release_url` matches this URL:
+- Artifact manifest `publication.artifact_release_doi` matches this DOI:
+- Artifact manifest `publication.public_access_status` is public, published, publicly accessible, or archived:
 - Source artifact directory path for preflight:
 - Source artifact preflight command passed:
 - Artifact release directory path for final validation:

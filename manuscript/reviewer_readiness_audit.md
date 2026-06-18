@@ -10,11 +10,11 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 69.
+Completed audit cycles: 70.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.
 
-Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.
+Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, and the artifact manifest publication object records the same URL or DOI with public access status.
 
 Non-code external inputs still required: author metadata, DKE author biography and photograph materials if that route is selected, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.
 
@@ -45,6 +45,7 @@ Next revision trigger: repeat the editorial desk check after target-journal temp
 | DKE author biographies and photographs may be missing at upload. | Medium | The target-journal shortlist, final-upload information request, submission metadata, and submission-system checklist now track author biographies and passport-type photographs as DKE-specific final-upload materials. | Collect author-approved biography text and photograph files after author order is confirmed and keep them out of anonymous preflight packages. |
 | Test fixtures may be mistaken for current Q2/B evidence. | Medium | The manuscript and audit package distinguish fixture-level code-path checks from live result artifacts and final-upload metadata. | Treat test fixtures, example summaries, and generated fixture rows as validator coverage only unless they are regenerated from current live artifacts, current commit metadata, and the selected target-journal route. |
 | Reproducibility depends on files outside Git. | Medium | Fixture rebuild, public-source commands, artifact manifest template, and checksums policy are documented. | Publish the L3 artifact release and link it in submission metadata. |
+| Artifact publication metadata may drift from final-upload metadata. | High | The artifact manifest template now includes a publication object, and final-upload package validation compares `artifact_release_url`, `artifact_release_doi`, and public access status against `submission_metadata.yml`. | Do not upload until the external artifact manifest, submission metadata, cover letter, and live system data statement all use the same public artifact URL or DOI. |
 | Final upload may mismatch journal template or system fields. | High | A submission-system checklist records file, metadata, PDF, artifact, source-archive, and template-binding checks. | Confirm target journal, set `target_journal_template_bound`, rebuild the final template source and PDFs, and verify the live system fields. |
 
 ## Claim-Evidence Check
@@ -650,6 +651,14 @@ This gate checks whether the scoring and merge algorithm table is needed in the 
 
 The reviewer-facing boundary is scoring-algorithm clarity without main-text table overload. The validator still requires the supplementary scoring-merge algorithm table and the explicit rule that same-work F1, FMR, HNFMR, coverage, and defer-rate audits refer to the same decision file.
 
+## Audit Cycle 70: Artifact Publication Binding Gate
+
+Outcome: pass for final-upload artifact publication binding; blocked for final upload until the external artifact release has a public URL or DOI, the artifact manifest publication object records the same public URL or DOI as `submission_metadata.yml`, and the manifest public access status is no longer pending.
+
+This gate checks whether final-upload validation can be satisfied by a local artifact directory alone. It cannot. The final-upload package validator now checks the external artifact release manifest after artifact-level validation and requires a `publication` object with `artifact_release_url`, `artifact_release_doi`, and `public_access_status`. The submission package is rejected when the artifact manifest is missing the publication object, when the publication URL or DOI differs from `submission_metadata.yml`, when the DOI in a `doi.org` URL disagrees with the DOI field, or when public access status remains pending rather than public, published, publicly accessible, or archived.
+
+The reviewer-facing boundary is artifact-publication traceability, not stronger empirical evidence. A passing final-upload validation shows that the manuscript package, submission metadata, cover letter, artifact manifest, checksums, row schemas, prediction schemas, repository commit, and public artifact link are aligned. It does not by itself create the external artifact release, confirm the live journal-system data statement, or upgrade Q2/B evidence.
+
 ## Minimum Gate Before Final Upload
 
 The manuscript should not be uploaded to a journal system until all of the following are true:
@@ -657,7 +666,7 @@ The manuscript should not be uploaded to a journal system until all of the follo
 1. `submission_metadata.yml` contains the selected target journal, `target_journal_template_bound: true`, completed author metadata, and author biography/photo readiness when the selected route requires it.
 2. `main.tex` or the selected journal source is converted to the selected journal template and rebuilt.
 3. `supplementary_material.tex` is rebuilt after any final source edits.
-4. The artifact release has a real URL or DOI, validates against its checksum file, and records the same repository commit used by the final manuscript package in both `README.md` and `manifest.json`.
+4. The artifact release has a real URL or DOI, validates against its checksum file, records the same repository commit used by the final manuscript package in both `README.md` and `manifest.json`, and stores the same public URL or DOI plus a public access status in the artifact manifest publication object.
 5. The funding statement text, author contribution statement, permissions statement, generative AI declaration, data/code availability statement, and journal-specific research data statement are complete and consistent with the live submission system, with CRediT roles covering every listed author and with the repository URL, repository commit, and artifact URL or DOI embedded in the availability statements.
 6. `python manuscript/scripts/verify_fixture_rebuild.py` passes from the public source tree without requiring raw third-party data.
 7. `python scripts/check_public_release.py` passes and confirms that `data/`, `outputs/`, caches, credentials, and large local artifacts are outside the public package.

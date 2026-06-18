@@ -65,7 +65,7 @@ python manuscript/scripts/validate_submission_package.py --dke-preflight
 
 `build/dke_preflight_package/` 和 `build/iad-risk-dke-preflight-package.zip` 是 DKE/Elsevier 匿名预投稿包的生成产物，不纳入 Git 跟踪；它们用于检查投稿文件组合，不替代最终上传门禁。
 
-`artifact_release_manifest.template.json` 和 `artifact_release_README.template.md` 用于准备正式 artifact release，不作为当前匿名预投稿包的替代物。`scripts/build_artifact_release_skeleton.py` 只生成外部 release 骨架；真实结果应从不纳入 Git 的 source artifact 目录先通过 `scripts/populate_artifact_release.py --preflight-only` 做只读完整性检查，再通过 `scripts/populate_artifact_release.py` 填充。填入真实结果 artifact 后，应使用 `scripts/finalize_artifact_release.py` 刷新 manifest 和 checksum。正式上传前应创建公开链接，并用 `scripts/validate_artifact_release.py` 校验 release 目录。
+`artifact_release_manifest.template.json` 和 `artifact_release_README.template.md` 用于准备正式 artifact release，不作为当前匿名预投稿包的替代物。`scripts/build_artifact_release_skeleton.py` 只生成外部 release 骨架；真实结果应从不纳入 Git 的 source artifact 目录先通过 `scripts/populate_artifact_release.py --preflight-only` 做只读完整性检查，再通过 `scripts/populate_artifact_release.py` 填充。填入真实结果 artifact 后，应使用 `scripts/finalize_artifact_release.py` 刷新 manifest 和 checksum。正式上传前应创建公开链接，并用 `scripts/validate_artifact_release.py` 校验 release 目录。最终上传还要求 artifact `manifest.json` 的 `publication.artifact_release_url`、`publication.artifact_release_doi` 和 `publication.public_access_status` 与 `submission_metadata.yml`、投稿信和 live submission-system data statement 保持一致。
 
 Artifact release 的 `repository.commit` 必须是 7 到 40 位十六进制 Git 提交号。`scripts/build_artifact_release_skeleton.py` 和 `scripts/validate_artifact_release.py` 都会拒绝默认模板值或非 Git SHA 文本，避免外部结果包无法追溯到明确代码版本。
 
@@ -73,7 +73,7 @@ Artifact release 的 `repository.commit` 必须是 7 到 40 位十六进制 Git 
 
 `iad_risk_predictions`、`representation_baseline_scores`、`supervised_baseline_predictions` 和 `threshold_selection_logs` 是外部结果 artifact 的行级预测与阈值证据。预测与分数 JSONL 必须记录 `pair_id`、`source_document_id`、`target_document_id`、expected labels、label strength、hard-negative level、split identifiers、`score_field` 或概率字段、`threshold_value`、threshold source 和 `merge_prediction`。阈值日志必须记录 system、threshold_name、`threshold_value`、selection_split、selection_metric、selection_rule、applied_scope 和 `score_field`，用于证明阈值来自固定验证流程而不是测试后选择。
 
-`final_upload_information_request.md` 用于收集正式上传前的 Author list、author biographies and photographs、Corresponding author、Funding statement、Author contribution statement、Permissions statement、Generative AI declaration、Artifact release URL or DOI 和 Live submission-system fields。该文件不作为正式投稿附件；作者确认这些外部输入后，再同步更新 `submission_metadata.yml`、投稿信和目标期刊系统字段。
+`final_upload_information_request.md` 用于收集正式上传前的 Author list、author biographies and photographs、Corresponding author、Funding statement、Author contribution statement、Permissions statement、Generative AI declaration、Artifact release URL or DOI、artifact manifest publication 字段和 Live submission-system fields。该文件不作为正式投稿附件；作者确认这些外部输入后，再同步更新 `submission_metadata.yml`、投稿信和目标期刊系统字段。
 
 `submission_system_checklist.md` 用于正式上传前逐项核对文件、元数据、PDF 和 artifact release，不作为当前匿名预投稿包的替代物。
 
@@ -87,4 +87,4 @@ Artifact release 的 `repository.commit` 必须是 7 到 40 位十六进制 Git 
 
 ## 正式上传检查项
 
-`submission_metadata.yml` 中的 `final_upload_checklist` 记录正式上传前必须完成的项目。当前预投稿包保持匿名预投稿状态，源文件中的 `statements.originality`、`statements.author_approval` 和 `statements.competing_interests` 保持空值，正式上传前再由作者确认后填入。`main.tex` 的 Competing Interests 段只记录预投稿边界，不作为最终作者声明；最终利益冲突状态需要与 `submission_metadata.yml` 和 live submission system 保持一致。正式上传前应至少完成目标期刊选择、期刊模板套用、作者信息、作者 biography/photo 材料、通讯作者信息、经费声明文本、作者贡献声明、第三方材料许可声明、生成式 AI 使用声明、模板后 PDF 重建、投稿系统文件核对和 artifact release 链接。`scripts/submission_metadata_checks.py` 对最终上传元数据执行结构检查，包括作者邮箱、ORCID、经费声明文本、作者贡献声明、permissions statement、generative AI declaration 和 artifact release URL/DOI。
+`submission_metadata.yml` 中的 `final_upload_checklist` 记录正式上传前必须完成的项目。当前预投稿包保持匿名预投稿状态，源文件中的 `statements.originality`、`statements.author_approval` 和 `statements.competing_interests` 保持空值，正式上传前再由作者确认后填入。`main.tex` 的 Competing Interests 段只记录预投稿边界，不作为最终作者声明；最终利益冲突状态需要与 `submission_metadata.yml` 和 live submission system 保持一致。正式上传前应至少完成目标期刊选择、期刊模板套用、作者信息、作者 biography/photo 材料、通讯作者信息、经费声明文本、作者贡献声明、第三方材料许可声明、生成式 AI 使用声明、模板后 PDF 重建、投稿系统文件核对和 artifact release 链接。`scripts/submission_metadata_checks.py` 对最终上传元数据执行结构检查，包括作者邮箱、ORCID、经费声明文本、作者贡献声明、permissions statement、generative AI declaration 和 artifact release URL/DOI。`scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` 进一步要求提交包元数据与外部 artifact manifest publication 字段指向 same public artifact URL or DOI。

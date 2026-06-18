@@ -94,7 +94,11 @@ The release must include source_input_manifest and processing_run_log so reviewe
 ## Release Metadata To Fill
 
 - Release URL:
+  - Must match `manifest.json` field `publication.artifact_release_url` and the final-upload `submission_metadata.yml`.
 - Release DOI:
+  - Must match `manifest.json` field `publication.artifact_release_doi` and the final-upload `submission_metadata.yml`.
+- Public access status:
+  - Must match `manifest.json` field `publication.public_access_status`; final upload accepts public, published, publicly accessible, or archived.
 - Repository commit:
   - Must match `manifest.json` field `repository.commit` and the final manuscript package commit.
 - Release date:

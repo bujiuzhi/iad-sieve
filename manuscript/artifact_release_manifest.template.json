@@ -9,6 +9,11 @@
     "branch": "main",
     "source_tree_clean": true
   },
+  "publication": {
+    "artifact_release_url": "",
+    "artifact_release_doi": "",
+    "public_access_status": "pending_public_release"
+  },
   "data_policy": {
     "raw_third_party_data_included": false,
     "model_checkpoints_included": false,

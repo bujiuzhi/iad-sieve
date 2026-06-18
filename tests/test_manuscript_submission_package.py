@@ -732,6 +732,11 @@ def _write_artifact_release_manifest(artifact_dir: Path, repository_commit: str 
             "branch": "main",
             "source_tree_clean": True,
         },
+        "publication": {
+            "artifact_release_url": "https://doi.org/10.0000/example",
+            "artifact_release_doi": "10.0000/example",
+            "public_access_status": "publicly_accessible",
+        },
         "data_policy": {
             "raw_third_party_data_included": False,
             "model_checkpoints_included": False,
@@ -766,6 +771,23 @@ def _write_artifact_release_manifest(artifact_dir: Path, repository_commit: str 
         },
     }
     _write_file(artifact_dir / "manifest.json", json.dumps(manifest, indent=2) + "\n")
+    checksum_lines = []
+    for path in sorted(artifact_dir.rglob("*")):
+        if path.is_file() and path.name != "checksums.sha256":
+            relative_path = path.relative_to(artifact_dir).as_posix()
+            checksum_lines.append(f"{_sha256_file(path)}  {relative_path}")
+    _write_file(artifact_dir / "checksums.sha256", "\n".join(checksum_lines) + "\n")
+
+
+def _refresh_artifact_release_checksums(artifact_dir: Path) -> None:
+    """刷新测试 artifact release 的 checksums.sha256。
+
+    参数:
+        artifact_dir: Artifact release 目录。
+
+    返回:
+        无。
+    """
     checksum_lines = []
     for path in sorted(artifact_dir.rglob("*")):
         if path.is_file() and path.name != "checksums.sha256":
@@ -1279,6 +1301,58 @@ def test_validate_submission_package_rejects_final_upload_artifact_commit_mismat
 
     assert any("submission_metadata.yml repository_commit" in error for error in errors)
     assert any("artifact manifest repository.commit" in error for error in errors)
+
+
+def test_validate_submission_package_rejects_missing_artifact_publication_binding(tmp_path) -> None:
+    """验证正式上传包要求 artifact manifest 记录公开 release 链接。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    artifact_dir = tmp_path / "artifact_release"
+    _write_required_manuscript_files(manuscript_root)
+    _write_final_upload_metadata(manuscript_root)
+    _write_final_upload_cover_letter(manuscript_root)
+    _write_artifact_release_manifest(artifact_dir)
+    manifest_path = artifact_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest.pop("publication")
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    _refresh_artifact_release_checksums(artifact_dir)
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
+    errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True, artifact_dir=artifact_dir)
+
+    assert any("artifact manifest missing publication object" in error for error in errors)
+
+
+def test_validate_submission_package_rejects_artifact_publication_link_mismatch(tmp_path) -> None:
+    """验证正式上传元数据与 artifact manifest 的公开 DOI 必须一致。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    artifact_dir = tmp_path / "artifact_release"
+    _write_required_manuscript_files(manuscript_root)
+    _write_final_upload_metadata(manuscript_root)
+    _write_final_upload_cover_letter(manuscript_root)
+    _write_artifact_release_manifest(artifact_dir)
+    manifest_path = artifact_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["publication"]["artifact_release_url"] = "https://doi.org/10.0000/other"
+    manifest["publication"]["artifact_release_doi"] = "10.0000/other"
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    _refresh_artifact_release_checksums(artifact_dir)
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
+    errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True, artifact_dir=artifact_dir)
+
+    assert any("artifact_release_url" in error and "publication.artifact_release_url" in error for error in errors)
+    assert any("artifact_release_doi" in error and "publication.artifact_release_doi" in error for error in errors)
 
 
 def test_validate_submission_package_rejects_invalid_final_upload_artifact_release(tmp_path) -> None:

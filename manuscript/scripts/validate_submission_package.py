@@ -25,8 +25,11 @@ if str(SCRIPT_ROOT) not in sys.path:
 from submission_metadata_checks import (
     COMMIT_PATTERN,
     DKE_ELSEVIER_FILE_REQUIREMENT_ERROR,
+    DOI_PATTERN,
+    URL_PATTERN,
     check_final_upload_cover_letter_text as check_structured_final_upload_cover_letter_text,
     check_final_upload_metadata_text as check_structured_final_upload_metadata_text,
+    doi_from_url,
     scalar_value,
     target_journal_requires_elsevier_files,
 )
@@ -40,6 +43,12 @@ DEFAULT_ZIP_PATH = MANUSCRIPT_ROOT / "build" / "iad-risk-submission-package.zip"
 DEFAULT_DKE_PREFLIGHT_PACKAGE_DIR = MANUSCRIPT_ROOT / "build" / "dke_preflight_package"
 DEFAULT_DKE_PREFLIGHT_ZIP_PATH = MANUSCRIPT_ROOT / "build" / "iad-risk-dke-preflight-package.zip"
 PACKAGE_ROOT_NAME = "submission_package"
+PUBLIC_ARTIFACT_ACCESS_STATUSES = {
+    "public",
+    "published",
+    "publicly_accessible",
+    "archived",
+}
 BASE_EXPECTED_FILES = {
     "main.tex",
     "supplementary_material.tex",
@@ -467,6 +476,63 @@ def check_final_upload_artifact_source_binding(
     return errors
 
 
+def check_final_upload_artifact_publication_binding(
+    metadata_text: str,
+    artifact_manifest: dict | None,
+    location: str,
+) -> list[str]:
+    """Check final-upload artifact URL/DOI binding against the artifact manifest.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+        artifact_manifest: Optional parsed artifact release manifest.
+        location: Human-readable package location.
+
+    返回:
+        list[str]: Error messages for public artifact link drift.
+    """
+    if artifact_manifest is None:
+        return []
+    publication = artifact_manifest.get("publication")
+    if not isinstance(publication, dict):
+        return [f"{location} artifact manifest missing publication object"]
+
+    errors: list[str] = []
+    public_access_status = str(publication.get("public_access_status", "")).strip()
+    if public_access_status not in PUBLIC_ARTIFACT_ACCESS_STATUSES:
+        errors.append(
+            f"{location} artifact manifest publication.public_access_status "
+            f"must be one of {sorted(PUBLIC_ARTIFACT_ACCESS_STATUSES)}"
+        )
+
+    metadata_url = scalar_value(metadata_text, "artifact_release_url")
+    metadata_doi = scalar_value(metadata_text, "artifact_release_doi")
+    artifact_url = str(publication.get("artifact_release_url", "")).strip()
+    artifact_doi = str(publication.get("artifact_release_doi", "")).strip()
+
+    if not artifact_url and not artifact_doi:
+        errors.append(f"{location} artifact manifest publication must record artifact_release_url or artifact_release_doi")
+    if artifact_url and URL_PATTERN.fullmatch(artifact_url) is None:
+        errors.append(f"{location} artifact manifest publication.artifact_release_url is invalid")
+    if artifact_doi and DOI_PATTERN.fullmatch(artifact_doi) is None:
+        errors.append(f"{location} artifact manifest publication.artifact_release_doi is invalid")
+
+    artifact_url_doi = doi_from_url(artifact_url) if artifact_url else ""
+    if artifact_url_doi and artifact_doi and artifact_url_doi.lower() != artifact_doi.lower():
+        errors.append(f"{location} artifact manifest publication URL DOI does not match publication DOI")
+    if metadata_url and metadata_url != artifact_url:
+        errors.append(
+            f"{location} submission_metadata.yml artifact_release_url {metadata_url} "
+            f"does not match artifact manifest publication.artifact_release_url {artifact_url}"
+        )
+    if metadata_doi and metadata_doi.lower() != artifact_doi.lower():
+        errors.append(
+            f"{location} submission_metadata.yml artifact_release_doi {metadata_doi} "
+            f"does not match artifact manifest publication.artifact_release_doi {artifact_doi}"
+        )
+    return errors
+
+
 def check_file_membership(file_names: set[str], location: str, dke_preflight: bool = False) -> list[str]:
     """Check exact package file membership.
 
@@ -710,6 +776,13 @@ def validate_package_directory(
                         str(package_dir),
                     )
                 )
+                errors.extend(
+                    check_final_upload_artifact_publication_binding(
+                        metadata_text,
+                        artifact_manifest,
+                        str(package_dir),
+                    )
+                )
             if cover_letter_path.exists():
                 errors.extend(check_final_upload_cover_letter_text(cover_letter_path.read_text(encoding="utf-8"), metadata_text))
             else:
@@ -817,6 +890,13 @@ def validate_zip_archive(
                 errors.extend(
                     check_final_upload_artifact_source_binding(
                         manifest_text,
+                        metadata_text,
+                        artifact_manifest,
+                        "zip archive",
+                    )
+                )
+                errors.extend(
+                    check_final_upload_artifact_publication_binding(
                         metadata_text,
                         artifact_manifest,
                         "zip archive",

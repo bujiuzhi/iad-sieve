@@ -38,7 +38,8 @@ Before linking an external artifact release, verify:
 6. `python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release` refreshes `manifest.json` and `checksums.sha256`.
 7. `python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release` passes.
 8. `manifest.json` records the release commit, source-tree cleanliness, required artifact IDs, claim boundaries, and SHA256 values for required artifacts.
-9. `checksums.sha256` covers every release file except itself and matches the file contents.
+9. `manifest.json` contains a `publication` object whose `artifact_release_url`, `artifact_release_doi`, and `public_access_status` match the final-upload metadata and public release record.
+10. `checksums.sha256` covers every release file except itself and matches the file contents.
 10. `open_v2_main_results` resolves to `tables/open_v2_main_results.csv` with per-row denominator counts, per-row threshold source, scope label used in the main table, automatic merge count, block count, defer count, automatic merge coverage, defer rate, and capacity-normalized review load.
 11. `iad_risk_predictions`, `representation_baseline_scores`, and `supervised_baseline_predictions` resolve to JSONL files with `pair_id`, `source_document_id`, `target_document_id`, expected labels, label strength, hard-negative level, split identifiers, score or probability fields, `threshold_value` where applicable, threshold source, and `merge_prediction`.
 11. `threshold_selection_logs` resolves to a JSONL file with system, threshold_name, `threshold_value`, selection_split, selection_metric, selection_rule, applied_scope, and `score_field`.
@@ -95,7 +96,7 @@ Before upload, verify:
 2. `python manuscript/scripts/build_submission_package.py --final-upload` writes `repository_url`, `repository_commit`, and `repository_branch` into the package copy of `submission_metadata.yml`.
 3. The package copy is bound to `git remote origin`, `git rev-parse HEAD`, and the current branch.
 4. `submission_manifest.json` records the same `repository_commit` as the package copy of `submission_metadata.yml`.
-5. `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes after the package is built and the external artifact release is finalized.
+5. `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes after the package is built, the external artifact release is finalized, and the artifact manifest publication object records the same public artifact URL or DOI as `submission_metadata.yml`.
 
 ## Final Metadata Checks
 
@@ -111,7 +112,7 @@ Before upload, verify:
 8. The generative AI declaration statement is complete and matches the selected journal's live submission field.
 9. Author biographies and photographs are ready when the selected DKE/Elsevier route requests them.
 10. The competing-interest statement, data/code availability statement, and ethics statement are consistent across the manuscript and system fields.
-11. The artifact release URL or DOI resolves publicly or according to the journal's access policy.
+11. The artifact release URL or DOI resolves publicly or according to the journal's access policy, and the artifact manifest `publication.public_access_status` records that public access state.
 12. The manuscript does not claim human gold labels, broad method superiority, or threshold stability unless the corresponding artifact evidence exists.
 
 ## Live Submission Text Checks

@@ -4333,6 +4333,11 @@ def test_check_artifact_release_readme_template_accepts_complete_template() -> N
             "command boundary",
             "output boundary",
             "checksum boundary",
+            "## Release Metadata To Fill",
+            "publication.artifact_release_url",
+            "publication.artifact_release_doi",
+            "publication.public_access_status",
+            "final-upload `submission_metadata.yml`",
         ]
     )
 
@@ -4734,6 +4739,7 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
             "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
             "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
+            "`manifest.json` contains a `publication` object whose `artifact_release_url`, `artifact_release_doi`, and `public_access_status` match the final-upload metadata.",
             "open_v2_main_results",
             "per-row denominator counts",
             "per-row threshold source",
@@ -4783,6 +4789,8 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "The cover letter states the final article type.",
             "The corresponding author name appears in the cover letter.",
             "The artifact URL or DOI appears in the cover letter when available.",
+            "The artifact manifest publication object records the same public artifact URL or DOI as `submission_metadata.yml`.",
+            "The artifact manifest `publication.public_access_status` records the public access state.",
             "The cover letter no longer uses the generic Dear Editor greeting.",
             "The cover letter no longer uses an anonymous author signature.",
             "## Source Archive Assembly Checks",
@@ -5316,9 +5324,9 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 69.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
-            "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
+            "Completed audit cycles: 70.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.",
+            "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
             "## Audit Dimensions",
@@ -5882,6 +5890,17 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "decision, row scope, denominators, thresholds, and checksum-bound artifact rows",
             "scoring-algorithm clarity without main-text table overload",
             "supplementary scoring-merge algorithm table",
+            "## Audit Cycle 70: Artifact Publication Binding Gate",
+            "final-upload artifact publication binding",
+            "artifact manifest publication object",
+            "`artifact_release_url`",
+            "`artifact_release_doi`",
+            "`public_access_status`",
+            "submission package is rejected",
+            "publication URL or DOI differs from `submission_metadata.yml`",
+            "public access status remains pending",
+            "artifact-publication traceability",
+            "public artifact link are aligned",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -5900,7 +5919,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 69",
+        "Completed audit cycles: 70",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -5911,7 +5930,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 69" in error for error in errors)
+    assert any("Completed audit cycles: 70" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
