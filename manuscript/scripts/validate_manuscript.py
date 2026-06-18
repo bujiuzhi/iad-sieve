@@ -86,6 +86,7 @@ REQUIRED_SECTIONS = [
     r"\subsection{Statistical Interpretation Boundary}",
     r"\subsection{Operating Point Disclosure}",
     r"\subsection{Selective Decision Coverage Boundary}",
+    r"\subsection{Pair-to-Cluster Evidence Boundary}",
     r"\subsection{Threshold Sensitivity Evidence Status}",
     r"\subsection{Claim-Evidence Boundary for Result Interpretation}",
     r"\subsection{Result Audit Trail}",
@@ -1081,6 +1082,34 @@ def check_selective_decision_coverage_boundary(manuscript_text: str) -> list[str
     ]
     return [
         f"selective decision coverage boundary missing marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
+
+
+def check_pair_cluster_evidence_boundary(manuscript_text: str) -> list[str]:
+    """Check whether pair-level metrics are separated from cluster-level claims.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing pair-to-cluster evidence boundaries.
+    """
+    required_markers = [
+        r"\subsection{Pair-to-Cluster Evidence Boundary}",
+        r"\label{tab:pair-cluster-evidence-boundary}",
+        "pair-level metrics do not by themselves prove cluster-level deduplication quality",
+        "transitive merge propagation",
+        "cannot-link violations",
+        "cluster assignments",
+        "cluster_metric_summary",
+        "cannot_link_audit",
+        "cluster contamination rate",
+        "does not claim cluster-level contamination is eliminated",
+    ]
+    return [
+        f"pair-to-cluster evidence boundary missing marker: {marker}"
         for marker in required_markers
         if marker not in manuscript_text
     ]
@@ -2821,6 +2850,7 @@ def main() -> int:
     errors.extend(check_data_code_availability_boundary(manuscript_text))
     errors.extend(check_operating_point_disclosure(manuscript_text))
     errors.extend(check_selective_decision_coverage_boundary(manuscript_text))
+    errors.extend(check_pair_cluster_evidence_boundary(manuscript_text))
     errors.extend(check_decision_metric_mapping(manuscript_text))
     errors.extend(check_metric_formula_boundary(manuscript_text))
     errors.extend(check_statistical_interpretation_boundary(manuscript_text))

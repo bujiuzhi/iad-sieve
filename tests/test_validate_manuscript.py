@@ -1036,6 +1036,47 @@ def test_check_selective_decision_coverage_boundary_rejects_missing_defer_bounda
     assert any("all-pair automatic resolution" in error for error in errors)
 
 
+def test_check_pair_cluster_evidence_boundary_accepts_complete_boundary() -> None:
+    """验证 pair-level 与 cluster-level 证据边界完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_pair_cluster_evidence_boundary", None)
+    assert callable(checker)
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Pair-to-Cluster Evidence Boundary}",
+            r"\label{tab:pair-cluster-evidence-boundary}",
+            "pair-level metrics do not by themselves prove cluster-level deduplication quality.",
+            "transitive merge propagation",
+            "cannot-link violations",
+            "cluster assignments",
+            "cluster_metric_summary",
+            "cannot_link_audit",
+            "cluster contamination rate",
+            "does not claim cluster-level contamination is eliminated",
+        ]
+    )
+
+    errors = checker(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_pair_cluster_evidence_boundary_rejects_missing_cluster_audit() -> None:
+    """验证缺少 cluster audit 边界时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_pair_cluster_evidence_boundary", None)
+    assert callable(checker)
+    manuscript_text = r"\subsection{Pair-to-Cluster Evidence Boundary} pair-level metrics are reported."
+
+    errors = checker(manuscript_text)
+
+    assert any("pair-cluster-evidence-boundary" in error for error in errors)
+    assert any("cluster assignments" in error for error in errors)
+    assert any("cannot_link_audit" in error for error in errors)
+
+
 def test_check_decision_metric_mapping_accepts_complete_mapping() -> None:
     """验证选择性决策到评价指标的映射完整时可通过检查。"""
 

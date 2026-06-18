@@ -627,6 +627,29 @@ Review load & Counts by label stratum, source, and hard-negative level. & Needed
 \end{tabular}
 \end{table}
 
+\subsection{Pair-to-Cluster Evidence Boundary}
+
+The reported pair-level metrics do not by themselves prove cluster-level deduplication quality. Pair decisions can propagate through transitive merge propagation when a deduplication system turns accepted links into connected components. A single unsafe merge can contaminate a larger cluster, while one cannot-link decision can block a transitive path that would otherwise merge distinct works. Table~\ref{tab:pair-cluster-evidence-boundary} states the additional audit evidence required before pair-level false-merge control can be interpreted as a cluster-level deployment guarantee.
+
+\begin{table}[H]
+\caption{Pair-to-cluster evidence boundary. Cluster-level deployment claims require artifacts beyond pair-level prediction and metric files.}
+\label{tab:pair-cluster-evidence-boundary}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.25\linewidth}L{0.33\linewidth}L{0.32\linewidth}}
+\toprule
+Evidence item & Required artifact source & Interpretation boundary \\
+\midrule
+cluster assignments & Released component or cluster ID for each evaluated record. & Needed before computing cluster purity, split errors, or merged-work contamination. \\
+cannot-link violations & \path{cannot_link_audit} generated from the same merge decisions and identifier-conflict rules. & Needed before claiming that risk gates prevent transitive false merges. \\
+Cluster metric summary & \path{cluster_metric_summary} with cluster contamination rate, singleton rate, merge coverage, and conflict counts. & Needed before claiming cluster-level quality rather than pair-level risk control. \\
+Pair-to-cluster trace & Mapping from pair decisions, thresholds, and cannot-link flags to final components. & Required to audit whether a pair-level error changes a downstream cluster. \\
+Current manuscript claim & Pair-level F1, FMR, and HNFMR under fixed operating points. & The paper does not claim cluster-level contamination is eliminated. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Threshold Sensitivity Evidence Status}
 
 Threshold stability is treated as an audit requirement, not as an unsupported robustness claim. The current Open-v2 table reports fixed operating points and therefore supports the mechanism interpretation under those operating points. A stronger statement that the method is stable across thresholds would require a threshold grid computed from the same prediction files, predefined threshold ranges, metric summaries for each setting, and checksums in the released artifact manifest.
