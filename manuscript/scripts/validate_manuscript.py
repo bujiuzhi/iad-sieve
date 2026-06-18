@@ -1035,6 +1035,35 @@ def check_baseline_fairness_controls(manuscript_text: str) -> list[str]:
     ]
 
 
+def check_result_interpretation_guardrails(manuscript_text: str) -> list[str]:
+    """Check whether the main result table states allowed and unsupported readings.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing result-interpretation guardrails.
+    """
+    required_markers = [
+        r"\subsection{Result Interpretation Guardrails}",
+        r"\label{tab:result-interpretation-guardrails}",
+        "Directly supported reading",
+        "Mechanism-supported reading",
+        "Unsupported reading",
+        "representation rows test false-merge exposure",
+        "RoBERTa row is a strong supervised comparator",
+        "IAD-Risk rows test split-held-out risk gating",
+        "not a claim of broad method superiority",
+        "not a same-scope leaderboard",
+        "not evidence of threshold stability or zero risk",
+    ]
+    return [
+        f"result interpretation guardrails missing marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
+
+
 def check_split_leakage_controls(manuscript_text: str) -> list[str]:
     """Check whether evaluation split and leakage boundaries are stated.
 
@@ -2404,6 +2433,7 @@ def main() -> int:
     errors.extend(check_threshold_sensitivity_status(manuscript_text))
     errors.extend(check_baseline_scope_alignment(manuscript_text))
     errors.extend(check_baseline_fairness_controls(manuscript_text))
+    errors.extend(check_result_interpretation_guardrails(manuscript_text))
     errors.extend(check_split_leakage_controls(manuscript_text))
     errors.extend(check_scope_compatibility(manuscript_text))
     errors.extend(check_extended_protocol_boundary(manuscript_text))

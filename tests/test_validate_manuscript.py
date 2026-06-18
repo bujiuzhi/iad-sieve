@@ -969,6 +969,43 @@ def test_check_baseline_fairness_controls_rejects_missing_protocol_markers() -> 
     assert any("not predictive features" in error for error in errors)
 
 
+def test_check_result_interpretation_guardrails_accepts_complete_boundaries() -> None:
+    """验证主结果表判读规则完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Result Interpretation Guardrails}",
+            r"\label{tab:result-interpretation-guardrails}",
+            "The table separates Directly supported reading.",
+            "It also separates Mechanism-supported reading.",
+            "It explicitly lists Unsupported reading.",
+            "The representation rows test false-merge exposure.",
+            "The RoBERTa row is a strong supervised comparator.",
+            "The IAD-Risk rows test split-held-out risk gating.",
+            "The result is not a claim of broad method superiority.",
+            "The table is not a same-scope leaderboard.",
+            "The table is not evidence of threshold stability or zero risk.",
+        ]
+    )
+
+    errors = module.check_result_interpretation_guardrails(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_result_interpretation_guardrails_rejects_missing_unsupported_reading() -> None:
+    """验证主结果表缺少禁止读法边界时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\subsection{Result Interpretation Guardrails}"
+
+    errors = module.check_result_interpretation_guardrails(manuscript_text)
+
+    assert any("Unsupported reading" in error for error in errors)
+    assert any("not a same-scope leaderboard" in error for error in errors)
+
+
 def test_check_extended_protocol_boundary_accepts_follow_up_protocol_scope() -> None:
     """验证 Open-v3/source-heldout 作为后续协议边界时可通过检查。"""
 

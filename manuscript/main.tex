@@ -681,6 +681,28 @@ IAD-Risk transformer (SPECTER2) & 1042 test & 0.980 & 0.001 & 0.000 \\
 
 The Open-v2 evidence shows why identity-agenda disentanglement is necessary. Single-space scientific representation baselines preserve topical relatedness, but their merge threshold can produce high false-merge rates on OpenAlex silver hard negatives. IAD-Risk transformer variants keep high same-work F1 on the held-out Open-v2 test split while suppressing hard-negative false merges. RoBERTa pair classification is a strong baseline and narrows the gap substantially; therefore the paper does not make broad superiority claims. Instead, the main result is that relation heads plus an explicit risk score provide a transparent and controllable mechanism for false-merge suppression.
 
+\subsection{Result Interpretation Guardrails}
+
+Table~\ref{tab:result-interpretation-guardrails} states how the Open-v2 table should be read before external artifact release and same-scope prediction files are available. These guardrails are included because the table combines full-scope representation baselines, a strong supervised comparator, and held-out IAD-Risk rows. The intended interpretation is mechanism-oriented; the table labels this as a Mechanism-supported reading rather than a leaderboard-oriented reading.
+
+\begin{table}[H]
+\caption{Result interpretation guardrails for the Open-v2 evidence snapshot. The table separates direct evidence, mechanism-supported reading, and unsupported reading.}
+\label{tab:result-interpretation-guardrails}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.24\linewidth}L{0.30\linewidth}L{0.36\linewidth}}
+\toprule
+Result row family & Directly supported reading & Unsupported reading \\
+\midrule
+Representation baselines & The representation rows test false-merge exposure when one-space scientific relatedness is used as merge evidence. & They do not define the best possible representation-threshold system under a fully tuned, same-scope leaderboard. \\
+RoBERTa pair classifier & The RoBERTa row is a strong supervised comparator that shows pair classification can suppress many hard-negative merges. & It is not a component-level explanation of identity-agenda risk control. \\
+IAD-Risk transformer variants & The IAD-Risk rows test split-held-out risk gating with explicit identity, agenda, and ANI signals. & The rows are not a claim of broad method superiority without same-scope predictions, intervals, and artifact checksums. \\
+Whole table & The table gives a mechanism-supported reading that semantic relatedness alone can be unsafe and risk gating can block hard-negative merges in the reported setting. & The table is not a same-scope leaderboard and is not evidence of threshold stability or zero risk. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Scope Compatibility of the Open-v2 Table}
 
 The Open-v2 table is a scope-bounded evidence table, not a single leaderboard. Full pair-scope representation baselines test whether single-space scientific relatedness can over-merge agenda-level hard negatives across the available Open-v2 pairs. Held-out IAD-Risk rows test whether risk-gated transformer variants preserve same-work performance and suppress hard-negative merges under a split-based model-evaluation protocol. The valid comparison is therefore mechanistic: semantic relatedness alone is unsafe as automatic merge evidence, while explicit risk gating can block hard-negative merges in the reported held-out setting.
