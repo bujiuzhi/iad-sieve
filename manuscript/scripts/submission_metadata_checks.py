@@ -14,6 +14,8 @@ FINAL_UPLOAD_BLOCKED_MARKERS = {
     'affiliation: ""': "corresponding author affiliation is empty",
     'email: ""': "corresponding author email is empty",
     "target_journal_selected: false": "target journal checklist item is incomplete",
+    "article_type_confirmed: false": "article type checklist item is incomplete",
+    "review_mode_confirmed: false": "review mode checklist item is incomplete",
     "target_journal_template_applied: false": "target journal template checklist item is incomplete",
     "author_metadata_completed: false": "author metadata checklist item is incomplete",
     "corresponding_author_completed: false": "corresponding author checklist item is incomplete",
@@ -71,6 +73,8 @@ DKE_ELSEVIER_FILE_REQUIREMENT_ERROR = "DKE/Elsevier final upload requires DKE/El
 FINAL_UPLOAD_TRUE_FIELDS = {
     "target_journal_template_bound": "target journal template is not bound",
     "target_journal_selected": "target journal checklist item is incomplete",
+    "article_type_confirmed": "article type checklist item is incomplete",
+    "review_mode_confirmed": "review mode checklist item is incomplete",
     "target_journal_template_applied": "target journal template checklist item is incomplete",
     "author_metadata_completed": "author metadata checklist item is incomplete",
     "corresponding_author_completed": "corresponding author checklist item is incomplete",

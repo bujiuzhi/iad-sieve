@@ -83,6 +83,8 @@ upload_preparation:
 
 final_upload_checklist:
   target_journal_selected: false
+  article_type_confirmed: false
+  review_mode_confirmed: false
   target_journal_template_applied: false
   author_metadata_completed: false
   corresponding_author_completed: false
