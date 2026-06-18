@@ -603,6 +603,42 @@ def test_check_method_feature_contract_rejects_missing_feature_boundary() -> Non
     assert any("different-identifier conflicts" in error for error in errors)
 
 
+def test_check_risk_score_design_rationale_accepts_complete_rationale() -> None:
+    """验证风险分数设计依据完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Risk Score Design Rationale}",
+            r"\label{tab:risk-score-rationale}",
+            r"$p_{\mathrm{risk}}$ is a conservative upper-envelope risk proxy.",
+            "The score increases monotonically with agenda-non-identity evidence.",
+            "It also increases when agenda evidence is high and identity evidence is weak.",
+            "The max operator keeps either direct ANI evidence or indirect agenda-without-identity evidence sufficient to block automatic merging.",
+            "The product term is not a calibrated probability unless validated against held-out artifacts.",
+            "Threshold transfer must be rechecked under new source distributions.",
+            "defer rather than merge",
+        ]
+    )
+
+    errors = module.check_risk_score_design_rationale(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_risk_score_design_rationale_rejects_missing_boundary() -> None:
+    """验证风险分数设计缺少边界说明时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\subsection{Risk Score Design Rationale}"
+
+    errors = module.check_risk_score_design_rationale(manuscript_text)
+
+    assert any("risk-score-rationale" in error for error in errors)
+    assert any("max operator" in error for error in errors)
+    assert any("not a calibrated probability" in error for error in errors)
+
+
 def test_check_method_pipeline_figure_accepts_complete_figure() -> None:
     """验证 IAD-Risk 方法流程图完整时可通过检查。"""
 

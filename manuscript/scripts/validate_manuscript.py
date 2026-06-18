@@ -754,6 +754,34 @@ def check_method_feature_contract(manuscript_text: str) -> list[str]:
     return [f"method feature contract missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
 
 
+def check_risk_score_design_rationale(manuscript_text: str) -> list[str]:
+    """Check whether the method explains the false-merge risk score design.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing risk-score rationale markers.
+    """
+    required_markers = [
+        r"\subsection{Risk Score Design Rationale}",
+        r"\label{tab:risk-score-rationale}",
+        r"$p_{\mathrm{risk}}$ is a conservative upper-envelope risk proxy",
+        "increases monotonically with agenda-non-identity evidence",
+        "agenda evidence is high and identity evidence is weak",
+        "max operator",
+        "direct ANI evidence or indirect agenda-without-identity evidence",
+        "not a calibrated probability",
+        "Threshold transfer must be rechecked under new source distributions",
+        "defer rather than merge",
+    ]
+    return [
+        f"risk score design rationale missing marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
+
+
 def check_method_pipeline_figure(manuscript_text: str) -> list[str]:
     """Check whether the method section includes the IAD-Risk pipeline figure.
 
@@ -2279,6 +2307,7 @@ def main() -> int:
     errors.extend(check_iad_bench_document_schema_contract(manuscript_text))
     errors.extend(check_iad_bench_pair_schema_contract(manuscript_text))
     errors.extend(check_method_feature_contract(manuscript_text))
+    errors.extend(check_risk_score_design_rationale(manuscript_text))
     errors.extend(check_method_pipeline_figure(manuscript_text))
     errors.extend(check_design_alternative_boundaries(manuscript_text))
     errors.extend(check_related_work_positioning(manuscript_text))

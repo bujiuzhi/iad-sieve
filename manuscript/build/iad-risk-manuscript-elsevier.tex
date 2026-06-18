@@ -257,6 +257,28 @@ p_{\mathrm{risk}}=\max\{p_{\mathrm{ani}},\ p_{\mathrm{agenda}}(1-p_{\mathrm{work
 \]
 This construction makes the safety signal high when a pair is explicitly predicted as agenda-non-identity, or when it is agenda-related but lacks strong identity evidence.
 
+\subsection{Risk Score Design Rationale}
+
+$p_{\mathrm{risk}}$ is a conservative upper-envelope risk proxy for automatic merge decisions. The score increases monotonically with agenda-non-identity evidence through $p_{\mathrm{ani}}$, and it also increases when agenda evidence is high and identity evidence is weak through $p_{\mathrm{agenda}}(1-p_{\mathrm{work}})$. The max operator keeps either direct ANI evidence or indirect agenda-without-identity evidence sufficient to block automatic merging. This design matches the safety objective of the paper: a pair should defer rather than merge when either source of false-merge risk is high.
+
+\begin{table}[H]
+\caption{Risk score design rationale. The score is designed as a conservative merge gate, not as an unconditional probability of error.}
+\label{tab:risk-score-rationale}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.24\linewidth}L{0.34\linewidth}L{0.32\linewidth}}
+\toprule
+Design element & Reviewer-facing rationale & Boundary \\
+\midrule
+$p_{\mathrm{ani}}$ term & Directly represents evidence that a related pair is not the same work. & Requires valid ANI supervision or artifact-backed hard-negative evidence. \\
+$p_{\mathrm{agenda}}(1-p_{\mathrm{work}})$ term & Flags pairs that are topically related but lack corresponding identity support. & It is not a calibrated probability unless validated against held-out artifacts. \\
+Max operator & Makes either risk pathway sufficient to block a merge. & Conservative blocking can increase deferrals and must be tuned to the application. \\
+Threshold gate & Converts the risk proxy into a merge, block, or defer decision. & Threshold transfer must be rechecked under new source distributions. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Training Objective}
 
 The learning objective combines identity, agenda, and agenda-non-identity supervision without treating every source as the same label type; the false-merge risk score is derived after the relation heads are estimated. For a pair $(i,j)$, the model minimizes
