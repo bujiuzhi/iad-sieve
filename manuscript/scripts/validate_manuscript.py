@@ -57,6 +57,7 @@ REQUIRED_SECTIONS = [
     r"\section{Method}",
     r"\subsection{Training Objective}",
     r"\subsection{Failure-Control Rationale}",
+    r"\subsection{Design Alternatives and Rejected Shortcuts}",
     r"\subsection{Implementation Details}",
     r"\subsection{Feature and Head Specification}",
     r"\subsection{Implementation and Reproducibility}",
@@ -638,6 +639,34 @@ def check_method_feature_contract(manuscript_text: str) -> list[str]:
         "it is not a training feature",
     ]
     return [f"method feature contract missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+
+
+def check_design_alternative_boundaries(manuscript_text: str) -> list[str]:
+    """Check whether the method explains why simpler alternatives are insufficient.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing design-alternative boundaries.
+    """
+    required_markers = [
+        r"\subsection{Design Alternatives and Rejected Shortcuts}",
+        r"\label{tab:design-alternatives}",
+        "Tune a representation-similarity threshold",
+        "Use one supervised pair classifier",
+        "Use provenance as a model feature",
+        "Always force a binary merge decision",
+        "Select thresholds after test results",
+        "RoBERTa remains a strong baseline",
+        "broad superiority is not claimed",
+        "Threshold stability needs a released grid and checksums",
+    ]
+    return [
+        f"design alternative boundary missing marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
 
 
 def check_operating_point_disclosure(manuscript_text: str) -> list[str]:
@@ -1667,6 +1696,7 @@ def main() -> int:
     errors.extend(check_contribution_evidence_summary(manuscript_text))
     errors.extend(check_openv2_benchmark_composition(manuscript_text))
     errors.extend(check_method_feature_contract(manuscript_text))
+    errors.extend(check_design_alternative_boundaries(manuscript_text))
     errors.extend(check_related_work_positioning(manuscript_text))
     errors.extend(check_error_taxonomy(manuscript_text))
     errors.extend(check_validity_threats(manuscript_text))

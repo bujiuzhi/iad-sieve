@@ -490,6 +490,43 @@ def test_check_method_feature_contract_rejects_missing_feature_boundary() -> Non
     assert any("different-identifier conflicts" in error for error in errors)
 
 
+def test_check_design_alternative_boundaries_accepts_complete_boundaries() -> None:
+    """验证设计替代项和拒绝边界完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Design Alternatives and Rejected Shortcuts}",
+            r"\label{tab:design-alternatives}",
+            "Tune a representation-similarity threshold.",
+            "Use one supervised pair classifier.",
+            "Use provenance as a model feature.",
+            "Always force a binary merge decision.",
+            "Select thresholds after test results.",
+            "RoBERTa remains a strong baseline.",
+            "The paper states broad superiority is not claimed.",
+            "Threshold stability needs a released grid and checksums.",
+        ]
+    )
+
+    errors = module.check_design_alternative_boundaries(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_design_alternative_boundaries_rejects_missing_shortcut_boundaries() -> None:
+    """验证方法部分缺少替代项边界时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\subsection{Design Alternatives and Rejected Shortcuts}"
+
+    errors = module.check_design_alternative_boundaries(manuscript_text)
+
+    assert any("design-alternatives" in error for error in errors)
+    assert any("one supervised pair classifier" in error for error in errors)
+    assert any("released grid and checksums" in error for error in errors)
+
+
 def test_check_operating_point_disclosure_accepts_complete_disclosure() -> None:
     """验证运行点披露完整时可通过检查。"""
 
