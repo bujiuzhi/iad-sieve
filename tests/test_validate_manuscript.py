@@ -1979,6 +1979,33 @@ def test_check_environment_setup_rejects_missing_fixture_command() -> None:
     assert any("does not download full raw datasets" in error for error in errors)
 
 
+def test_check_reviewer_evidence_gate_rejects_missing_artifact_gates() -> None:
+    """验证补充材料审稿证据门禁必须覆盖关键 artifact 证据。"""
+
+    module = _load_validate_manuscript_module()
+    supplementary_text = r"\section{Reviewer Evidence Gate}" + "\nContribution clarity only."
+
+    errors = module.check_reviewer_evidence_gate(supplementary_text)
+
+    assert any("same-scope prediction files" in error for error in errors)
+    assert any("bootstrap intervals" in error for error in errors)
+    assert any("ablation suite" in error for error in errors)
+    assert any("manual-validation slice" in error for error in errors)
+    assert any("source-heldout validation" in error for error in errors)
+    assert any("cluster-level artifact audits" in error for error in errors)
+
+
+def test_check_reviewer_evidence_gate_accepts_complete_supplement() -> None:
+    """验证实际补充材料覆盖审稿证据门禁时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    supplementary_text = Path("manuscript/supplementary_material.tex").read_text(encoding="utf-8")
+
+    errors = module.check_reviewer_evidence_gate(supplementary_text)
+
+    assert errors == []
+
+
 def test_check_target_journal_shortlist_accepts_complete_shortlist() -> None:
     """验证目标期刊候选清单包含候选、边界和模板要求时可通过。"""
 

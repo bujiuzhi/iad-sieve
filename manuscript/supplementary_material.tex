@@ -239,6 +239,31 @@ Mechanism claims should be tied to explicit ablation outputs. The repository pro
 
 Cluster-level claims should be tied to artifacts generated after the pair decisions are converted into connected components. A defensible package should include cluster assignments, a cluster metric summary, a cannot-link audit, and command logs for the merge policy. Without those outputs, pair-level FMR and HNFMR should not be interpreted as proof that cluster-level contamination has been reduced or eliminated.
 
+\section{Reviewer Evidence Gate}
+
+This section states the evidence gate that should be applied before a reviewer reads the present results as stronger than the manuscript claims. The current package supports a bounded mechanism claim: identity-agenda separation and false-merge risk gating can suppress hard-negative automatic merges in the reported Open-v2 evidence snapshot. Stronger claims require released artifacts that bind the same rows, thresholds, logs, and checksums to the submitted text.
+
+\begin{table}[H]
+\caption{Reviewer evidence gate for upgrading manuscript claims. Each stronger interpretation requires an explicit artifact source before it should appear in the abstract, conclusion, cover letter, or response to reviewers.}
+\label{tab:reviewer-evidence-gate}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{2pt}
+\begin{tabular}{L{0.20\linewidth}L{0.30\linewidth}L{0.40\linewidth}}
+\toprule
+Review dimension & Current supported reading & Evidence required before stronger wording \\
+\midrule
+Contribution clarity & Identity-agenda confusion is a targeted scholarly false-merge failure mode. & Broader task-replacement claims require source diversity, same-scope prediction files, and domain-facing error analysis. \\
+Experimental strength & Open-v2 supports fixed-scope false-merge control under the reported operating points. & Model-ranking claims require same-scope prediction files, threshold logs, bootstrap intervals, and released metric tables. \\
+Evaluation completeness & The manuscript separates gold, proxy, silver, and future manual evidence layers. & Component-causality or label-precision claims require an ablation suite, threshold grid, and manual-validation slice. \\
+Method design soundness & Risk gating exposes identity, agenda, ANI, threshold, and cannot-link behavior. & Deployment claims require source-heldout validation, topic-heldout checks, review-load analysis, and cluster-level artifact audits. \\
+Reproducibility & Git supports code-level checks, fixture rebuilds, schema validation, and artifact release preparation. & Full numerical audit requires an external release with manifests, checksums, command logs, and fixed commit identifiers. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The practical rule is a do not upgrade claims rule: do not strengthen the title, abstract, conclusion, cover letter, or reviewer response beyond the bounded Open-v2 mechanism claim unless the corresponding evidence row in Table~\ref{tab:reviewer-evidence-gate} is satisfied by released artifacts.
+
 \section{Manual Validation Protocol}
 
 Manual validation is a future evidence layer for assessing label precision and difficult boundary cases; it is not completed in the current manuscript package. A defensible validation slice should sample 500--1,000 pairs across the strata most likely to affect claim strength: OpenAlex/OpenCitations silver hard negatives, high-score representation false-merge candidates, IAD-Risk blocked or deferred pairs, version-boundary cases, identifier conflicts, and sparse-metadata cases.

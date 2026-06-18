@@ -111,6 +111,7 @@ REQUIRED_SUPPLEMENT_SECTIONS = [
     r"\section{Artifact Package Requirements}",
     r"\section{Claim-Evidence Matrix}",
     r"\section{Uncertainty and Ablation Requirements}",
+    r"\section{Reviewer Evidence Gate}",
     r"\section{Manual Validation Protocol}",
     r"\section{Claim Boundary}",
 ]
@@ -1602,6 +1603,33 @@ def check_environment_setup(supplementary_text: str) -> list[str]:
     ]
     return [
         f"environment setup missing marker: {marker}"
+        for marker in required_markers
+        if marker not in supplementary_text
+    ]
+
+
+def check_reviewer_evidence_gate(supplementary_text: str) -> list[str]:
+    """Check whether supplementary material states reviewer-facing evidence gates.
+
+    参数:
+        supplementary_text: Supplementary LaTeX source.
+
+    返回:
+        list[str]: Error messages for missing reviewer-evidence gate markers.
+    """
+    required_markers = [
+        r"\section{Reviewer Evidence Gate}",
+        "Contribution clarity",
+        "same-scope prediction files",
+        "bootstrap intervals",
+        "ablation suite",
+        "manual-validation slice",
+        "source-heldout validation",
+        "cluster-level artifact audits",
+        "do not upgrade claims",
+    ]
+    return [
+        f"reviewer evidence gate missing marker: {marker}"
         for marker in required_markers
         if marker not in supplementary_text
     ]
@@ -3112,6 +3140,7 @@ def main() -> int:
     errors.extend(check_submission_system_checklist(submission_system_checklist_text))
     errors.extend(check_reviewer_readiness_audit(reviewer_readiness_audit_text))
     errors.extend(check_manual_validation_protocol(supplementary_text))
+    errors.extend(check_reviewer_evidence_gate(supplementary_text))
     errors.extend(check_result_claim_boundary(manuscript_text, supplementary_text))
     errors.extend(check_highlights(highlights_text))
     errors.extend(check_keywords(keywords_text))
