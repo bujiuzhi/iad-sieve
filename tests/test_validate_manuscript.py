@@ -1045,6 +1045,57 @@ def test_check_citation_bibliography_alignment_rejects_missing_duplicate_and_unc
     assert any("uncited entries" in error and "uncited2024" in error for error in errors)
 
 
+def test_check_bibliography_entry_metadata_accepts_complete_entries() -> None:
+    """验证参考文献条目具备核心出版元数据时可通过。"""
+
+    module = _load_validate_manuscript_module()
+    bibliography_text = "\n".join(
+        [
+            "@article{fellegi1969record,",
+            "  title = {A Theory for Record Linkage},",
+            "  author = {Fellegi, Ivan P. and Sunter, Alan B.},",
+            "  journal = {Journal of the American Statistical Association},",
+            "  year = {1969}",
+            "}",
+            "@inproceedings{mudgal2018deep,",
+            "  title = {Deep Learning for Entity Matching},",
+            "  author = {Mudgal, Sidharth and Li, Han},",
+            "  booktitle = {Proceedings of SIGMOD},",
+            "  year = {2018}",
+            "}",
+        ]
+    )
+
+    errors = module.check_bibliography_entry_metadata(bibliography_text)
+
+    assert errors == []
+
+
+def test_check_bibliography_entry_metadata_rejects_missing_core_fields() -> None:
+    """验证参考文献条目缺少作者、年份或出版场所时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    bibliography_text = "\n".join(
+        [
+            "@article{missing_author,",
+            "  title = {A Reference Without Author},",
+            "  journal = {Journal of Testing},",
+            "  year = {2026}",
+            "}",
+            "@inproceedings{missing_year_and_venue,",
+            "  title = {A Reference Without Year or Venue},",
+            "  author = {Example, Author}",
+            "}",
+        ]
+    )
+
+    errors = module.check_bibliography_entry_metadata(bibliography_text)
+
+    assert any("missing_author" in error and "author" in error for error in errors)
+    assert any("missing_year_and_venue" in error and "year" in error for error in errors)
+    assert any("missing_year_and_venue" in error and "journal or booktitle" in error for error in errors)
+
+
 def test_check_latex_cross_references_accepts_defined_labels_and_refs() -> None:
     """验证 LaTeX label 和 ref 在同一源文件内一致时可通过。"""
 

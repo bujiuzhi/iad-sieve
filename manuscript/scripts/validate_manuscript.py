@@ -121,6 +121,11 @@ CITATION_COMMAND_PATTERN = re.compile(
     r"\\(?:cite|citep|citet|citealp|citealt|citeauthor|citeyear|citeyearpar)\*?(?:\s*\[[^\]]*\]){0,2}\s*\{([^}]+)\}"
 )
 BIBTEX_ENTRY_PATTERN = re.compile(r"@\w+\s*\{\s*([^,\s]+)\s*,", re.MULTILINE)
+BIBTEX_ENTRY_BLOCK_PATTERN = re.compile(
+    r"@(?P<entry_type>\w+)\s*\{\s*(?P<entry_key>[^,\s]+)\s*,(?P<body>.*?)(?=\n@\w+\s*\{|\Z)",
+    re.DOTALL,
+)
+BIBTEX_FIELD_PATTERN = re.compile(r"(?<![A-Za-z0-9_-])(?P<field_name>[A-Za-z][A-Za-z0-9_-]*)\s*=")
 LATEX_LABEL_PATTERN = re.compile(r"\\label\{([^}]+)\}")
 LATEX_REFERENCE_PATTERN = re.compile(r"\\(?:ref|eqref|pageref|autoref)\{([^}]+)\}")
 ALLOWED_LABEL_PREFIXES = ("fig:", "tab:", "eq:", "sec:", "alg:", "app:")
@@ -780,6 +785,47 @@ def check_bibliography_depth(bibliography_text: str) -> list[str]:
     if entry_count < MIN_BIB_ENTRIES:
         return [f"bibliography has {entry_count} entries; expected at least {MIN_BIB_ENTRIES}"]
     return []
+
+
+def extract_bibtex_entry_fields(bibliography_text: str) -> dict[str, set[str]]:
+    """Extract field names for each BibTeX entry.
+
+    参数:
+        bibliography_text: BibTeX source text.
+
+    返回:
+        dict[str, set[str]]: Mapping from BibTeX key to lower-cased field names.
+    """
+    entry_fields: dict[str, set[str]] = {}
+    for match in BIBTEX_ENTRY_BLOCK_PATTERN.finditer(bibliography_text):
+        entry_key = match.group("entry_key").strip()
+        body = match.group("body")
+        field_names = {
+            field_match.group("field_name").strip().lower()
+            for field_match in BIBTEX_FIELD_PATTERN.finditer(body)
+        }
+        entry_fields[entry_key] = field_names
+    return entry_fields
+
+
+def check_bibliography_entry_metadata(bibliography_text: str) -> list[str]:
+    """Check whether each BibTeX entry has core publication metadata.
+
+    参数:
+        bibliography_text: BibTeX source text.
+
+    返回:
+        list[str]: Error messages for incomplete BibTeX metadata fields.
+    """
+    entry_fields = extract_bibtex_entry_fields(bibliography_text)
+    errors: list[str] = []
+    for entry_key, field_names in entry_fields.items():
+        for required_field in ["title", "author", "year"]:
+            if required_field not in field_names:
+                errors.append(f"references.bib entry {entry_key} missing required field: {required_field}")
+        if "journal" not in field_names and "booktitle" not in field_names:
+            errors.append(f"references.bib entry {entry_key} missing venue field: journal or booktitle")
+    return errors
 
 
 def extract_citation_keys(document_texts: dict[str, str]) -> set[str]:
@@ -3359,6 +3405,7 @@ def main() -> int:
         errors.extend(check_final_upload_metadata(submission_metadata_text))
         errors.extend(check_final_upload_cover_letter(cover_letter_text, submission_metadata_text))
     errors.extend(check_bibliography_depth(bibliography_text))
+    errors.extend(check_bibliography_entry_metadata(bibliography_text))
     errors.extend(
         check_citation_bibliography_alignment(
             {
