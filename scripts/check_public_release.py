@@ -73,6 +73,15 @@ LOCAL_ONLY_PATHS = (
     "outputs/remote_connection_profile.local.json",
 )
 
+ALLOWED_DOCS_FILES = {
+    "docs/README.md",
+    "docs/method-design.md",
+    "docs/iad-bench-contract.md",
+    "docs/data-processing-pipeline.md",
+    "docs/annotation-requirements.md",
+    "docs/data-and-artifact-release.md",
+}
+
 
 @dataclass(frozen=True)
 class RiskPattern:
@@ -447,6 +456,45 @@ def check_required_documentation(project_root: Path) -> list[Finding]:
     return findings
 
 
+def check_document_directory_scope(project_root: Path) -> list[Finding]:
+    """检查 docs 目录是否只包含课题相关公开文档。
+
+    参数:
+        project_root: 项目根目录。
+
+    返回:
+        清单外文档发现项列表。
+    """
+
+    docs_dir = project_root / "docs"
+    if not docs_dir.exists():
+        return []
+
+    findings: list[Finding] = []
+    for current_root_text, dirnames, filenames in os.walk(docs_dir):
+        current_root = Path(current_root_text)
+        dirnames[:] = [dirname for dirname in dirnames if not is_excluded_directory(current_root / dirname)]
+        if has_excluded_path_parts(current_root, project_root):
+            continue
+        for filename in filenames:
+            path = current_root / filename
+            if has_excluded_path_parts(path, project_root):
+                continue
+            relative_path = normalize_relative_path(path, project_root)
+            if relative_path in ALLOWED_DOCS_FILES:
+                continue
+            findings.append(
+                Finding(
+                    path=path,
+                    line_number=0,
+                    category="unexpected_documentation_file",
+                    message="docs 目录只能保留本课题公开技术文档清单内的文件",
+                    snippet=relative_path,
+                )
+            )
+    return findings
+
+
 def find_large_files(project_root: Path, max_size_mb: float) -> list[Finding]:
     """查找公开范围内的大文件。
 
@@ -534,8 +582,15 @@ def run_public_release_check(project_root: Path, max_size_mb: float) -> int:
     sensitive_findings = scan_sensitive_patterns(resolved_root, HIGH_RISK_PATTERNS)
     document_trace_findings = scan_document_traces(resolved_root, DOCUMENT_TRACE_PATTERNS)
     missing_document_findings = check_required_documentation(resolved_root)
+    unexpected_document_findings = check_document_directory_scope(resolved_root)
     large_file_findings = find_large_files(resolved_root, max_size_mb)
-    high_risk_findings = sensitive_findings + document_trace_findings + missing_document_findings + large_file_findings
+    high_risk_findings = (
+        sensitive_findings
+        + document_trace_findings
+        + missing_document_findings
+        + unexpected_document_findings
+        + large_file_findings
+    )
 
     local_only_paths = find_local_only_paths(resolved_root)
     if local_only_paths:

@@ -6,6 +6,7 @@ from pathlib import Path
 
 from scripts.check_public_release import (
     DOCUMENT_TRACE_PATTERNS,
+    check_document_directory_scope,
     check_required_documentation,
     run_public_release_check,
     scan_document_traces,
@@ -92,6 +93,20 @@ def test_check_required_documentation_flags_missing_file(tmp_path: Path) -> None
     assert len(findings) == 1
     assert findings[0].category == "missing_required_document"
     assert findings[0].snippet == "manuscript/MANIFEST.md"
+
+
+def test_check_document_directory_scope_flags_unlisted_docs_file(tmp_path: Path) -> None:
+    """验证 docs 目录中不在课题文档清单内的文件会被拦截。"""
+
+    _write_text(tmp_path / "docs" / "README.md", "# 文档索引\n")
+    _write_text(tmp_path / "docs" / "method-design.md", "# 方法设计\n")
+    _write_text(tmp_path / "docs" / "codex-work-record.md", "# Work Record\n")
+
+    findings = check_document_directory_scope(tmp_path)
+
+    assert len(findings) == 1
+    assert findings[0].category == "unexpected_documentation_file"
+    assert findings[0].snippet == "docs/codex-work-record.md"
 
 
 def test_run_public_release_check_fails_on_document_trace(tmp_path: Path) -> None:
