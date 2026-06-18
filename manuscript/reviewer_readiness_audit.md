@@ -101,6 +101,21 @@ Outcome: pass for template-independent first-screen claim alignment; must be rep
 
 The editorial desk check compares the title, abstract, conclusion, cover letter, highlights, and keywords against the same core story: IAD-Risk addresses identity-agenda confusion in scholarly work deduplication; IAD-Bench separates gold, proxy, and silver evidence; the Open-v2 evidence snapshot supports targeted false-merge suppression; and the paper does not claim broad method ranking, statistical superiority, threshold stability, or human-gold validation. This keeps the editorial claim alignment consistent before the manuscript reaches external review.
 
+## Audit Cycle 6: Reviewer Rebuttal Boundary
+
+Outcome: pass for conservative response planning; blocked for stronger evidence claims.
+
+This cycle separates reviewer questions that can be answered from the current manuscript from questions that require additional artifact-backed evidence. The status labels are: `ready_to_answer` when the manuscript already contains direct evidence, `limited_answer` when the response must stay within the present Open-v2 evidence snapshot, and `do_not_answer_as_claim` when the answer would require new experiments, public artifact files, or target-journal confirmation before it can appear as a manuscript claim.
+
+| Reviewer challenge | Response status | safe response scope | must-not-claim boundary |
+| --- | --- | --- | --- |
+| The problem may be ordinary semantic similarity rather than a distinct failure mode. | `ready_to_answer` | Point to identity-agenda confusion, HNFMR, and the label-strength separation in IAD-Bench. | Do not claim a universal prevalence estimate across scholarly databases. |
+| Silver hard negatives may contain noisy non-identity labels. | `limited_answer` | State that silver labels are stress-test evidence and are not presented as human gold. | Do not claim complete human validation until a reviewed slice, adjudication log, and agreement report are released. |
+| The table mixes pair scopes and may not support a ranking. | `limited_answer` | Treat Open-v2 as a scope-bounded evidence snapshot and cite operating-point and scope-compatibility disclosures. | Do not claim method ranking, SOTA performance, or interval-supported superiority without same-scope prediction artifacts and bootstrap logs. |
+| The mechanism may not be causal without ablations. | `do_not_answer_as_claim` | Use only the current mechanism-consistent wording. | Do not claim completed component causality before no-gate, no-ANI, single-space, and threshold-grid artifacts are released. |
+| The result cannot be fully reproduced from Git alone. | `limited_answer` | Distinguish fixture-level code reproduction from L2/L3 artifact reproduction. | Do not imply full numerical audit until the external artifact release URL or DOI, manifest, and checksums are available. |
+| The paper is ready for final upload. | `do_not_answer_as_claim` | State that the anonymous pre-submission package validates, but final upload is still gated. | Do not state final-upload readiness until target journal, author metadata, final PDFs, live system fields, and artifact release link are complete. |
+
 ## Minimum Gate Before Final Upload
 
 The manuscript should not be uploaded to a journal system until all of the following are true:
