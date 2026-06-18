@@ -397,6 +397,73 @@ def test_check_data_code_availability_boundary_rejects_missing_artifact_boundary
     assert any("Full prediction files and model checkpoints" in error for error in errors)
 
 
+def test_check_reproduction_levels_boundary_accepts_supplementary_table() -> None:
+    """验证复现层级表迁入补充材料后仍可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Artifact Reproduction Protocol}",
+            "The full reproduction-level table is reported in the supplementary material.",
+            "L0 code check and L1 fixture rebuild verify executable contracts.",
+            "These checks do not reproduce the Open-v2 numerical table.",
+            "L2 public-source rebuild requires independently obtained public raw files.",
+            r"The release includes \path{source_input_manifest}.",
+            r"The release includes \path{processing_run_log}.",
+            "L3 result audit requires released tables, predictions, logs, manifests, checksums, and commit identifiers.",
+            "A reviewer who has only the Git repository cannot verify model predictions, threshold choices, or row-level Open-v2 numbers from Git alone.",
+            "The L2/L3 artifact chain is required.",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Reproduction Levels}",
+            r"\label{tab:reproduction-levels}",
+            "Reproduction levels for auditing the repository and the reported evidence.",
+            "L0/L1 levels verify executable code and fixture contracts.",
+            "L2/L3 levels are required for result-level numerical audit.",
+            "L0 code check",
+            "L1 fixture rebuild",
+            "L2 public-source rebuild",
+            "L3 result audit",
+            "Source tree, package environment, and manuscript scripts",
+            r"\texttt{tests/fixtures}",
+            r"\path{source_input_manifest}",
+            r"\path{processing_run_log}",
+            "Released tables, predictions, logs, manifests, checksums, and commit identifiers",
+        ]
+    )
+
+    errors = module.check_reproduction_levels_boundary(manuscript_text, supplementary_text)
+
+    assert errors == []
+
+
+def test_check_reproduction_levels_boundary_rejects_missing_supplementary_table() -> None:
+    """验证缺少补充材料复现层级表时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Artifact Reproduction Protocol}",
+            "The full reproduction-level table is reported in the supplementary material.",
+            "L0 code check and L1 fixture rebuild verify executable contracts.",
+            "These checks do not reproduce the Open-v2 numerical table.",
+            "L2 public-source rebuild requires independently obtained public raw files.",
+            r"The release includes \path{source_input_manifest}.",
+            r"The release includes \path{processing_run_log}.",
+            "L3 result audit requires released tables, predictions, logs, manifests, checksums, and commit identifiers.",
+            "A reviewer who has only the Git repository cannot verify model predictions, threshold choices, or row-level Open-v2 numbers from Git alone.",
+            "The L2/L3 artifact chain is required.",
+        ]
+    )
+
+    errors = module.check_reproduction_levels_boundary(manuscript_text, "")
+
+    assert any("tab:reproduction-levels" in error for error in errors)
+    assert any("Reproduction levels for auditing" in error for error in errors)
+
+
 def test_check_highlights_accepts_five_concise_bullets() -> None:
     """验证 5 条简洁投稿 highlights 可通过检查。"""
 
@@ -5138,7 +5205,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 65.",
+            "Completed audit cycles: 66.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -5666,6 +5733,15 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "Proxy labels are over-interpreted",
             "failure-control clarity without main-text table overload",
             "supplementary failure-control rationale table",
+            "## Audit Cycle 66: Reproduction Levels Density Gate",
+            "reproduction-level table-density reduction",
+            "full reproduction-level table",
+            "L0 code check and L1 fixture rebuild",
+            "do not reproduce the Open-v2 numerical table",
+            "L2 public-source rebuild requires independently obtained public raw files",
+            "L3 result audit requires released tables, predictions, logs, manifests, checksums, and commit identifiers",
+            "reproduction-level clarity without main-text table overload",
+            "supplementary reproduction-level table",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -5684,7 +5760,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 65",
+        "Completed audit cycles: 66",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -5695,7 +5771,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 65" in error for error in errors)
+    assert any("Completed audit cycles: 66" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

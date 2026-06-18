@@ -520,6 +520,59 @@ def check_data_code_availability_boundary(manuscript_text: str, supplementary_te
     return errors
 
 
+def check_reproduction_levels_boundary(manuscript_text: str, supplementary_text: str = "") -> list[str]:
+    """Check whether reproduction levels are stated without overloading the main text.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
+
+    返回:
+        list[str]: Error messages for missing reproduction-level boundary markers.
+    """
+    required_main_markers = [
+        r"\subsection{Artifact Reproduction Protocol}",
+        "full reproduction-level table is reported in the supplementary material",
+        "L0 code check and L1 fixture rebuild verify executable contracts",
+        "do not reproduce the Open-v2 numerical table",
+        "L2 public-source rebuild requires independently obtained public raw files",
+        r"\path{source_input_manifest}",
+        r"\path{processing_run_log}",
+        "L3 result audit requires released tables, predictions, logs, manifests, checksums, and commit identifiers",
+        "reviewer who has only the Git repository",
+        "cannot verify model predictions, threshold choices, or row-level Open-v2 numbers from Git alone",
+        "L2/L3 artifact chain",
+    ]
+    required_supplement_markers = [
+        r"\section{Reproduction Levels}",
+        r"\label{tab:reproduction-levels}",
+        "Reproduction levels for auditing the repository and the reported evidence",
+        "L0/L1 levels verify executable code and fixture contracts",
+        "L2/L3 levels are required for result-level numerical audit",
+        "L0 code check",
+        "L1 fixture rebuild",
+        "L2 public-source rebuild",
+        "L3 result audit",
+        "Source tree, package environment, and manuscript scripts",
+        r"\texttt{tests/fixtures}",
+        r"\path{source_input_manifest}",
+        r"\path{processing_run_log}",
+        "Released tables, predictions, logs, manifests, checksums, and commit identifiers",
+    ]
+    errors = [
+        f"reproduction-level boundary missing manuscript marker: {marker}"
+        for marker in required_main_markers
+        if marker not in manuscript_text
+    ]
+    evidence_text = supplementary_text or manuscript_text
+    errors.extend(
+        f"reproduction-level boundary missing supplementary marker: {marker}"
+        for marker in required_supplement_markers
+        if marker not in evidence_text
+    )
+    return errors
+
+
 def check_cli_entrypoint_contract(pyproject_text: str, cli_text: str) -> list[str]:
     """Check whether the installable CLI entry point is auditable from source.
 
@@ -3348,7 +3401,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 65",
+        "Completed audit cycles: 66",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3471,8 +3524,17 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 63: Risk Score Design Rationale Density Gate",
         "Audit Cycle 64: Design Alternatives Density Gate",
         "Audit Cycle 65: Failure-Control Rationale Density Gate",
+        "Audit Cycle 66: Reproduction Levels Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
+        "reproduction-level table-density reduction",
+        "full reproduction-level table",
+        "L0 code check and L1 fixture rebuild",
+        "do not reproduce the Open-v2 numerical table",
+        "L2 public-source rebuild requires independently obtained public raw files",
+        "L3 result audit requires released tables, predictions, logs, manifests, checksums, and commit identifiers",
+        "reproduction-level clarity without main-text table overload",
+        "supplementary reproduction-level table",
         "failure-control table-density reduction",
         "full failure-control rationale table",
         "Topically close papers receive high semantic similarity",
@@ -4981,6 +5043,7 @@ def main() -> int:
     errors.extend(check_claim_interpretation_boundary(manuscript_text, supplementary_text))
     errors.extend(check_declaration_statements(manuscript_text))
     errors.extend(check_data_code_availability_boundary(manuscript_text, supplementary_text))
+    errors.extend(check_reproduction_levels_boundary(manuscript_text, supplementary_text))
     errors.extend(check_cli_entrypoint_contract(pyproject_text, cli_entrypoint_text))
     errors.extend(check_operating_point_disclosure(manuscript_text, supplementary_text))
     errors.extend(check_selective_decision_coverage_boundary(manuscript_text, supplementary_text))

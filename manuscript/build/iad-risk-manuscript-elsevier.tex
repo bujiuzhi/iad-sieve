@@ -461,24 +461,9 @@ The repository separates executable code from large data artifacts: raw third-pa
 
 \subsection{Artifact Reproduction Protocol}
 
-Because the repository does not redistribute large third-party data, reproducibility is divided into code-level reproduction and result-level artifact reproduction. Table~\ref{tab:reproduction-levels} defines what each level proves. The key principle is that small fixtures verify the processing contracts, while the full reported tables require either independently obtained public source files or a released artifact package with manifests and checksums.
+Because the repository does not redistribute large third-party data, reproducibility is divided into code-level reproduction and result-level artifact reproduction. The full reproduction-level table is reported in the supplementary material. The main boundary is that L0 code check and L1 fixture rebuild verify executable contracts, command-line discovery, public-release scans, tests, PDF builds, and miniature fixture adapters under \texttt{tests/fixtures}; they do not reproduce the Open-v2 numerical table. L2 public-source rebuild requires independently obtained public raw files plus \path{source_input_manifest} and \path{processing_run_log} so that input provenance, commands, software versions, seeds, output summaries, and checksums can be audited. L3 result audit requires released tables, predictions, logs, manifests, checksums, and commit identifiers before numerical results can be treated as externally auditable.
 
-\begin{table}[H]
-\caption{Reproduction levels for auditing the repository and the reported evidence.}
-\label{tab:reproduction-levels}
-\centering
-\small
-\begin{tabular}{L{0.12\linewidth}L{0.38\linewidth}L{0.40\linewidth}}
-\toprule
-Level & Required input & Audit target \\
-\midrule
-L0 code check & Source tree, package environment, and manuscript scripts & Verify that the CLI, tests, public-release scan, and LaTeX build run in a clean environment. \\
-L1 fixture rebuild & Public miniature fixtures under \texttt{tests/fixtures} & Verify that DeepMatcher, SciRepEval-style, OpenAlex-style, and IAD-Bench adapters produce the documented pair schema. \\
-L2 public-source rebuild & Independently obtained public raw files from the cited sources, plus \path{source_input_manifest} and \path{processing_run_log} & Rebuild derived IAD-Bench files with documented commands, input provenance, run metadata, output summaries, and checksums. \\
-L3 result audit & Released tables, predictions, logs, manifests, and checksums & Verify the numerical results reported in the manuscript against immutable artifact files. \\
-\bottomrule
-\end{tabular}
-\end{table}
+The key principle is that small fixtures verify processing contracts, while full reported tables require either independently obtained public source files or a released artifact package with manifests and checksums. A reviewer who has only the Git repository can evaluate installation, schema behavior, fixture rebuilding, public-release boundaries, and manuscript construction. A reviewer cannot verify model predictions, threshold choices, or row-level Open-v2 numbers from Git alone without the L2/L3 artifact chain.
 
 \subsection{Claim-Evidence Boundary for Result Interpretation}
 

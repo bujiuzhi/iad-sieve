@@ -20,6 +20,25 @@
 
 This supplementary material documents the reproducibility boundary for the manuscript ``IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication.'' It is intended to accompany the main manuscript, not to replace the project repository or the final artifact release. The repository contains executable code, fixture data, schema contracts, and build scripts; large third-party raw data, model checkpoints, and full experimental outputs are kept outside Git and must be distributed through an artifact release when numerical result reproduction is required.
 
+\section{Reproduction Levels}
+
+\begin{table}[H]
+\caption{Reproduction levels for auditing the repository and the reported evidence. L0/L1 levels verify executable code and fixture contracts, while L2/L3 levels are required for result-level numerical audit.}
+\label{tab:reproduction-levels}
+\centering
+\small
+\begin{tabular}{L{0.12\linewidth}L{0.38\linewidth}L{0.40\linewidth}}
+\toprule
+Level & Required input & Audit target \\
+\midrule
+L0 code check & Source tree, package environment, and manuscript scripts & Verify that the CLI, tests, public-release scan, and LaTeX build run in a clean environment. \\
+L1 fixture rebuild & Public miniature fixtures under \texttt{tests/fixtures} & Verify that DeepMatcher, SciRepEval-style, OpenAlex-style, and IAD-Bench adapters produce the documented pair schema. \\
+L2 public-source rebuild & Independently obtained public raw files from the cited sources, plus \path{source_input_manifest} and \path{processing_run_log} & Rebuild derived IAD-Bench files with documented commands, input provenance, run metadata, output summaries, and checksums. \\
+L3 result audit & Released tables, predictions, logs, manifests, checksums, and commit identifiers & Verify the numerical results reported in the manuscript against immutable artifact files. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Closest-Work Positioning}
 
 The main manuscript summarizes the novelty boundary in prose. Table~\ref{tab:closest-work-positioning} keeps the full closest-work positioning matrix auditable without interrupting the Related Work narrative.
@@ -38,24 +57,6 @@ End-to-end entity resolution systems & Blocking, matching, labeling, and deploym
 Neural entity matching & Pair-level same-entity classification from tuple or text encoders. & Strong text similarity can still link different papers in one agenda. & Trains same-work, same-agenda, and agenda-non-identity heads with provenance-aware masking. \\
 Scientific document representations & Citation-informed or contrastive scientific relatedness embeddings. & Relatedness embeddings support retrieval but are unsafe as direct merge evidence. & Uses representation similarity as candidate and agenda evidence, then blocks risky merges. \\
 Open scholarly metadata benchmarks & Public metadata, citation, and topic signals for scalable evaluation. & Topic or citation proximity is silver evidence, not human identity gold. & Reports gold, proxy, and silver strata separately and ties claims to label strength. \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\section{Reproduction Levels}
-
-\begin{table}[h]
-\caption{Reproduction levels and expected evidence.}
-\centering
-\small
-\begin{tabular}{L{0.12\linewidth}L{0.35\linewidth}L{0.43\linewidth}}
-\toprule
-Level & Required input & Evidence produced \\
-\midrule
-L0 & Source tree and configured Python environment & CLI help, public-release scan, unit tests, and PDF build logs. \\
-L1 & Public miniature fixtures in \texttt{tests/fixtures} & Eval-source files and an IAD-Bench fixture package with the documented schema. \\
-L2 & Independently obtained public raw files & Rebuilt DeepMatcher, SciRepEval-style, OpenAlex-style, and OpenCitations-derived evaluation sources. \\
-L3 & Released artifact package & Fixed tables, predictions, logs, manifests, checksums, and commit identifiers for result audit. \\
 \bottomrule
 \end{tabular}
 \end{table}
