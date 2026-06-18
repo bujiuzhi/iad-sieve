@@ -2486,6 +2486,8 @@ def check_editorial_claim_alignment(
                 "Open-v2 evidence snapshot",
                 "HNFMR 0.790--0.999",
                 "HNFMR=0.000",
+                "pair-level conclusion",
+                "cluster artifacts",
                 "broad method-ranking claims",
             ],
         ),
