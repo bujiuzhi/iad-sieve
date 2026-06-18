@@ -39,6 +39,8 @@ statements:
   data_code_availability: "The repository provides source code, small public fixtures, schema contracts, build scripts, and artifact-release instructions. Raw third-party data and full experimental outputs are not redistributed in Git."
 
 funding:
+  no_external_funding_declared: false
+  funding_statement: ""
   funding_sources: []
   grant_numbers: []
 

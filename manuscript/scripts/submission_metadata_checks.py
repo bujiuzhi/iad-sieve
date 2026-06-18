@@ -454,6 +454,25 @@ def target_journal_requires_elsevier_files(metadata_text: str) -> bool:
     return target_journal.strip().lower() in ELSEVIER_TARGET_JOURNALS
 
 
+def check_funding_statement(metadata_text: str) -> list[str]:
+    """Check whether final-upload metadata declares funding status.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages for missing funding declaration fields.
+    """
+    funding_row = parse_mapping_section(metadata_text, "funding")
+    funding_statement = funding_row.get("funding_statement", "") or funding_row.get("statement", "")
+    no_external_funding = funding_row.get("no_external_funding_declared", "").lower() == "true"
+    funding_sources = funding_row.get("funding_sources", "")
+    has_funding_source = bool(funding_sources and funding_sources != "[]")
+    if funding_statement or no_external_funding or has_funding_source:
+        return []
+    return ["funding statement is missing"]
+
+
 def check_final_upload_cover_letter_text(cover_letter_text: str, metadata_text: str) -> list[str]:
     """Check final-upload cover letter target and artifact boundaries.
 
@@ -528,6 +547,7 @@ def check_final_upload_metadata_text(metadata_text: str) -> list[str]:
         f"final upload metadata unresolved: {message}"
         for message in check_corresponding_author_matches_author_rows(metadata_text)
     )
+    errors.extend(f"final upload metadata unresolved: {message}" for message in check_funding_statement(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_artifact_release_link(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_final_upload_review_mode(metadata_text))
     return sorted(set(errors))
