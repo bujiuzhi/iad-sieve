@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 64.
+Completed audit cycles: 65.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -609,6 +609,14 @@ Outcome: pass for design-alternatives table-density reduction; blocked for broad
 This gate checks whether the design alternatives table is needed in the main manuscript. The main manuscript now states the rejected shortcuts in prose: Tune a representation-similarity threshold, Use one supervised pair classifier, Use provenance as a model feature, Always force a binary merge decision, and Select thresholds after test results. It also states the reviewer-facing boundaries that RoBERTa remains a strong baseline, broad superiority is not claimed, and Threshold stability needs a released grid and checksums. The supplementary material preserves the full design-alternatives table with the alternative, why it is insufficient for this failure mode, the IAD-Risk design response, and evidence boundary.
 
 The reviewer-facing boundary is design-alternative clarity without main-text table overload. The validator still requires the supplementary design-alternatives table, including all five rejected shortcuts, the explicit RoBERTa baseline boundary, the broad-superiority boundary, and the threshold-stability artifact boundary.
+
+## Audit Cycle 65: Failure-Control Rationale Density Gate
+
+Outcome: pass for failure-control table-density reduction; blocked for complete failure-mode coverage claims until released artifacts include hard-negative coverage, label-strength preservation checks, cannot-link coverage, threshold-transfer evidence, and proxy-label stratum audits.
+
+This gate checks whether the failure-control rationale table is needed in the main manuscript. The main manuscript now states the failure-control boundary in prose: IAD-Risk is a failure-control framework rather than another similarity scorer, Topically close papers receive high semantic similarity, Silver metadata is treated as if it were human gold only when label strength is ignored, Pairwise errors can contaminate clusters through transitivity, Thresholds can turn a classifier into an unsafe automatic merger, and Proxy labels are over-interpreted when relation support is mixed. The supplementary material preserves the full failure-control rationale table with failure pathway, design response, and remaining boundary.
+
+The reviewer-facing boundary is failure-control clarity without main-text table overload. The validator still requires the supplementary failure-control rationale table, including all five failure pathways, cluster-level cannot-link coverage, threshold-transfer evidence, and the rule that proxy rows remain non-human evidence even when reproducible.
 
 ## Minimum Gate Before Final Upload
 

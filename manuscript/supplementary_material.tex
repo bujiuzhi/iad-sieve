@@ -102,7 +102,25 @@ Evaluation control & \texttt{split}, \texttt{hard\_negative\_level} & Controls t
 
 \section{Method Design Boundaries}
 
-The main manuscript summarizes method-design boundaries in prose. The tables below keep the risk-score rationale, design alternatives, feature-head specification, operational net-benefit, and version-identifier policies auditable without overloading the Method narrative.
+The main manuscript summarizes method-design boundaries in prose. The tables below keep the failure-control rationale, risk-score rationale, design alternatives, feature-head specification, operational net-benefit, and version-identifier policies auditable without overloading the Method narrative.
+
+\begin{table}[H]
+\caption{Failure-control rationale of IAD-Risk. Each component targets a concrete way in which agenda-level similarity can be mistaken for work identity.}
+\label{tab:failure-controls}
+\centering
+\small
+\begin{tabular}{L{0.26\linewidth}L{0.34\linewidth}L{0.30\linewidth}}
+\toprule
+Failure pathway & Design response & Remaining boundary \\
+\midrule
+Topically close papers receive high semantic similarity. & Separate agenda evidence from identity evidence before the merge gate. & Requires the benchmark to include agenda-level hard negatives. \\
+Silver metadata is treated as if it were human gold. & Preserve label strength and provenance, and mask supervision by valid label source. & Silver labels support stress testing, not exhaustive truth claims. \\
+Pairwise errors contaminate clusters through transitivity. & Apply risk gating before constrained union-find and respect cannot-link evidence. & Cluster-level guarantees require complete cannot-link coverage. \\
+Thresholds turn a classifier into an unsafe automatic merger. & Expose work, ANI, and risk thresholds and evaluate held-out merge decisions. & Threshold transfer should be rechecked under new source distributions. \\
+Proxy labels are over-interpreted. & Keep proxy rows separate unless the label source supports the relation being evaluated. & Proxy rows remain non-human evidence even when reproducible. \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \begin{table}[H]
 \caption{Risk score design rationale. The score is designed as a conservative merge gate, not as an unconditional probability of error.}

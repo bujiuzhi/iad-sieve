@@ -1973,6 +1973,70 @@ def test_check_design_alternative_boundaries_rejects_missing_supplementary_table
     assert any("Design alternatives considered" in error for error in errors)
 
 
+def test_check_failure_control_rationale_accepts_supplementary_table() -> None:
+    """验证 failure-control 表迁入补充材料后可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Failure-Control Rationale}",
+            "The full failure-control rationale table is reported in the supplementary material.",
+            "IAD-Risk is a failure-control framework rather than another similarity scorer.",
+            "Topically close papers receive high semantic similarity.",
+            "Silver metadata is treated as if it were human gold.",
+            "Pairwise errors can contaminate clusters through transitivity.",
+            "Thresholds can turn a classifier into an unsafe automatic merger.",
+            "Proxy labels are over-interpreted.",
+            "Threshold transfer should be rechecked under new source distributions.",
+            "proxy rows remain non-human evidence even when reproducible.",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\label{tab:failure-controls}",
+            "Failure-control rationale of IAD-Risk.",
+            "Failure pathway",
+            "Design response",
+            "Remaining boundary",
+            "Topically close papers receive high semantic similarity.",
+            "Silver metadata is treated as if it were human gold.",
+            "Pairwise errors contaminate clusters through transitivity.",
+            "Thresholds turn a classifier into an unsafe automatic merger.",
+            "Proxy labels are over-interpreted.",
+            "Cluster-level guarantees require complete cannot-link coverage.",
+        ]
+    )
+
+    errors = module.check_failure_control_rationale(manuscript_text, supplementary_text)
+
+    assert errors == []
+
+
+def test_check_failure_control_rationale_rejects_missing_supplementary_table() -> None:
+    """验证缺少补充材料 failure-control 表时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Failure-Control Rationale}",
+            "The full failure-control rationale table is reported in the supplementary material.",
+            "IAD-Risk is a failure-control framework rather than another similarity scorer.",
+            "Topically close papers receive high semantic similarity.",
+            "Silver metadata is treated as if it were human gold.",
+            "Pairwise errors can contaminate clusters through transitivity.",
+            "Thresholds can turn a classifier into an unsafe automatic merger.",
+            "Proxy labels are over-interpreted.",
+            "Threshold transfer should be rechecked under new source distributions.",
+            "proxy rows remain non-human evidence even when reproducible.",
+        ]
+    )
+
+    errors = module.check_failure_control_rationale(manuscript_text, "")
+
+    assert any("failure-controls" in error for error in errors)
+    assert any("Failure-control rationale" in error for error in errors)
+
+
 def test_check_operating_point_disclosure_accepts_supplementary_table() -> None:
     """验证运行点披露表迁入补充材料后可通过检查。"""
 
@@ -5074,7 +5138,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 64.",
+            "Completed audit cycles: 65.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -5592,6 +5656,16 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "Select thresholds after test results",
             "design-alternative clarity without main-text table overload",
             "supplementary design-alternatives table",
+            "## Audit Cycle 65: Failure-Control Rationale Density Gate",
+            "failure-control table-density reduction",
+            "full failure-control rationale table",
+            "Topically close papers receive high semantic similarity",
+            "Silver metadata is treated as if it were human gold",
+            "Pairwise errors can contaminate clusters through transitivity",
+            "Thresholds can turn a classifier into an unsafe automatic merger",
+            "Proxy labels are over-interpreted",
+            "failure-control clarity without main-text table overload",
+            "supplementary failure-control rationale table",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -5610,7 +5684,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 64",
+        "Completed audit cycles: 65",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -5621,7 +5695,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 64" in error for error in errors)
+    assert any("Completed audit cycles: 65" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

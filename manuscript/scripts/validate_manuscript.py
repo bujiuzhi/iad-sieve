@@ -1597,6 +1597,55 @@ def check_design_alternative_boundaries(manuscript_text: str, supplementary_text
     return errors
 
 
+def check_failure_control_rationale(manuscript_text: str, supplementary_text: str = "") -> list[str]:
+    """Check whether the method states failure-control pathways and boundaries.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
+
+    返回:
+        list[str]: Error messages for missing failure-control rationale markers.
+    """
+    required_main_markers = [
+        r"\subsection{Failure-Control Rationale}",
+        "full failure-control rationale table is reported in the supplementary material",
+        "failure-control framework rather than another similarity scorer",
+        "Topically close papers receive high semantic similarity",
+        "Silver metadata is treated as if it were human gold",
+        "Pairwise errors can contaminate clusters through transitivity",
+        "Thresholds can turn a classifier into an unsafe automatic merger",
+        "Proxy labels are over-interpreted",
+        "Threshold transfer should be rechecked under new source distributions",
+        "proxy rows remain non-human evidence even when reproducible",
+    ]
+    required_supplement_markers = [
+        r"\label{tab:failure-controls}",
+        "Failure-control rationale of IAD-Risk",
+        "Failure pathway",
+        "Design response",
+        "Remaining boundary",
+        "Topically close papers receive high semantic similarity",
+        "Silver metadata is treated as if it were human gold",
+        "Pairwise errors contaminate clusters through transitivity",
+        "Thresholds turn a classifier into an unsafe automatic merger",
+        "Proxy labels are over-interpreted",
+        "Cluster-level guarantees require complete cannot-link coverage",
+    ]
+    errors = [
+        f"failure-control rationale missing manuscript marker: {marker}"
+        for marker in required_main_markers
+        if marker not in manuscript_text
+    ]
+    evidence_text = supplementary_text or manuscript_text
+    errors.extend(
+        f"failure-control rationale missing supplementary marker: {marker}"
+        for marker in required_supplement_markers
+        if marker not in evidence_text
+    )
+    return errors
+
+
 def check_operating_point_disclosure(manuscript_text: str, supplementary_text: str = "") -> list[str]:
     """Check whether result operating points are disclosed for review.
 
@@ -3299,7 +3348,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 64",
+        "Completed audit cycles: 65",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3421,8 +3470,18 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 62: Feature and Head Specification Density Gate",
         "Audit Cycle 63: Risk Score Design Rationale Density Gate",
         "Audit Cycle 64: Design Alternatives Density Gate",
+        "Audit Cycle 65: Failure-Control Rationale Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
+        "failure-control table-density reduction",
+        "full failure-control rationale table",
+        "Topically close papers receive high semantic similarity",
+        "Silver metadata is treated as if it were human gold",
+        "Pairwise errors can contaminate clusters through transitivity",
+        "Thresholds can turn a classifier into an unsafe automatic merger",
+        "Proxy labels are over-interpreted",
+        "failure-control clarity without main-text table overload",
+        "supplementary failure-control rationale table",
         "design-alternatives table-density reduction",
         "full design-alternatives table",
         "Tune a representation-similarity threshold",
@@ -4915,6 +4974,7 @@ def main() -> int:
     errors.extend(check_method_pipeline_figure(manuscript_text))
     errors.extend(check_scoring_merge_algorithm(manuscript_text))
     errors.extend(check_design_alternative_boundaries(manuscript_text, supplementary_text))
+    errors.extend(check_failure_control_rationale(manuscript_text, supplementary_text))
     errors.extend(check_related_work_positioning(manuscript_text, supplementary_text))
     errors.extend(check_error_taxonomy(manuscript_text, supplementary_text))
     errors.extend(check_validity_threats(manuscript_text, supplementary_text))

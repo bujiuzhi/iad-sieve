@@ -347,25 +347,7 @@ Version and identifier evidence is treated as merge-policy input rather than as 
 
 \subsection{Failure-Control Rationale}
 
-IAD-Risk is designed as a failure-control framework rather than as another similarity scorer. Table~\ref{tab:failure-controls} summarizes how each design choice addresses a specific false-merge pathway. The table also states the remaining boundary for each control, because a safety mechanism should make its unsupported cases explicit.
-
-\begin{table}[H]
-\caption{Failure-control rationale of IAD-Risk. Each component targets a concrete way in which agenda-level similarity can be mistaken for work identity.}
-\label{tab:failure-controls}
-\centering
-\small
-\begin{tabular}{L{0.26\linewidth}L{0.34\linewidth}L{0.30\linewidth}}
-\toprule
-Failure pathway & Design response & Remaining boundary \\
-\midrule
-Topically close papers receive high semantic similarity. & Separate agenda evidence from identity evidence before the merge gate. & Requires the benchmark to include agenda-level hard negatives. \\
-Silver metadata is treated as if it were human gold. & Preserve label strength and provenance, and mask supervision by valid label source. & Silver labels support stress testing, not exhaustive truth claims. \\
-Pairwise errors contaminate clusters through transitivity. & Apply risk gating before constrained union-find and respect cannot-link evidence. & Cluster-level guarantees require complete cannot-link coverage. \\
-Thresholds turn a classifier into an unsafe automatic merger. & Expose work, ANI, and risk thresholds and evaluate held-out merge decisions. & Threshold transfer should be rechecked under new source distributions. \\
-Proxy labels are over-interpreted. & Keep proxy rows separate unless the label source supports the relation being evaluated. & Proxy rows remain non-human evidence even when reproducible. \\
-\bottomrule
-\end{tabular}
-\end{table}
+IAD-Risk is designed as a failure-control framework rather than another similarity scorer. The full failure-control rationale table is reported in the supplementary material. The main failure-control boundary is that each design choice targets a specific false-merge pathway while leaving unsupported cases explicit. Topically close papers receive high semantic similarity, so the method separates agenda evidence from identity evidence before the merge gate and requires agenda-level hard negatives for this claim. Silver metadata is treated as if it were human gold only if label strength is ignored, so IAD-Risk preserves label strength and provenance and keeps silver labels as stress-test evidence rather than exhaustive truth claims. Pairwise errors can contaminate clusters through transitivity, so risk gating and cannot-link evidence are applied before constrained union-find, while cluster-level guarantees still require complete cannot-link coverage. Thresholds can turn a classifier into an unsafe automatic merger, so work, ANI, and risk thresholds are exposed. Threshold transfer should be rechecked under new source distributions. Proxy labels are over-interpreted when relation support is mixed, so proxy rows remain non-human evidence even when reproducible.
 
 \subsection{Design Alternatives and Rejected Shortcuts}
 
