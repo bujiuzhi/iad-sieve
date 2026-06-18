@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 40.
+Completed audit cycles: 44.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -441,6 +441,14 @@ Outcome: pass for Method table-density reduction; blocked for final numerical au
 This gate checks whether operational net-benefit and version-identifier policy tables make the Method section heavier than necessary for first-pass review. The main manuscript now states the cost, workload, threshold-governance, version-policy, and adjudication boundaries in prose, while the supplementary material preserves the full operational net-benefit and version-identifier matrices.
 
 The reviewer-facing boundary is design soundness without table overload. The edit keeps the Method section focused on the algorithm and decision policy, while the validator still requires both main-text boundary statements and supplementary method-design tables.
+
+## Audit Cycle 44: Experiment Reporting Boundary Density Gate
+
+Outcome: pass for Experiments table-density reduction; blocked for final numerical audit until the external artifact release remains populated, finalized, checksum-validated, and publicly linked.
+
+This gate checks whether threshold-governance and statistical-interpretation matrices make the Experiments section heavier than necessary for first-pass review. The main manuscript now states the fixed threshold-selection protocol, uncertainty requirements, point-estimate boundary, confidence-interval requirement, statistical-significance requirement, zero-observed HNFMR interpretation, and model-ranking boundary in prose, while the supplementary material preserves the full threshold and uncertainty reporting protocol table and the full statistical interpretation boundary table.
+
+The reviewer-facing boundary is experimental interpretability without table overload. The edit keeps the Experiments section focused on what the reported Open-v2 snapshot can and cannot support, while the validator still requires the main-text boundary statements and both supplementary experiment-reporting tables.
 
 ## Minimum Gate Before Final Upload
 

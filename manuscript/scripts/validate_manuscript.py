@@ -1631,6 +1631,36 @@ def check_threshold_sensitivity_status(manuscript_text: str) -> list[str]:
     ]
 
 
+def check_threshold_uncertainty_reporting(manuscript_text: str) -> list[str]:
+    """Check whether threshold and uncertainty boundaries remain visible in the main text.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing threshold and uncertainty boundaries.
+    """
+    required_markers = [
+        r"\subsection{Threshold Selection and Uncertainty Reporting}",
+        "full threshold and uncertainty reporting protocol is reported in the supplementary material",
+        "fixed selection protocol",
+        "best test threshold",
+        "validation evidence",
+        "default implementation threshold",
+        "fixed operating point",
+        "test split is then used only for final metric reporting",
+        "FMR and HNFMR",
+        "prediction files and resampling logs",
+        "no-risk-gate, no-ANI, and single-space variants",
+        "predictions, configs, logs, checksums, and commit identifiers",
+    ]
+    return [
+        f"threshold uncertainty reporting missing marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
+
+
 def check_statistical_interpretation_boundary(manuscript_text: str) -> list[str]:
     """Check whether point estimates are separated from interval and significance claims.
 
@@ -1642,7 +1672,7 @@ def check_statistical_interpretation_boundary(manuscript_text: str) -> list[str]
     """
     required_markers = [
         r"\subsection{Statistical Interpretation Boundary}",
-        r"\label{tab:statistical-interpretation-boundary}",
+        "full statistical interpretation table is reported in the supplementary material",
         "point estimates for a fixed evidence snapshot",
         "not statistical superiority estimates",
         "Confidence intervals, significance tests, and model-ranking statements are intentionally withheld",
@@ -1657,6 +1687,42 @@ def check_statistical_interpretation_boundary(manuscript_text: str) -> list[str]
         f"statistical interpretation boundary missing marker: {marker}"
         for marker in required_markers
         if marker not in manuscript_text
+    ]
+
+
+def check_experiment_reporting_supplementary_boundaries(supplementary_text: str) -> list[str]:
+    """Check whether moved experiment-reporting boundary tables are in the supplement.
+
+    参数:
+        supplementary_text: Supplementary LaTeX source.
+
+    返回:
+        list[str]: Error messages for missing supplementary experiment-reporting tables.
+    """
+    required_markers = [
+        r"\section{Uncertainty and Ablation Requirements}",
+        r"\label{tab:threshold-uncertainty-protocol}",
+        r"\label{tab:statistical-interpretation-boundary}",
+        "Threshold and uncertainty reporting protocol",
+        "Merge thresholds",
+        "Metric uncertainty",
+        "Risk metrics",
+        "Ablation claims",
+        "Artifact audit",
+        "Statistical interpretation boundary",
+        "Point estimates",
+        "Confidence intervals",
+        "Statistical significance",
+        "Zero HNFMR rows",
+        "Model ranking",
+        r"\path{bootstrap_intervals}",
+        "Predefined tests, multiplicity handling, input artifacts, and reproducible analysis logs",
+        "Same-scope predictions, interval estimates, ablations, and manual-validation slice",
+    ]
+    return [
+        f"experiment reporting supplementary boundary missing marker: {marker}"
+        for marker in required_markers
+        if marker not in supplementary_text
     ]
 
 
@@ -2893,7 +2959,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 40",
+        "Completed audit cycles: 44",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -2991,6 +3057,10 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 31: Zero-Observed HNFMR Wording Gate",
         "Audit Cycle 32: L2 Public-Source Rebuild Traceability Gate",
         "Audit Cycle 33: Main-Text L2 Provenance Alignment Gate",
+        "Audit Cycle 41: Main-Text Schema Density Gate",
+        "Audit Cycle 42: Related-Work Positioning Density Gate",
+        "Audit Cycle 43: Method Design Boundary Density Gate",
+        "Audit Cycle 44: Experiment Reporting Boundary Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
         "method-writing clarity",
@@ -3063,6 +3133,16 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "source-to-result alignment",
         "same provenance vocabulary",
         "supplemental-only instructions",
+        "schema-density reduction",
+        "document-schema and pair-schema tables",
+        "closest-work positioning matrix",
+        "positioning matrix",
+        "method-design tables",
+        "operational net-benefit and version-identifier matrices",
+        "Experiments table-density reduction",
+        "threshold and uncertainty reporting protocol table",
+        "statistical interpretation boundary table",
+        "experimental interpretability without table overload",
         "remote reproducibility",
         "strong model matrix",
         "model superiority",
@@ -4208,6 +4288,7 @@ def main() -> int:
     errors.extend(check_pair_cluster_evidence_boundary(manuscript_text))
     errors.extend(check_decision_metric_mapping(manuscript_text))
     errors.extend(check_metric_formula_boundary(manuscript_text))
+    errors.extend(check_threshold_uncertainty_reporting(manuscript_text))
     errors.extend(check_statistical_interpretation_boundary(manuscript_text))
     errors.extend(check_threshold_sensitivity_status(manuscript_text))
     errors.extend(check_baseline_scope_alignment(manuscript_text))
@@ -4239,6 +4320,7 @@ def main() -> int:
     errors.extend(check_reviewer_readiness_audit(reviewer_readiness_audit_text))
     errors.extend(check_manual_validation_protocol(supplementary_text))
     errors.extend(check_reviewer_evidence_gate(supplementary_text))
+    errors.extend(check_experiment_reporting_supplementary_boundaries(supplementary_text))
     errors.extend(check_result_claim_boundary(manuscript_text, supplementary_text))
     errors.extend(check_highlights(highlights_text))
     errors.extend(check_keywords(keywords_text))

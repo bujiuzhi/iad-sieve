@@ -2105,6 +2105,43 @@ def test_check_threshold_sensitivity_status_rejects_unbounded_claim() -> None:
     assert any("not threshold-stable ranking" in error for error in errors)
 
 
+def test_check_threshold_uncertainty_reporting_accepts_complete_boundary() -> None:
+    """验证主稿阈值与不确定性边界完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Threshold Selection and Uncertainty Reporting}",
+            "The full threshold and uncertainty reporting protocol is reported in the supplementary material.",
+            "The reported system follows a fixed selection protocol and does not choose the best test threshold.",
+            "Thresholds are selected from validation evidence.",
+            "The default implementation threshold is used as a fixed operating point.",
+            "The test split is then used only for final metric reporting.",
+            "FMR and HNFMR are reported together.",
+            "Stronger claims require prediction files and resampling logs.",
+            "The required ablations include no-risk-gate, no-ANI, and single-space variants.",
+            "Artifacts bind predictions, configs, logs, checksums, and commit identifiers.",
+        ]
+    )
+
+    errors = module.check_threshold_uncertainty_reporting(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_threshold_uncertainty_reporting_rejects_missing_artifact_boundary() -> None:
+    """验证缺少 artifact 约束时阈值与不确定性边界会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\subsection{Threshold Selection and Uncertainty Reporting}"
+
+    errors = module.check_threshold_uncertainty_reporting(manuscript_text)
+
+    assert any("prediction files and resampling logs" in error for error in errors)
+    assert any("no-risk-gate" in error for error in errors)
+    assert any("checksums" in error for error in errors)
+
+
 def test_check_statistical_interpretation_boundary_accepts_bounded_point_estimates() -> None:
     """验证统计解释边界完整时可通过检查。"""
 
@@ -2112,7 +2149,7 @@ def test_check_statistical_interpretation_boundary_accepts_bounded_point_estimat
     manuscript_text = "\n".join(
         [
             r"\subsection{Statistical Interpretation Boundary}",
-            r"\label{tab:statistical-interpretation-boundary}",
+            "The full statistical interpretation table is reported in the supplementary material.",
             "The reported numbers are point estimates for a fixed evidence snapshot.",
             "They are not statistical superiority estimates.",
             "Confidence intervals, significance tests, and model-ranking statements are intentionally withheld.",
@@ -2141,6 +2178,51 @@ def test_check_statistical_interpretation_boundary_rejects_missing_significance_
     assert any("statistical superiority estimates" in error for error in errors)
     assert any("bootstrap_intervals" in error for error in errors)
     assert any("zero risk" in error for error in errors)
+
+
+def test_check_experiment_reporting_supplementary_boundaries_accepts_complete_tables() -> None:
+    """验证补充材料包含迁移后的实验报告边界表时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    supplementary_text = "\n".join(
+        [
+            r"\section{Uncertainty and Ablation Requirements}",
+            r"\label{tab:threshold-uncertainty-protocol}",
+            r"\label{tab:statistical-interpretation-boundary}",
+            "Threshold and uncertainty reporting protocol.",
+            "Merge thresholds.",
+            "Metric uncertainty.",
+            "Risk metrics.",
+            "Ablation claims.",
+            "Artifact audit.",
+            "Statistical interpretation boundary.",
+            "Point estimates.",
+            "Confidence intervals.",
+            "Statistical significance.",
+            "Zero HNFMR rows.",
+            "Model ranking.",
+            r"\path{bootstrap_intervals}",
+            "Predefined tests, multiplicity handling, input artifacts, and reproducible analysis logs.",
+            "Same-scope predictions, interval estimates, ablations, and manual-validation slice.",
+        ]
+    )
+
+    errors = module.check_experiment_reporting_supplementary_boundaries(supplementary_text)
+
+    assert errors == []
+
+
+def test_check_experiment_reporting_supplementary_boundaries_rejects_missing_tables() -> None:
+    """验证缺少补充材料实验报告边界表时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    supplementary_text = r"\section{Uncertainty and Ablation Requirements}"
+
+    errors = module.check_experiment_reporting_supplementary_boundaries(supplementary_text)
+
+    assert any("threshold-uncertainty-protocol" in error for error in errors)
+    assert any("statistical-interpretation-boundary" in error for error in errors)
+    assert any("bootstrap_intervals" in error for error in errors)
 
 
 def test_check_baseline_scope_alignment_accepts_reported_result_scope() -> None:
@@ -4325,7 +4407,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 40.",
+            "Completed audit cycles: 44.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -4647,6 +4729,20 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "source-to-result alignment",
             "same provenance vocabulary",
             "supplemental-only instructions",
+            "## Audit Cycle 41: Main-Text Schema Density Gate",
+            "main-text schema-density reduction",
+            "document-schema and pair-schema tables",
+            "## Audit Cycle 42: Related-Work Positioning Density Gate",
+            "closest-work positioning matrix",
+            "positioning matrix",
+            "## Audit Cycle 43: Method Design Boundary Density Gate",
+            "operational net-benefit and version-identifier matrices",
+            "method-design tables",
+            "## Audit Cycle 44: Experiment Reporting Boundary Density Gate",
+            "Experiments table-density reduction",
+            "threshold and uncertainty reporting protocol table",
+            "statistical interpretation boundary table",
+            "experimental interpretability without table overload",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -4665,7 +4761,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 40",
+        "Completed audit cycles: 44",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -4676,7 +4772,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 40" in error for error in errors)
+    assert any("Completed audit cycles: 44" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

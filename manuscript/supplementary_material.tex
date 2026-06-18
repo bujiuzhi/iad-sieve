@@ -407,6 +407,43 @@ Cluster-level quality is claimed only after pair-to-cluster audit. & \path{clust
 
 \section{Uncertainty and Ablation Requirements}
 
+\begin{table}[H]
+\caption{Threshold and uncertainty reporting protocol. The protocol separates what is required for the current main table from what is required for stronger follow-up claims.}
+\label{tab:threshold-uncertainty-protocol}
+\centering
+\small
+\begin{tabular}{L{0.23\linewidth}L{0.33\linewidth}L{0.34\linewidth}}
+\toprule
+Item & Reporting purpose & Interpretation role \\
+\midrule
+Merge thresholds & Record $\tau_w$, $\tau_a$, $\tau_r$, validation source, and fixed operating point. & Prevents post-hoc threshold selection on the test set. \\
+Metric uncertainty & Report bootstrap intervals when prediction files and resampling logs are present in the artifact package. & Distinguishes stable effects from small numerical differences. \\
+Risk metrics & Always report FMR and HNFMR with same-work F1. & Prevents a high F1 score from hiding unsafe hard-negative merges. \\
+Ablation claims & Claim component causality only when no-risk-gate, no-ANI, and single-space variants are present. & Separates mechanism-consistent evidence from complete causal ablation evidence. \\
+Artifact audit & Tie each numerical table to predictions, configs, logs, checksums, and commit identifiers. & Makes result-level reproduction possible without committing raw data. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\caption{Statistical interpretation boundary for the Open-v2 evidence snapshot. The table states how reported numbers may be read before interval and significance artifacts are released.}
+\label{tab:statistical-interpretation-boundary}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.22\linewidth}L{0.34\linewidth}L{0.34\linewidth}}
+\toprule
+Interpretation item & Current manuscript status & Required evidence before stronger claim \\
+\midrule
+Point estimates & Reported for the fixed Open-v2 scope, split, and operating points. & Prediction files, metric summaries, thresholds, and checksums for the same rows. \\
+Confidence intervals & Not reported as primary evidence in the current manuscript. & \path{bootstrap_intervals} generated from the same prediction files, with command logs and random seeds. \\
+Statistical significance & Not claimed for baseline ranking or model superiority. & Predefined tests, multiplicity handling, input artifacts, and reproducible analysis logs. \\
+Zero HNFMR rows & Interpreted as no observed hard-negative false merge in the reported scope. & Larger source-heldout evidence and manual validation before any zero-risk wording. \\
+Model ranking & Restricted to mechanism interpretation rather than a universal ranking. & Same-scope predictions, interval estimates, ablations, and manual-validation slice. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 Result packages that report confidence intervals should include bootstrap outputs generated from the exact prediction files used in the manuscript tables. The repository provides \emph{run-iad-evidence-bootstrap} for stratified pair-level intervals and \emph{run-bootstrap} for general metric intervals. A numerical interval should be cited only when the corresponding CSV file, command log, random seed, and checksum are present in the artifact package.
 
 Threshold-stability claims should be tied to a released threshold-sensitivity grid generated from the same prediction files as the main tables. The grid should report threshold ranges, selected operating points, pair counts, same-work F1, FMR, HNFMR, random seeds, command logs, and checksums. Without this file, the manuscript should discuss only the fixed operating points reported in the main table.
