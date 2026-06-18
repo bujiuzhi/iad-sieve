@@ -201,7 +201,9 @@ python manuscript/scripts/validate_artifact_release.py \
 
 The release preparation commands create a scaffold, copy generated result files from a source artifact directory, refresh manifest and checksum metadata, and then validate the final package. The validation command checks the manifest schema, required artifact files, required result identifiers, checksum coverage, repository commit metadata, claim-boundary flags, conditional claim artifacts, and exclusion of raw third-party data, caches, credentials, local outputs, and model checkpoints.
 
-The artifact manifest uses conditional claim flags so that optional stronger claims cannot be enabled without their evidence files. Confidence-interval claims require \path{bootstrap_intervals}; component-causality claims require \path{ablation_suite}; human-validation claims require \path{manual_validation_slice}; threshold-stability claims require \path{threshold_sensitivity_grid}; and broad method-ranking claims require the interval, validation, and threshold-grid artifacts together. If a conditional flag is set to true, the corresponding artifact row must be marked required and must include a file path and SHA256 checksum.
+The artifact manifest uses conditional claim flags so that optional stronger claims cannot be enabled without their evidence files. Confidence-interval claims require \path{bootstrap_intervals}; component-causality claims require \path{ablation_suite}; human-validation claims require \path{manual_validation_slice}; threshold-stability claims require \path{threshold_sensitivity_grid}; cluster-level quality claims require \path{cluster_metric_summary} and \path{cannot_link_audit}; and broad method-ranking claims require the interval, validation, and threshold-grid artifacts together. If a conditional flag is set to true, the corresponding artifact row must be marked required and must include a file path and SHA256 checksum.
+
+Cluster-level quality claims require evidence beyond pair-level prediction files. The \path{cluster_metric_summary} artifact should include cluster assignments, cluster contamination rate, singleton rate, merge coverage, conflict counts, and a pair-to-cluster trace from accepted links to connected components. The \path{cannot_link_audit} artifact should report cannot-link coverage, violations, unresolved conflicts, and identifier-conflict rules under the same threshold and merge policy used for the reported results. Without both files and their checksums, the manuscript should discuss pair-level false-merge control only and should not claim cluster-level contamination reduction.
 
 \section{Claim-Evidence Matrix}
 
@@ -220,6 +222,7 @@ Identity-agenda confusion is a practical false-merge risk. & Open-v2 hard-negati
 IAD-Risk suppresses hard-negative false merges under the reported setting. & IAD-Risk prediction files, metric summaries, split identifiers, thresholds, and checksums. & Supports targeted false-merge suppression; does not establish broad method superiority. \\
 IAD-Bench is provenance-aware. & Pair schema, label strength, label source, provenance fields, and fixture rebuild commands. & Supports a benchmark contract; does not turn silver or proxy labels into human gold. \\
 Repository-level reproduction is possible without committing raw data. & L0/L1 fixture rebuild, public-release scan, unit tests, and documented public-source commands. & Verifies code and schema behavior; full numerical reproduction requires L2/L3 source files or artifacts. \\
+Cluster-level quality is claimed only after pair-to-cluster audit. & \path{cluster_metric_summary}, \path{cannot_link_audit}, cluster assignments, cannot-link coverage, and cluster contamination rate. & Supports cluster-level quality claims only when the released artifact package includes these files with checksums; otherwise the claim remains pair-level. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -231,6 +234,8 @@ Result packages that report confidence intervals should include bootstrap output
 Threshold-stability claims should be tied to a released threshold-sensitivity grid generated from the same prediction files as the main tables. The grid should report threshold ranges, selected operating points, pair counts, same-work F1, FMR, HNFMR, random seeds, command logs, and checksums. Without this file, the manuscript should discuss only the fixed operating points reported in the main table.
 
 Mechanism claims should be tied to explicit ablation outputs. The repository provides \emph{run-iad-ablation-suite} for comparing full IAD-Risk decisions with variants that remove risk gating, agenda-non-identity blocking, or single-space separation. Without those outputs, the main manuscript should keep the mechanism claim at the level of stratified HNFMR evidence rather than claiming a complete ablation study.
+
+Cluster-level claims should be tied to artifacts generated after the pair decisions are converted into connected components. A defensible package should include cluster assignments, a cluster metric summary, a cannot-link audit, and command logs for the merge policy. Without those outputs, pair-level FMR and HNFMR should not be interpreted as proof that cluster-level contamination has been reduced or eliminated.
 
 \section{Manual Validation Protocol}
 
@@ -256,6 +261,6 @@ Reporting & The artifact package reports inter-annotator agreement, per-stratum 
 
 \section{Claim Boundary}
 
-The main manuscript treats DeepMatcher-style labels as gold identity evidence. It treats SciRepEval and SciDocs-style proximity as same-agenda proxy evidence. It treats OpenAlex and OpenCitations-derived pairs as silver hard-negative evidence. OpenAlex and OpenCitations signals are not human gold labels. Broad method-ranking claims require stronger source-heldout evidence and manual validation beyond the current manuscript package.
+The main manuscript treats DeepMatcher-style labels as gold identity evidence. It treats SciRepEval and SciDocs-style proximity as same-agenda proxy evidence. It treats OpenAlex and OpenCitations-derived pairs as silver hard-negative evidence. OpenAlex and OpenCitations signals are not human gold labels. Cluster-level quality is not claimed unless the released artifact package includes cluster assignments, \path{cluster_metric_summary}, \path{cannot_link_audit}, cannot-link coverage, and cluster contamination rate. Broad method-ranking claims require stronger source-heldout evidence and manual validation beyond the current manuscript package.
 
 \end{document}

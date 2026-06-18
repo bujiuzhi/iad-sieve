@@ -847,6 +847,12 @@ def check_result_claim_boundary(manuscript_text: str, supplementary_text: str) -
         "required result identifiers",
         "conditional claim artifacts",
         r"\path{threshold_sensitivity_grid}",
+        r"\path{cluster_metric_summary}",
+        r"\path{cannot_link_audit}",
+        "cluster-level quality claims",
+        "cluster assignments",
+        "cannot-link coverage",
+        "cluster contamination rate",
         "exclusion of raw third-party data",
     ]
     errors: list[str] = []
