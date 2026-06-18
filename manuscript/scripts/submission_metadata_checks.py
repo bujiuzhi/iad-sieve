@@ -683,7 +683,7 @@ def check_author_contribution_statement(metadata_text: str) -> list[str]:
         "credit_statement",
         "",
     )
-    credit_required = contribution_row.get("credit_taxonomy_required_before_final_upload", "").lower() == "true"
+    credit_required = contribution_row.get("credit_taxonomy_required_before_final_upload", "true").lower() != "false"
     contribution_role_rows = parse_contribution_role_rows(metadata_text)
     valid_role_rows = [
         row
