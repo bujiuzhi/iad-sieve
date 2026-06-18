@@ -203,6 +203,14 @@ def _write_final_upload_metadata(manuscript_root: Path) -> None:
                 "  target_journal_template_bound: true",
                 "  author_metadata_required_before_final_upload: true",
                 "",
+                "target_preparation:",
+                "  ranking_confirmation_required_before_final_upload: true",
+                "  ranking_confirmation_completed: true",
+                '  ranking_confirmation_source: "institutional ranking system"',
+                '  ranking_confirmation_checked_date: "2026-06-19"',
+                "  selected_target_requires_author_confirmation: true",
+                "  selected_target_author_confirmed: true",
+                "",
                 "authors:",
                 '  - name: "Example Author"',
                 '    affiliation: "Example University"',
@@ -359,6 +367,14 @@ def _write_dke_final_upload_metadata(manuscript_root: Path) -> None:
                 '  target_journal: "Data & Knowledge Engineering"',
                 "  target_journal_template_bound: true",
                 "  author_metadata_required_before_final_upload: true",
+                "",
+                "target_preparation:",
+                "  ranking_confirmation_required_before_final_upload: true",
+                "  ranking_confirmation_completed: true",
+                '  ranking_confirmation_source: "institutional ranking system"',
+                '  ranking_confirmation_checked_date: "2026-06-19"',
+                "  selected_target_requires_author_confirmation: true",
+                "  selected_target_author_confirmed: true",
                 "",
                 "authors:",
                 '  - name: "Example Author"',
@@ -1182,6 +1198,48 @@ def test_validate_submission_package_rejects_final_upload_with_unresolved_metada
     assert any("target journal is empty" in error for error in errors)
     assert any("corresponding author email is empty" in error for error in errors)
     assert any("artifact release checklist item is incomplete" in error for error in errors)
+
+
+def test_validate_submission_package_rejects_missing_target_ranking_confirmation(tmp_path) -> None:
+    """验证正式上传包校验拒绝缺失的目标期刊排名或类别确认。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    artifact_dir = tmp_path / "artifact_release"
+    _write_required_manuscript_files(manuscript_root)
+    _write_final_upload_metadata(manuscript_root)
+    _write_final_upload_cover_letter(manuscript_root)
+    _write_artifact_release_manifest(artifact_dir)
+    metadata_path = manuscript_root / "submission_metadata.yml"
+    metadata_text = metadata_path.read_text(encoding="utf-8")
+    metadata_text = metadata_text.replace(
+        "  ranking_confirmation_completed: true",
+        "  ranking_confirmation_completed: false",
+    )
+    metadata_text = metadata_text.replace(
+        '  ranking_confirmation_source: "institutional ranking system"',
+        '  ranking_confirmation_source: ""',
+    )
+    metadata_text = metadata_text.replace(
+        '  ranking_confirmation_checked_date: "2026-06-19"',
+        '  ranking_confirmation_checked_date: ""',
+    )
+    metadata_text = metadata_text.replace(
+        "  selected_target_author_confirmed: true",
+        "  selected_target_author_confirmed: false",
+    )
+    metadata_path.write_text(metadata_text, encoding="utf-8")
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path)
+    errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True, artifact_dir=artifact_dir)
+
+    assert any("ranking/category confirmation is incomplete" in error for error in errors)
+    assert any("ranking/category confirmation source is missing" in error for error in errors)
+    assert any("ranking/category confirmation checked date is missing" in error for error in errors)
+    assert any("selected target journal author confirmation is incomplete" in error for error in errors)
 
 
 def test_validate_submission_package_accepts_final_upload_with_valid_artifact_release(tmp_path) -> None:

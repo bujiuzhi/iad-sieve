@@ -22,7 +22,7 @@ The checklist intentionally remains incomplete until the authors confirm the tar
 | Cover letter | `cover_letter.md` | Replace the generic greeting and add target-journal-specific fit only after journal selection. |
 | Highlights | `highlights.md` | Keep 3--5 bullets, each at most 85 characters, if the selected journal uses Elsevier-style highlights. |
 | Keywords | `keywords.md` | Keep 1--7 keywords for the current Elsevier candidate route unless the selected journal specifies otherwise. |
-| Submission metadata | `submission_metadata.yml` | Fill target journal, `target_journal_template_bound`, authors, corresponding author, funding statement text, author contribution statement, permissions statement, third-party material permission status, artifact URL, and final-upload checklist fields. |
+| Submission metadata | `submission_metadata.yml` | Fill target journal, `target_journal_template_bound`, target ranking/category confirmation fields, authors, corresponding author, funding statement text, author contribution statement, permissions statement, third-party material permission status, artifact URL, and final-upload checklist fields. |
 | Author biographies and photographs | External author-provided files | For the DKE route, prepare short author biographies and passport-type photographs as final-upload materials after author identities are confirmed. |
 | Artifact release manifest | `artifact_release_manifest.template.json` | Replace with the real release manifest, DOI or URL, and SHA256 checksum file. |
 
@@ -104,16 +104,17 @@ Before upload, verify:
 
 1. The selected target journal and article type match the submission system.
 2. `target_journal_template_bound` is true and the selected journal template matches the final manuscript source.
-3. For single-anonymized routes such as DKE and Information Systems, the final title page and submission-system fields include author identities; the anonymous package is only a preflight package.
-4. The author list, order, affiliations, ORCID values, and corresponding author match the title page.
-5. The funding statement text is completed and matches the manuscript and submission system.
-6. The author contribution statement is completed and matches the final author list.
-7. The permissions statement records whether third-party material permission is not required or lists the permission files needed by the journal.
-8. The generative AI declaration statement is complete and matches the selected journal's live submission field.
-9. Author biographies and photographs are ready when the selected DKE/Elsevier route requests them.
-10. The competing-interest statement, data/code availability statement, and ethics statement are consistent across the manuscript and system fields.
-11. The artifact release URL or DOI resolves publicly or according to the journal's access policy, and the artifact manifest `publication.public_access_status` records that public access state.
-12. The manuscript does not claim human gold labels, broad method superiority, or threshold stability unless the corresponding artifact evidence exists.
+3. `ranking_confirmation_completed`, `ranking_confirmation_source`, `ranking_confirmation_checked_date`, and `selected_target_author_confirmed` are complete before final upload.
+4. For single-anonymized routes such as DKE and Information Systems, the final title page and submission-system fields include author identities; the anonymous package is only a preflight package.
+5. The author list, order, affiliations, ORCID values, and corresponding author match the title page.
+6. The funding statement text is completed and matches the manuscript and submission system.
+7. The author contribution statement is completed and matches the final author list.
+8. The permissions statement records whether third-party material permission is not required or lists the permission files needed by the journal.
+9. The generative AI declaration statement is complete and matches the selected journal's live submission field.
+10. Author biographies and photographs are ready when the selected DKE/Elsevier route requests them.
+11. The competing-interest statement, data/code availability statement, and ethics statement are consistent across the manuscript and system fields.
+12. The artifact release URL or DOI resolves publicly or according to the journal's access policy, and the artifact manifest `publication.public_access_status` records that public access state.
+13. The manuscript does not claim human gold labels, broad method superiority, or threshold stability unless the corresponding artifact evidence exists.
 
 ## Live Submission Text Checks
 

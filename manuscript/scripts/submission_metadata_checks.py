@@ -35,6 +35,7 @@ ORCID_PATTERN = re.compile(r"^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$")
 URL_PATTERN = re.compile(r"^https?://[^\s]+$", re.IGNORECASE)
 DOI_PATTERN = re.compile(r"^10\.[^\s/]+/[^\s]+$", re.IGNORECASE)
 COMMIT_PATTERN = re.compile(r"^[0-9a-f]{7,40}$", re.IGNORECASE)
+DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 COMMIT_PLACEHOLDERS = {
     "<commit>",
     "commit",
@@ -466,6 +467,41 @@ def check_corresponding_author_matches_author_rows(metadata_text: str) -> list[s
     return ["corresponding author must match an author row by name or email"]
 
 
+def check_target_preparation_confirmation(metadata_text: str) -> list[str]:
+    """Check target-journal ranking and author confirmation gates.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages for unresolved target-journal confirmation fields.
+    """
+    row = parse_mapping_section(metadata_text, "target_preparation")
+    errors: list[str] = []
+    if not row:
+        return ["target preparation section is missing"]
+
+    ranking_required = row.get("ranking_confirmation_required_before_final_upload", "").lower()
+    if ranking_required != "true":
+        errors.append("ranking/category confirmation requirement is missing")
+    if row.get("ranking_confirmation_completed", "").lower() != "true":
+        errors.append("ranking/category confirmation is incomplete")
+    if not row.get("ranking_confirmation_source", "").strip():
+        errors.append("ranking/category confirmation source is missing")
+    checked_date = row.get("ranking_confirmation_checked_date", "").strip()
+    if not checked_date:
+        errors.append("ranking/category confirmation checked date is missing")
+    elif DATE_PATTERN.fullmatch(checked_date) is None:
+        errors.append("ranking/category confirmation checked date is invalid")
+
+    selected_target_required = row.get("selected_target_requires_author_confirmation", "").lower()
+    if selected_target_required != "true":
+        errors.append("selected target journal author confirmation requirement is missing")
+    if row.get("selected_target_author_confirmed", "").lower() != "true":
+        errors.append("selected target journal author confirmation is incomplete")
+    return errors
+
+
 def check_artifact_release_link(metadata_text: str) -> list[str]:
     """Check final-upload artifact release URL or DOI fields.
 
@@ -849,6 +885,10 @@ def check_final_upload_metadata_text(metadata_text: str) -> list[str]:
     errors.extend(
         f"final upload metadata unresolved: {message}"
         for message in check_corresponding_author_matches_author_rows(metadata_text)
+    )
+    errors.extend(
+        f"final upload metadata unresolved: {message}"
+        for message in check_target_preparation_confirmation(metadata_text)
     )
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_funding_statement(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_submission_statement_fields(metadata_text))

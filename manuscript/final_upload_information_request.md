@@ -10,7 +10,7 @@ Repository URL and commit binding: keep the source `repository_reference` fields
 
 | Request section | Primary `submission_metadata.yml` target | Additional file or system target |
 | --- | --- | --- |
-| Target journal | `submission`, `target_preparation`, `target_journal_template_bound`, `final_upload_checklist.target_journal_selected`, `final_upload_checklist.article_type_confirmed`, `final_upload_checklist.review_mode_confirmed`, `final_upload_checklist.target_journal_template_applied` | Target-journal template source and live submission system |
+| Target journal | `submission`, `target_preparation`, `target_journal_template_bound`, `final_upload_checklist.target_journal_selected`, `final_upload_checklist.article_type_confirmed`, `final_upload_checklist.review_mode_confirmed`, `final_upload_checklist.target_journal_template_applied` | Target-journal template source, institutional ranking/category source, and live submission system |
 | Author list | `authors`, `author_contributions.roles`, `final_upload_checklist.author_metadata_completed` | Final title page and live submission system |
 | Author biographies and photographs | `final_upload_checklist.author_biographies_and_photos_ready` | DKE/Elsevier biography text and photograph upload files, if requested |
 | Corresponding author | `corresponding_author`, `final_upload_checklist.corresponding_author_completed` | Final title page, cover letter, and live submission system |
@@ -31,6 +31,10 @@ Repository URL and commit binding: keep the source `repository_reference` fields
 - Journal template:
 - Submission system URL:
 - Rechecked author-guide date:
+- Institutional ranking/category source checked:
+- Ranking/category checked date:
+- Ranking/category confirmation completed:
+- Selected target journal author-confirmed:
 
 ## Author list
 
