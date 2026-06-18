@@ -1792,6 +1792,12 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "The artifact URL or DOI appears in the cover letter when available.",
             "The cover letter no longer uses the generic Dear Editor greeting.",
             "The cover letter no longer uses an anonymous author signature.",
+            "## Source Archive Assembly Checks",
+            "The source archive contains editable LaTeX sources.",
+            "The source archive includes references.bib and submission text files.",
+            "The source archive includes manifest and checksum files.",
+            "The source archive excludes build caches and generated zip files.",
+            "The source archive is rebuilt after template conversion.",
             "## Final Metadata Checks",
             "The funding statement is completed and matches the manuscript and submission system.",
             "The author contribution statement is completed before final upload.",
@@ -1934,6 +1940,72 @@ def test_check_submission_system_checklist_rejects_missing_cover_letter_customiz
     assert any("Cover Letter Customization Checks" in error for error in errors)
     assert any("selected target journal" in error for error in errors)
     assert any("anonymous author signature" in error for error in errors)
+
+
+def test_check_submission_system_checklist_rejects_missing_source_archive_checks() -> None:
+    """验证投稿系统清单缺少源文件压缩包组装检查时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    checklist_text = "\n".join(
+        [
+            "# Submission System Checklist",
+            "This is not a manuscript file for journal upload.",
+            "## Required Upload Files",
+            "Main manuscript source",
+            "Main manuscript PDF",
+            "DKE/Elsevier preflight source",
+            "DKE/Elsevier preflight PDF",
+            "Supplementary source",
+            "Supplementary PDF",
+            "Bibliography",
+            "Cover letter",
+            "Highlights",
+            "Keywords",
+            "Submission metadata",
+            "Artifact release manifest",
+            "## Artifact Release Package Checks",
+            "python manuscript/scripts/build_artifact_release_skeleton.py --output-dir /path/to/release --repository-commit",
+            "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
+            "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
+            "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
+            "## DKE/Elsevier Preflight Package Checks",
+            "python manuscript/scripts/build_submission_package.py --dke-preflight",
+            "python manuscript/scripts/validate_submission_package.py --dke-preflight",
+            "build/iad-risk-dke-preflight-package.zip",
+            "iad-risk-manuscript-elsevier.tex",
+            "iad-risk-manuscript-elsevier.pdf",
+            "Passing this check does not complete the final-upload gate.",
+            "## Publisher Declaration Checks",
+            "The declaration text matches submission_metadata.yml.",
+            "No declaration placeholder remains before final upload.",
+            "The funding role is stated when funding exists.",
+            "Permission files are listed when third-party permission is required.",
+            "The data availability statement matches artifact release status.",
+            "## Cover Letter Customization Checks",
+            "The cover letter names the selected target journal.",
+            "The cover letter states the final article type.",
+            "The corresponding author name appears in the cover letter.",
+            "The artifact URL or DOI appears in the cover letter when available.",
+            "The cover letter no longer uses the generic Dear Editor greeting.",
+            "The cover letter no longer uses an anonymous author signature.",
+            "## Final Metadata Checks",
+            "The funding statement is completed and matches the manuscript and submission system.",
+            "The author contribution statement is completed before final upload.",
+            "The permissions statement records third-party material permission status.",
+            "## File Hygiene Checks",
+            "No `data/`, `outputs/`, cache, local connection, credential, or raw third-party file.",
+            "Anonymous packages contain no author email addresses, ORCID values, personal account URLs, local absolute paths, or development process notes.",
+            "## Current Blocking Items",
+            "Target journal has not been author-confirmed.",
+            "Artifact release URL or DOI has not been created.",
+        ]
+    )
+
+    errors = module.check_submission_system_checklist(checklist_text)
+
+    assert any("Source Archive Assembly Checks" in error for error in errors)
+    assert any("editable LaTeX sources" in error for error in errors)
+    assert any("generated zip files" in error for error in errors)
 
 
 def test_check_submission_system_checklist_rejects_missing_artifact_release_checks() -> None:
