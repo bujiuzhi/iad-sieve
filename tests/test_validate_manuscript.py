@@ -697,6 +697,8 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "## Required Upload Files",
             "Main manuscript source",
             "Main manuscript PDF",
+            "DKE/Elsevier preflight source",
+            "DKE/Elsevier preflight PDF",
             "Supplementary source",
             "Supplementary PDF",
             "Bibliography",
@@ -705,6 +707,13 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "Keywords",
             "Submission metadata",
             "Artifact release manifest",
+            "## DKE/Elsevier Preflight Package Checks",
+            "python manuscript/scripts/build_submission_package.py --dke-preflight",
+            "python manuscript/scripts/validate_submission_package.py --dke-preflight",
+            "build/iad-risk-dke-preflight-package.zip",
+            "iad-risk-manuscript-elsevier.tex",
+            "iad-risk-manuscript-elsevier.pdf",
+            "Passing this check does not complete the final-upload gate.",
             "## Final Metadata Checks",
             "## File Hygiene Checks",
             "No `data/`, `outputs/`, cache, local connection, credential, or raw third-party file.",
@@ -730,6 +739,41 @@ def test_check_submission_system_checklist_rejects_missing_hygiene_boundary() ->
     assert any("File Hygiene Checks" in error for error in errors)
     assert any("raw third-party file" in error for error in errors)
     assert any("Artifact release URL or DOI" in error for error in errors)
+
+
+def test_check_submission_system_checklist_rejects_missing_dke_preflight_package() -> None:
+    """验证投稿系统上传清单缺少DKE预投稿包检查时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    checklist_text = "\n".join(
+        [
+            "# Submission System Checklist",
+            "This is not a manuscript file for journal upload.",
+            "## Required Upload Files",
+            "Main manuscript source",
+            "Main manuscript PDF",
+            "Supplementary source",
+            "Supplementary PDF",
+            "Bibliography",
+            "Cover letter",
+            "Highlights",
+            "Keywords",
+            "Submission metadata",
+            "Artifact release manifest",
+            "## Final Metadata Checks",
+            "## File Hygiene Checks",
+            "No `data/`, `outputs/`, cache, local connection, credential, or raw third-party file.",
+            "## Current Blocking Items",
+            "Target journal has not been author-confirmed.",
+            "Artifact release URL or DOI has not been created.",
+        ]
+    )
+
+    errors = module.check_submission_system_checklist(checklist_text)
+
+    assert any("DKE/Elsevier Preflight Package Checks" in error for error in errors)
+    assert any("--dke-preflight" in error for error in errors)
+    assert any("does not complete the final-upload gate" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:

@@ -14,6 +14,8 @@ The checklist intentionally remains incomplete until the authors confirm the tar
 | --- | --- | --- |
 | Main manuscript source | `main.tex` | Convert to the selected journal template and rebuild the PDF. |
 | Main manuscript PDF | `build/iad-risk-manuscript-latex.pdf` | Rebuild after template conversion and author metadata insertion. |
+| DKE/Elsevier preflight source | `build/iad-risk-manuscript-elsevier.tex` | Use only for Data & Knowledge Engineering preflight until authors confirm the final target. |
+| DKE/Elsevier preflight PDF | `build/iad-risk-manuscript-elsevier.pdf` | Check template fit and table rendering; do not treat it as final upload proof. |
 | Supplementary source | `supplementary_material.tex` | Keep claim boundaries, reproducibility levels, and artifact requirements aligned with the main manuscript. |
 | Supplementary PDF | `build/iad-risk-supplementary-material.pdf` | Rebuild after any supplementary source changes. |
 | Bibliography | `references.bib` | Confirm all cited references compile under the selected bibliography style. |
@@ -22,6 +24,16 @@ The checklist intentionally remains incomplete until the authors confirm the tar
 | Keywords | `keywords.md` | Keep 1--7 keywords for the current Elsevier candidate route unless the selected journal specifies otherwise. |
 | Submission metadata | `submission_metadata.yml` | Fill target journal, authors, corresponding author, funding, artifact URL, and final-upload checklist fields. |
 | Artifact release manifest | `artifact_release_manifest.template.json` | Replace with the real release manifest, DOI or URL, and SHA256 checksum file. |
+
+## DKE/Elsevier Preflight Package Checks
+
+Before using the DKE/Elsevier preflight package, verify:
+
+1. `python manuscript/scripts/build_submission_package.py --dke-preflight` completes and writes `build/dke_preflight_package/`.
+2. `python manuscript/scripts/validate_submission_package.py --dke-preflight` passes.
+3. `build/iad-risk-dke-preflight-package.zip` contains `iad-risk-manuscript-elsevier.tex`, `iad-risk-manuscript-elsevier.pdf`, the generic LaTeX source files, submission text files, manifest, and checksums.
+4. The DKE/Elsevier preflight package remains anonymous and does not include `data/`, `outputs/`, raw third-party files, local caches, credentials, or artifact outputs.
+5. Passing the DKE/Elsevier preflight package check does not complete the final-upload gate; author metadata, target confirmation, live submission-system fields, and artifact release URL or DOI remain required.
 
 ## Final Metadata Checks
 
