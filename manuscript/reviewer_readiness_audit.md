@@ -10,9 +10,9 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 15.
+Completed audit cycles: 16.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, artifact release commit validity, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, source-control commit binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, artifact release README completeness, artifact release commit validity, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, source-control commit binding, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.
 
@@ -214,6 +214,14 @@ Outcome: pass for commit-format validator coverage; blocked for final upload unt
 This cycle checks whether the external result release can be tied to a real source revision rather than a placeholder or free-form label. The artifact release skeleton builder and validator require `repository.commit` to be a 7 to 40 character hexadecimal Git commit. This applies both when creating a release scaffold and when validating a populated release directory.
 
 The reviewer-facing boundary is narrow. A syntactically valid commit makes the artifact manifest auditable, but it does not prove that all result files were generated from that commit. That stronger guarantee still requires checksums, command logs, prediction files, threshold logs, and the final manuscript metadata to reference the same repository commit and artifact URL or DOI.
+
+## Audit Cycle 16: Artifact Release README Reproducibility Gate
+
+Outcome: pass for README validator coverage; blocked for final upload until the external artifact release is populated, finalized, validated, and linked.
+
+This cycle checks whether the release README preserves the minimum instructions a reviewer needs before auditing external results. The artifact release validator now requires `README.md` to retain the data policy, `manifest.json`, `checksums.sha256`, the checksum command, the `validate_artifact_release.py` command, the repository commit field, reproduction levels, and claim boundaries. The same gate keeps raw third-party data exclusions visible in the release package rather than only in repository-side documentation.
+
+The reviewer-facing boundary is procedural. A complete README improves auditability, but it does not replace artifact checksums, result files, threshold logs, command logs, or the final artifact URL or DOI. It only ensures that the external release cannot pass validation after its reproduction instructions have been reduced to an uninformative file.
 
 ## Minimum Gate Before Final Upload
 

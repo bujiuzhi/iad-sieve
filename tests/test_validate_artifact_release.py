@@ -55,6 +55,33 @@ def _sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _complete_readme_text() -> str:
+    """生成包含必需复现说明的测试 README。
+
+    参数:
+        无。
+
+    返回:
+        str: README.md 测试内容。
+    """
+    return "\n".join(
+        [
+            "# IAD-Risk Artifact Release",
+            "",
+            "Do not include raw third-party data.",
+            "Required files include README.md, manifest.json, and checksums.sha256.",
+            "Run sha256sum -c checksums.sha256 before manuscript validation.",
+            "Run python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release.",
+            "Repository commit: 0123456789abcdef0123456789abcdef01234567.",
+            "## Claim Boundaries",
+            "Full numerical audit requires external artifacts.",
+            "## Reproduction Levels",
+            "L3 result audit checks released tables, predictions, logs, manifests, checksums, and commit identifiers.",
+            "",
+        ]
+    )
+
+
 def _write_complete_release(artifact_dir: Path, release_status: str = "release_candidate") -> None:
     """写入完整的测试 artifact release 目录。
 
@@ -73,7 +100,7 @@ def _write_complete_release(artifact_dir: Path, release_status: str = "release_c
         "threshold_selection_logs": "logs/threshold_selection_logs.jsonl",
         "iad_bench_split_summary": "reports/iad_bench_split_summary.jsonl",
     }
-    _write_file(artifact_dir / "README.md", "# IAD-Risk Artifact Release\n")
+    _write_file(artifact_dir / "README.md", _complete_readme_text())
     _write_file(artifact_dir / "configs" / "model_config.json", '{"seed": 7}\n')
     for artifact_id, relative_path in artifact_locations.items():
         if artifact_id == "open_v2_main_results":
@@ -198,6 +225,23 @@ def test_validate_artifact_release_accepts_complete_release(tmp_path) -> None:
     errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
 
     assert errors == []
+
+
+def test_validate_artifact_release_rejects_readme_without_reproducibility_markers(tmp_path) -> None:
+    """验证 release README 缺少复现说明时会被拒绝。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    _write_file(artifact_dir / "README.md", "# IAD-Risk Artifact Release\n")
+    _refresh_checksums(artifact_dir)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("README.md missing required release instruction" in error for error in errors)
+    assert any("manifest.json" in error for error in errors)
+    assert any("validate_artifact_release.py" in error for error in errors)
+    assert any("Repository commit" in error for error in errors)
 
 
 def test_validate_artifact_release_rejects_open_v2_results_without_row_audit_columns(tmp_path) -> None:

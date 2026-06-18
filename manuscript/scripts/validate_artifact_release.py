@@ -23,6 +23,18 @@ DEFAULT_ARTIFACT_DIR = MANUSCRIPT_ROOT / "build" / "artifact_release"
 DEFAULT_TEMPLATE_PATH = MANUSCRIPT_ROOT / "artifact_release_manifest.template.json"
 REQUIRED_DIRECTORIES = {"configs", "tables", "predictions", "reports", "logs"}
 REQUIRED_TOP_LEVEL_FILES = {"README.md", "manifest.json", "checksums.sha256"}
+REQUIRED_README_MARKERS = {
+    "release title": "IAD-Risk Artifact Release",
+    "raw data exclusion": "Do not include raw third-party data",
+    "manifest file": "manifest.json",
+    "checksum file": "checksums.sha256",
+    "checksum command": "sha256sum -c checksums.sha256",
+    "validator command": "python manuscript/scripts/validate_artifact_release.py --artifact-dir",
+    "repository commit": "Repository commit",
+    "claim boundaries": "Claim Boundaries",
+    "external artifact boundary": "Full numerical audit requires external artifacts",
+    "result audit level": "L3 result audit",
+}
 FORBIDDEN_RELEASE_STATUSES = {"template_pending_external_artifact", "skeleton_pending_artifacts"}
 REQUIRED_ARTIFACT_IDS = {
     "open_v2_main_results",
@@ -236,6 +248,24 @@ def check_required_membership(artifact_dir: Path) -> list[str]:
     for directory_name in sorted(REQUIRED_DIRECTORIES):
         if not (artifact_dir / directory_name).is_dir():
             errors.append(f"artifact release missing required directory: {directory_name}")
+    return errors
+
+
+def check_readme_text(readme_text: str) -> list[str]:
+    """Check reviewer-facing release README reproducibility instructions.
+
+    参数:
+        readme_text: README.md content from the artifact release root.
+
+    返回:
+        list[str]: Error messages for missing README instructions.
+    """
+    normalized_text = " ".join(readme_text.split()).casefold()
+    errors: list[str] = []
+    for label, marker in sorted(REQUIRED_README_MARKERS.items()):
+        normalized_marker = " ".join(marker.split()).casefold()
+        if normalized_marker not in normalized_text:
+            errors.append(f"README.md missing required release instruction `{label}`: {marker}")
     return errors
 
 
@@ -586,6 +616,13 @@ def validate_artifact_release(artifact_dir: Path, template_path: Path) -> list[s
     errors = check_required_membership(artifact_dir)
     if errors:
         return errors
+
+    try:
+        readme_text = (artifact_dir / "README.md").read_text(encoding="utf-8")
+    except OSError as exc:
+        errors.append(f"README.md cannot be read: {exc}")
+    else:
+        errors.extend(check_readme_text(readme_text))
 
     file_names = release_file_names(artifact_dir)
     errors.extend(check_forbidden_paths(file_names))
