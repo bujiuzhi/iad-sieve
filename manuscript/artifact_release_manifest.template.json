@@ -104,7 +104,7 @@
       "artifact_id": "ablation_suite",
       "required": false,
       "expected_location": "reports/iad_ablation_suite.csv",
-      "claim_support": "Component-level causality only if cited by the final manuscript."
+      "claim_support": "Component-level causality only if cited by the final manuscript. The CSV must include protocol_variant rows for no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold, with protocol_required, accepted_for_component_causality, threshold_source, protocol_scope_rule, requires_prediction_rows, denominators, and false-merge metrics. The post-hoc-threshold row must use threshold_source=post_hoc_labeled_sweep and must not be accepted as standalone component-causality evidence."
     },
     {
       "artifact_id": "manual_validation_slice",

@@ -194,6 +194,76 @@ def _required_artifact_content(artifact_id: str) -> str:
     return _jsonl_row({"artifact_id": artifact_id, "status": "present"})
 
 
+def _complete_ablation_suite_csv() -> str:
+    """生成满足消融协议 schema 的 CSV 内容。
+
+    参数:
+        无。
+
+    返回:
+        str: ablation_suite CSV 内容。
+    """
+    header = [
+        "variant",
+        "protocol_variant",
+        "protocol_required",
+        "accepted_for_component_causality",
+        "metric_target",
+        "threshold_source",
+        "protocol_scope_rule",
+        "requires_prediction_rows",
+        "identity_threshold",
+        "selected_identity_threshold",
+        "weak_label_count",
+        "precision",
+        "recall",
+        "f1",
+        "false_merge_rate",
+        "false_positive",
+        "false_negative",
+    ]
+    rows = [
+        ["without_false_merge_risk", "no-risk-gate", "true", "true", "same_work_false_merge", "predeclared_cli_argument"],
+        ["without_agenda_non_identity", "no-ANI-head", "true", "true", "same_work_false_merge", "predeclared_cli_argument"],
+        ["dense_single_space", "single-space", "true", "true", "same_work_false_merge", "predeclared_cli_argument"],
+        ["without_cannot_link", "no-cannot-link", "true", "true", "same_work_false_merge", "predeclared_cli_argument"],
+        ["post_hoc_threshold", "post-hoc-threshold", "true", "false", "same_work_false_merge", "post_hoc_labeled_sweep"],
+    ]
+    suffix = ["same_input_pair_scope_and_split_required", "true", "0.9", "0.9", "100", "0.9", "0.8", "0.85", "0.01", "1", "2"]
+    lines = [",".join(header)]
+    lines.extend(",".join(row + suffix) for row in rows)
+    return "\n".join(lines) + "\n"
+
+
+def _add_ablation_suite_artifact(artifact_dir: Path, csv_content: str | None = None, component_claimed: bool = True) -> None:
+    """向测试 release 添加 ablation_suite artifact。
+
+    参数:
+        artifact_dir: Release 目录。
+        csv_content: 可选 ablation_suite CSV 内容。
+        component_claimed: 是否打开 component_causality_claimed。
+
+    返回:
+        无。
+    """
+    ablation_path = artifact_dir / "reports" / "iad_ablation_suite.csv"
+    _write_file(ablation_path, csv_content or _complete_ablation_suite_csv())
+    manifest_path = artifact_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["claim_boundaries"]["component_causality_claimed"] = component_claimed
+    manifest["required_artifacts"].append(
+        {
+            "artifact_id": "ablation_suite",
+            "required": component_claimed,
+            "expected_location": "reports/iad_ablation_suite.csv",
+            "sha256": _sha256_file(ablation_path),
+            "claim_support": "Component-causality artifact with protocol_variant coverage.",
+        }
+    )
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    _refresh_checksums(artifact_dir)
+
+
 def _complete_readme_text() -> str:
     """生成包含必需复现说明的测试 README。
 
@@ -553,3 +623,52 @@ def test_validate_artifact_release_rejects_claimed_cluster_quality_without_clust
     assert any("cluster_level_quality_claimed" in error for error in errors)
     assert any("cluster_metric_summary" in error for error in errors)
     assert any("cannot_link_audit" in error for error in errors)
+
+
+def test_validate_artifact_release_accepts_claimed_component_causality_with_protocol_ablation_suite(tmp_path) -> None:
+    """验证组件因果 claim 只有在消融协议字段完整时通过。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    _add_ablation_suite_artifact(artifact_dir)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert errors == []
+
+
+def test_validate_artifact_release_rejects_ablation_suite_missing_protocol_variants(tmp_path) -> None:
+    """验证 ablation_suite 缺少协议变体覆盖时会被拒绝。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    incomplete_csv = _complete_ablation_suite_csv().replace(
+        "without_cannot_link,no-cannot-link,true,true,same_work_false_merge,predeclared_cli_argument,"
+        "same_input_pair_scope_and_split_required,true,0.9,0.9,100,0.9,0.8,0.85,0.01,1,2\n",
+        "",
+    )
+    _add_ablation_suite_artifact(artifact_dir, incomplete_csv)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("ablation_suite CSV missing required protocol_variant rows" in error for error in errors)
+    assert any("no-cannot-link" in error for error in errors)
+
+
+def test_validate_artifact_release_rejects_post_hoc_ablation_as_component_causality(tmp_path) -> None:
+    """验证 post-hoc-threshold 行不能标记为组件因果证据。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    invalid_csv = _complete_ablation_suite_csv().replace(
+        "post_hoc_threshold,post-hoc-threshold,true,false,same_work_false_merge,post_hoc_labeled_sweep",
+        "post_hoc_threshold,post-hoc-threshold,true,true,same_work_false_merge,post_hoc_labeled_sweep",
+    )
+    _add_ablation_suite_artifact(artifact_dir, invalid_csv)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("post-hoc-threshold row must not be accepted for component causality" in error for error in errors)

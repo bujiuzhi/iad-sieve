@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 77.
+Completed audit cycles: 78.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.
 
@@ -714,6 +714,14 @@ Outcome: pass for ablation CLI protocol-variant alignment; blocked for completed
 This gate checks whether the executable ablation command can emit the same manuscript-facing variant names used by the ablation acceptance protocol. The `run-iad-ablation-suite` output now preserves the legacy `variant` field while adding `protocol_variant` values for no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold. The output also records whether a row is protocol-required, whether it can be accepted for component-causality interpretation, the threshold source, and whether prediction rows are required before using the row as artifact-backed evidence.
 
 The reviewer-facing boundary is code-to-manuscript traceability, not new experimental strength. The post-hoc-threshold row is flagged with `post_hoc_labeled_sweep` and is retained as a threshold-overfitting diagnostic, not as standalone causal evidence. A future causal interpretation still requires same-scope prediction rows, threshold logs, denominators, merge/block/defer decisions, command logs, commit identifiers, manifests, and checksums.
+
+## Audit Cycle 78: Ablation Artifact Release Schema Gate
+
+Outcome: pass for ablation artifact release schema validation; blocked for completed causal ablation claims until a real external artifact release passes the strengthened schema.
+
+This gate checks whether an external artifact release can pass `component_causality_claimed` merely by including a file named `ablation_suite`. It cannot. The artifact validator now checks `reports/iad_ablation_suite.csv` for protocol audit columns, required `protocol_variant` rows for no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold, and row-level flags including `protocol_required`, `accepted_for_component_causality`, `threshold_source`, `protocol_scope_rule`, and `requires_prediction_rows`.
+
+The reviewer-facing boundary is artifact-level auditability, not a new result. The validator rejects an ablation suite with missing protocol variants, missing audit columns, or a post-hoc-threshold row marked as component-causality evidence. This makes the external artifact release consistent with the manuscript's ablation acceptance boundary while preserving the current claim limit: component-causality remains unclaimed until the real same-scope ablation files, prediction rows, threshold logs, denominators, command logs, commit identifiers, manifests, and checksums are released.
 
 ## Minimum Gate Before Final Upload
 

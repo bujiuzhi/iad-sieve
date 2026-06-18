@@ -65,6 +65,32 @@ OPEN_V2_MAIN_RESULTS_REQUIRED_COLUMNS = {
     "defer_rate",
     "capacity_normalized_review_load",
 }
+ABLATION_SUITE_REQUIRED_COLUMNS = {
+    "variant",
+    "protocol_variant",
+    "protocol_required",
+    "accepted_for_component_causality",
+    "metric_target",
+    "threshold_source",
+    "protocol_scope_rule",
+    "requires_prediction_rows",
+    "identity_threshold",
+    "selected_identity_threshold",
+    "weak_label_count",
+    "precision",
+    "recall",
+    "f1",
+    "false_merge_rate",
+    "false_positive",
+    "false_negative",
+}
+REQUIRED_ABLATION_PROTOCOL_VARIANTS = {
+    "no-risk-gate",
+    "no-ANI-head",
+    "single-space",
+    "no-cannot-link",
+    "post-hoc-threshold",
+}
 JSONL_REQUIRED_FIELDS_BY_ARTIFACT = {
     "iad_risk_predictions": {
         "system",
@@ -533,6 +559,76 @@ def check_open_v2_main_results_schema(csv_path: Path) -> list[str]:
     ]
 
 
+def _csv_truthy(value: Any) -> bool:
+    """Interpret CSV boolean-like values.
+
+    参数:
+        value: CSV cell value.
+
+    返回:
+        bool: True when the value is a recognized true value.
+    """
+    return str(value).strip().casefold() in {"1", "true", "yes", "y"}
+
+
+def check_ablation_suite_schema(csv_path: Path) -> list[str]:
+    """Check ablation-suite artifact columns and protocol-variant coverage.
+
+    参数:
+        csv_path: Path to reports/iad_ablation_suite.csv.
+
+    返回:
+        list[str]: Error messages for missing protocol fields or invalid rows.
+    """
+    try:
+        with csv_path.open("r", encoding="utf-8", newline="") as file_handle:
+            reader = csv.DictReader(file_handle)
+            header = [column.strip() for column in (reader.fieldnames or []) if column and column.strip()]
+            rows = list(reader)
+    except OSError as exc:
+        return [f"ablation_suite CSV cannot be read: {exc}"]
+    if not header:
+        return ["ablation_suite CSV is empty or missing a header row"]
+
+    errors: list[str] = []
+    actual_columns = set(header)
+    missing_columns = ABLATION_SUITE_REQUIRED_COLUMNS - actual_columns
+    for column in sorted(missing_columns):
+        errors.append(f"ablation_suite CSV missing protocol audit column: {column}")
+    if missing_columns:
+        return errors
+    if not rows:
+        return ["ablation_suite CSV has no data rows"]
+
+    protocol_rows = {str(row.get("protocol_variant", "")).strip(): row for row in rows if str(row.get("protocol_variant", "")).strip()}
+    missing_variants = REQUIRED_ABLATION_PROTOCOL_VARIANTS - set(protocol_rows)
+    if missing_variants:
+        errors.append(f"ablation_suite CSV missing required protocol_variant rows: {sorted(missing_variants)}")
+    for protocol_variant in sorted(REQUIRED_ABLATION_PROTOCOL_VARIANTS & set(protocol_rows)):
+        row = protocol_rows[protocol_variant]
+        if not _csv_truthy(row.get("protocol_required")):
+            errors.append(f"ablation_suite protocol_variant {protocol_variant} must set protocol_required=true")
+        if not _csv_truthy(row.get("requires_prediction_rows")):
+            errors.append(f"ablation_suite protocol_variant {protocol_variant} must set requires_prediction_rows=true")
+        if str(row.get("protocol_scope_rule", "")).strip() != "same_input_pair_scope_and_split_required":
+            errors.append(
+                f"ablation_suite protocol_variant {protocol_variant} must use protocol_scope_rule=same_input_pair_scope_and_split_required"
+            )
+    post_hoc_row = protocol_rows.get("post-hoc-threshold")
+    if post_hoc_row:
+        if str(post_hoc_row.get("threshold_source", "")).strip() != "post_hoc_labeled_sweep":
+            errors.append("ablation_suite post-hoc-threshold row must set threshold_source=post_hoc_labeled_sweep")
+        if _csv_truthy(post_hoc_row.get("accepted_for_component_causality")):
+            errors.append("ablation_suite post-hoc-threshold row must not be accepted for component causality")
+    for protocol_variant in sorted((REQUIRED_ABLATION_PROTOCOL_VARIANTS - {"post-hoc-threshold"}) & set(protocol_rows)):
+        row = protocol_rows[protocol_variant]
+        if not _csv_truthy(row.get("accepted_for_component_causality")):
+            errors.append(f"ablation_suite protocol_variant {protocol_variant} must set accepted_for_component_causality=true")
+        if str(row.get("threshold_source", "")).strip() != "predeclared_cli_argument":
+            errors.append(f"ablation_suite protocol_variant {protocol_variant} must use predeclared_cli_argument threshold source")
+    return errors
+
+
 def _missing_jsonl_required_fields(row: dict[str, Any], required_fields: set[str]) -> list[str]:
     """Return required JSONL fields that are absent or empty.
 
@@ -682,6 +778,18 @@ def check_manifest_artifacts(
             and (artifact_dir / artifact_location).is_file()
         ):
             errors.extend(check_jsonl_required_fields(artifact_dir / artifact_location, artifact_id, required_fields))
+
+    ablation_row = artifact_rows.get("ablation_suite")
+    if isinstance(ablation_row, dict):
+        ablation_location = str(ablation_row.get("expected_location", "")).strip()
+        ablation_location_path = Path(ablation_location)
+        if (
+            ablation_location
+            and not ablation_location_path.is_absolute()
+            and ".." not in ablation_location_path.parts
+            and (artifact_dir / ablation_location).is_file()
+        ):
+            errors.extend(check_ablation_suite_schema(artifact_dir / ablation_location))
 
     claim_boundaries = manifest.get("claim_boundaries")
     if isinstance(claim_boundaries, dict):

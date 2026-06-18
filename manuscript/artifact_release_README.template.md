@@ -58,6 +58,8 @@ python scripts/check_public_release.py
   - configs/source_input_manifest.json must record source name, acquisition date or version, original provider, local file name, record count when known, license boundary, and SHA256 checksum for each public input file.
 - processing_run_log
   - logs/processing_run_log.jsonl must record command line, code commit, environment summary, random seed, start and finish timestamps, input manifest reference, output path, and exit status for each rebuild stage.
+- ablation_suite
+  - reports/iad_ablation_suite.csv is required before component-causality claims. It must include protocol_variant rows for no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold, with protocol_required, accepted_for_component_causality, threshold_source, protocol_scope_rule, requires_prediction_rows, denominators, and false-merge metrics. The post-hoc-threshold row must use threshold_source=post_hoc_labeled_sweep and must not be treated as standalone component-causality evidence.
 - cluster_metric_summary
 - cannot_link_audit
 
@@ -76,7 +78,7 @@ Silver labels are not human gold.
 Full numerical audit requires external artifacts.
 Broad method ranking is not claimed unless conditional artifacts are complete.
 Threshold-stability claims require threshold_sensitivity_grid and threshold_selection_logs.
-Component-causality claims require ablation_suite.
+Component-causality claims require ablation_suite with full protocol_variant coverage and post-hoc threshold diagnostics separated from causal evidence.
 Human-validation claims require manual_validation_slice and adjudication records.
 Cluster-level quality is not claimed unless cluster artifacts are complete.
 
