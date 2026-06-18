@@ -116,6 +116,18 @@ This cycle separates reviewer questions that can be answered from the current ma
 | The result cannot be fully reproduced from Git alone. | `limited_answer` | Distinguish fixture-level code reproduction from L2/L3 artifact reproduction. | Do not imply full numerical audit until the external artifact release URL or DOI, manifest, and checksums are available. |
 | The paper is ready for final upload. | `do_not_answer_as_claim` | State that the anonymous pre-submission package validates, but final upload is still gated. | Do not state final-upload readiness until target journal, author metadata, funding statement, author contribution statement, permissions statement, final PDFs, live system fields, and artifact release link are complete. |
 
+## Revision Trigger Register
+
+This register converts likely reviewer pressure into mandatory edits. Each reviewer concern triggers a concrete manuscript revision rather than a stronger unsupported claim. If the evidence listed in the third column is absent, revise the relevant manuscript text to weaken the claim, add artifact-backed evidence, or keep the limitation explicit. The revision rule is: do not upgrade the abstract, introduction, conclusion, cover letter, or highlights until the required evidence and final-upload metadata are complete.
+
+| Trigger | Required revision action | Evidence required before stronger wording | Claim boundary |
+| --- | --- | --- | --- |
+| Contribution trigger: reviewers treat identity-agenda confusion as ordinary semantic similarity. | Tighten the problem framing around false-merge control, HNFMR, and label-strength separation. | A clearer novelty comparison against ordinary entity matching and representation-only scoring. | Do not claim universal prevalence or broad task replacement. |
+| Writing clarity trigger: reviewers cannot reproduce the method from the paper. | Expand notation, feature construction, thresholding, and artifact pointers in the method and supplementary material. | Runnable commands, schema contracts, fixture rebuilds, and manifest-linked artifacts. | Do not imply full numerical audit from Git-only files. |
+| Experimental strength trigger: reviewers ask whether gains over strong baselines are meaningful. | Keep the result as a bounded Open-v2 evidence snapshot or add stronger same-scope baseline evidence. | Same-scope prediction files, metric tables, threshold logs, checksums, and bootstrap intervals. | Do not claim SOTA, broad superiority, or interval-supported ranking before artifacts exist. |
+| Evaluation completeness trigger: reviewers request ablations, threshold sensitivity, or manual validation. | Move unsupported mechanism statements to limitations or add the missing experiment artifacts. | Ablation suite, threshold sensitivity grid, manual validation slice, adjudication log, and agreement report. | Do not claim component causality, threshold stability, or human-gold validation without these files. |
+| Method design soundness trigger: reviewers argue the gate adds complexity or unrealistic assumptions. | Clarify deployment assumptions, cannot-link behavior, risk thresholds, and the net benefit of false-merge control. | Source-heldout checks, topic-heldout checks, realistic operating points, and failure-case analysis. | Do not claim robust cross-source transfer before split-readiness and source-heldout evidence are defensible. |
+
 ## Audit Cycle 7: Journal Fit and Novelty Desk Check
 
 Outcome: pass for a conservative Data & Knowledge Engineering route; blocked for a stronger Information Systems or broad Q2/B claim until artifact-backed evidence is complete.
