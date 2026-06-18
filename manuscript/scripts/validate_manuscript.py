@@ -2362,6 +2362,7 @@ def check_cover_letter(cover_letter_text: str) -> list[str]:
         "full experimental outputs are not redistributed in Git",
         "artifact-release instructions",
         "manifests and checksums",
+        "does not claim cluster-level deployment quality without cluster artifacts",
     ]
     errors = [f"cover letter missing required statement: {marker}" for marker in required_markers if marker not in cover_letter_text]
     subjective_fit_markers = [

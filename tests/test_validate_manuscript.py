@@ -3094,6 +3094,7 @@ def test_check_cover_letter_accepts_required_submission_statements() -> None:
             "full experimental outputs are not redistributed in Git.",
             "The repository includes artifact-release instructions.",
             "Released artifacts should include manifests and checksums.",
+            "The manuscript does not claim cluster-level deployment quality without cluster artifacts.",
         ]
     )
 
@@ -3136,6 +3137,30 @@ def test_check_cover_letter_rejects_missing_artifact_release_boundary() -> None:
     assert any("artifact-release instructions" in error for error in errors)
 
 
+def test_check_cover_letter_rejects_missing_cluster_claim_boundary() -> None:
+    """验证 cover letter 必须声明 cluster-level 主张的证据边界。"""
+
+    module = _load_validate_manuscript_module()
+    cover_letter_text = "\n".join(
+        [
+            "Dear Editor,",
+            "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication.",
+            "The manuscript is not under consideration elsewhere.",
+            "All listed authors have approved the submitted version.",
+            "The authors declare no competing interests.",
+            "The repository does not redistribute raw third-party data.",
+            "full experimental outputs are not redistributed in Git.",
+            "The repository includes artifact-release instructions.",
+            "Released artifacts should include manifests and checksums.",
+        ]
+    )
+
+    errors = module.check_cover_letter(cover_letter_text)
+
+    assert any("cluster-level deployment quality" in error for error in errors)
+    assert any("cluster artifacts" in error for error in errors)
+
+
 def test_check_cover_letter_rejects_subjective_fit_language() -> None:
     """验证 cover letter 不应使用主观适配措辞。"""
 
@@ -3151,6 +3176,7 @@ def test_check_cover_letter_rejects_subjective_fit_language() -> None:
             "full experimental outputs are not redistributed in Git.",
             "The repository includes artifact-release instructions.",
             "Released artifacts should include manifests and checksums.",
+            "The manuscript does not claim cluster-level deployment quality without cluster artifacts.",
             "We believe the paper is relevant to readers interested in scholarly data integration.",
         ]
     )
