@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 66.
+Completed audit cycles: 67.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -625,6 +625,14 @@ Outcome: pass for reproduction-level table-density reduction; blocked for full n
 This gate checks whether the reproduction-level table is needed in the main manuscript. The main manuscript now states the reproduction boundary in prose: L0 code check and L1 fixture rebuild verify executable contracts and do not reproduce the Open-v2 numerical table; L2 public-source rebuild requires independently obtained public raw files plus source-input and processing-run provenance; and L3 result audit requires released tables, predictions, logs, manifests, checksums, and commit identifiers. The supplementary material preserves the full reproduction-level table.
 
 The reviewer-facing boundary is reproduction-level clarity without main-text table overload. The validator still requires the supplementary reproduction-level table and the explicit rule that a Git-only reviewer cannot verify model predictions, threshold choices, or row-level Open-v2 numbers without the L2/L3 artifact chain.
+
+## Audit Cycle 67: Evaluation Protocol Density Gate
+
+Outcome: pass for evaluation-protocol table-density reduction; blocked for broad evaluation-completeness claims until released artifacts provide same-scope predictions, threshold logs, interval estimates, manual-validation evidence, and checksum-fixed result files.
+
+This gate checks whether the evaluation-protocol table is needed in the main manuscript. The main manuscript now states the evaluation boundary in prose: RQ1 tests whether IAD-Risk preserves same-work matching performance on gold identity pairs, RQ2 tests whether it reduces false merges on silver hard negatives with HNFMR, RQ3 examines whether the observed behavior is consistent with the proposed risk mechanism through FMR and HNFMR, and RQ4 tests whether results remain interpretable under gold, proxy, and silver label strata through split metrics. The supplementary material preserves the full evaluation-protocol table with question, evidence layer, metric, and interpretation columns.
+
+The reviewer-facing boundary is evaluation-protocol clarity without main-text table overload. The validator still requires the supplementary evaluation-protocol table and the explicit rule that gold, proxy, and silver evidence are not mixed into one undifferentiated score.
 
 ## Minimum Gate Before Final Upload
 

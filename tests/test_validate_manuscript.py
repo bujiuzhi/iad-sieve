@@ -464,6 +464,78 @@ def test_check_reproduction_levels_boundary_rejects_missing_supplementary_table(
     assert any("Reproduction levels for auditing" in error for error in errors)
 
 
+def test_check_evaluation_protocol_boundary_accepts_supplementary_table() -> None:
+    """验证 evaluation protocol 表迁入补充材料后仍可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Experimental Questions}",
+            "The full evaluation-protocol table is reported in the supplementary material.",
+            "RQ1 tests whether IAD-Risk preserves same-work matching performance on gold identity pairs.",
+            "RQ2 tests whether it reduces false merges on silver hard negatives with HNFMR.",
+            "RQ3 examines whether the observed behavior is consistent with the proposed risk mechanism through FMR and HNFMR.",
+            "RQ4 tests whether results remain interpretable under gold, proxy, and silver label strata through split metrics.",
+            "The evidence strength is tied to the label stratum behind each question.",
+            "gold, proxy, and silver evidence are not mixed into one undifferentiated score.",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Evaluation Protocol Boundary}",
+            r"\label{tab:evaluation-protocol}",
+            "Evaluation protocol. Each question is tied to a label stratum and a metric.",
+            "RQ",
+            "Evidence layer",
+            "Metric",
+            "Interpretation",
+            "RQ1",
+            "Gold identity pairs",
+            "Same-work F1",
+            "Duplicate matching ability",
+            "RQ2",
+            "Silver hard negatives",
+            "HNFMR",
+            "False-merge safety",
+            "RQ3",
+            "Mechanism analysis",
+            "FMR and HNFMR",
+            "Role of risk signals",
+            "RQ4",
+            "Gold/proxy/silver strata",
+            "Split metrics",
+            "Provenance-aware robustness",
+        ]
+    )
+
+    errors = module.check_evaluation_protocol_boundary(manuscript_text, supplementary_text)
+
+    assert errors == []
+
+
+def test_check_evaluation_protocol_boundary_rejects_missing_supplementary_table() -> None:
+    """验证缺少补充材料 evaluation protocol 表时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Experimental Questions}",
+            "The full evaluation-protocol table is reported in the supplementary material.",
+            "RQ1 tests whether IAD-Risk preserves same-work matching performance on gold identity pairs.",
+            "RQ2 tests whether it reduces false merges on silver hard negatives with HNFMR.",
+            "RQ3 examines whether the observed behavior is consistent with the proposed risk mechanism through FMR and HNFMR.",
+            "RQ4 tests whether results remain interpretable under gold, proxy, and silver label strata through split metrics.",
+            "The evidence strength is tied to the label stratum behind each question.",
+            "gold, proxy, and silver evidence are not mixed into one undifferentiated score.",
+        ]
+    )
+
+    errors = module.check_evaluation_protocol_boundary(manuscript_text, "")
+
+    assert any("tab:evaluation-protocol" in error for error in errors)
+    assert any("Evaluation Protocol Boundary" in error for error in errors)
+
+
 def test_check_highlights_accepts_five_concise_bullets() -> None:
     """验证 5 条简洁投稿 highlights 可通过检查。"""
 
@@ -5205,7 +5277,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 66.",
+            "Completed audit cycles: 67.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -5742,6 +5814,15 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "L3 result audit requires released tables, predictions, logs, manifests, checksums, and commit identifiers",
             "reproduction-level clarity without main-text table overload",
             "supplementary reproduction-level table",
+            "## Audit Cycle 67: Evaluation Protocol Density Gate",
+            "evaluation-protocol table-density reduction",
+            "full evaluation-protocol table",
+            "RQ1 tests whether IAD-Risk preserves same-work matching performance",
+            "RQ2 tests whether it reduces false merges on silver hard negatives",
+            "RQ3 examines whether the observed behavior is consistent with the proposed risk mechanism",
+            "RQ4 tests whether results remain interpretable under gold, proxy, and silver label strata",
+            "evaluation-protocol clarity without main-text table overload",
+            "supplementary evaluation-protocol table",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -5760,7 +5841,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 66",
+        "Completed audit cycles: 67",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -5771,7 +5852,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 66" in error for error in errors)
+    assert any("Completed audit cycles: 67" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

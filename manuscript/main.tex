@@ -373,25 +373,7 @@ These controls reduce two common validity risks. First, the model cannot gain ac
 
 \subsection{Experimental Questions}
 
-The experiments ask four questions. RQ1 tests whether IAD-Risk preserves same-work matching performance on gold labels. RQ2 tests whether it reduces false merges on agenda-level hard negatives. RQ3 examines whether the observed behavior is consistent with the proposed risk mechanism. RQ4 tests whether results remain interpretable under gold, proxy, and silver label strata.
-
-\begin{table}[H]
-\caption{Evaluation protocol. Each question is tied to a label stratum and a metric so that evidence strength is not mixed across sources.}
-\label{tab:evaluation-protocol}
-\centering
-\small
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{L{0.08\linewidth}L{0.25\linewidth}L{0.17\linewidth}L{0.30\linewidth}}
-\toprule
-RQ & Evidence layer & Metric & Interpretation \\
-\midrule
-RQ1 & Gold identity pairs & Same-work F1 & Duplicate matching ability \\
-RQ2 & Silver hard negatives & HNFMR & False-merge safety \\
-RQ3 & Mechanism analysis & FMR and HNFMR & Role of risk signals \\
-RQ4 & Gold/proxy/silver strata & Split metrics & Provenance-aware robustness \\
-\bottomrule
-\end{tabular}
-\end{table}
+The experiments ask four questions. The full evaluation-protocol table is reported in the supplementary material so that the main manuscript can keep the evidence logic in prose. RQ1 tests whether IAD-Risk preserves same-work matching performance on gold identity pairs with same-work F1. RQ2 tests whether it reduces false merges on silver hard negatives with HNFMR. RQ3 examines whether the observed behavior is consistent with the proposed risk mechanism through FMR and HNFMR. RQ4 tests whether results remain interpretable under gold, proxy, and silver label strata through split metrics. The interpretation boundary is that evidence strength is tied to the label stratum behind each question; gold, proxy, and silver evidence are not mixed into one undifferentiated score.
 
 These questions are ordered by the strength of evidence that the current package can support. RQ1 and RQ2 are the primary quantitative checks because they map directly to gold identity rows and silver hard-negative rows. RQ3 is a mechanism-consistency check, not a complete causal ablation claim. RQ4 is an interpretation check over label strata, not a claim that source-heldout or topic-heldout generalization has been fully established. This ordering keeps the result section focused on bounded false-merge evidence rather than on an unsupported same-scope method ranking.
 

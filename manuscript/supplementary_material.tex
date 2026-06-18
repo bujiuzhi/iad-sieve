@@ -548,6 +548,28 @@ Metric implementation & All systems report same-work F1, FMR, and HNFMR from the
 \end{tabular}
 \end{table}
 
+\section{Evaluation Protocol Boundary}
+
+The main manuscript summarizes the experimental questions in prose. Table~\ref{tab:evaluation-protocol} preserves the label stratum, metric, and interpretation boundary for each question so that evidence strength is not mixed across sources.
+
+\begin{table}[H]
+\caption{Evaluation protocol. Each question is tied to a label stratum and a metric so that evidence strength is not mixed across sources.}
+\label{tab:evaluation-protocol}
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.08\linewidth}L{0.25\linewidth}L{0.17\linewidth}L{0.30\linewidth}}
+\toprule
+RQ & Evidence layer & Metric & Interpretation \\
+\midrule
+RQ1 & Gold identity pairs & Same-work F1 & Duplicate matching ability. \\
+RQ2 & Silver hard negatives & HNFMR & False-merge safety. \\
+RQ3 & Mechanism analysis & FMR and HNFMR & Role of risk signals. \\
+RQ4 & Gold/proxy/silver strata & Split metrics & Provenance-aware robustness. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Claim-Evidence Matrix}
 
 Table~\ref{tab:claim-evidence} maps the major manuscript claims to the evidence required for responsible interpretation. The matrix is part of the submission boundary: a claim should be weakened or removed if the corresponding evidence file is absent from the released artifact package.

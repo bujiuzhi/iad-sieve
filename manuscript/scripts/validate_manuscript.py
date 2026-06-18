@@ -573,6 +573,65 @@ def check_reproduction_levels_boundary(manuscript_text: str, supplementary_text:
     return errors
 
 
+def check_evaluation_protocol_boundary(manuscript_text: str, supplementary_text: str = "") -> list[str]:
+    """Check whether experimental questions preserve label-stratum boundaries.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
+
+    返回:
+        list[str]: Error messages for missing evaluation-protocol markers.
+    """
+    required_main_markers = [
+        r"\subsection{Experimental Questions}",
+        "full evaluation-protocol table is reported in the supplementary material",
+        "RQ1 tests whether IAD-Risk preserves same-work matching performance on gold identity pairs",
+        "RQ2 tests whether it reduces false merges on silver hard negatives with HNFMR",
+        "RQ3 examines whether the observed behavior is consistent with the proposed risk mechanism through FMR and HNFMR",
+        "RQ4 tests whether results remain interpretable under gold, proxy, and silver label strata through split metrics",
+        "evidence strength is tied to the label stratum behind each question",
+        "gold, proxy, and silver evidence are not mixed into one undifferentiated score",
+    ]
+    required_supplement_markers = [
+        r"\section{Evaluation Protocol Boundary}",
+        r"\label{tab:evaluation-protocol}",
+        "Evaluation protocol. Each question is tied to a label stratum and a metric",
+        "RQ",
+        "Evidence layer",
+        "Metric",
+        "Interpretation",
+        "RQ1",
+        "Gold identity pairs",
+        "Same-work F1",
+        "Duplicate matching ability",
+        "RQ2",
+        "Silver hard negatives",
+        "HNFMR",
+        "False-merge safety",
+        "RQ3",
+        "Mechanism analysis",
+        "FMR and HNFMR",
+        "Role of risk signals",
+        "RQ4",
+        "Gold/proxy/silver strata",
+        "Split metrics",
+        "Provenance-aware robustness",
+    ]
+    errors = [
+        f"evaluation protocol boundary missing manuscript marker: {marker}"
+        for marker in required_main_markers
+        if marker not in manuscript_text
+    ]
+    evidence_text = supplementary_text or manuscript_text
+    errors.extend(
+        f"evaluation protocol boundary missing supplementary marker: {marker}"
+        for marker in required_supplement_markers
+        if marker not in evidence_text
+    )
+    return errors
+
+
 def check_cli_entrypoint_contract(pyproject_text: str, cli_text: str) -> list[str]:
     """Check whether the installable CLI entry point is auditable from source.
 
@@ -3401,7 +3460,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 66",
+        "Completed audit cycles: 67",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3525,8 +3584,17 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 64: Design Alternatives Density Gate",
         "Audit Cycle 65: Failure-Control Rationale Density Gate",
         "Audit Cycle 66: Reproduction Levels Density Gate",
+        "Audit Cycle 67: Evaluation Protocol Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
+        "evaluation-protocol table-density reduction",
+        "full evaluation-protocol table",
+        "RQ1 tests whether IAD-Risk preserves same-work matching performance",
+        "RQ2 tests whether it reduces false merges on silver hard negatives",
+        "RQ3 examines whether the observed behavior is consistent with the proposed risk mechanism",
+        "RQ4 tests whether results remain interpretable under gold, proxy, and silver label strata",
+        "evaluation-protocol clarity without main-text table overload",
+        "supplementary evaluation-protocol table",
         "reproduction-level table-density reduction",
         "full reproduction-level table",
         "L0 code check and L1 fixture rebuild",
@@ -5044,6 +5112,7 @@ def main() -> int:
     errors.extend(check_declaration_statements(manuscript_text))
     errors.extend(check_data_code_availability_boundary(manuscript_text, supplementary_text))
     errors.extend(check_reproduction_levels_boundary(manuscript_text, supplementary_text))
+    errors.extend(check_evaluation_protocol_boundary(manuscript_text, supplementary_text))
     errors.extend(check_cli_entrypoint_contract(pyproject_text, cli_entrypoint_text))
     errors.extend(check_operating_point_disclosure(manuscript_text, supplementary_text))
     errors.extend(check_selective_decision_coverage_boundary(manuscript_text, supplementary_text))
