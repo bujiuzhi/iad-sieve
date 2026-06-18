@@ -660,7 +660,7 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
             r"\subsection{Claim-Evidence Boundary for Result Interpretation}",
             r"\label{tab:claim-evidence-boundary-main}",
             r"\subsection{Result Audit Trail}",
-            r"\label{tab:result-artifact-crosswalk}",
+            "The complete row-family artifact crosswalk is reported in the supplementary material.",
             r"\path{open_v2_main_results}",
             r"\path{iad_bench_split_summary}",
             r"\path{representation_baseline_scores}",
@@ -709,6 +709,8 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
         [
             r"\section{Artifact Package Requirements}",
             r"\section{Claim-Evidence Matrix}",
+            r"\label{tab:result-artifact-crosswalk}",
+            "Result artifact crosswalk for the Open-v2 evidence snapshot.",
             "The released artifact package includes checksums.sha256.",
             "Reviewers can run python manuscript/scripts/build_artifact_release_skeleton.py.",
             "Reviewers can run with --preflight-only.",
@@ -721,6 +723,14 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
             "The validator checks required result identifiers.",
             "The validator checks conditional claim artifacts.",
             r"The package documents \path{open_v2_main_results}.",
+            r"The package documents \path{iad_bench_split_summary}.",
+            r"The package documents \path{representation_baseline_scores}.",
+            r"The package documents \path{supervised_baseline_predictions}.",
+            r"The package documents \path{iad_risk_predictions}.",
+            r"The package documents \path{threshold_selection_logs}.",
+            r"The package documents \path{bootstrap_intervals}.",
+            r"The package documents \path{ablation_suite}.",
+            r"The package documents \path{manual_validation_slice}.",
             "The artifact package records per-row denominator counts.",
             "The artifact package records the per-row threshold source.",
             "The artifact package records the scope label used in the main table.",
@@ -4407,7 +4417,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 44.",
+            "Completed audit cycles: 45.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -4743,6 +4753,14 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "threshold and uncertainty reporting protocol table",
             "statistical interpretation boundary table",
             "experimental interpretability without table overload",
+            "## Audit Cycle 45: Result Artifact Crosswalk Density Gate",
+            "result-audit table-density reduction",
+            "row-level audit requirements",
+            "prediction-file requirements",
+            "threshold-log requirements",
+            "public-source provenance requirements",
+            "full result artifact crosswalk",
+            "numerical-audit traceability without main-text table overload",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -4761,7 +4779,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 44",
+        "Completed audit cycles: 45",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -4772,7 +4790,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 44" in error for error in errors)
+    assert any("Completed audit cycles: 45" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

@@ -312,6 +312,27 @@ paper-artifacts/
 
 The manifest should record the source data version, processing commands, dependency versions, random seeds, thresholds, split configuration, hardware summary, and SHA256 checksum for every result file. The checksums should be validated before using artifact files to support claims in the manuscript.
 
+\begin{table}[H]
+\caption{Result artifact crosswalk for the Open-v2 evidence snapshot. Each row family in the main table has a required artifact path or manifest entry before it can be used for full numerical audit.}
+\label{tab:result-artifact-crosswalk}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.22\linewidth}L{0.36\linewidth}L{0.32\linewidth}}
+\toprule
+Main-table evidence & Required artifact IDs & Audit purpose \\
+\midrule
+Open-v2 aggregate table & \path{open_v2_main_results}, \path{iad_bench_split_summary} & Verifies row scopes, pair counts, document counts, label strata, metric columns, and selective-decision coverage fields. \\
+L2 public-source rebuild provenance & \path{source_input_manifest}, \path{processing_run_log} & Verifies public input provenance, processing commands, code commit, environment summary, random seed, output path, exit status, and checksum-fixed rebuild metadata. \\
+Representation cosine baselines & \path{representation_baseline_scores}, \path{threshold_selection_logs} & Verifies SciNCL and SPECTER2 scores, threshold choices, and full-pair false-merge rates. \\
+RoBERTa pair classifier & \path{supervised_baseline_predictions}, \path{threshold_selection_logs} & Verifies supervised baseline predictions under the same pair schema and fixed operating point. \\
+IAD-Risk transformer variants & \path{iad_risk_predictions}, \path{threshold_selection_logs} & Verifies held-out predictions, relation-head scores, risk-gate decisions, thresholds, and split identifiers. \\
+Optional stronger claims & \path{bootstrap_intervals}, \path{ablation_suite}, \path{manual_validation_slice} & Required only before claiming confidence intervals, component causality, or human label precision. \\
+Threshold-stability claims & \path{threshold_sensitivity_grid}, \path{threshold_selection_logs} & Required only before claiming stability across operating points or threshold ranges. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \small
 \begin{verbatim}
 python manuscript/scripts/build_artifact_release_skeleton.py \

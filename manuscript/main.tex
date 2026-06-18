@@ -698,26 +698,7 @@ Repository-level reproduction is possible without committing raw data. & Public 
 
 Table~\ref{tab:openv2-results} should be read together with the artifact boundary in Table~\ref{tab:claim-evidence-boundary-main}. Each numerical row must be traceable to three audit objects: a prediction or score file, a metric summary produced from that file, and a checksum or manifest entry that fixes the artifact version. The same audit record must also contain per-row denominator counts for same-work F1, FMR, and HNFMR, the per-row threshold source, the scope label used in the main table, and the selective-decision coverage fields: automatic merge count, block count, defer count, automatic merge coverage, defer rate, and capacity-normalized review load. Prediction JSONL artifacts must expose system, pair/document IDs, expected labels, label strength, hard-negative level, split identifiers, score or probability fields, threshold source, threshold values where applicable, and merge decisions; threshold logs must expose threshold name, value, selection split, selection metric, selection rule, applied scope, and score field. Public-source rebuild evidence must also include \path{source_input_manifest} and \path{processing_run_log}, because these files bind public inputs, commands, code commits, environments, seeds, output paths, and exit status to the derived evaluation artifacts. The Git repository verifies the schema, fixture rebuild, public-release boundary, manuscript build, and submission package, but it deliberately does not store raw third-party data, large model outputs, or full prediction files. Therefore the manuscript treats the Open-v2 table as a supported evidence snapshot and reserves full numerical reproduction for the released L3 artifact package.
 
-\begin{table}[H]
-\caption{Result artifact crosswalk for the Open-v2 evidence snapshot. Each row family in the main table has a required artifact path or manifest entry before it can be used for full numerical audit.}
-\label{tab:result-artifact-crosswalk}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{L{0.22\linewidth}L{0.36\linewidth}L{0.32\linewidth}}
-\toprule
-Main-table evidence & Required artifact IDs & Audit purpose \\
-\midrule
-Open-v2 aggregate table & \path{open_v2_main_results}, \path{iad_bench_split_summary} & Verifies row scopes, pair counts, document counts, label strata, metric columns, and selective-decision coverage fields. \\
-L2 public-source rebuild provenance & \path{source_input_manifest}, \path{processing_run_log} & Verifies public input provenance, processing commands, code commit, environment summary, random seed, output path, exit status, and checksum-fixed rebuild metadata. \\
-Representation cosine baselines & \path{representation_baseline_scores}, \path{threshold_selection_logs} & Verifies SciNCL and SPECTER2 scores, threshold choices, and full-pair false-merge rates. \\
-RoBERTa pair classifier & \path{supervised_baseline_predictions}, \path{threshold_selection_logs} & Verifies supervised baseline predictions under the same pair schema and fixed operating point. \\
-IAD-Risk transformer variants & \path{iad_risk_predictions}, \path{threshold_selection_logs} & Verifies held-out predictions, relation-head scores, risk-gate decisions, thresholds, and split identifiers. \\
-Optional stronger claims & \path{bootstrap_intervals}, \path{ablation_suite}, \path{manual_validation_slice} & Required only before claiming confidence intervals, component causality, or human label precision. \\
-Threshold-stability claims & \path{threshold_sensitivity_grid}, \path{threshold_selection_logs} & Required only before claiming stability across operating points or threshold ranges. \\
-\bottomrule
-\end{tabular}
-\end{table}
+The complete row-family artifact crosswalk is reported in the supplementary material. It binds \path{open_v2_main_results}, \path{iad_bench_split_summary}, \path{representation_baseline_scores}, \path{supervised_baseline_predictions}, \path{iad_risk_predictions}, \path{threshold_selection_logs}, \path{bootstrap_intervals}, \path{ablation_suite}, \path{manual_validation_slice}, and \path{threshold_sensitivity_grid} to the row scopes, operating points, optional stronger claims, and checksum-fixed artifact records used for full numerical audit.
 
 \subsection{Main Open-v2 Results}
 
