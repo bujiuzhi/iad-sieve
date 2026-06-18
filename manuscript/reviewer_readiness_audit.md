@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 62.
+Completed audit cycles: 63.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -593,6 +593,14 @@ Outcome: pass for feature-head table-density reduction; blocked for implementati
 This gate checks whether the feature and head specification table is needed in the main manuscript. The main manuscript now states the implementation contract in prose: Transformer distances, title similarity, author overlap, DOI/arXiv/OpenAlex identifier agreement, topic overlap, reference Jaccard similarity, different-identifier conflicts, and provenance-aware masking define the relation-head boundary; audit metadata remains traceable but is not a training feature. The supplementary material preserves the full feature and head specification table with each head or stage, main input fields, supervision or calculation, and output role.
 
 The reviewer-facing boundary is feature-head clarity without main-text table overload. The validator still requires the supplementary feature and head specification table, including Identity head, Agenda head, ANI risk head, Risk gate, Audit metadata, the direct statement that metadata fields are retained for auditing but are not used as model features, and the rule that audit metadata is not a training feature.
+
+## Audit Cycle 63: Risk Score Design Rationale Density Gate
+
+Outcome: pass for risk-score rationale table-density reduction; blocked for calibrated-risk or threshold-transfer claims until held-out calibration artifacts, threshold grids, and checksum-fixed prediction files are released for the same evaluated rows.
+
+This gate checks whether the risk score design rationale table is needed in the main manuscript. The main manuscript now states the rationale in prose: $p_{\mathrm{risk}}$ is a conservative upper-envelope risk proxy, it increases with agenda-non-identity evidence, it increases when agenda evidence is high and identity evidence is weak, the max operator keeps direct ANI evidence or indirect agenda-without-identity evidence sufficient to block automatic merging, and the product term is not a calibrated probability. Threshold transfer must be rechecked under new source distributions. The supplementary material preserves the full risk score design rationale table with design element, design rationale, and boundary columns.
+
+The reviewer-facing boundary is risk-score clarity without main-text table overload. The validator still requires the supplementary risk score design rationale table, including the $p_{\mathrm{ani}}$ term, the $p_{\mathrm{agenda}}(1-p_{\mathrm{work}})$ term, Max operator, Threshold gate, the non-calibration boundary, and the threshold-transfer boundary.
 
 ## Minimum Gate Before Final Upload
 

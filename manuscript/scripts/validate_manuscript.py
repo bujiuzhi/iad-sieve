@@ -1305,18 +1305,19 @@ def check_training_objective_masking(manuscript_text: str) -> list[str]:
     return [f"training objective masking missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
 
 
-def check_risk_score_design_rationale(manuscript_text: str) -> list[str]:
+def check_risk_score_design_rationale(manuscript_text: str, supplementary_text: str = "") -> list[str]:
     """Check whether the method explains the false-merge risk score design.
 
     参数:
         manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
 
     返回:
         list[str]: Error messages for missing risk-score rationale markers.
     """
-    required_markers = [
+    required_main_markers = [
         r"\subsection{Risk Score Design Rationale}",
-        r"\label{tab:risk-score-rationale}",
+        "full risk score design rationale table is reported in the supplementary material",
         r"$p_{\mathrm{risk}}$ is a conservative upper-envelope risk proxy",
         "increases monotonically with agenda-non-identity evidence",
         "agenda evidence is high and identity evidence is weak",
@@ -1326,11 +1327,31 @@ def check_risk_score_design_rationale(manuscript_text: str) -> list[str]:
         "Threshold transfer must be rechecked under new source distributions",
         "defer rather than merge",
     ]
-    return [
-        f"risk score design rationale missing marker: {marker}"
-        for marker in required_markers
+    required_supplement_markers = [
+        r"\label{tab:risk-score-rationale}",
+        "Risk score design rationale",
+        "Design element",
+        "Design rationale",
+        "Boundary",
+        r"$p_{\mathrm{ani}}$ term",
+        r"$p_{\mathrm{agenda}}(1-p_{\mathrm{work}})$ term",
+        "Max operator",
+        "Threshold gate",
+        "not a calibrated probability",
+        "Threshold transfer must be rechecked under new source distributions",
+    ]
+    errors = [
+        f"risk score design rationale missing manuscript marker: {marker}"
+        for marker in required_main_markers
         if marker not in manuscript_text
     ]
+    evidence_text = supplementary_text or manuscript_text
+    errors.extend(
+        f"risk score design rationale missing supplementary marker: {marker}"
+        for marker in required_supplement_markers
+        if marker not in evidence_text
+    )
+    return errors
 
 
 def check_risk_calibration_overclaims(manuscript_text: str) -> list[str]:
@@ -3254,7 +3275,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 62",
+        "Completed audit cycles: 63",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3374,8 +3395,17 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 60: Decision-to-Metric Mapping Density Gate",
         "Audit Cycle 61: Split and Leakage Controls Density Gate",
         "Audit Cycle 62: Feature and Head Specification Density Gate",
+        "Audit Cycle 63: Risk Score Design Rationale Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
+        "risk-score rationale table-density reduction",
+        "full risk score design rationale table",
+        r"$p_{\mathrm{risk}}$ is a conservative upper-envelope risk proxy",
+        "increases with agenda-non-identity evidence",
+        "product term is not a calibrated probability",
+        "Threshold transfer must be rechecked under new source distributions",
+        "risk-score clarity without main-text table overload",
+        "supplementary risk score design rationale table",
         "feature-head table-density reduction",
         "full feature and head specification table",
         "Transformer distances",
@@ -4842,7 +4872,7 @@ def main() -> int:
     errors.extend(check_iad_bench_supplementary_schema_tables(supplementary_text))
     errors.extend(check_method_feature_contract(manuscript_text, supplementary_text))
     errors.extend(check_training_objective_masking(manuscript_text))
-    errors.extend(check_risk_score_design_rationale(manuscript_text))
+    errors.extend(check_risk_score_design_rationale(manuscript_text, supplementary_text))
     errors.extend(check_risk_calibration_overclaims(manuscript_text))
     errors.extend(check_method_cluster_overclaims(manuscript_text))
     errors.extend(check_operational_net_benefit_boundary(manuscript_text))
