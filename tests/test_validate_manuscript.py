@@ -87,6 +87,7 @@ def test_check_final_upload_information_request_rejects_missing_required_fields(
     assert any("Permissions statement" in error for error in errors)
     assert any("Artifact release URL or DOI" in error for error in errors)
     assert any("Live submission-system fields" in error for error in errors)
+    assert any("Submission metadata mapping" in error for error in errors)
 
 
 def test_check_final_upload_information_request_rejects_missing_credit_roles() -> None:
@@ -96,6 +97,21 @@ def test_check_final_upload_information_request_rejects_missing_credit_roles() -
     request_text = "\n".join(
         [
             "# Final Upload Information Request",
+            "Submission metadata mapping",
+            "After the authors complete this form",
+            "`submission_metadata.yml`, `cover_letter.md`, and the live submission system",
+            "python manuscript/scripts/validate_submission_package.py --final-upload",
+            "Primary `submission_metadata.yml` target",
+            "Additional file or system target",
+            "`submission`, `target_preparation`, `final_upload_checklist.target_journal_selected`",
+            "`authors`, `author_contributions.roles`, `final_upload_checklist.author_metadata_completed`",
+            "`corresponding_author`, `final_upload_checklist.corresponding_author_completed`",
+            "`funding`, `statements`, `final_upload_checklist.funding_statement_text_ready`",
+            "`author_contributions`, `final_upload_checklist.contribution_statement_complete`",
+            "`permissions`, `final_upload_checklist.permissions_statement_complete`",
+            "`repository_reference`, `artifact_boundary`, `statements.research_data_statement`",
+            "`artifact_boundary`, `final_upload_checklist.artifact_release_prepared_or_linked`",
+            "`final_upload_checklist.manuscript_pdf_rebuilt_after_template`",
             "Target journal",
             "Article type",
             "Review mode",
@@ -134,6 +150,25 @@ def test_check_final_upload_information_request_accepts_complete_request() -> No
     errors = module.check_final_upload_information_request(request_text)
 
     assert errors == []
+
+
+def test_check_final_upload_information_request_rejects_missing_metadata_mapping() -> None:
+    """验证最终上传信息表必须说明外部输入如何同步到元数据文件。"""
+
+    module = _load_validate_manuscript_module()
+    request_text = Path("manuscript/final_upload_information_request.md").read_text(encoding="utf-8")
+    request_text = request_text.replace("## Submission metadata mapping", "## Removed mapping")
+    request_text = request_text.replace("Primary `submission_metadata.yml` target", "Primary metadata target")
+    request_text = request_text.replace(
+        "`repository_reference`, `artifact_boundary`, `statements.research_data_statement`",
+        "`repository_reference`",
+    )
+
+    errors = module.check_final_upload_information_request(request_text)
+
+    assert any("Submission metadata mapping" in error for error in errors)
+    assert any("Primary `submission_metadata.yml` target" in error for error in errors)
+    assert any("statements.research_data_statement" in error for error in errors)
 
 
 def test_check_final_upload_information_request_rejects_legacy_checklist_names() -> None:
