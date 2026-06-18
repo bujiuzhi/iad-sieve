@@ -69,7 +69,7 @@ This matrix records the current reviewer-facing answer to the five required self
 | Writing clarity self-review | Can a knowledgeable reader reproduce the method and understand each module's motivation? | pass | The method section defines identity, agenda, ANI, risk score, thresholds, feature groups, and provenance-aware masking. | Recheck length, figure placement, and title-page formatting after target-journal template conversion. |
 | Experimental strength self-review | Are the reported gains meaningful against strong baselines under a fair interpretation? | needs new experiment | Open-v2 evidence reports representation baseline HNFMR 0.790--0.999, RoBERTa FMR 0.001/HNFMR 0.0001, and zero observed IAD-Risk HNFMR on the reported held-out scope. | Release same-scope prediction files, threshold logs, checksums, and bootstrap intervals before claiming stronger comparative advantage. |
 | Evaluation completeness self-review | Are ablations, metrics, datasets, and label strata sufficient for the claimed scope? | needs new experiment | The manuscript reports F1, FMR, HNFMR, label strata, scope compatibility, threshold-status boundaries, and manual-validation requirements. | Add artifact-backed ablations, threshold grid, manual-validation slice, and source-heldout package before stronger robustness or component-causality claims. |
-| Method design soundness self-review | Does the method have realistic assumptions and a positive net benefit despite added complexity? | pass | The method exposes thresholds, cannot-link behavior, audit metadata, and explicit boundaries for silver labels and source transfer. | Reassess threshold transfer and deployment complexity after the selected journal route and external artifact are fixed. |
+| Method design soundness self-review | Does the method have realistic assumptions and a positive net benefit despite added complexity? | pass | The method exposes thresholds, cannot-link behavior, audit metadata, explicit label-boundary rules, and workload evidence requirements for selective decisions. | Reassess threshold transfer, deployment complexity, automatic merge coverage, defer rate, and manual-review capacity after the selected journal route and external artifact are fixed. |
 
 ## Reviewer Response Matrix
 
@@ -164,7 +164,7 @@ The first-screen materials carry the same boundary. The cover letter states that
 
 Outcome: pass for release-template and validator coverage; blocked for final numerical audit until the external artifact release is populated and linked.
 
-This cycle checks whether the external result package can support a row-by-row reviewer audit of the main Open-v2 result table. The release validator now treats `open_v2_main_results` as a schema-bearing artifact rather than a generic file: `tables/open_v2_main_results.csv` must include per-row denominator counts, per-row threshold source, scope label used in the main table, automatic merge count, block count, defer count, automatic merge coverage, and defer rate. This prevents a release from passing only because the CSV exists and has a matching checksum.
+This cycle checks whether the external result package can support a row-by-row reviewer audit of the main Open-v2 result table. The release validator treats `open_v2_main_results` as a schema-bearing artifact rather than a generic file: `tables/open_v2_main_results.csv` must include per-row denominator counts, per-row threshold source, scope label used in the main table, automatic merge count, block count, defer count, automatic merge coverage, defer rate, and capacity-normalized review load. This prevents a release from passing only because the CSV exists and has a matching checksum.
 
 The reviewer-facing interpretation is narrow. A valid `open_v2_main_results` file lets reviewers trace each reported row to its denominator, operating-point source, evaluated scope, and selective-decision coverage. It does not by itself establish broad method ranking, confidence intervals, threshold stability, component causality, human-gold validation, or cluster-level deployment quality. Those stronger claims remain gated by the optional artifact rows and their checksums.
 
@@ -361,6 +361,14 @@ Outcome: pass for main-text L2 provenance alignment; blocked for final numerical
 This gate checks whether the main manuscript itself names the L2 provenance artifacts introduced in the supplementary material and release template. The reproduction-level table, result audit trail, result artifact crosswalk, and Data and Code Availability section now state that L2 public-source rebuilds require `source_input_manifest` and `processing_run_log` in addition to prediction, threshold, manifest, checksum, and metric artifacts.
 
 The reviewer-facing boundary is source-to-result alignment. Main text, supplementary material, artifact release template, validator, and tests now use the same provenance vocabulary, reducing the risk that reviewers see the artifact rules as supplemental-only instructions. This alignment still does not create the artifact release; it only ensures the submitted manuscript points to the evidence that must exist before full numerical reproduction or final-upload readiness can be claimed.
+
+## Audit Cycle 34: Selective Decision Workload Boundary Gate
+
+Outcome: pass for selective-decision workload wording and validator coverage; blocked for operational throughput or cost-saving claims until the external artifact reports automatic merge coverage, block rate, defer rate, review-load counts, and capacity-normalized review load from the same prediction files.
+
+This gate checks whether low false-merge rates can be overread as evidence that the method reduces human review. The manuscript now treats low FMR or HNFMR with high deferral as a conservative triage outcome rather than a productivity outcome. Operational benefit requires the released artifacts to bind false-merge metrics to automatic merge coverage, block rate, defer rate, a predeclared deferral budget, and manual-review capacity.
+
+The reviewer-facing boundary is workload attribution. The current manuscript can argue safety-oriented false-merge control under fixed operating points, but it should not claim throughput reduction, review-cost savings, or all-pair automatic resolution until the workload evidence is released and validated.
 
 ## Minimum Gate Before Final Upload
 

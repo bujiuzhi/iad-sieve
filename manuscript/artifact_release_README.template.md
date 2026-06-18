@@ -43,7 +43,7 @@ python scripts/check_public_release.py
 ## Required Artifact IDs
 
 - open_v2_main_results
-  - tables/open_v2_main_results.csv must include per-row denominator counts, per-row threshold source, scope label used in the main table, automatic merge count, block count, defer count, automatic merge coverage, and defer rate.
+  - tables/open_v2_main_results.csv must include per-row denominator counts, per-row threshold source, scope label used in the main table, automatic merge count, block count, defer count, automatic merge coverage, defer rate, and capacity-normalized review load.
 - iad_risk_predictions
   - predictions/iad_risk_transformer_predictions.jsonl must include system, pair_id, source_document_id, target_document_id, expected labels, label strength, hard-negative level, split identifiers, relation-head scores, work_threshold, agenda_block_threshold, risk_threshold, threshold source, and merge_prediction.
 - representation_baseline_scores

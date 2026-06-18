@@ -606,6 +606,7 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
             "Each row records defer count.",
             "Each row records automatic merge coverage.",
             "Each row records defer rate.",
+            "Each row records capacity-normalized review load.",
             "Prediction JSONL artifacts expose pair/document IDs.",
             "Prediction JSONL artifacts expose score or probability fields.",
             "Threshold logs expose threshold name.",
@@ -645,6 +646,7 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
             "The artifact package records defer count.",
             "The artifact package records automatic merge coverage.",
             "The artifact package records defer rate.",
+            "The artifact package records capacity-normalized review load.",
             "Prediction and threshold artifacts are row-auditable.",
             "Prediction artifacts include pair_id.",
             "Representation artifacts include normalized score.",
@@ -732,6 +734,7 @@ def test_check_result_claim_boundary_rejects_missing_row_level_audit_binding() -
     assert any("scope label used in the main table" in error for error in errors)
     assert any("automatic merge coverage" in error for error in errors)
     assert any("defer rate" in error for error in errors)
+    assert any("capacity-normalized review load" in error for error in errors)
 
 
 def test_check_result_claim_boundary_rejects_missing_supplementary_row_schema() -> None:
@@ -764,6 +767,7 @@ def test_check_result_claim_boundary_rejects_missing_supplementary_row_schema() 
             "Each row records defer count.",
             "Each row records automatic merge coverage.",
             "Each row records defer rate.",
+            "Each row records capacity-normalized review load.",
             "The evidence does not support a broad method-ranking claim.",
         ]
     )
@@ -796,6 +800,7 @@ def test_check_result_claim_boundary_rejects_missing_supplementary_row_schema() 
     assert any("scope label used in the main table" in error for error in errors)
     assert any("automatic merge coverage" in error for error in errors)
     assert any("defer rate" in error for error in errors)
+    assert any("capacity-normalized review load" in error for error in errors)
 
 
 def test_check_result_claim_boundary_rejects_missing_manuscript_artifact_validation_binding() -> None:
@@ -828,6 +833,7 @@ def test_check_result_claim_boundary_rejects_missing_manuscript_artifact_validat
             "Each row records defer count.",
             "Each row records automatic merge coverage.",
             "Each row records defer rate.",
+            "Each row records capacity-normalized review load.",
             "Prediction JSONL artifacts expose pair/document IDs.",
             "Prediction JSONL artifacts expose score or probability fields.",
             "Threshold logs expose threshold name.",
@@ -856,6 +862,7 @@ def test_check_result_claim_boundary_rejects_missing_manuscript_artifact_validat
             "The artifact package records defer count.",
             "The artifact package records automatic merge coverage.",
             "The artifact package records defer rate.",
+            "The artifact package records capacity-normalized review load.",
             "Prediction and threshold artifacts are row-auditable.",
             "Prediction artifacts include pair_id.",
             "Representation artifacts include normalized score.",
@@ -1483,7 +1490,10 @@ def test_check_operational_net_benefit_boundary_accepts_complete_boundary() -> N
             r"\label{tab:operational-net-benefit}",
             "IAD-Risk is appropriate when false merges are more costly than additional review.",
             "The additional cost comes from three relation heads and explicit threshold records.",
+            "automatic merge coverage must be large enough to reduce reviewer work",
+            "Low FMR or HNFMR alone is insufficient for productivity or cost-saving claims",
             "The deferral budget and manual-review capacity should be recorded before deployment.",
+            "The method should be interpreted as a conservative safety filter without workload evidence.",
             "Shared thresholds should be selected on validation evidence, not tuned per pair.",
             "The framework is not a universal replacement for simple deduplication pipelines.",
             "net benefit is strongest in high-stakes scholarly indexes",
@@ -1506,6 +1516,7 @@ def test_check_operational_net_benefit_boundary_rejects_missing_cost_boundary() 
 
     assert any("operational-net-benefit" in error for error in errors)
     assert any("deferral budget" in error for error in errors)
+    assert any("productivity or cost-saving claims" in error for error in errors)
     assert any("not a universal replacement" in error for error in errors)
 
 
@@ -1714,7 +1725,10 @@ def test_check_selective_decision_coverage_boundary_accepts_complete_boundary() 
             "Block rate",
             "defer rate",
             "Review load",
+            "Capacity-normalized review load",
             "same prediction files",
+            "A result with low FMR or HNFMR but high deferral is a conservative triage result.",
+            "Results must be compared with a predeclared manual-review capacity and deferral budget.",
             "The current manuscript does not claim throughput reduction.",
             "It does not claim all-pair automatic resolution.",
         ]
@@ -1736,6 +1750,9 @@ def test_check_selective_decision_coverage_boundary_rejects_missing_defer_bounda
     errors = checker(manuscript_text)
 
     assert any("defer rate" in error for error in errors)
+    assert any("Capacity-normalized review load" in error for error in errors)
+    assert any("conservative triage result" in error for error in errors)
+    assert any("manual-review capacity" in error for error in errors)
     assert any("throughput reduction" in error for error in errors)
     assert any("all-pair automatic resolution" in error for error in errors)
 
@@ -2738,7 +2755,8 @@ def test_check_artifact_release_manifest_template_accepts_complete_template() ->
                     "claim_support": (
                         "Main Open-v2 result table with same-work F1, FMR, HNFMR, pair counts, row scopes, "
                         "per-row denominator counts, per-row threshold source, scope label used in the main table, "
-                        "automatic merge count, block count, defer count, automatic merge coverage, and defer rate."
+                        "automatic merge count, block count, defer count, automatic merge coverage, defer rate, "
+                        "and capacity-normalized review load."
                     ),
                 },
                 {
@@ -2855,6 +2873,7 @@ def test_check_artifact_release_manifest_template_rejects_missing_result_row_aud
     assert any("scope label used in the main table" in error for error in errors)
     assert any("automatic merge coverage" in error for error in errors)
     assert any("defer rate" in error for error in errors)
+    assert any("capacity-normalized review load" in error for error in errors)
 
 
 def test_check_artifact_release_manifest_template_rejects_unsafe_data_policy() -> None:
@@ -3055,6 +3074,7 @@ def test_check_artifact_release_readme_template_accepts_complete_template() -> N
             "defer count",
             "automatic merge coverage",
             "defer rate",
+            "capacity-normalized review load",
             "iad_risk_predictions",
             "relation-head scores",
             "work_threshold",
@@ -3131,6 +3151,7 @@ def test_check_artifact_release_readme_template_rejects_missing_result_row_audit
         "defer count",
         "automatic merge coverage",
         "defer rate",
+        "capacity-normalized review load",
     ]:
         readme_text = readme_text.replace(marker, "")
 
@@ -3141,6 +3162,7 @@ def test_check_artifact_release_readme_template_rejects_missing_result_row_audit
     assert any("scope label used in the main table" in error for error in errors)
     assert any("automatic merge coverage" in error for error in errors)
     assert any("defer rate" in error for error in errors)
+    assert any("capacity-normalized review load" in error for error in errors)
 
 
 def test_check_artifact_release_readme_template_rejects_missing_release_boundaries() -> None:
@@ -3185,6 +3207,7 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
         "defer count",
         "automatic merge coverage",
         "defer rate",
+        "capacity-normalized review load",
         "iad_risk_predictions",
         "representation_baseline_scores",
         "supervised_baseline_predictions",
@@ -3215,6 +3238,7 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
     assert any("scope label used in the main table" in error for error in errors)
     assert any("automatic merge coverage" in error for error in errors)
     assert any("defer rate" in error for error in errors)
+    assert any("capacity-normalized review load" in error for error in errors)
     assert any("iad_risk_predictions" in error for error in errors)
     assert any("threshold_selection_logs" in error for error in errors)
     assert any("pair_id" in error for error in errors)
@@ -3448,6 +3472,7 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "defer count",
             "automatic merge coverage",
             "defer rate",
+            "capacity-normalized review load",
             "iad_risk_predictions",
             "representation_baseline_scores",
             "supervised_baseline_predictions",
@@ -3874,6 +3899,7 @@ def test_check_submission_system_checklist_rejects_missing_artifact_row_schema_c
         "defer count",
         "automatic merge coverage",
         "defer rate",
+        "capacity-normalized review load",
         "iad_risk_predictions",
         "representation_baseline_scores",
         "supervised_baseline_predictions",
@@ -3905,6 +3931,7 @@ def test_check_submission_system_checklist_rejects_missing_artifact_row_schema_c
     assert any("scope label used in the main table" in error for error in errors)
     assert any("automatic merge coverage" in error for error in errors)
     assert any("defer rate" in error for error in errors)
+    assert any("capacity-normalized review load" in error for error in errors)
     assert any("iad_risk_predictions" in error for error in errors)
     assert any("threshold_selection_logs" in error for error in errors)
     assert any("pair_id" in error for error in errors)
@@ -4103,6 +4130,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "defer count",
             "automatic merge coverage",
             "defer rate",
+            "capacity-normalized review load",
             "validate_artifact_release.py",
             "## Audit Cycle 10: Final Template Binding and System Metadata Gate",
             "target_journal_template_bound",
@@ -4424,6 +4452,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_artifact_row_level_audit
         "defer count",
         "automatic merge coverage",
         "defer rate",
+        "capacity-normalized review load",
         "validate_artifact_release.py",
     ]:
         audit_text = audit_text.replace(marker, "")
@@ -4437,6 +4466,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_artifact_row_level_audit
     assert any("scope label used in the main table" in error for error in errors)
     assert any("automatic merge coverage" in error for error in errors)
     assert any("defer rate" in error for error in errors)
+    assert any("capacity-normalized review load" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_template_binding_gate() -> None:

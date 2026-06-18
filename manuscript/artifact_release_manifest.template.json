@@ -39,7 +39,7 @@
       "artifact_id": "open_v2_main_results",
       "required": true,
       "expected_location": "tables/open_v2_main_results.csv",
-      "claim_support": "Main Open-v2 result table with same-work F1, FMR, HNFMR, pair counts, row scopes, per-row denominator counts, per-row threshold source, scope label used in the main table, automatic merge count, block count, defer count, automatic merge coverage, and defer rate."
+      "claim_support": "Main Open-v2 result table with same-work F1, FMR, HNFMR, pair counts, row scopes, per-row denominator counts, per-row threshold source, scope label used in the main table, automatic merge count, block count, defer count, automatic merge coverage, defer rate, and capacity-normalized review load."
     },
     {
       "artifact_id": "iad_risk_predictions",

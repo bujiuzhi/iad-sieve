@@ -80,8 +80,8 @@ def _required_artifact_content(artifact_id: str) -> str:
         return (
             "\n".join(
                 [
-                    "system,scope_type,same_work_f1,fmr,hnfmr,same_work_f1_denominator,fmr_denominator,hnfmr_denominator,threshold_source,automatic_merge_count,block_count,defer_count,automatic_merge_coverage,defer_rate",
-                    "IAD-Risk,Open-v2,0.61,0.08,0.12,100,200,50,threshold_selection_logs,64,120,16,0.32,0.08",
+                    "system,scope_type,same_work_f1,fmr,hnfmr,same_work_f1_denominator,fmr_denominator,hnfmr_denominator,threshold_source,automatic_merge_count,block_count,defer_count,automatic_merge_coverage,defer_rate,capacity_normalized_review_load",
+                    "IAD-Risk,Open-v2,0.61,0.08,0.12,100,200,50,threshold_selection_logs,64,120,16,0.32,0.08,0.24",
                 ]
             )
             + "\n"
@@ -392,6 +392,7 @@ def test_validate_artifact_release_rejects_open_v2_results_without_row_audit_col
     assert any("threshold_source" in error for error in errors)
     assert any("automatic_merge_coverage" in error for error in errors)
     assert any("defer_rate" in error for error in errors)
+    assert any("capacity_normalized_review_load" in error for error in errors)
 
 
 def test_validate_artifact_release_rejects_prediction_jsonl_without_row_audit_fields(tmp_path) -> None:

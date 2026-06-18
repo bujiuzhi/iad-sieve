@@ -63,6 +63,7 @@ OPEN_V2_MAIN_RESULTS_REQUIRED_COLUMNS = {
     "defer_count",
     "automatic_merge_coverage",
     "defer_rate",
+    "capacity_normalized_review_load",
 }
 JSONL_REQUIRED_FIELDS_BY_ARTIFACT = {
     "iad_risk_predictions": {

@@ -68,7 +68,7 @@ python manuscript/scripts/validate_submission_package.py --dke-preflight
 
 Artifact release 的 `repository.commit` 必须是 7 到 40 位十六进制 Git 提交号。`scripts/build_artifact_release_skeleton.py` 和 `scripts/validate_artifact_release.py` 都会拒绝默认模板值或非 Git SHA 文本，避免外部结果包无法追溯到明确代码版本。
 
-`open_v2_main_results` 是主结果表对应的外部结果 artifact。正式 artifact release 中的 CSV 必须包含 per-row denominator counts、per-row threshold source、scope label used in the main table、automatic merge count、block count、defer count、automatic merge coverage 和 defer rate，确保主结果表不是仅由文件名和 checksum 支撑，而是可按行追溯 denominator、阈值来源、评价范围和选择性决策覆盖率。
+`open_v2_main_results` 是主结果表对应的外部结果 artifact。正式 artifact release 中的 CSV 必须包含 per-row denominator counts、per-row threshold source、scope label used in the main table、automatic merge count、block count、defer count、automatic merge coverage、defer rate 和 capacity-normalized review load，确保主结果表不是仅由文件名和 checksum 支撑，而是可按行追溯 denominator、阈值来源、评价范围、选择性决策覆盖率和人工复核负担边界。
 
 `iad_risk_predictions`、`representation_baseline_scores`、`supervised_baseline_predictions` 和 `threshold_selection_logs` 是外部结果 artifact 的行级预测与阈值证据。预测与分数 JSONL 必须记录 `pair_id`、`source_document_id`、`target_document_id`、expected labels、label strength、hard-negative level、split identifiers、`score_field` 或概率字段、`threshold_value`、threshold source 和 `merge_prediction`。阈值日志必须记录 system、threshold_name、`threshold_value`、selection_split、selection_metric、selection_rule、applied_scope 和 `score_field`，用于证明阈值来自固定验证流程而不是测试后选择。
 

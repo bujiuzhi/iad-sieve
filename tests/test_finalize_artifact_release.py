@@ -19,8 +19,8 @@ README_TEMPLATE_PATH = PROJECT_ROOT / "manuscript" / "artifact_release_README.te
 TEST_COMMIT = "0123456789abcdef0123456789abcdef01234567"
 OPEN_V2_MAIN_RESULTS_CSV = "\n".join(
     [
-        "system,scope_type,same_work_f1,fmr,hnfmr,same_work_f1_denominator,fmr_denominator,hnfmr_denominator,threshold_source,automatic_merge_count,block_count,defer_count,automatic_merge_coverage,defer_rate",
-        "IAD-Risk,Open-v2,0.61,0.08,0.12,100,200,50,threshold_selection_logs,64,120,16,0.32,0.08",
+        "system,scope_type,same_work_f1,fmr,hnfmr,same_work_f1_denominator,fmr_denominator,hnfmr_denominator,threshold_source,automatic_merge_count,block_count,defer_count,automatic_merge_coverage,defer_rate,capacity_normalized_review_load",
+        "IAD-Risk,Open-v2,0.61,0.08,0.12,100,200,50,threshold_selection_logs,64,120,16,0.32,0.08,0.24",
     ]
 ) + "\n"
 

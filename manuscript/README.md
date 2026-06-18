@@ -107,7 +107,7 @@ python manuscript/scripts/validate_submission_package.py --dke-preflight
 
 `artifact_release_manifest.template.json` 记录结果 artifact release 应包含的表格、预测、日志、校验命令和 claim boundary。`artifact_release_README.template.md` 是外部 artifact release 的 README 模板，说明目录结构、校验命令、数据边界和条件 claim artifact。`scripts/build_artifact_release_skeleton.py` 可从模板生成外部 release 骨架，但不会生成真实结果文件；真实结果应先由实验流程写入不纳入 Git 的 source artifact 目录，再由 `scripts/populate_artifact_release.py` 拷贝到 release 骨架。补齐真实 artifact 后，应使用 `scripts/finalize_artifact_release.py` 刷新 manifest 和 SHA256，再用 `scripts/validate_artifact_release.py` 校验 release 目录。正式上传前还应在 `submission_metadata.yml` 中填写 artifact 链接。
 
-`open_v2_main_results` 是主结果表对应的外部 artifact。其 CSV 需要包含 per-row denominator counts、per-row threshold source、scope label used in the main table、automatic merge count、block count、defer count、automatic merge coverage 和 defer rate；否则只能说明文件存在，不能支持主结果表逐行审计。
+`open_v2_main_results` 是主结果表对应的外部 artifact。其 CSV 需要包含 per-row denominator counts、per-row threshold source、scope label used in the main table、automatic merge count、block count、defer count、automatic merge coverage、defer rate 和 capacity-normalized review load；否则只能说明文件存在，不能支持主结果表逐行审计或人工复核负担判断。
 
 `iad_risk_predictions`、`representation_baseline_scores`、`supervised_baseline_predictions` 和 `threshold_selection_logs` 是主结果表的行级复核入口。预测与分数 JSONL 至少需要包含 `pair_id`、`source_document_id`、`target_document_id`、expected labels、label strength、hard-negative level、split identifiers、`score_field` 或概率字段、`threshold_value`、threshold source 和 `merge_prediction`；阈值日志至少需要包含 system、threshold_name、`threshold_value`、selection_split、selection_metric、selection_rule、applied_scope 和 `score_field`。缺少这些字段时，外部 artifact 只能证明文件存在，不能支持 L3 result audit。
 
