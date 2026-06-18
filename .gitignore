@@ -45,3 +45,4 @@ build/
 !/manuscript/build/
 !/manuscript/build/*.pdf
 /manuscript/build/submission_package/
+/manuscript/build/dke_preflight_package/

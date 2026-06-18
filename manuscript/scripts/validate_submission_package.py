@@ -19,8 +19,10 @@ LOGGER = logging.getLogger(__name__)
 MANUSCRIPT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_PACKAGE_DIR = MANUSCRIPT_ROOT / "build" / "submission_package"
 DEFAULT_ZIP_PATH = MANUSCRIPT_ROOT / "build" / "iad-risk-submission-package.zip"
+DEFAULT_DKE_PREFLIGHT_PACKAGE_DIR = MANUSCRIPT_ROOT / "build" / "dke_preflight_package"
+DEFAULT_DKE_PREFLIGHT_ZIP_PATH = MANUSCRIPT_ROOT / "build" / "iad-risk-dke-preflight-package.zip"
 PACKAGE_ROOT_NAME = "submission_package"
-EXPECTED_FILES = {
+BASE_EXPECTED_FILES = {
     "main.tex",
     "supplementary_material.tex",
     "references.bib",
@@ -33,7 +35,11 @@ EXPECTED_FILES = {
     "submission_manifest.json",
     "checksums.sha256",
 }
-EXPECTED_MANIFEST_ROLES = {
+DKE_PREFLIGHT_EXPECTED_FILES = {
+    "iad-risk-manuscript-elsevier.tex",
+    "iad-risk-manuscript-elsevier.pdf",
+}
+BASE_EXPECTED_MANIFEST_ROLES = {
     "main_latex_source",
     "supplementary_latex_source",
     "bibliography",
@@ -43,6 +49,10 @@ EXPECTED_MANIFEST_ROLES = {
     "submission_metadata",
     "main_pdf",
     "supplementary_pdf",
+}
+DKE_PREFLIGHT_EXPECTED_MANIFEST_ROLES = {
+    "dke_elsevier_latex_source",
+    "dke_elsevier_pdf",
 }
 EXPECTED_MANIFEST_TOP_LEVEL_FIELDS = {
     "package_name",
@@ -100,8 +110,39 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--package-dir", default=str(DEFAULT_PACKAGE_DIR), help="Generated package directory.")
     parser.add_argument("--zip-path", default=str(DEFAULT_ZIP_PATH), help="Generated package zip path.")
     parser.add_argument("--final-upload", action="store_true", help="Require target journal and real author metadata.")
+    parser.add_argument("--dke-preflight", action="store_true", help="Validate a DKE/Elsevier preflight package.")
     parser.add_argument("--log-level", default="INFO", help="Logging level.")
     return parser.parse_args()
+
+
+def expected_files(dke_preflight: bool = False) -> set[str]:
+    """Return expected package file names for a package profile.
+
+    参数:
+        dke_preflight: Whether the package should include DKE/Elsevier files.
+
+    返回:
+        set[str]: Expected package file names.
+    """
+    files = set(BASE_EXPECTED_FILES)
+    if dke_preflight:
+        files.update(DKE_PREFLIGHT_EXPECTED_FILES)
+    return files
+
+
+def expected_manifest_roles(dke_preflight: bool = False) -> set[str]:
+    """Return expected manifest roles for a package profile.
+
+    参数:
+        dke_preflight: Whether the package should include DKE/Elsevier roles.
+
+    返回:
+        set[str]: Expected manifest roles.
+    """
+    roles = set(BASE_EXPECTED_MANIFEST_ROLES)
+    if dke_preflight:
+        roles.update(DKE_PREFLIGHT_EXPECTED_MANIFEST_ROLES)
+    return roles
 
 
 def sha256_bytes(content: bytes) -> str:
@@ -154,11 +195,12 @@ def parse_checksums(text: str) -> dict[str, str]:
     return checksums
 
 
-def check_manifest_text(manifest_text: str) -> list[str]:
+def check_manifest_text(manifest_text: str, dke_preflight: bool = False) -> list[str]:
     """Check submission manifest structure and roles.
 
     参数:
         manifest_text: JSON manifest content.
+        dke_preflight: Whether the package should include DKE/Elsevier files.
 
     返回:
         list[str]: Error messages.
@@ -173,8 +215,9 @@ def check_manifest_text(manifest_text: str) -> list[str]:
         errors.append(f"submission_manifest.json missing top-level fields: {sorted(missing_fields)}")
     if manifest.get("package_type") != "journal_submission":
         errors.append("submission_manifest.json package_type must be journal_submission")
-    if manifest.get("submission_stage") != "template_independent_anonymous_pre_submission":
-        errors.append("submission_manifest.json submission_stage must describe anonymous template-independent pre-submission")
+    expected_stage = "dke_elsevier_anonymous_preflight" if dke_preflight else "template_independent_anonymous_pre_submission"
+    if manifest.get("submission_stage") != expected_stage:
+        errors.append(f"submission_manifest.json submission_stage must be {expected_stage}")
     anonymization = manifest.get("anonymization")
     if not isinstance(anonymization, dict) or anonymization.get("author_status") != "anonymous_placeholder":
         errors.append("submission_manifest.json must record anonymous author placeholder status")
@@ -183,6 +226,8 @@ def check_manifest_text(manifest_text: str) -> list[str]:
         errors.append("submission_manifest.json must record that no target journal template is bound")
     elif "target journal document class" not in journal_template.get("final_upload_requirements", []):
         errors.append("submission_manifest.json missing target journal document class final-upload requirement")
+    if dke_preflight and journal_template.get("dke_elsevier_preflight_included") is not True:
+        errors.append("submission_manifest.json must record DKE/Elsevier preflight inclusion")
     reproducibility_level = manifest.get("reproducibility_level")
     if not isinstance(reproducibility_level, dict) or reproducibility_level.get("raw_data_distribution") != "excluded":
         errors.append("submission_manifest.json must record that raw data distribution is excluded")
@@ -193,8 +238,9 @@ def check_manifest_text(manifest_text: str) -> list[str]:
     if not isinstance(file_rows, list):
         return ["submission_manifest.json missing files list"]
     roles = {row.get("role") for row in file_rows if isinstance(row, dict)}
-    missing_roles = EXPECTED_MANIFEST_ROLES - roles
-    extra_roles = roles - EXPECTED_MANIFEST_ROLES
+    expected_roles = expected_manifest_roles(dke_preflight)
+    missing_roles = expected_roles - roles
+    extra_roles = roles - expected_roles
     if missing_roles:
         errors.append(f"submission_manifest.json missing roles: {sorted(missing_roles)}")
     if extra_roles:
@@ -204,23 +250,25 @@ def check_manifest_text(manifest_text: str) -> list[str]:
             errors.append("submission_manifest.json contains a non-object file row")
             continue
         package_path = row.get("package_path")
-        if package_path not in EXPECTED_FILES:
+        if package_path not in expected_files(dke_preflight):
             errors.append(f"submission_manifest.json has unexpected package_path: {package_path}")
     return errors
 
 
-def check_file_membership(file_names: set[str], location: str) -> list[str]:
+def check_file_membership(file_names: set[str], location: str, dke_preflight: bool = False) -> list[str]:
     """Check exact package file membership.
 
     参数:
         file_names: File names found in a package location.
         location: Human-readable location label.
+        dke_preflight: Whether the package should include DKE/Elsevier files.
 
     返回:
         list[str]: Error messages.
     """
-    missing_files = EXPECTED_FILES - file_names
-    extra_files = file_names - EXPECTED_FILES
+    expected_file_names = expected_files(dke_preflight)
+    missing_files = expected_file_names - file_names
+    extra_files = file_names - expected_file_names
     errors: list[str] = []
     if missing_files:
         errors.append(f"{location} missing files: {sorted(missing_files)}")
@@ -267,12 +315,13 @@ def check_forbidden_path_name(path_name: str, location: str) -> list[str]:
     return errors
 
 
-def validate_package_directory(package_dir: Path, final_upload: bool = False) -> list[str]:
+def validate_package_directory(package_dir: Path, final_upload: bool = False, dke_preflight: bool = False) -> list[str]:
     """Validate the generated package directory.
 
     参数:
         package_dir: Generated package directory.
         final_upload: Whether to require journal and author metadata for final upload.
+        dke_preflight: Whether the package should include DKE/Elsevier files.
 
     返回:
         list[str]: Error messages.
@@ -284,7 +333,7 @@ def validate_package_directory(package_dir: Path, final_upload: bool = False) ->
     entries = list(package_dir.iterdir())
     files = [path for path in entries if path.is_file()]
     directories = [path for path in entries if path.is_dir()]
-    errors = check_file_membership({path.name for path in files}, str(package_dir))
+    errors = check_file_membership({path.name for path in files}, str(package_dir), dke_preflight)
     if directories:
         errors.append(f"{package_dir} has unexpected directories: {sorted(path.name for path in directories)}")
     for path in entries:
@@ -293,7 +342,7 @@ def validate_package_directory(package_dir: Path, final_upload: bool = False) ->
     manifest_path = package_dir / "submission_manifest.json"
     metadata_path = package_dir / "submission_metadata.yml"
     if manifest_path.exists():
-        errors.extend(check_manifest_text(manifest_path.read_text(encoding="utf-8")))
+        errors.extend(check_manifest_text(manifest_path.read_text(encoding="utf-8"), dke_preflight))
     if final_upload:
         if metadata_path.exists():
             errors.extend(check_final_upload_metadata_text(metadata_path.read_text(encoding="utf-8")))
@@ -305,7 +354,7 @@ def validate_package_directory(package_dir: Path, final_upload: bool = False) ->
         except ValueError as exc:
             errors.append(f"checksums.sha256 is invalid: {exc}")
             checksums = {}
-        expected_checksum_files = EXPECTED_FILES - {"checksums.sha256"}
+        expected_checksum_files = expected_files(dke_preflight) - {"checksums.sha256"}
         if "checksums.sha256" in checksums:
             errors.append("checksums.sha256 must not include itself")
         missing_checksum_entries = expected_checksum_files - set(checksums)
@@ -321,12 +370,19 @@ def validate_package_directory(package_dir: Path, final_upload: bool = False) ->
     return errors
 
 
-def validate_zip_archive(zip_path: Path, final_upload: bool = False) -> list[str]:
+def validate_zip_archive(
+    zip_path: Path,
+    final_upload: bool = False,
+    dke_preflight: bool = False,
+    package_root_name: str = PACKAGE_ROOT_NAME,
+) -> list[str]:
     """Validate the generated package zip archive.
 
     参数:
         zip_path: Zip archive path.
         final_upload: Whether to require journal and author metadata for final upload.
+        dke_preflight: Whether the package should include DKE/Elsevier files.
+        package_root_name: Expected root directory name inside the zip archive.
 
     返回:
         list[str]: Error messages.
@@ -339,8 +395,9 @@ def validate_zip_archive(zip_path: Path, final_upload: bool = False) -> list[str
             member_names = archive.namelist()
             for member_name in member_names:
                 errors.extend(check_forbidden_path_name(member_name, "zip archive"))
-            expected_prefix = f"{PACKAGE_ROOT_NAME}/"
-            expected_member_names = {f"{expected_prefix}{file_name}" for file_name in EXPECTED_FILES}
+            expected_prefix = f"{package_root_name}/"
+            expected_file_names = expected_files(dke_preflight)
+            expected_member_names = {f"{expected_prefix}{file_name}" for file_name in expected_file_names}
             file_member_names = {member_name for member_name in member_names if not member_name.endswith("/")}
             directory_member_names = {member_name for member_name in member_names if member_name.endswith("/")}
             missing_member_names = expected_member_names - file_member_names
@@ -357,16 +414,16 @@ def validate_zip_archive(zip_path: Path, final_upload: bool = False) -> list[str
                 for member_name in member_names
                 if member_name.startswith(expected_prefix) and not member_name.endswith("/")
             }
-            errors.extend(check_file_membership(package_file_names, str(zip_path)))
+            errors.extend(check_file_membership(package_file_names, str(zip_path), dke_preflight))
             try:
-                manifest_text = archive.read(f"{PACKAGE_ROOT_NAME}/submission_manifest.json").decode("utf-8")
-                checksums_text = archive.read(f"{PACKAGE_ROOT_NAME}/checksums.sha256").decode("utf-8")
+                manifest_text = archive.read(f"{package_root_name}/submission_manifest.json").decode("utf-8")
+                checksums_text = archive.read(f"{package_root_name}/checksums.sha256").decode("utf-8")
             except KeyError as exc:
                 return errors + [f"zip archive missing required metadata file: {exc}"]
-            errors.extend(check_manifest_text(manifest_text))
+            errors.extend(check_manifest_text(manifest_text, dke_preflight))
             if final_upload:
                 try:
-                    metadata_text = archive.read(f"{PACKAGE_ROOT_NAME}/submission_metadata.yml").decode("utf-8")
+                    metadata_text = archive.read(f"{package_root_name}/submission_metadata.yml").decode("utf-8")
                 except KeyError as exc:
                     return errors + [f"zip archive missing submission_metadata.yml for final upload: {exc}"]
                 errors.extend(check_final_upload_metadata_text(metadata_text))
@@ -375,7 +432,7 @@ def validate_zip_archive(zip_path: Path, final_upload: bool = False) -> list[str
             except ValueError as exc:
                 errors.append(f"zip checksums.sha256 is invalid: {exc}")
                 checksums = {}
-            expected_checksum_files = EXPECTED_FILES - {"checksums.sha256"}
+            expected_checksum_files = expected_file_names - {"checksums.sha256"}
             if "checksums.sha256" in checksums:
                 errors.append("zip checksums.sha256 must not include itself")
             missing_checksum_entries = expected_checksum_files - set(checksums)
@@ -385,7 +442,7 @@ def validate_zip_archive(zip_path: Path, final_upload: bool = False) -> list[str
             if extra_checksum_entries:
                 errors.append(f"zip checksums.sha256 has unexpected entries: {sorted(extra_checksum_entries)}")
             for file_name in expected_checksum_files & set(checksums):
-                member_path = f"{PACKAGE_ROOT_NAME}/{file_name}"
+                member_path = f"{package_root_name}/{file_name}"
                 try:
                     member_content = archive.read(member_path)
                 except KeyError:
@@ -417,18 +474,29 @@ def unique_errors(errors: list[str]) -> list[str]:
     return unique_error_list
 
 
-def validate_submission_package(package_dir: Path, zip_path: Path, final_upload: bool = False) -> list[str]:
+def validate_submission_package(
+    package_dir: Path,
+    zip_path: Path,
+    final_upload: bool = False,
+    dke_preflight: bool = False,
+) -> list[str]:
     """Validate the package directory and zip archive.
 
     参数:
         package_dir: Generated package directory.
         zip_path: Generated zip archive path.
         final_upload: Whether to require journal and author metadata for final upload.
+        dke_preflight: Whether the package should include DKE/Elsevier files.
 
     返回:
         list[str]: Error messages.
     """
-    errors = validate_package_directory(package_dir, final_upload) + validate_zip_archive(zip_path, final_upload)
+    errors = validate_package_directory(package_dir, final_upload, dke_preflight) + validate_zip_archive(
+        zip_path,
+        final_upload,
+        dke_preflight,
+        package_dir.name,
+    )
     return unique_errors(errors)
 
 
@@ -443,8 +511,19 @@ def main() -> int:
     """
     args = parse_arguments()
     logging.basicConfig(level=getattr(logging, args.log_level.upper(), logging.INFO), format="%(levelname)s %(message)s")
+    package_dir = Path(args.package_dir)
+    zip_path = Path(args.zip_path)
+    if args.dke_preflight and package_dir == DEFAULT_PACKAGE_DIR:
+        package_dir = DEFAULT_DKE_PREFLIGHT_PACKAGE_DIR
+    if args.dke_preflight and zip_path == DEFAULT_ZIP_PATH:
+        zip_path = DEFAULT_DKE_PREFLIGHT_ZIP_PATH
     try:
-        errors = validate_submission_package(Path(args.package_dir).resolve(), Path(args.zip_path).resolve(), args.final_upload)
+        errors = validate_submission_package(
+            package_dir.resolve(),
+            zip_path.resolve(),
+            args.final_upload,
+            args.dke_preflight,
+        )
     except Exception as exc:  # noqa: BLE001
         LOGGER.error("submission package validation failed: %s", exc)
         return 1

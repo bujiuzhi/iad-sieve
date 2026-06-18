@@ -90,6 +90,19 @@ def _write_required_manuscript_files(manuscript_root: Path) -> None:
     _write_file(manuscript_root / "build" / "iad-risk-supplementary-material.pdf", b"%PDF-1.5 supp\n")
 
 
+def _write_dke_preflight_files(manuscript_root: Path) -> None:
+    """写入DKE预投稿包测试所需的Elsevier文件。
+
+    参数:
+        manuscript_root: 临时稿件目录。
+
+    返回:
+        无。
+    """
+    _write_file(manuscript_root / "build" / "iad-risk-manuscript-elsevier.tex", "\\documentclass{elsarticle}\n")
+    _write_file(manuscript_root / "build" / "iad-risk-manuscript-elsevier.pdf", b"%PDF-1.5 dke\n")
+
+
 def _write_unresolved_submission_metadata(manuscript_root: Path) -> None:
     """写入未完成正式投稿信息的元数据。
 
@@ -256,6 +269,32 @@ def test_build_submission_package_accepts_final_upload_with_filled_metadata(tmp_
     assert summary["file_count"] == 11
 
 
+def test_build_submission_package_writes_dke_preflight_package(tmp_path) -> None:
+    """验证DKE预投稿包包含Elsevier源文件和PDF但仍保持匿名预投稿状态。"""
+
+    module = _load_submission_package_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "dke_preflight_package"
+    zip_path = tmp_path / "dke_preflight_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_dke_preflight_files(manuscript_root)
+
+    summary = module.build_submission_package(manuscript_root, output_dir, zip_path, dke_preflight=True)
+
+    manifest = json.loads((output_dir / "submission_manifest.json").read_text(encoding="utf-8"))
+    with zipfile.ZipFile(zip_path) as archive:
+        zip_names = archive.namelist()
+
+    assert summary["file_count"] == 13
+    assert summary["dke_preflight"] is True
+    assert manifest["submission_stage"] == "dke_elsevier_anonymous_preflight"
+    assert manifest["journal_template"]["dke_elsevier_preflight_included"] is True
+    assert any(row["role"] == "dke_elsevier_latex_source" for row in manifest["files"])
+    assert any(row["role"] == "dke_elsevier_pdf" for row in manifest["files"])
+    assert "dke_preflight_package/iad-risk-manuscript-elsevier.tex" in zip_names
+    assert "dke_preflight_package/iad-risk-manuscript-elsevier.pdf" in zip_names
+
+
 def test_validate_submission_package_accepts_generated_package(tmp_path) -> None:
     """验证投稿包校验器接受生成器产物。"""
 
@@ -270,6 +309,41 @@ def test_validate_submission_package_accepts_generated_package(tmp_path) -> None
     errors = validator.validate_submission_package(output_dir, zip_path)
 
     assert errors == []
+
+
+def test_validate_submission_package_accepts_dke_preflight_package(tmp_path) -> None:
+    """验证投稿包校验器接受DKE预投稿包。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "dke_preflight_package"
+    zip_path = tmp_path / "dke_preflight_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_dke_preflight_files(manuscript_root)
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path, dke_preflight=True)
+    errors = validator.validate_submission_package(output_dir, zip_path, dke_preflight=True)
+
+    assert errors == []
+
+
+def test_validate_submission_package_rejects_dke_package_without_profile(tmp_path) -> None:
+    """验证DKE预投稿包必须用DKE profile 校验。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "dke_preflight_package"
+    zip_path = tmp_path / "dke_preflight_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_dke_preflight_files(manuscript_root)
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path, dke_preflight=True)
+    errors = validator.validate_submission_package(output_dir, zip_path)
+
+    assert any("unexpected files" in error for error in errors)
+    assert any("submission_stage must be template_independent_anonymous_pre_submission" in error for error in errors)
 
 
 def test_validate_submission_package_rejects_final_upload_with_unresolved_metadata(tmp_path) -> None:

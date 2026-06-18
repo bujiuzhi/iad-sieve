@@ -35,6 +35,8 @@ python manuscript/scripts/build_submission_package.py
 python manuscript/scripts/validate_submission_package.py
 cd manuscript && ./scripts/build_latex_pdf.sh
 python manuscript/scripts/build_elsevier_draft.py
+python manuscript/scripts/build_submission_package.py --dke-preflight
+python manuscript/scripts/validate_submission_package.py --dke-preflight
 ```
 
 ## 投稿边界
@@ -44,6 +46,8 @@ python manuscript/scripts/build_elsevier_draft.py
 `target_journal_shortlist.md` 用于记录候选期刊和模板前置要求，不作为正式投稿附件。目标期刊和分区/分类应在最终上传前由作者按所在单位认可的数据源重新确认。
 
 `build/iad-risk-manuscript-elsevier.tex` 和 `build/iad-risk-manuscript-elsevier.pdf` 是 Data & Knowledge Engineering 路线的匿名 `elsarticle` 预转换预览，用于模板适配检查和源文件上传准备；正式上传前仍需作者确认目标期刊、作者元数据、artifact release 和实时投稿系统字段。
+
+`build/dke_preflight_package/` 和 `build/iad-risk-dke-preflight-package.zip` 是 DKE/Elsevier 匿名预投稿包的生成产物，不纳入 Git 跟踪；它们用于检查投稿文件组合，不替代最终上传门禁。
 
 `artifact_release_manifest.template.json` 用于准备正式 artifact release，不作为当前匿名预投稿包的替代物。正式上传前应生成真实 artifact manifest、checksum 和公开链接。
 
