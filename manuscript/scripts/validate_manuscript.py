@@ -114,6 +114,7 @@ REQUIRED_SUPPLEMENT_SECTIONS = [
     r"\section{Public-Source Rebuild}",
     r"\section{Public-Source Rebuild Audit Boundary}",
     r"\section{Artifact Package Requirements}",
+    r"\section{Baseline Audit Boundary}",
     r"\section{Claim-Evidence Matrix}",
     r"\section{Uncertainty and Ablation Requirements}",
     r"\section{Reviewer Evidence Gate}",
@@ -1631,7 +1632,7 @@ def check_baseline_inclusion_rationale(manuscript_text: str) -> list[str]:
     """
     required_markers = [
         r"\subsection{Baseline Inclusion Rationale}",
-        r"\label{tab:baseline-inclusion-rationale}",
+        "complete inclusion matrix is reported in the supplementary material",
         "exact identifier matching",
         "title-normalization rules",
         "Traditional entity-resolution systems",
@@ -1660,7 +1661,7 @@ def check_baseline_fairness_controls(manuscript_text: str) -> list[str]:
     """
     required_markers = [
         r"\subsection{Baseline Fairness Controls}",
-        r"\label{tab:baseline-fairness-controls}",
+        "full fairness-control matrix is in the supplementary material",
         "same IAD-Bench pair records",
         "same train/dev/test split field",
         "validation-selected operating points",
@@ -1674,6 +1675,39 @@ def check_baseline_fairness_controls(manuscript_text: str) -> list[str]:
         f"baseline fairness controls missing marker: {marker}"
         for marker in required_markers
         if marker not in manuscript_text
+    ]
+
+
+def check_baseline_supplementary_tables(supplementary_text: str) -> list[str]:
+    """Check whether supplementary material preserves the full baseline audit matrices.
+
+    参数:
+        supplementary_text: Supplementary LaTeX source text.
+
+    返回:
+        list[str]: Error messages for missing supplementary baseline tables.
+    """
+    required_markers = [
+        r"\section{Baseline Audit Boundary}",
+        r"\label{tab:baseline-inclusion-rationale}",
+        r"\label{tab:baseline-fairness-controls}",
+        "Exact identifier matching",
+        "Title-normalization rules",
+        "Traditional entity-resolution systems",
+        "Scientific representation baselines",
+        "RoBERTa pair classification",
+        "Included as primary evidence only when metric summaries, prediction files, threshold records, and checksums are available",
+        "Excluded from primary result table when only utility code or fixture-level checks are available",
+        "same IAD-Bench pair records",
+        "same train/dev/test split field",
+        "validation-selected operating points",
+        "same-scope released prediction files",
+        "not be read as a single comparative ranking",
+    ]
+    return [
+        f"baseline supplementary audit table missing marker: {marker}"
+        for marker in required_markers
+        if marker not in supplementary_text
     ]
 
 
@@ -4079,6 +4113,7 @@ def main() -> int:
     errors.extend(check_baseline_scope_alignment(manuscript_text))
     errors.extend(check_baseline_inclusion_rationale(manuscript_text))
     errors.extend(check_baseline_fairness_controls(manuscript_text))
+    errors.extend(check_baseline_supplementary_tables(supplementary_text))
     errors.extend(check_result_interpretation_guardrails(manuscript_text))
     errors.extend(check_openv2_result_table_scope_labels(manuscript_text))
     errors.extend(check_manual_validation_boundary(manuscript_text))

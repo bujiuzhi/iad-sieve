@@ -747,51 +747,13 @@ The main table reports two scientific representation cosine baselines and one su
 
 \subsection{Baseline Inclusion Rationale}
 
-The baseline set is selected by evidence availability and evaluation relevance rather than by convenience. Table~\ref{tab:baseline-inclusion-rationale} states which baseline families are used as primary evidence and which are kept outside the main result table until their artifacts are complete. This prevents utility code, fixture-level checks, or partially audited runs from being presented as if they were complete comparison experiments.
-
-\begin{table}[H]
-\caption{Baseline inclusion rationale. A baseline enters the primary result table only when it has auditable outputs under the reported pair scope.}
-\label{tab:baseline-inclusion-rationale}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{L{0.24\linewidth}L{0.30\linewidth}L{0.36\linewidth}}
-\toprule
-Baseline family & Current role & Inclusion or exclusion rule \\
-\midrule
-Exact identifier matching & Important sanity-check family for DOI, arXiv, and publication-lineage evidence. & Excluded from primary result table when only utility code or fixture-level checks are available; full metrics require prediction files and checksums. \\
-Title-normalization rules & Useful lower-bound family for metadata-only deduplication. & Excluded until the same pair scope, threshold records, metric summaries, and error cases are released. \\
-Traditional entity-resolution systems & Relevant workflow baselines for blocking, matching, and clustering comparisons. & Included as primary evidence only when metric summaries, prediction files, threshold records, and checksums are available. \\
-Scientific representation baselines & Primary stress-test evidence for single-space scientific relatedness. & Included because SciNCL cosine and SPECTER2 adapter cosine have reported score summaries under Open-v2. \\
-RoBERTa pair classification & Strong supervised comparator for pair-level matching. & Included as a primary supervised comparator while keeping the result below broad ranking claims. \\
-\bottomrule
-\end{tabular}
-\end{table}
+The baseline set is selected by evidence availability and evaluation relevance rather than by convenience. The complete inclusion matrix is reported in the supplementary material so that the main manuscript states only the decision rule. The prose keeps exact identifier matching and title-normalization rules as important sanity checks; their current boundary is: Excluded from primary result table when only utility code or fixture-level checks are available. Traditional entity-resolution systems use the artifact rule: Included as primary evidence only when metric summaries, prediction files, threshold records, and checksums are available. Scientific representation baselines are included because SciNCL cosine and SPECTER2 adapter cosine have reported score summaries under Open-v2, and RoBERTa pair classification is included as a supervised comparator while keeping the result below broad ranking claims.
 
 Omitting a baseline family from Table~\ref{tab:openv2-results} is not a claim that omitted baselines were outperformed. It means the current manuscript does not yet have the artifact-backed evidence needed to make that row auditable. A same-scope baseline matrix is required before broad ranking claims, especially for exact identifier matching, title-normalization rules, and traditional entity-resolution systems.
 
 \subsection{Baseline Fairness Controls}
 
-Baseline comparison is controlled through the pair contract rather than through a broad comparative-ranking claim. All baselines consume the same IAD-Bench pair records for the row scope being reported, and each row uses the same train/dev/test split field when training is required. Threshold-sensitive rows use validation-selected operating points before held-out reporting. All systems report same-work F1, FMR, and HNFMR from the same metric implementation.
-
-\begin{table}[H]
-\caption{Baseline fairness controls for the Open-v2 evidence snapshot. The controls make the reported comparison auditable while preserving the scope boundary of each row family.}
-\label{tab:baseline-fairness-controls}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{L{0.23\linewidth}L{0.35\linewidth}L{0.32\linewidth}}
-\toprule
-Control & Application in the reported table & Interpretation boundary \\
-\midrule
-Input rows & Baselines use the same IAD-Bench pair records within each reported row scope. & A stricter ranking requires same-scope released prediction files for all rows. \\
-Split use & Trainable rows use the same train/dev/test split field; non-trainable representation rows are reported as fixed score baselines. & Different available scopes should not be read as a single comparative ranking. \\
-Threshold selection & Threshold-sensitive rows use validation-selected operating points or recorded fixed thresholds. & Post-hoc test-threshold selection is not used for the reported claims. \\
-Feature boundary & Label source, provenance, and split identifiers are audit fields, not predictive features. & Provenance can explain evidence strength but cannot be used as a shortcut feature. \\
-Metric implementation & All systems report same-work F1, FMR, and HNFMR from the same metric implementation. & Metric comparability does not remove the need for released predictions and checksums. \\
-\bottomrule
-\end{tabular}
-\end{table}
+Baseline comparison is controlled through the pair contract rather than through a broad comparative-ranking claim. All baselines consume the same IAD-Bench pair records for the row scope being reported, and each row uses the same train/dev/test split field when training is required. Threshold-sensitive rows use validation-selected operating points before held-out reporting. All systems report same-work F1, FMR, and HNFMR from the same metric implementation. Label source, provenance, and split identifiers remain audit fields, not predictive features. A stricter comparative ranking requires same-scope released prediction files, and rows with different available scopes should not be read as a single comparative ranking. The full fairness-control matrix is in the supplementary material.
 
 \subsection{Implementation and Reproducibility}
 

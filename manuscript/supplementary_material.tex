@@ -237,6 +237,48 @@ The artifact manifest uses conditional claim flags so that optional stronger cla
 
 Cluster-level quality claims require evidence beyond pair-level prediction files. The \path{cluster_metric_summary} artifact should include cluster assignments, cluster contamination rate, singleton rate, merge coverage, conflict counts, and a pair-to-cluster trace from accepted links to connected components. The \path{cannot_link_audit} artifact should report cannot-link coverage, violations, unresolved conflicts, and identifier-conflict rules under the same threshold and merge policy used for the reported results. Without both files and their checksums, the manuscript should discuss pair-level false-merge control only and should not claim cluster-level contamination reduction.
 
+\section{Baseline Audit Boundary}
+
+The main manuscript reports the baseline decision rule in prose to keep the result narrative readable. The full audit matrices below define which baseline families enter the primary result table and which comparison controls must hold before a broad ranking claim is made.
+
+\begin{table}[H]
+\caption{Baseline inclusion rationale. A baseline enters the primary result table only when it has auditable outputs under the reported pair scope.}
+\label{tab:baseline-inclusion-rationale}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.24\linewidth}L{0.30\linewidth}L{0.36\linewidth}}
+\toprule
+Baseline family & Current role & Inclusion or exclusion rule \\
+\midrule
+Exact identifier matching & Important sanity-check family for DOI, arXiv, and publication-lineage evidence. & Excluded from primary result table when only utility code or fixture-level checks are available; full metrics require prediction files and checksums. \\
+Title-normalization rules & Useful lower-bound family for metadata-only deduplication. & Excluded until the same pair scope, threshold records, metric summaries, and error cases are released. \\
+Traditional entity-resolution systems & Relevant workflow baselines for blocking, matching, and clustering comparisons. & Included as primary evidence only when metric summaries, prediction files, threshold records, and checksums are available. \\
+Scientific representation baselines & Primary stress-test evidence for single-space scientific relatedness. & Included because SciNCL cosine and SPECTER2 adapter cosine have reported score summaries under Open-v2. \\
+RoBERTa pair classification & Strong supervised comparator for pair-level matching. & Included as a primary supervised comparator while keeping the result below broad ranking claims. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\caption{Baseline fairness controls for the Open-v2 evidence snapshot. The controls make the reported comparison auditable while preserving the scope boundary of each row family.}
+\label{tab:baseline-fairness-controls}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.23\linewidth}L{0.35\linewidth}L{0.32\linewidth}}
+\toprule
+Control & Application in the reported table & Interpretation boundary \\
+\midrule
+Input rows & Baselines use the same IAD-Bench pair records within each reported row scope. & A stricter ranking requires same-scope released prediction files for all rows. \\
+Split use & Trainable rows use the same train/dev/test split field; non-trainable representation rows are reported as fixed score baselines. & Different available scopes should not be read as a single comparative ranking. \\
+Threshold selection & Threshold-sensitive rows use validation-selected operating points or recorded fixed thresholds. & Post-hoc test-threshold selection is not used for the reported claims. \\
+Feature boundary & Label source, provenance, and split identifiers are audit fields, not predictive features. & Provenance can explain evidence strength but cannot be used as a shortcut feature. \\
+Metric implementation & All systems report same-work F1, FMR, and HNFMR from the same metric implementation. & Metric comparability does not remove the need for released predictions and checksums. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Claim-Evidence Matrix}
 
 Table~\ref{tab:claim-evidence} maps the major manuscript claims to the evidence required for responsible interpretation. The matrix is part of the submission boundary: a claim should be weakened or removed if the corresponding evidence file is absent from the released artifact package.

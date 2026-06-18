@@ -2111,7 +2111,7 @@ def test_check_baseline_inclusion_rationale_accepts_complete_rationale() -> None
     manuscript_text = "\n".join(
         [
             r"\subsection{Baseline Inclusion Rationale}",
-            r"\label{tab:baseline-inclusion-rationale}",
+            "The complete inclusion matrix is reported in the supplementary material.",
             "The table discusses exact identifier matching.",
             "It also discusses title-normalization rules.",
             "Traditional entity-resolution systems require the same artifacts.",
@@ -2138,6 +2138,7 @@ def test_check_baseline_inclusion_rationale_rejects_missing_omitted_baseline_bou
     errors = module.check_baseline_inclusion_rationale(manuscript_text)
 
     assert any("exact identifier matching" in error for error in errors)
+    assert any("supplementary material" in error for error in errors)
     assert any("not a claim that omitted baselines were outperformed" in error for error in errors)
 
 
@@ -2148,7 +2149,7 @@ def test_check_baseline_fairness_controls_accepts_complete_controls() -> None:
     manuscript_text = "\n".join(
         [
             r"\subsection{Baseline Fairness Controls}",
-            r"\label{tab:baseline-fairness-controls}",
+            "The full fairness-control matrix is in the supplementary material.",
             "All baselines consume the same IAD-Bench pair records.",
             "Each row uses the same train/dev/test split field when training is required.",
             "Threshold-sensitive rows use validation-selected operating points.",
@@ -2172,9 +2173,48 @@ def test_check_baseline_fairness_controls_rejects_missing_protocol_markers() -> 
 
     errors = module.check_baseline_fairness_controls(manuscript_text)
 
-    assert any("baseline-fairness-controls" in error for error in errors)
+    assert any("fairness-control matrix" in error for error in errors)
     assert any("same IAD-Bench pair records" in error for error in errors)
     assert any("not predictive features" in error for error in errors)
+
+
+def test_check_baseline_supplementary_tables_accepts_complete_tables() -> None:
+    """验证补充材料包含完整 baseline 审计矩阵时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    supplementary_text = "\n".join(
+        [
+            r"\section{Baseline Audit Boundary}",
+            r"\label{tab:baseline-inclusion-rationale}",
+            r"\label{tab:baseline-fairness-controls}",
+            "Exact identifier matching and Title-normalization rules are documented.",
+            "Traditional entity-resolution systems require comparable artifacts.",
+            "Scientific representation baselines and RoBERTa pair classification are included.",
+            "Included as primary evidence only when metric summaries, prediction files, threshold records, and checksums are available.",
+            "Excluded from primary result table when only utility code or fixture-level checks are available.",
+            "Baselines use the same IAD-Bench pair records.",
+            "Rows use the same train/dev/test split field.",
+            "Rows use validation-selected operating points.",
+            "A stricter ranking requires same-scope released prediction files.",
+            "Different scopes should not be read as a single comparative ranking.",
+        ]
+    )
+
+    errors = module.check_baseline_supplementary_tables(supplementary_text)
+
+    assert errors == []
+
+
+def test_check_baseline_supplementary_tables_rejects_missing_tables() -> None:
+    """验证补充材料缺少 baseline 表格标签时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    supplementary_text = r"\section{Baseline Audit Boundary}"
+
+    errors = module.check_baseline_supplementary_tables(supplementary_text)
+
+    assert any("baseline-inclusion-rationale" in error for error in errors)
+    assert any("baseline-fairness-controls" in error for error in errors)
 
 
 def test_check_result_interpretation_guardrails_accepts_complete_boundaries() -> None:
