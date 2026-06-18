@@ -518,6 +518,30 @@ Model ranking & Restricted to mechanism interpretation rather than a universal r
 \end{tabular}
 \end{table}
 
+\section{Validity Threats Boundary}
+
+The main manuscript summarizes validity threats in prose. Table~\ref{tab:validity-threats} preserves the full validity-threats matrix for audit. The table is intentionally conservative: a mitigation reduces a specific validity risk, but it does not turn proxy or silver evidence into human-adjudicated truth.
+
+\begin{table}[H]
+\caption{Threats to validity and claim boundaries. Each risk is paired with the current mitigation and the remaining statement that should not be over-claimed.}
+\label{tab:validity-threats}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.18\linewidth}L{0.24\linewidth}L{0.26\linewidth}L{0.22\linewidth}}
+\toprule
+Validity dimension & Main risk & Current mitigation & Remaining boundary \\
+\midrule
+Construct validity & Silver hard negatives may contain metadata noise. & Label strength is preserved; silver rows remain stress-test evidence. & Not a replacement for manual non-identity gold. \\
+Internal validity & Threshold choice or split leakage can inflate metrics. & Operating points, split fields, and pair-leakage audits are required. & Numerical claims need released predictions and logs. \\
+External validity & Open-v2 may not cover every source, topic, or version policy. & Claims are tied to Open-v2 and source-heldout evidence boundaries. & Broad deployment requires domain-diverse validation. \\
+Conclusion validity & HNFMR evidence may be mistaken for full causality. & Ablation requirements precede component-level causal claims. & Complete causality requires no-gate, no-ANI, and single-space variants. \\
+Reproducibility & Raw data and large predictions are not stored in Git. & Public commands, fixtures, manifests, checksums, and artifact rules are provided. & Full numeric audit requires L2/L3 artifacts. \\
+Operational validity & Pair errors can propagate through transitive merges. & Risk gating and cannot-link-aware clustering are described. & Cluster guarantees need complete cannot-link coverage. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 Result packages that report confidence intervals should include bootstrap outputs generated from the exact prediction files used in the manuscript tables. The repository provides \emph{run-iad-evidence-bootstrap} for stratified pair-level intervals and \emph{run-bootstrap} for general metric intervals. A numerical interval should be cited only when the corresponding CSV file, command log, random seed, and checksum are present in the artifact package.
 
 Threshold-stability claims should be tied to a released threshold-sensitivity grid generated from the same prediction files as the main tables. The grid should report threshold ranges, selected operating points, pair counts, same-work F1, FMR, HNFMR, random seeds, command logs, and checksums. Without this file, the manuscript should discuss only the fixed operating points reported in the main table.

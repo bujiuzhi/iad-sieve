@@ -1984,6 +1984,51 @@ def test_check_pair_cluster_evidence_boundary_rejects_missing_cluster_audit() ->
     assert any("cannot_link_audit" in error for error in errors)
 
 
+def test_check_validity_threats_accepts_supplementary_matrix() -> None:
+    """验证 validity threats 迁入补充材料后仍可通过完整检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\section{Limitations}",
+            "This study has five limitations.",
+            "pair-level metrics do not by themselves establish cluster-level deployment quality.",
+            "The stronger claim requires cluster assignments.",
+            "It also requires cannot-link coverage.",
+            "It also requires cluster contamination rate.",
+            r"\section{Threats to Validity}",
+            "The full validity-threats matrix is reported in the supplementary material.",
+            "The construct validity is bounded by label strata.",
+            "The internal validity is bounded by threshold and split separation.",
+            "The external validity is bounded by the current source mix.",
+            "The conclusion validity is bounded by the absence of complete causal ablations.",
+            "The reproducibility is bounded by source and artifact availability.",
+            "The operational validity is bounded by the gap between pair-level decisions and cluster-level deployment.",
+            "These safeguards do not turn proxy or silver evidence into human-adjudicated truth.",
+            "The full numeric audit requires L2/L3 artifacts.",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Validity Threats Boundary}",
+            r"\label{tab:validity-threats}",
+            "Threats to validity and claim boundaries.",
+            "Construct validity",
+            "Internal validity",
+            "External validity",
+            "Conclusion validity",
+            "Reproducibility",
+            "Operational validity",
+            "not turn proxy or silver evidence into human-adjudicated truth",
+            "Full numeric audit requires L2/L3 artifacts",
+        ]
+    )
+
+    errors = module.check_validity_threats(manuscript_text, supplementary_text)
+
+    assert errors == []
+
+
 def test_check_validity_threats_rejects_limitations_without_cluster_boundary() -> None:
     """验证 Limitations 段落必须声明 pair-level 到 cluster-level 的证据限制。"""
 
@@ -1992,6 +2037,21 @@ def test_check_validity_threats_rejects_limitations_without_cluster_boundary() -
         [
             r"\section{Limitations}",
             "This study has four limitations.",
+            r"\section{Threats to Validity}",
+            "The full validity-threats matrix is reported in the supplementary material.",
+            "The construct validity is bounded by label strata.",
+            "The internal validity is bounded by threshold and split separation.",
+            "The external validity is bounded by the current source mix.",
+            "The conclusion validity is bounded by the absence of complete causal ablations.",
+            "The reproducibility is bounded by source and artifact availability.",
+            "The operational validity is bounded by the gap between pair-level decisions and cluster-level deployment.",
+            "These safeguards do not turn proxy or silver evidence into human-adjudicated truth.",
+            "The full numeric audit requires L2/L3 artifacts.",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Validity Threats Boundary}",
             r"\label{tab:validity-threats}",
             "Threats to validity and claim boundaries",
             "Construct validity",
@@ -2005,7 +2065,7 @@ def test_check_validity_threats_rejects_limitations_without_cluster_boundary() -
         ]
     )
 
-    errors = module.check_validity_threats(manuscript_text)
+    errors = module.check_validity_threats(manuscript_text, supplementary_text)
 
     assert any("Limitations" in error for error in errors)
     assert any("pair-level metrics" in error for error in errors)
@@ -4524,7 +4584,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 49.",
+            "Completed audit cycles: 50.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -4898,6 +4958,16 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "repository-level reproduction",
             "claim-evidence clarity without main-text table overload",
             "supplementary claim-evidence boundary",
+            "## Audit Cycle 50: Validity Threats Density Gate",
+            "validity-threat table-density reduction",
+            "full validity-threats matrix",
+            "construct validity",
+            "internal validity",
+            "external validity",
+            "conclusion validity",
+            "operational validity",
+            "validity-threat clarity without main-text table overload",
+            "supplementary validity-threat boundary",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -4916,7 +4986,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 49",
+        "Completed audit cycles: 50",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -4927,7 +4997,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 49" in error for error in errors)
+    assert any("Completed audit cycles: 50" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

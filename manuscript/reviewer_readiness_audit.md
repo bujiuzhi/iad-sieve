@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 49.
+Completed audit cycles: 50.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -489,6 +489,14 @@ Outcome: pass for claim-evidence table-density reduction; blocked for final nume
 This gate checks whether the claim-evidence boundary table is needed in the main result section. The main manuscript now states the boundary in prose: identity-agenda confusion is supported only as a false-merge pathway, IAD-Risk support is bounded to the reported Open-v2 setting, IAD-Bench remains a provenance-aware evaluation contract, and repository-level reproduction does not by itself prove full numerical results without public source files or a released artifact package. The supplementary material preserves the full claim-evidence boundary table with required support and unsupported claim classes.
 
 The reviewer-facing boundary is claim-evidence clarity without main-text table overload. The edit keeps the main result section focused on the reported evidence snapshot while the validator still requires the supplementary claim-evidence boundary, including identity-agenda confusion, IAD-Risk support, IAD-Bench evidence, and repository-level reproduction limits.
+
+## Audit Cycle 50: Validity Threats Density Gate
+
+Outcome: pass for validity-threat table-density reduction; blocked for final numerical audit until source-heldout evidence, causal ablations, cluster-level artifacts, and external artifact checksums are released.
+
+This gate checks whether the threats-to-validity matrix is needed in the main manuscript. The main manuscript now states the validity threat model in prose: construct validity is tied to label strata, internal validity to threshold and split separation, external validity to the current source mix, conclusion validity to the absence of complete causal ablations, reproducibility to source and artifact availability, and operational validity to the gap between pair-level decisions and cluster-level deployment. The supplementary material preserves the full validity-threats matrix with each risk, mitigation, and remaining boundary.
+
+The reviewer-facing boundary is validity-threat clarity without main-text table overload. The edit keeps the main threats section readable while the validator still requires the supplementary validity-threat boundary, including construct validity, internal validity, external validity, conclusion validity, reproducibility, operational validity, and the explicit rule that mitigations do not turn proxy or silver evidence into human-adjudicated truth.
 
 ## Minimum Gate Before Final Upload
 

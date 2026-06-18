@@ -3027,7 +3027,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 49",
+        "Completed audit cycles: 50",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3134,6 +3134,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 47: Scope Compatibility Matrix Density Gate",
         "Audit Cycle 48: Result Interpretation Guardrails Density Gate",
         "Audit Cycle 49: Claim-Evidence Boundary Density Gate",
+        "Audit Cycle 50: Validity Threats Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
         "method-writing clarity",
@@ -3247,6 +3248,15 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "repository-level reproduction",
         "claim-evidence clarity without main-text table overload",
         "supplementary claim-evidence boundary",
+        "validity-threat table-density reduction",
+        "full validity-threats matrix",
+        "construct validity",
+        "internal validity",
+        "external validity",
+        "conclusion validity",
+        "operational validity",
+        "validity-threat clarity without main-text table overload",
+        "supplementary validity-threat boundary",
         "remote reproducibility",
         "strong model matrix",
         "model superiority",
@@ -3521,16 +3531,30 @@ def check_error_taxonomy(manuscript_text: str) -> list[str]:
     return [f"error taxonomy missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
 
 
-def check_validity_threats(manuscript_text: str) -> list[str]:
+def check_validity_threats(manuscript_text: str, supplementary_text: str = "") -> list[str]:
     """Check whether threats to validity state concrete reviewer-facing boundaries.
 
     参数:
         manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
 
     返回:
         list[str]: Error messages for missing validity-threat markers.
     """
-    required_markers = [
+    required_main_markers = [
+        r"\section{Threats to Validity}",
+        "full validity-threats matrix is reported in the supplementary material",
+        "construct validity is bounded by label strata",
+        "internal validity is bounded by threshold and split separation",
+        "external validity is bounded by the current source mix",
+        "conclusion validity is bounded by the absence of complete causal ablations",
+        "reproducibility is bounded by source and artifact availability",
+        "operational validity is bounded by the gap between pair-level decisions and cluster-level deployment",
+        "not turn proxy or silver evidence into human-adjudicated truth",
+        "full numeric audit requires L2/L3 artifacts",
+    ]
+    required_supplement_markers = [
+        r"\section{Validity Threats Boundary}",
         r"\label{tab:validity-threats}",
         "Threats to validity and claim boundaries",
         "Construct validity",
@@ -3549,7 +3573,17 @@ def check_validity_threats(manuscript_text: str) -> list[str]:
         "cannot-link coverage",
         "cluster contamination rate",
     ]
-    errors = [f"validity threats missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+    errors = [
+        f"validity threats missing manuscript marker: {marker}"
+        for marker in required_main_markers
+        if marker not in manuscript_text
+    ]
+    evidence_text = supplementary_text or manuscript_text
+    errors.extend(
+        f"validity threats missing supplementary marker: {marker}"
+        for marker in required_supplement_markers
+        if marker not in evidence_text
+    )
     errors.extend(
         f"Limitations missing cluster-level boundary marker: {marker}"
         for marker in required_limitation_markers
@@ -4382,7 +4416,7 @@ def main() -> int:
     errors.extend(check_design_alternative_boundaries(manuscript_text))
     errors.extend(check_related_work_positioning(manuscript_text, supplementary_text))
     errors.extend(check_error_taxonomy(manuscript_text))
-    errors.extend(check_validity_threats(manuscript_text))
+    errors.extend(check_validity_threats(manuscript_text, supplementary_text))
     errors.extend(check_claim_interpretation_boundary(manuscript_text))
     errors.extend(check_declaration_statements(manuscript_text))
     errors.extend(check_data_code_availability_boundary(manuscript_text))
