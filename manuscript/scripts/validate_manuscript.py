@@ -23,7 +23,10 @@ ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_ROOT = Path(__file__).resolve().parent
 if str(SCRIPT_ROOT) not in sys.path:
     sys.path.insert(0, str(SCRIPT_ROOT))
-from submission_metadata_checks import check_final_upload_metadata_text as check_structured_final_upload_metadata_text
+from submission_metadata_checks import (
+    check_final_upload_cover_letter_text as check_structured_final_upload_cover_letter_text,
+    check_final_upload_metadata_text as check_structured_final_upload_metadata_text,
+)
 
 REQUIRED_FILES = [
     ROOT / "main.tex",
@@ -1884,6 +1887,19 @@ def check_final_upload_metadata(metadata_text: str) -> list[str]:
     return check_structured_final_upload_metadata_text(metadata_text)
 
 
+def check_final_upload_cover_letter(cover_letter_text: str, metadata_text: str) -> list[str]:
+    """Check cover letter fields that must be resolved before final journal upload.
+
+    参数:
+        cover_letter_text: Cover letter Markdown text.
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages for unresolved final-upload cover letter fields.
+    """
+    return check_structured_final_upload_cover_letter_text(cover_letter_text, metadata_text)
+
+
 def extract_first_page_text(pdf_path: Path) -> tuple[str, list[str]]:
     """Extract text from the first page of a PDF.
 
@@ -2207,6 +2223,7 @@ def main() -> int:
     errors.extend(check_submission_metadata(submission_metadata_text))
     if args.final_upload:
         errors.extend(check_final_upload_metadata(submission_metadata_text))
+        errors.extend(check_final_upload_cover_letter(cover_letter_text, submission_metadata_text))
     errors.extend(check_bibliography_depth(bibliography_text))
     errors.extend(
         check_citation_bibliography_alignment(

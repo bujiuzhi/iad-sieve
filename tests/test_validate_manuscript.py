@@ -1994,6 +1994,27 @@ def test_check_final_upload_metadata_rejects_missing_template_and_checklist_fiel
     assert any("artifact release checklist item is incomplete" in error for error in errors)
 
 
+def test_check_final_upload_cover_letter_rejects_generic_cover_letter() -> None:
+    """验证 final-upload 门禁拒绝通用匿名投稿信。"""
+
+    module = _load_validate_manuscript_module()
+    assert hasattr(module, "check_final_upload_cover_letter")
+    metadata_text = 'target_journal: "Journal of Scholarly Data"\n'
+    cover_letter_text = "\n".join(
+        [
+            "Dear Editor,",
+            "The artifact release instructions are documented.",
+            "Sincerely,",
+            "Anonymous Authors",
+        ]
+    )
+
+    errors = module.check_final_upload_cover_letter(cover_letter_text, metadata_text)
+
+    assert any("generic editor greeting" in error for error in errors)
+    assert any("anonymous author signature" in error for error in errors)
+
+
 def test_check_pdf_first_page_markers_accepts_expected_text() -> None:
     """验证 PDF 首页包含全部关键文本时可通过。"""
 

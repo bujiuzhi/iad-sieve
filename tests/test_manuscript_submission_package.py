@@ -203,6 +203,38 @@ def _write_final_upload_metadata(manuscript_root: Path) -> None:
     )
 
 
+def _write_final_upload_cover_letter(manuscript_root: Path) -> None:
+    """写入满足正式上传门禁的投稿信。
+
+    参数:
+        manuscript_root: 临时稿件目录。
+
+    返回:
+        无。
+    """
+    _write_file(
+        manuscript_root / "cover_letter.md",
+        "\n".join(
+            [
+                "# Cover Letter",
+                "",
+                "Dear Editors of Journal of Scholarly Data,",
+                "",
+                "We submit the manuscript titled "
+                '"IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication" '
+                "for consideration as a research article in Journal of Scholarly Data.",
+                "The final-upload manuscript uses the selected journal template and the author metadata in the submission system.",
+                "The artifact release URL or DOI is recorded in submission_metadata.yml and supports result-level review.",
+                "",
+                "Sincerely,",
+                "",
+                "Example Author",
+            ]
+        )
+        + "\n",
+    )
+
+
 def _write_malformed_final_upload_metadata(manuscript_root: Path) -> None:
     """写入结构不完整的正式上传元数据。
 
@@ -316,10 +348,29 @@ def test_build_submission_package_accepts_final_upload_with_filled_metadata(tmp_
     zip_path = tmp_path / "submission_package.zip"
     _write_required_manuscript_files(manuscript_root)
     _write_final_upload_metadata(manuscript_root)
+    _write_final_upload_cover_letter(manuscript_root)
 
     summary = module.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
 
     assert summary["file_count"] == 11
+
+
+def test_build_submission_package_rejects_generic_final_upload_cover_letter(tmp_path) -> None:
+    """验证正式上传构建器拒绝通用占位投稿信。"""
+
+    module = _load_submission_package_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_final_upload_metadata(manuscript_root)
+
+    with pytest.raises(ValueError) as exc_info:
+        module.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
+
+    message = str(exc_info.value)
+    assert "cover letter missing target journal" in message
+    assert "cover letter missing artifact release boundary" in message
 
 
 def test_build_submission_package_rejects_malformed_final_upload_metadata(tmp_path) -> None:
@@ -501,11 +552,30 @@ def test_validate_submission_package_accepts_final_upload_with_filled_metadata(t
     zip_path = tmp_path / "submission_package.zip"
     _write_required_manuscript_files(manuscript_root)
     _write_final_upload_metadata(manuscript_root)
+    _write_final_upload_cover_letter(manuscript_root)
 
     builder.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
     errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True)
 
     assert errors == []
+
+
+def test_validate_submission_package_rejects_generic_final_upload_cover_letter(tmp_path) -> None:
+    """验证正式上传校验器拒绝通用占位投稿信。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_final_upload_metadata(manuscript_root)
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path)
+    errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True)
+
+    assert any("cover letter missing target journal" in error for error in errors)
+    assert any("cover letter missing artifact release boundary" in error for error in errors)
 
 
 def test_validate_submission_package_rejects_malformed_final_upload_metadata(tmp_path) -> None:

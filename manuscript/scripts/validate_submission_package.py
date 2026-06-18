@@ -22,7 +22,10 @@ MANUSCRIPT_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_ROOT = Path(__file__).resolve().parent
 if str(SCRIPT_ROOT) not in sys.path:
     sys.path.insert(0, str(SCRIPT_ROOT))
-from submission_metadata_checks import check_final_upload_metadata_text as check_structured_final_upload_metadata_text
+from submission_metadata_checks import (
+    check_final_upload_cover_letter_text as check_structured_final_upload_cover_letter_text,
+    check_final_upload_metadata_text as check_structured_final_upload_metadata_text,
+)
 
 DEFAULT_PACKAGE_DIR = MANUSCRIPT_ROOT / "build" / "submission_package"
 DEFAULT_ZIP_PATH = MANUSCRIPT_ROOT / "build" / "iad-risk-submission-package.zip"
@@ -306,6 +309,19 @@ def check_final_upload_metadata_text(metadata_text: str) -> list[str]:
     return check_structured_final_upload_metadata_text(metadata_text)
 
 
+def check_final_upload_cover_letter_text(cover_letter_text: str, metadata_text: str) -> list[str]:
+    """Check final-upload cover letter text against submission metadata.
+
+    参数:
+        cover_letter_text: Cover letter Markdown text.
+        metadata_text: Metadata YAML text.
+
+    返回:
+        list[str]: Error messages for unresolved final-upload cover letter fields.
+    """
+    return check_structured_final_upload_cover_letter_text(cover_letter_text, metadata_text)
+
+
 def is_text_hygiene_file(file_name: str) -> bool:
     """Return whether a package file should be scanned as UTF-8 text.
 
@@ -437,11 +453,17 @@ def validate_package_directory(package_dir: Path, final_upload: bool = False, dk
     checksums_path = package_dir / "checksums.sha256"
     manifest_path = package_dir / "submission_manifest.json"
     metadata_path = package_dir / "submission_metadata.yml"
+    cover_letter_path = package_dir / "cover_letter.md"
     if manifest_path.exists():
         errors.extend(check_manifest_text(manifest_path.read_text(encoding="utf-8"), dke_preflight))
     if final_upload:
         if metadata_path.exists():
-            errors.extend(check_final_upload_metadata_text(metadata_path.read_text(encoding="utf-8")))
+            metadata_text = metadata_path.read_text(encoding="utf-8")
+            errors.extend(check_final_upload_metadata_text(metadata_text))
+            if cover_letter_path.exists():
+                errors.extend(check_final_upload_cover_letter_text(cover_letter_path.read_text(encoding="utf-8"), metadata_text))
+            else:
+                errors.append("package directory missing cover_letter.md for final upload")
         else:
             errors.append("package directory missing submission_metadata.yml for final upload")
     if checksums_path.exists():
@@ -537,6 +559,11 @@ def validate_zip_archive(
                 except KeyError as exc:
                     return errors + [f"zip archive missing submission_metadata.yml for final upload: {exc}"]
                 errors.extend(check_final_upload_metadata_text(metadata_text))
+                try:
+                    cover_letter_text = archive.read(f"{package_root_name}/cover_letter.md").decode("utf-8")
+                except KeyError as exc:
+                    return errors + [f"zip archive missing cover_letter.md for final upload: {exc}"]
+                errors.extend(check_final_upload_cover_letter_text(cover_letter_text, metadata_text))
             try:
                 checksums = parse_checksums(checksums_text)
             except ValueError as exc:

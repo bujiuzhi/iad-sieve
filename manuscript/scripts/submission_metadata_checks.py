@@ -295,6 +295,30 @@ def check_artifact_release_link(metadata_text: str) -> list[str]:
     return errors
 
 
+def check_final_upload_cover_letter_text(cover_letter_text: str, metadata_text: str) -> list[str]:
+    """Check final-upload cover letter target and artifact boundaries.
+
+    参数:
+        cover_letter_text: Cover letter Markdown text.
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages for unresolved final-upload cover letter fields.
+    """
+    errors: list[str] = []
+    target_journal = scalar_value(metadata_text, "target_journal")
+    if target_journal and target_journal not in cover_letter_text:
+        errors.append(f"final upload cover letter unresolved: cover letter missing target journal: {target_journal}")
+    if "Dear Editor," in cover_letter_text:
+        errors.append("final upload cover letter unresolved: cover letter uses generic editor greeting")
+    if "Anonymous Authors" in cover_letter_text:
+        errors.append("final upload cover letter unresolved: cover letter still uses anonymous author signature")
+    lowered_text = cover_letter_text.lower()
+    if "artifact release" not in lowered_text and "artifact url" not in lowered_text and "artifact doi" not in lowered_text:
+        errors.append("final upload cover letter unresolved: cover letter missing artifact release boundary")
+    return errors
+
+
 def check_final_upload_metadata_text(metadata_text: str) -> list[str]:
     """Check final-upload submission metadata for completeness and structure.
 

@@ -23,7 +23,7 @@ MANUSCRIPT_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_ROOT = Path(__file__).resolve().parent
 if str(SCRIPT_ROOT) not in sys.path:
     sys.path.insert(0, str(SCRIPT_ROOT))
-from submission_metadata_checks import check_final_upload_metadata_text
+from submission_metadata_checks import check_final_upload_cover_letter_text, check_final_upload_metadata_text
 
 DEFAULT_OUTPUT_DIR = MANUSCRIPT_ROOT / "build" / "submission_package"
 DEFAULT_ZIP_PATH = MANUSCRIPT_ROOT / "build" / "iad-risk-submission-package.zip"
@@ -160,6 +160,26 @@ def check_final_upload_metadata(manuscript_root: Path) -> list[str]:
     return check_final_upload_metadata_text(metadata_text)
 
 
+def check_final_upload_cover_letter(manuscript_root: Path) -> list[str]:
+    """Check whether the cover letter is ready for final journal upload.
+
+    参数:
+        manuscript_root: Manuscript root directory.
+
+    返回:
+        list[str]: Error messages for unresolved final-upload cover letter fields.
+    """
+    metadata_path = manuscript_root / "submission_metadata.yml"
+    cover_letter_path = manuscript_root / "cover_letter.md"
+    if not metadata_path.exists():
+        return ["missing submission_metadata.yml for final-upload cover letter check"]
+    if not cover_letter_path.exists():
+        return ["missing cover_letter.md for final upload"]
+    metadata_text = metadata_path.read_text(encoding="utf-8")
+    cover_letter_text = cover_letter_path.read_text(encoding="utf-8")
+    return check_final_upload_cover_letter_text(cover_letter_text, metadata_text)
+
+
 def write_manifest(output_dir: Path, records: list[dict], dke_preflight: bool = False) -> Path:
     """Write a JSON submission manifest.
 
@@ -289,6 +309,7 @@ def build_submission_package(
     """
     if final_upload:
         final_upload_errors = check_final_upload_metadata(manuscript_root)
+        final_upload_errors.extend(check_final_upload_cover_letter(manuscript_root))
         if final_upload_errors:
             raise ValueError("; ".join(final_upload_errors))
     remove_existing_output(output_dir, zip_path)
