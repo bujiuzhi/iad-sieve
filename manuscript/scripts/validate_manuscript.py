@@ -3056,7 +3056,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 52",
+        "Completed audit cycles: 53",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3166,6 +3166,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 50: Validity Threats Density Gate",
         "Audit Cycle 51: Claim Interpretation Boundary Density Gate",
         "Audit Cycle 52: Data and Code Availability Density Gate",
+        "Audit Cycle 53: Error Taxonomy Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
         "method-writing clarity",
@@ -3307,6 +3308,15 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "derived evaluation artifacts",
         "data/code availability clarity without main-text table overload",
         "supplementary data/code availability boundary",
+        "error-taxonomy table-density reduction",
+        "full error taxonomy table",
+        "same task, different contribution",
+        "citation-neighborhood neighbors",
+        "version or extension boundaries",
+        "identifier conflicts",
+        "sparse metadata cases",
+        "error-taxonomy clarity without main-text table overload",
+        "supplementary error taxonomy boundary",
         "remote reproducibility",
         "strong model matrix",
         "model superiority",
@@ -3559,16 +3569,30 @@ def check_related_work_positioning(manuscript_text: str, supplementary_text: str
     return errors
 
 
-def check_error_taxonomy(manuscript_text: str) -> list[str]:
+def check_error_taxonomy(manuscript_text: str, supplementary_text: str = "") -> list[str]:
     """Check whether the mechanism section includes error taxonomy boundaries.
 
     参数:
         manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
 
     返回:
         list[str]: Error messages for missing error-taxonomy markers.
     """
-    required_markers = [
+    required_main_markers = [
+        r"\section{Mechanism and Error Analysis}",
+        "full error taxonomy table is reported in the supplementary material",
+        "same task, different contribution",
+        "citation-neighborhood neighbors",
+        "version or extension boundaries",
+        "identifier conflicts",
+        "sparse metadata cases",
+        "diagnostic rather than a measured error distribution",
+        "per-category annotations and adjudication logs",
+        "human judgment beyond metadata-derived silver evidence",
+    ]
+    required_supplement_markers = [
+        r"\section{Error Taxonomy Boundary}",
         r"\label{tab:error-taxonomy}",
         "Error taxonomy for identity-agenda confusion",
         "Same task, different contribution",
@@ -3576,9 +3600,20 @@ def check_error_taxonomy(manuscript_text: str) -> list[str]:
         "Version or extension boundary",
         "Identifier conflict",
         "Sparse metadata",
-        "diagnostic rather than a measured error distribution",
+        "Stronger audit evidence",
     ]
-    return [f"error taxonomy missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+    errors = [
+        f"error taxonomy missing manuscript marker: {marker}"
+        for marker in required_main_markers
+        if marker not in manuscript_text
+    ]
+    evidence_text = supplementary_text or manuscript_text
+    errors.extend(
+        f"error taxonomy missing supplementary marker: {marker}"
+        for marker in required_supplement_markers
+        if marker not in evidence_text
+    )
+    return errors
 
 
 def check_validity_threats(manuscript_text: str, supplementary_text: str = "") -> list[str]:
@@ -4490,7 +4525,7 @@ def main() -> int:
     errors.extend(check_scoring_merge_algorithm(manuscript_text))
     errors.extend(check_design_alternative_boundaries(manuscript_text))
     errors.extend(check_related_work_positioning(manuscript_text, supplementary_text))
-    errors.extend(check_error_taxonomy(manuscript_text))
+    errors.extend(check_error_taxonomy(manuscript_text, supplementary_text))
     errors.extend(check_validity_threats(manuscript_text, supplementary_text))
     errors.extend(check_claim_interpretation_boundary(manuscript_text, supplementary_text))
     errors.extend(check_declaration_statements(manuscript_text))

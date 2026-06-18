@@ -804,26 +804,7 @@ Can cluster-level contamination be eliminated? & The method supports cannot-link
 \end{tabular}
 \end{table}
 
-The qualitative error taxonomy in Table~\ref{tab:error-taxonomy} states which failure cases the framework is designed to expose. The taxonomy is diagnostic rather than a measured error distribution unless a released artifact contains per-category annotations and adjudication logs. This distinction matters because some categories, such as version boundaries, require human judgment beyond metadata-derived silver evidence.
-
-\begin{table}[H]
-\caption{Error taxonomy for identity-agenda confusion. The table identifies the expected failure mode, the IAD-Risk control, and the audit evidence needed for stronger claims.}
-\label{tab:error-taxonomy}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{L{0.22\linewidth}L{0.26\linewidth}L{0.24\linewidth}L{0.20\linewidth}}
-\toprule
-Error category & Typical source of confusion & IAD-Risk control & Stronger audit evidence \\
-\midrule
-Same task, different contribution & Papers share a benchmark, model family, or problem statement. & Agenda-non-identity head and HNFMR reporting. & Human-reviewed hard-negative slice with pair notes. \\
-Citation-neighborhood neighbor & Papers share references or citation community but are distinct works. & Reference-overlap features contribute to agenda evidence, not direct merge evidence. & Citation-derived pair provenance and checksum-fixed predictions. \\
-Version or extension boundary & Preprint, short paper, conference, and journal records are similar but may not be mergeable. & Conservative defer/block behavior when identity evidence is incomplete. & Manual adjudication with version-policy labels. \\
-Identifier conflict & DOI, arXiv, or OpenAlex identifiers disagree despite text similarity. & Different-identifier conflicts enter the ANI risk head and cannot-link logic. & Identifier-resolution logs and conflict audit table. \\
-Sparse metadata & Abstract, venue, author, or identifier fields are missing or noisy. & Merge requires positive identity evidence rather than semantic similarity alone. & Missing-field stratified metrics and per-source diagnostics. \\
-\bottomrule
-\end{tabular}
-\end{table}
+The full error taxonomy table is reported in the supplementary material. The main text keeps the taxonomy as a prose rule: same task, different contribution pairs, citation-neighborhood neighbors, version or extension boundaries, identifier conflicts, and sparse metadata cases are the main failure modes the framework is designed to expose. This taxonomy is diagnostic rather than a measured error distribution unless a released artifact contains per-category annotations and adjudication logs. The distinction matters because version boundaries, identifier conflicts, and sparse metadata cases require human judgment beyond metadata-derived silver evidence.
 
 The error analysis emphasizes claim discipline. The current evidence supports identity-agenda risk modeling, stratified benchmark construction, and targeted false-merge suppression. It does not support claims that OpenAlex labels are human gold, that the system has broad domain superiority, that component-level ablations have already closed every mechanism question, or that manual annotation has already been completed.
 

@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 52.
+Completed audit cycles: 53.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -513,6 +513,14 @@ Outcome: pass for data/code availability table-density reduction; blocked for fi
 This gate checks whether the data/code availability matrix is needed in the main manuscript. The main manuscript now states the availability boundary in prose and the supplementary material preserves the full data and code availability boundary table. Source code, CLI entry points, small public fixtures, schema contracts, and data-processing commands are version-controlled in Git; raw third-party source files, full prediction files, model checkpoints, and derived evaluation artifacts remain outside Git unless released through an external artifact package. The same paragraph keeps the L0/L1 code-level reproduction and L2/L3 result-level audit distinction and states that full numerical reproduction requires public-source rebuilds or released artifacts.
 
 The reviewer-facing boundary is data/code availability clarity without main-text table overload. The edit keeps the journal data availability statement readable while the validator still requires the supplementary data/code availability boundary, including source code and CLI entry points, public fixtures, raw third-party source files, derived evaluation artifacts, data-processing path, manifests, checksums, and commit identifiers.
+
+## Audit Cycle 53: Error Taxonomy Density Gate
+
+Outcome: pass for error-taxonomy table-density reduction; blocked for measured error-distribution claims until per-category annotations, adjudication logs, and checksum-fixed error artifacts are released.
+
+This gate checks whether the qualitative error taxonomy table is needed in the main manuscript. The main manuscript now states the error taxonomy in prose: same task, different contribution pairs, citation-neighborhood neighbors, version or extension boundaries, identifier conflicts, and sparse metadata cases are the failure modes the framework is designed to expose. The supplementary material preserves the full error taxonomy table with typical confusion sources, IAD-Risk controls, and stronger audit evidence.
+
+The reviewer-facing boundary is error-taxonomy clarity without main-text table overload. The edit keeps the mechanism section focused on evidence interpretation while the validator still requires the supplementary error taxonomy boundary, including same task, different contribution, citation-neighborhood neighbors, version or extension boundaries, identifier conflicts, sparse metadata cases, and the explicit rule that the taxonomy is diagnostic rather than a measured error distribution.
 
 ## Minimum Gate Before Final Upload
 

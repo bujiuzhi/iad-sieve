@@ -2007,6 +2007,68 @@ def test_check_pair_cluster_evidence_boundary_rejects_missing_cluster_audit() ->
     assert any("cannot_link_audit" in error for error in errors)
 
 
+def test_check_error_taxonomy_accepts_supplementary_table() -> None:
+    """验证错误分类表迁入补充材料后仍可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\section{Mechanism and Error Analysis}",
+            "The full error taxonomy table is reported in the supplementary material.",
+            "The taxonomy includes same task, different contribution pairs.",
+            "The taxonomy includes citation-neighborhood neighbors.",
+            "The taxonomy includes version or extension boundaries.",
+            "The taxonomy includes identifier conflicts.",
+            "The taxonomy includes sparse metadata cases.",
+            "The taxonomy is diagnostic rather than a measured error distribution.",
+            "A stronger package requires per-category annotations and adjudication logs.",
+            "The boundary requires human judgment beyond metadata-derived silver evidence.",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Error Taxonomy Boundary}",
+            r"\label{tab:error-taxonomy}",
+            "Error taxonomy for identity-agenda confusion.",
+            "Same task, different contribution",
+            "Citation-neighborhood neighbor",
+            "Version or extension boundary",
+            "Identifier conflict",
+            "Sparse metadata",
+            "Stronger audit evidence",
+        ]
+    )
+
+    errors = module.check_error_taxonomy(manuscript_text, supplementary_text)
+
+    assert errors == []
+
+
+def test_check_error_taxonomy_rejects_missing_supplementary_table() -> None:
+    """验证错误分类缺少补充材料完整表时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\section{Mechanism and Error Analysis}",
+            "The full error taxonomy table is reported in the supplementary material.",
+            "The taxonomy includes same task, different contribution pairs.",
+            "The taxonomy includes citation-neighborhood neighbors.",
+            "The taxonomy includes version or extension boundaries.",
+            "The taxonomy includes identifier conflicts.",
+            "The taxonomy includes sparse metadata cases.",
+            "The taxonomy is diagnostic rather than a measured error distribution.",
+            "A stronger package requires per-category annotations and adjudication logs.",
+            "The boundary requires human judgment beyond metadata-derived silver evidence.",
+        ]
+    )
+
+    errors = module.check_error_taxonomy(manuscript_text, "")
+
+    assert any("tab:error-taxonomy" in error for error in errors)
+    assert any("Error Taxonomy Boundary" in error for error in errors)
+
+
 def test_check_validity_threats_accepts_supplementary_matrix() -> None:
     """验证 validity threats 迁入补充材料后仍可通过完整检查。"""
 
@@ -4627,7 +4689,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 52.",
+            "Completed audit cycles: 53.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -5032,6 +5094,16 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "derived evaluation artifacts",
             "data/code availability clarity without main-text table overload",
             "supplementary data/code availability boundary",
+            "## Audit Cycle 53: Error Taxonomy Density Gate",
+            "error-taxonomy table-density reduction",
+            "full error taxonomy table",
+            "same task, different contribution",
+            "citation-neighborhood neighbors",
+            "version or extension boundaries",
+            "identifier conflicts",
+            "sparse metadata cases",
+            "error-taxonomy clarity without main-text table overload",
+            "supplementary error taxonomy boundary",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -5050,7 +5122,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 52",
+        "Completed audit cycles: 53",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -5061,7 +5133,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 52" in error for error in errors)
+    assert any("Completed audit cycles: 53" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

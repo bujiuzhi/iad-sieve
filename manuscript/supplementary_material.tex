@@ -598,6 +598,29 @@ Reproducibility & Git supports code-level checks, fixture rebuilds, schema valid
 
 The practical rule is a do not upgrade claims rule: do not strengthen the title, abstract, conclusion, cover letter, or reviewer response beyond the bounded Open-v2 mechanism claim unless the corresponding evidence row in Table~\ref{tab:reviewer-evidence-gate} is satisfied by released artifacts.
 
+\section{Error Taxonomy Boundary}
+
+The main manuscript summarizes the identity-agenda error taxonomy in prose. Table~\ref{tab:error-taxonomy} preserves the full taxonomy, the IAD-Risk control associated with each failure mode, and the audit evidence needed before stronger error-distribution claims are made.
+
+\begin{table}[H]
+\caption{Error taxonomy for identity-agenda confusion. The table identifies the expected failure mode, the IAD-Risk control, and the audit evidence needed for stronger claims.}
+\label{tab:error-taxonomy}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.22\linewidth}L{0.26\linewidth}L{0.24\linewidth}L{0.20\linewidth}}
+\toprule
+Error category & Typical source of confusion & IAD-Risk control & Stronger audit evidence \\
+\midrule
+Same task, different contribution & Papers share a benchmark, model family, or problem statement. & Agenda-non-identity head and HNFMR reporting. & Human-reviewed hard-negative slice with pair notes. \\
+Citation-neighborhood neighbor & Papers share references or citation community but are distinct works. & Reference-overlap features contribute to agenda evidence, not direct merge evidence. & Citation-derived pair provenance and checksum-fixed predictions. \\
+Version or extension boundary & Preprint, short paper, conference, and journal records are similar but may not be mergeable. & Conservative defer/block behavior when identity evidence is incomplete. & Manual adjudication with version-policy labels. \\
+Identifier conflict & DOI, arXiv, or OpenAlex identifiers disagree despite text similarity. & Different-identifier conflicts enter the ANI risk head and cannot-link logic. & Identifier-resolution logs and conflict audit table. \\
+Sparse metadata & Abstract, venue, author, or identifier fields are missing or noisy. & Merge requires positive identity evidence rather than semantic similarity alone. & Missing-field stratified metrics and per-source diagnostics. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Manual Validation Protocol}
 
 Manual validation is a future evidence layer for assessing label precision and difficult boundary cases; it is not completed in the current manuscript package. A defensible validation slice should sample 500--1,000 pairs across the strata most likely to affect claim strength: OpenAlex/OpenCitations silver hard negatives, high-score representation false-merge candidates, IAD-Risk blocked or deferred pairs, version-boundary cases, identifier conflicts, and sparse-metadata cases.
