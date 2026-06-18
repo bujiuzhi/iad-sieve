@@ -159,6 +159,38 @@ def _required_artifact_content(artifact_id: str) -> str:
                 "score_field": "score",
             }
         )
+    if artifact_id == "source_input_manifest":
+        return json.dumps(
+            {
+                "inputs": [
+                    {
+                        "source_name": "OpenAlex fixture",
+                        "acquisition_date_or_version": "2026-06-19",
+                        "original_provider": "OpenAlex",
+                        "local_file_name": "works.jsonl",
+                        "record_count": 2,
+                        "license_boundary": "provider terms",
+                        "sha256": "0" * 64,
+                    }
+                ]
+            },
+            sort_keys=True,
+        ) + "\n"
+    if artifact_id == "processing_run_log":
+        return _jsonl_row(
+            {
+                "stage": "prepare-openalex-weak-labels",
+                "command_line": "python -m iad_sieve.cli prepare-openalex-weak-labels",
+                "code_commit": "0123456789abcdef0123456789abcdef01234567",
+                "environment_summary": "python=3.11",
+                "random_seed": 42,
+                "started_at": "2026-06-19T00:00:00Z",
+                "finished_at": "2026-06-19T00:01:00Z",
+                "input_manifest_reference": "configs/source_input_manifest.json",
+                "output_path": "reports/iad_bench_split_summary.jsonl",
+                "exit_status": 0,
+            }
+        )
     return _jsonl_row({"artifact_id": artifact_id, "status": "present"})
 
 
@@ -182,6 +214,8 @@ def _complete_readme_text() -> str:
             "Repository commit: 0123456789abcdef0123456789abcdef01234567.",
             "## Claim Boundaries",
             "Full numerical audit requires external artifacts.",
+            "source_input_manifest records the public input boundary.",
+            "processing_run_log records the processing command boundary.",
             "## Reproduction Levels",
             "L3 result audit checks released tables, predictions, logs, manifests, checksums, and commit identifiers.",
             "",
@@ -206,6 +240,8 @@ def _write_complete_release(artifact_dir: Path, release_status: str = "release_c
         "supervised_baseline_predictions": "predictions/roberta_pair_classifier_predictions.jsonl",
         "threshold_selection_logs": "logs/threshold_selection_logs.jsonl",
         "iad_bench_split_summary": "reports/iad_bench_split_summary.jsonl",
+        "source_input_manifest": "configs/source_input_manifest.json",
+        "processing_run_log": "logs/processing_run_log.jsonl",
     }
     _write_file(artifact_dir / "README.md", _complete_readme_text())
     _write_file(artifact_dir / "configs" / "model_config.json", '{"seed": 7}\n')

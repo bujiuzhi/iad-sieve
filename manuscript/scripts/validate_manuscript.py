@@ -110,6 +110,7 @@ REQUIRED_SUPPLEMENT_SECTIONS = [
     r"\section{Environment Setup}",
     r"\section{No-Network Fixture Rebuild}",
     r"\section{Public-Source Rebuild}",
+    r"\section{Public-Source Rebuild Audit Boundary}",
     r"\section{Artifact Package Requirements}",
     r"\section{Claim-Evidence Matrix}",
     r"\section{Uncertainty and Ablation Requirements}",
@@ -1872,6 +1873,40 @@ def check_environment_setup(supplementary_text: str) -> list[str]:
     ]
 
 
+def check_public_source_rebuild_audit_boundary(supplementary_text: str) -> list[str]:
+    """Check whether L2 public-source rebuilds have an auditable boundary.
+
+    参数:
+        supplementary_text: Supplementary LaTeX source.
+
+    返回:
+        list[str]: Error messages for missing public-source rebuild audit markers.
+    """
+    required_markers = [
+        r"\section{Public-Source Rebuild Audit Boundary}",
+        r"\label{tab:public-source-rebuild-audit-boundary}",
+        r"\path{source_input_manifest}",
+        r"\path{processing_run_log}",
+        "Source name",
+        "acquisition date or version",
+        "original provider",
+        "license boundary",
+        "SHA256 checksum",
+        "Command line",
+        "code commit",
+        "environment summary",
+        "random seed",
+        "output summaries",
+        "chain of custody",
+        "do not upgrade fixture-level reproduction into a full numerical audit",
+    ]
+    return [
+        f"public-source rebuild audit boundary missing marker: {marker}"
+        for marker in required_markers
+        if marker not in supplementary_text
+    ]
+
+
 def check_reviewer_evidence_gate(supplementary_text: str) -> list[str]:
     """Check whether supplementary material states reviewer-facing evidence gates.
 
@@ -2015,6 +2050,8 @@ def check_artifact_release_manifest_template(template_text: str) -> list[str]:
         "supervised_baseline_predictions",
         "threshold_selection_logs",
         "iad_bench_split_summary",
+        "source_input_manifest",
+        "processing_run_log",
     }
     conditional_artifact_ids = {
         "bootstrap_intervals",
@@ -2099,6 +2136,25 @@ def check_artifact_release_manifest_template(template_text: str) -> list[str]:
             "selection_rule",
             "applied_scope",
             "score_field",
+        ],
+        "source_input_manifest": [
+            "source name",
+            "acquisition date or version",
+            "original provider",
+            "local file name",
+            "record count",
+            "license boundary",
+            "SHA256 checksum",
+        ],
+        "processing_run_log": [
+            "command line",
+            "code commit",
+            "environment summary",
+            "random seed",
+            "start and finish timestamps",
+            "input manifest reference",
+            "output path",
+            "exit status",
         ],
     }
     for artifact_id, markers in claim_support_markers_by_artifact.items():
@@ -2244,6 +2300,16 @@ def check_artifact_release_readme_template(readme_text: str) -> list[str]:
         "selection_rule",
         "applied_scope",
         "iad_bench_split_summary",
+        "source_input_manifest",
+        "acquisition date or version",
+        "original provider",
+        "license boundary",
+        "processing_run_log",
+        "command line",
+        "code commit",
+        "environment summary",
+        "random seed",
+        "exit status",
         "Conditional Claim Artifacts",
         "confidence_intervals_claimed",
         "bootstrap_intervals",
@@ -2267,6 +2333,11 @@ def check_artifact_release_readme_template(readme_text: str) -> list[str]:
         "L1 fixture rebuild",
         "L2 public-source rebuild",
         "L3 result audit",
+        "L2 Public-Source Rebuild Boundary",
+        "input boundary",
+        "command boundary",
+        "output boundary",
+        "checksum boundary",
     ]
     lowered_text = readme_text.lower()
     return [
@@ -2343,6 +2414,11 @@ def check_data_processing_pipeline_document(document_text: str) -> list[str]:
         "tests/fixtures/",
         "outputs/repro_fixture",
         "data/raw/",
+        "L2 重建审计文件",
+        "configs/source_input_manifest.json",
+        "logs/processing_run_log.jsonl",
+        "reports/iad_bench_split_summary.jsonl",
+        "chain of custody",
         "prepare-deepmatcher",
         "prepare-scirepeval-proximity",
         "fetch-openalex-works",
@@ -2610,7 +2686,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 31",
+        "Completed audit cycles: 32",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -2620,6 +2696,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "final-upload artifact-dir omission bypass",
         "manuscript artifact-validation text drift",
         "zero-observed HNFMR overread",
+        "L2 public-source rebuild chain-of-custody gap",
         "artifact release README completeness",
         "artifact release commit validity",
         "artifact README/manifest commit mismatch",
@@ -2700,6 +2777,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 29: Final-Upload Artifact-Dir Required Gate",
         "Audit Cycle 30: Main-Manuscript Artifact Validation Text Gate",
         "Audit Cycle 31: Zero-Observed HNFMR Wording Gate",
+        "Audit Cycle 32: L2 Public-Source Rebuild Traceability Gate",
         "method-writing clarity",
         "training and inference trace",
         "schema loading",
@@ -2755,6 +2833,13 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "first-screen prose",
         "no hard-negative false merge was observed",
         "does not prove zero risk under all scholarly sources",
+        "L2 public-source rebuild traceability wording",
+        "source_input_manifest",
+        "processing_run_log",
+        "output summaries",
+        "chain of custody",
+        "real public-source inputs",
+        "alongside result tables, predictions, threshold logs, and split summaries",
         "remote reproducibility",
         "strong model matrix",
         "model superiority",
@@ -3804,6 +3889,7 @@ def main() -> int:
     errors.extend(check_scope_compatibility(manuscript_text))
     errors.extend(check_extended_protocol_boundary(manuscript_text))
     errors.extend(check_environment_setup(supplementary_text))
+    errors.extend(check_public_source_rebuild_audit_boundary(supplementary_text))
     errors.extend(check_target_journal_shortlist(target_journal_shortlist_text))
     errors.extend(check_artifact_release_manifest_template(artifact_release_template_text))
     errors.extend(check_artifact_release_readme_template(artifact_release_readme_template_text))

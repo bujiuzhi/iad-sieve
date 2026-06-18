@@ -141,6 +141,30 @@ python -m iad_sieve.cli build-iad-bench \
 \end{verbatim}
 \normalsize
 
+\section{Public-Source Rebuild Audit Boundary}
+
+The L2 public-source rebuild should be treated as auditable only when the raw-input boundary, processing run, and derived-output boundary are recorded together. A reviewer does not need the raw third-party files in Git, but should be able to inspect a release-level \path{source_input_manifest}, a \path{processing_run_log}, and output summaries that identify which public files, commands, seeds, software versions, and checksums produced each derived evaluation source.
+
+\begin{table}[H]
+\caption{Audit boundary for L2 public-source rebuilds. The table states the files that should accompany a rebuild when raw third-party data are not committed to Git.}
+\label{tab:public-source-rebuild-audit-boundary}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.22\linewidth}L{0.34\linewidth}L{0.34\linewidth}}
+\toprule
+Audit item & Required content & Audit use \\
+\midrule
+\path{source_input_manifest} & Source name, acquisition date or version, original provider, local file name, record count when known, license boundary, and SHA256 checksum for each input file. & Shows that the rebuild used identifiable public inputs without redistributing those inputs in Git. \\
+\path{processing_run_log} & Command line, code commit, environment summary, random seed, start and finish timestamps, input manifest reference, output path, and exit status for each processing stage. & Shows that DeepMatcher, SciRepEval-style, OpenAlex/OpenCitations, and IAD-Bench assembly commands were run under a fixed source revision. \\
+Output summaries & Dataset summaries, split summaries, provenance summaries, row counts, label-strength counts, and checksum entries for derived files. & Lets reviewers compare derived evaluation artifacts against the manuscript scope before using them as numerical evidence. \\
+Exclusion record & Explicit statement that raw third-party files, credentials, caches, model checkpoints, and local experiment outputs are excluded from the public Git package. & Prevents a clean repository from being mistaken for an incomplete or hidden data release. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The artifact release template therefore requires \path{source_input_manifest} and \path{processing_run_log} in addition to result tables, predictions, threshold logs, and split summaries. These files do not upgrade fixture-level reproduction into a full numerical audit by themselves. They provide the chain of custody needed to decide whether an L2 rebuild is consistent with the L3 result artifacts used to support manuscript numbers.
+
 \section{Data Processing Traceability}
 
 Table~\ref{tab:data-processing-traceability} gives the audit trace from public source files to derived evaluation artifacts. The repository commits the processing commands and schema checks, but keeps the raw source files and large derived outputs outside Git. This separation allows an independent reader to rebuild the same artifact classes from obtained public sources while respecting source licenses and keeping the public repository small.

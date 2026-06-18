@@ -105,6 +105,19 @@ data/
 
 这些真实数据目录不进入 Git。提交仓库时只保留 `data/README.md` 和处理代码。
 
+## L2 重建审计文件
+
+第三方不拿到仓库中的原始数据时，正式复验不能只依赖命令文本。公开来源重建应同步生成或整理以下审计文件，并在外部 artifact release 中用 checksum 固定。
+
+| 文件 | 内容 | 用途 |
+| --- | --- | --- |
+| `configs/source_input_manifest.json` | 来源名称、获取日期或版本、原始提供方、本地文件名、记录数、许可边界和输入文件 SHA256。 | 说明使用的是可识别公开输入，而不是仓库中隐藏的私有数据。 |
+| `logs/processing_run_log.jsonl` | 每个阶段的 CLI 命令、代码提交、环境摘要、随机种子、开始/结束时间、输入 manifest 引用、输出路径和退出状态。 | 说明数据转换和 IAD-Bench 组装在固定源码版本下执行。 |
+| `reports/iad_bench_split_summary.jsonl` | 文档数、pair 数、split 分布、label strength 分布和来源覆盖。 | 说明派生评估包与论文报告的范围一致。 |
+| `checksums.sha256` | 所有可发布派生文件、日志、配置和报告的 SHA256。 | 让审稿人能验证 artifact release 未被后续替换。 |
+
+这些文件不要求把 raw third-party data 放进 Git。它们用于记录从公开来源到派生评估产物的 chain of custody；缺少这些文件时，只能说明代码路径可运行，不能支持论文主结果的逐行数值复核。
+
 ## arXiv 样本处理
 
 arXiv metadata 可用于端到端开发实验，不作为 IAD-Bench gold label 来源。

@@ -53,6 +53,10 @@ python scripts/check_public_release.py
 - threshold_selection_logs
   - logs/threshold_selection_logs.jsonl must include system, threshold_name, threshold_value, selection_split, selection_metric, selection_rule, applied_scope, and score_field.
 - iad_bench_split_summary
+- source_input_manifest
+  - configs/source_input_manifest.json must record source name, acquisition date or version, original provider, local file name, record count when known, license boundary, and SHA256 checksum for each public input file.
+- processing_run_log
+  - logs/processing_run_log.jsonl must record command line, code commit, environment summary, random seed, start and finish timestamps, input manifest reference, output path, and exit status for each rebuild stage.
 - cluster_metric_summary
 - cannot_link_audit
 
@@ -81,6 +85,10 @@ Cluster-level quality is not claimed unless cluster artifacts are complete.
 - L1 fixture rebuild: rebuild the no-network fixture package under tests/fixtures.
 - L2 public-source rebuild: rebuild derived evaluation sources from independently obtained public raw files.
 - L3 result audit: verify released tables, predictions, configs, logs, manifests, checksums, and commit identifiers.
+
+## L2 Public-Source Rebuild Boundary
+
+The release must include source_input_manifest and processing_run_log so reviewers can trace public inputs to derived evaluation artifacts without receiving raw third-party data in Git. These files document the input boundary, command boundary, output boundary, and checksum boundary for the rebuild.
 
 ## Release Metadata To Fill
 

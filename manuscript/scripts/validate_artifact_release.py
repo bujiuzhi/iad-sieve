@@ -33,6 +33,8 @@ REQUIRED_README_MARKERS = {
     "repository commit": "Repository commit",
     "claim boundaries": "Claim Boundaries",
     "external artifact boundary": "Full numerical audit requires external artifacts",
+    "source input manifest": "source_input_manifest",
+    "processing run log": "processing_run_log",
     "result audit level": "L3 result audit",
 }
 FORBIDDEN_RELEASE_STATUSES = {"template_pending_external_artifact", "skeleton_pending_artifacts"}
@@ -43,6 +45,8 @@ REQUIRED_ARTIFACT_IDS = {
     "supervised_baseline_predictions",
     "threshold_selection_logs",
     "iad_bench_split_summary",
+    "source_input_manifest",
+    "processing_run_log",
 }
 OPEN_V2_MAIN_RESULTS_REQUIRED_COLUMNS = {
     "system",

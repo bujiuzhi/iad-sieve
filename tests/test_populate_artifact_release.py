@@ -223,6 +223,8 @@ def test_populate_artifact_release_copies_required_files_and_finalizes(tmp_path)
         "supervised_baseline_predictions",
         "threshold_selection_logs",
         "iad_bench_split_summary",
+        "source_input_manifest",
+        "processing_run_log",
     } <= copied_ids
     assert (artifact_dir / "tables" / "open_v2_main_results.csv").read_text(encoding="utf-8").strip()
     assert (artifact_dir / "logs" / "artifact_population_log.jsonl").is_file()

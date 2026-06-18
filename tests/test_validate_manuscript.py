@@ -2485,6 +2485,44 @@ def test_check_environment_setup_rejects_missing_fixture_command() -> None:
     assert any("does not download full raw datasets" in error for error in errors)
 
 
+def test_check_public_source_rebuild_audit_boundary_accepts_complete_boundary() -> None:
+    """验证补充材料必须说明 L2 公开源重建的输入、运行和输出审计边界。"""
+
+    module = _load_validate_manuscript_module()
+    supplementary_text = "\n".join(
+        [
+            r"\section{Public-Source Rebuild Audit Boundary}",
+            r"\label{tab:public-source-rebuild-audit-boundary}",
+            r"The package includes \path{source_input_manifest}.",
+            r"The package includes \path{processing_run_log}.",
+            "Source name and acquisition date or version are recorded.",
+            "The original provider and license boundary are recorded.",
+            "Each input has a SHA256 checksum.",
+            "Command line, code commit, environment summary, and random seed are recorded.",
+            "The release includes output summaries.",
+            "The package preserves chain of custody.",
+            "These files do not upgrade fixture-level reproduction into a full numerical audit.",
+        ]
+    )
+
+    errors = module.check_public_source_rebuild_audit_boundary(supplementary_text)
+
+    assert errors == []
+
+
+def test_check_public_source_rebuild_audit_boundary_rejects_missing_manifest_and_log() -> None:
+    """验证 L2 公开源重建说明缺少输入 manifest 或运行日志时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    supplementary_text = r"\section{Public-Source Rebuild Audit Boundary}" + "\nCommands are documented."
+
+    errors = module.check_public_source_rebuild_audit_boundary(supplementary_text)
+
+    assert any("source_input_manifest" in error for error in errors)
+    assert any("processing_run_log" in error for error in errors)
+    assert any("chain of custody" in error for error in errors)
+
+
 def test_check_reviewer_evidence_gate_rejects_missing_artifact_gates() -> None:
     """验证补充材料审稿证据门禁必须覆盖关键 artifact 证据。"""
 
@@ -2726,6 +2764,20 @@ def test_check_artifact_release_manifest_template_accepts_complete_template() ->
                     ),
                 },
                 {"artifact_id": "iad_bench_split_summary"},
+                {
+                    "artifact_id": "source_input_manifest",
+                    "claim_support": (
+                        "L2 public-source rebuild chain of custody with source name, acquisition date or version, "
+                        "original provider, local file name, record count, license boundary, and SHA256 checksum."
+                    ),
+                },
+                {
+                    "artifact_id": "processing_run_log",
+                    "claim_support": (
+                        "Processing-stage log with command line, code commit, environment summary, random seed, "
+                        "start and finish timestamps, input manifest reference, output path, and exit status."
+                    ),
+                },
                 {"artifact_id": "bootstrap_intervals"},
                 {"artifact_id": "ablation_suite"},
                 {"artifact_id": "manual_validation_slice"},
@@ -3012,6 +3064,16 @@ def test_check_artifact_release_readme_template_accepts_complete_template() -> N
             "selection_rule",
             "applied_scope",
             "iad_bench_split_summary",
+            "source_input_manifest",
+            "acquisition date or version",
+            "original provider",
+            "license boundary",
+            "processing_run_log",
+            "command line",
+            "code commit",
+            "environment summary",
+            "random seed",
+            "exit status",
             "cluster_metric_summary",
             "cannot_link_audit",
             "## Conditional Claim Artifacts",
@@ -3031,6 +3093,11 @@ def test_check_artifact_release_readme_template_accepts_complete_template() -> N
             "L1 fixture rebuild",
             "L2 public-source rebuild",
             "L3 result audit",
+            "## L2 Public-Source Rebuild Boundary",
+            "input boundary",
+            "command boundary",
+            "output boundary",
+            "checksum boundary",
         ]
     )
 
@@ -3186,6 +3253,11 @@ def test_check_data_processing_pipeline_document_accepts_reproducible_pipeline()
             "tests/fixtures/",
             "outputs/repro_fixture",
             "data/raw/",
+            "L2 重建审计文件",
+            "configs/source_input_manifest.json",
+            "logs/processing_run_log.jsonl",
+            "reports/iad_bench_split_summary.jsonl",
+            "chain of custody",
             "prepare-deepmatcher",
             "prepare-scirepeval-proximity",
             "fetch-openalex-works",
@@ -3928,8 +4000,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 31.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, manuscript artifact-validation text drift, zero-observed HNFMR overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
+            "Completed audit cycles: 32.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, manuscript artifact-validation text drift, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -4185,6 +4257,14 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "first-screen prose",
             "no hard-negative false merge was observed",
             "does not prove zero risk under all scholarly sources",
+            "## Audit Cycle 32: L2 Public-Source Rebuild Traceability Gate",
+            "L2 public-source rebuild traceability wording",
+            "source_input_manifest",
+            "processing_run_log",
+            "output summaries",
+            "chain of custody",
+            "real public-source inputs",
+            "alongside result tables, predictions, threshold logs, and split summaries",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -4203,7 +4283,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 31",
+        "Completed audit cycles: 32",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -4214,7 +4294,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 31" in error for error in errors)
+    assert any("Completed audit cycles: 32" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -4660,6 +4740,30 @@ def test_check_reviewer_readiness_audit_rejects_missing_zero_observed_hnfmr_gate
     assert any("Zero-Observed HNFMR Wording Gate" in error for error in errors)
     assert any("first-screen zero-risk overread control" in error for error in errors)
     assert any("does not prove zero risk under all scholarly sources" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_l2_traceability_gate() -> None:
+    """验证审稿准备度审计必须覆盖 L2 公开源重建追踪门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Audit Cycle 32: L2 Public-Source Rebuild Traceability Gate",
+        "L2 public-source rebuild traceability wording",
+        "source_input_manifest",
+        "processing_run_log",
+        "output summaries",
+        "chain of custody",
+        "real public-source inputs",
+        "alongside result tables, predictions, threshold logs, and split summaries",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("L2 Public-Source Rebuild Traceability Gate" in error for error in errors)
+    assert any("source_input_manifest" in error for error in errors)
+    assert any("chain of custody" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_final_upload_source_control_package_gate() -> None:

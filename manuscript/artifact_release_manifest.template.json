@@ -72,6 +72,18 @@
       "claim_support": "Pair counts, document counts, label strata, split coverage, and source coverage."
     },
     {
+      "artifact_id": "source_input_manifest",
+      "required": true,
+      "expected_location": "configs/source_input_manifest.json",
+      "claim_support": "L2 public-source rebuild chain of custody with source name, acquisition date or version, original provider, local file name, record count when known, license boundary, and SHA256 checksum for each public input file."
+    },
+    {
+      "artifact_id": "processing_run_log",
+      "required": true,
+      "expected_location": "logs/processing_run_log.jsonl",
+      "claim_support": "Processing-stage audit log with command line, code commit, environment summary, random seed, start and finish timestamps, input manifest reference, output path, and exit status for each rebuild stage."
+    },
+    {
       "artifact_id": "bootstrap_intervals",
       "required": false,
       "expected_location": "reports/bootstrap_intervals.csv",
