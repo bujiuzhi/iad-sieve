@@ -289,6 +289,29 @@ def check_author_rows(metadata_text: str) -> list[str]:
     return errors
 
 
+def check_author_orcid_uniqueness(metadata_text: str) -> list[str]:
+    """Check whether non-empty author ORCID values are unique.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages.
+    """
+    seen_orcids: set[str] = set()
+    duplicate_orcids: set[str] = set()
+    for row in parse_author_rows(metadata_text):
+        orcid = row.get("orcid", "").strip()
+        if not orcid:
+            continue
+        if orcid in seen_orcids:
+            duplicate_orcids.add(orcid)
+        seen_orcids.add(orcid)
+    if duplicate_orcids:
+        return [f"duplicate author ORCID values: {sorted(duplicate_orcids)}"]
+    return []
+
+
 def check_corresponding_author(metadata_text: str) -> list[str]:
     """Check final-upload corresponding-author fields.
 
@@ -458,6 +481,7 @@ def check_final_upload_metadata_text(metadata_text: str) -> list[str]:
         errors.append("final upload metadata unresolved: target journal is empty")
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_true_fields(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_author_rows(metadata_text))
+    errors.extend(f"final upload metadata unresolved: {message}" for message in check_author_orcid_uniqueness(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_corresponding_author(metadata_text))
     errors.extend(
         f"final upload metadata unresolved: {message}"
