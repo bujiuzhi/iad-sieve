@@ -312,6 +312,29 @@ def check_author_orcid_uniqueness(metadata_text: str) -> list[str]:
     return []
 
 
+def check_author_email_uniqueness(metadata_text: str) -> list[str]:
+    """Check whether author email values are unique.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages.
+    """
+    seen_emails: set[str] = set()
+    duplicate_emails: set[str] = set()
+    for row in parse_author_rows(metadata_text):
+        email = row.get("email", "").strip().lower()
+        if not email:
+            continue
+        if email in seen_emails:
+            duplicate_emails.add(email)
+        seen_emails.add(email)
+    if duplicate_emails:
+        return [f"duplicate author email values: {sorted(duplicate_emails)}"]
+    return []
+
+
 def check_corresponding_author(metadata_text: str) -> list[str]:
     """Check final-upload corresponding-author fields.
 
@@ -481,6 +504,7 @@ def check_final_upload_metadata_text(metadata_text: str) -> list[str]:
         errors.append("final upload metadata unresolved: target journal is empty")
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_true_fields(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_author_rows(metadata_text))
+    errors.extend(f"final upload metadata unresolved: {message}" for message in check_author_email_uniqueness(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_author_orcid_uniqueness(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_corresponding_author(metadata_text))
     errors.extend(
