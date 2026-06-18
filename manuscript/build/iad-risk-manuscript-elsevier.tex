@@ -152,6 +152,28 @@ Manual validation & Independent human review & External validation target \\
 \end{tabular}
 \end{table}
 
+\subsection{Document Schema Contract}
+
+IAD-Bench first standardizes each scholarly record before constructing pair evidence. Table~\ref{tab:iad-bench-document-schema} lists the document fields used by the manuscript. The contract keeps identity-bearing metadata, agenda-bearing metadata, and source provenance in one record so that downstream pair construction can be audited without redistributing raw third-party files.
+
+\begin{table}[H]
+\caption{IAD-Bench document schema contract. Missing values are represented by empty strings, empty arrays, or null values rather than by dropping required fields.}
+\label{tab:iad-bench-document-schema}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.22\linewidth}L{0.38\linewidth}L{0.30\linewidth}}
+\toprule
+Field group & Required fields & Reviewer-facing role \\
+\midrule
+Record identity & \texttt{document\_id}, \texttt{source\_dataset} & Makes each standardized record traceable to its originating public source. \\
+Text and authorship & \texttt{title}, \texttt{abstract}, \texttt{authors} & Provides the textual and author evidence used by identity and agenda features. \\
+Bibliographic metadata & \texttt{year}, \texttt{venue}, \texttt{doi}, \texttt{arxiv\_id}, \texttt{openalex\_work\_id} & Supplies identifier and publication-context evidence for same-work decisions. \\
+Agenda context & \texttt{topics}, \texttt{references} & Supplies topical and citation evidence used for same-agenda and hard-negative construction. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Pair Schema Contract}
 
 IAD-Bench uses a pair schema that makes relation semantics and evidence strength auditable. Table~\ref{tab:iad-bench-pair-schema} lists the required fields used by the manuscript. The schema separates the binary same-work target from agenda relatedness, records the source and strength of each label, and keeps split and hard-negative metadata visible so that training, threshold selection, held-out reporting, and manual audit cannot be silently mixed.

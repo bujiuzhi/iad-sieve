@@ -372,6 +372,49 @@ def test_check_openv2_benchmark_composition_rejects_missing_counts() -> None:
     assert any("not human non-identity gold" in error for error in errors)
 
 
+def test_check_iad_bench_document_schema_contract_accepts_complete_contract() -> None:
+    """验证 IAD-Bench document schema 字段契约完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Document Schema Contract}",
+            r"\label{tab:iad-bench-document-schema}",
+            r"\texttt{document\_id}",
+            r"\texttt{source\_dataset}",
+            r"\texttt{title}",
+            r"\texttt{abstract}",
+            r"\texttt{authors}",
+            r"\texttt{year}",
+            r"\texttt{venue}",
+            r"\texttt{doi}",
+            r"\texttt{arxiv\_id}",
+            r"\texttt{openalex\_work\_id}",
+            r"\texttt{topics}",
+            r"\texttt{references}",
+            "Missing values are represented by empty strings, empty arrays, or null values.",
+            "The schema can be audited without redistributing raw third-party files.",
+        ]
+    )
+
+    errors = module.check_iad_bench_document_schema_contract(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_iad_bench_document_schema_contract_rejects_missing_fields() -> None:
+    """验证 IAD-Bench document schema 缺少核心字段时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\subsection{Document Schema Contract}"
+
+    errors = module.check_iad_bench_document_schema_contract(manuscript_text)
+
+    assert any("iad-bench-document-schema" in error for error in errors)
+    assert any("openalex\\_work\\_id" in error for error in errors)
+    assert any("raw third-party files" in error for error in errors)
+
+
 def test_check_iad_bench_pair_schema_contract_accepts_complete_contract() -> None:
     """验证 IAD-Bench pair schema 字段契约完整时可通过检查。"""
 
