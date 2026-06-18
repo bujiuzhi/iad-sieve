@@ -4295,6 +4295,8 @@ def test_check_final_upload_metadata_rejects_placeholders() -> None:
             "author_metadata_completed: false",
             "corresponding_author_completed: false",
             "funding_statement_text_ready: false",
+            "contribution_statement_complete: false",
+            "permissions_statement_complete: false",
             "manuscript_pdf_rebuilt_after_template: false",
             "supplementary_pdf_rebuilt_after_template: false",
             "submission_system_files_verified: false",
@@ -4308,6 +4310,8 @@ def test_check_final_upload_metadata_rejects_placeholders() -> None:
     assert any("author list is empty" in error for error in errors)
     assert any("corresponding author email is empty" in error for error in errors)
     assert any("funding statement text checklist item is incomplete" in error for error in errors)
+    assert any("author contribution statement checklist item is incomplete" in error for error in errors)
+    assert any("permissions statement checklist item is incomplete" in error for error in errors)
     assert any("artifact release checklist item is incomplete" in error for error in errors)
 
 
@@ -4364,6 +4368,8 @@ def test_check_final_upload_metadata_accepts_filled_metadata() -> None:
             "  author_metadata_completed: true",
             "  corresponding_author_completed: true",
             "  funding_statement_text_ready: true",
+            "  contribution_statement_complete: true",
+            "  permissions_statement_complete: true",
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
@@ -4425,6 +4431,8 @@ def test_check_final_upload_metadata_rejects_missing_repository_reference() -> N
             "  author_metadata_completed: true",
             "  corresponding_author_completed: true",
             "  funding_statement_text_ready: true",
+            "  contribution_statement_complete: true",
+            "  permissions_statement_complete: true",
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
@@ -4491,6 +4499,8 @@ def test_check_final_upload_metadata_rejects_data_code_statement_without_release
             "  author_metadata_completed: true",
             "  corresponding_author_completed: true",
             "  funding_statement_text_ready: true",
+            "  contribution_statement_complete: true",
+            "  permissions_statement_complete: true",
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
@@ -4532,6 +4542,8 @@ def test_check_final_upload_metadata_rejects_corresponding_author_outside_author
             "  author_metadata_completed: true",
             "  corresponding_author_completed: true",
             "  funding_statement_text_ready: true",
+            "  contribution_statement_complete: true",
+            "  permissions_statement_complete: true",
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
@@ -4943,6 +4955,8 @@ def test_check_final_upload_metadata_accepts_dke_research_data_statement_with_ar
             "  author_metadata_completed: true",
             "  corresponding_author_completed: true",
             "  funding_statement_text_ready: true",
+            "  contribution_statement_complete: true",
+            "  permissions_statement_complete: true",
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
@@ -5113,6 +5127,8 @@ def test_check_final_upload_metadata_rejects_empty_credit_roles_by_default() -> 
             "  author_metadata_completed: true",
             "  corresponding_author_completed: true",
             "  funding_statement_text_ready: true",
+            "  contribution_statement_complete: true",
+            "  permissions_statement_complete: true",
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
@@ -5303,6 +5319,8 @@ def test_check_final_upload_metadata_rejects_no_permission_without_statement_tex
             "  author_metadata_completed: true",
             "  corresponding_author_completed: true",
             "  funding_statement_text_ready: true",
+            "  contribution_statement_complete: true",
+            "  permissions_statement_complete: true",
             "  manuscript_pdf_rebuilt_after_template: true",
             "  supplementary_pdf_rebuilt_after_template: true",
             "  submission_system_files_verified: true",
