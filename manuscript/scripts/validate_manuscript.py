@@ -1220,18 +1220,41 @@ def check_result_claim_boundary(manuscript_text: str, supplementary_text: str) -
     return errors
 
 
-def check_method_feature_contract(manuscript_text: str) -> list[str]:
+def check_method_feature_contract(manuscript_text: str, supplementary_text: str = "") -> list[str]:
     """Check whether the method states implementation-level feature boundaries.
 
     参数:
         manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
 
     返回:
         list[str]: Error messages for missing method-contract markers.
     """
-    required_markers = [
+    required_main_markers = [
         r"\subsection{Feature and Head Specification}",
+        "full feature and head specification table is reported in the supplementary material",
+        "Transformer distances",
+        "title similarity",
+        "author overlap",
+        "DOI/arXiv/OpenAlex identifier agreement",
+        "topic overlap",
+        "reference Jaccard similarity",
+        "different-identifier conflicts",
+        "provenance-aware masking",
+        "audit metadata remains traceable but is not a training feature",
+    ]
+    required_supplement_markers = [
         r"\label{tab:feature-head-specification}",
+        "Feature and head specification for IAD-Risk transformer variants",
+        "Head or stage",
+        "Main input fields",
+        "Supervision or calculation",
+        "Output role",
+        "Identity head",
+        "Agenda head",
+        "ANI risk head",
+        "Risk gate",
+        "Audit metadata",
         "Transformer distances",
         "title similarity",
         "author overlap",
@@ -1242,7 +1265,18 @@ def check_method_feature_contract(manuscript_text: str) -> list[str]:
         "provenance-aware masking",
         "it is not a training feature",
     ]
-    return [f"method feature contract missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+    errors = [
+        f"method feature contract missing manuscript marker: {marker}"
+        for marker in required_main_markers
+        if marker not in manuscript_text
+    ]
+    evidence_text = supplementary_text or manuscript_text
+    errors.extend(
+        f"method feature contract missing supplementary marker: {marker}"
+        for marker in required_supplement_markers
+        if marker not in evidence_text
+    )
+    return errors
 
 
 def check_training_objective_masking(manuscript_text: str) -> list[str]:
@@ -3220,7 +3254,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 61",
+        "Completed audit cycles: 62",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3339,8 +3373,18 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 59: Metric Formula Boundary Density Gate",
         "Audit Cycle 60: Decision-to-Metric Mapping Density Gate",
         "Audit Cycle 61: Split and Leakage Controls Density Gate",
+        "Audit Cycle 62: Feature and Head Specification Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
+        "feature-head table-density reduction",
+        "full feature and head specification table",
+        "Transformer distances",
+        "title similarity",
+        "DOI/arXiv/OpenAlex identifier agreement",
+        "reference Jaccard similarity",
+        "different-identifier conflicts",
+        "feature-head clarity without main-text table overload",
+        "supplementary feature and head specification table",
         "split-control table-density reduction",
         "full split and leakage controls table",
         "Training uses only the declared training split",
@@ -4796,7 +4840,7 @@ def main() -> int:
     errors.extend(check_iad_bench_document_schema_contract(manuscript_text))
     errors.extend(check_iad_bench_pair_schema_contract(manuscript_text))
     errors.extend(check_iad_bench_supplementary_schema_tables(supplementary_text))
-    errors.extend(check_method_feature_contract(manuscript_text))
+    errors.extend(check_method_feature_contract(manuscript_text, supplementary_text))
     errors.extend(check_training_objective_masking(manuscript_text))
     errors.extend(check_risk_score_design_rationale(manuscript_text))
     errors.extend(check_risk_calibration_overclaims(manuscript_text))

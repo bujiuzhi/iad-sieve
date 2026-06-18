@@ -1515,14 +1515,35 @@ def test_check_training_objective_masking_rejects_unmasked_loss() -> None:
     assert any("risk score is not directly supervised" in error for error in errors)
 
 
-def test_check_method_feature_contract_accepts_complete_contract() -> None:
-    """验证方法特征契约完整时可通过检查。"""
+def test_check_method_feature_contract_accepts_supplementary_table() -> None:
+    """验证方法特征契约表迁入补充材料后可通过检查。"""
 
     module = _load_validate_manuscript_module()
     manuscript_text = "\n".join(
         [
             r"\subsection{Feature and Head Specification}",
+            "The full feature and head specification table is reported in the supplementary material.",
+            "Transformer distances and title similarity are used with author overlap.",
+            "DOI/arXiv/OpenAlex identifier agreement is treated as identity evidence.",
+            "The agenda head uses topic overlap and reference Jaccard similarity.",
+            "The ANI risk head uses different-identifier conflicts.",
+            "The relation heads use provenance-aware masking.",
+            "audit metadata remains traceable but is not a training feature.",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
             r"\label{tab:feature-head-specification}",
+            "Feature and head specification for IAD-Risk transformer variants.",
+            "Head or stage",
+            "Main input fields",
+            "Supervision or calculation",
+            "Output role",
+            "Identity head",
+            "Agenda head",
+            "ANI risk head",
+            "Risk gate",
+            "Audit metadata",
             "Transformer distances and title similarity are used with author overlap.",
             "DOI/arXiv/OpenAlex identifier agreement is treated as identity evidence.",
             "The agenda head uses topic overlap and reference Jaccard similarity.",
@@ -1532,21 +1553,32 @@ def test_check_method_feature_contract_accepts_complete_contract() -> None:
         ]
     )
 
-    errors = module.check_method_feature_contract(manuscript_text)
+    errors = module.check_method_feature_contract(manuscript_text, supplementary_text)
 
     assert errors == []
 
 
-def test_check_method_feature_contract_rejects_missing_feature_boundary() -> None:
-    """验证方法特征契约缺少关键字段时会被拒绝。"""
+def test_check_method_feature_contract_rejects_missing_supplementary_table() -> None:
+    """验证缺少补充材料方法特征契约表时会被拒绝。"""
 
     module = _load_validate_manuscript_module()
-    manuscript_text = r"\subsection{Feature and Head Specification}"
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Feature and Head Specification}",
+            "The full feature and head specification table is reported in the supplementary material.",
+            "Transformer distances and title similarity are used with author overlap.",
+            "DOI/arXiv/OpenAlex identifier agreement is treated as identity evidence.",
+            "The agenda head uses topic overlap and reference Jaccard similarity.",
+            "The ANI risk head uses different-identifier conflicts.",
+            "The relation heads use provenance-aware masking.",
+            "audit metadata remains traceable but is not a training feature.",
+        ]
+    )
 
-    errors = module.check_method_feature_contract(manuscript_text)
+    errors = module.check_method_feature_contract(manuscript_text, "")
 
     assert any("feature-head-specification" in error for error in errors)
-    assert any("different-identifier conflicts" in error for error in errors)
+    assert any("Feature and head specification" in error for error in errors)
 
 
 def test_check_risk_score_design_rationale_accepts_complete_rationale() -> None:
@@ -4986,7 +5018,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 61.",
+            "Completed audit cycles: 62.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -5475,6 +5507,16 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "Topic-heldout readiness audit",
             "split-control clarity without main-text table overload",
             "supplementary split and leakage controls table",
+            "## Audit Cycle 62: Feature and Head Specification Density Gate",
+            "feature-head table-density reduction",
+            "full feature and head specification table",
+            "Transformer distances",
+            "title similarity",
+            "DOI/arXiv/OpenAlex identifier agreement",
+            "reference Jaccard similarity",
+            "different-identifier conflicts",
+            "feature-head clarity without main-text table overload",
+            "supplementary feature and head specification table",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -5493,7 +5535,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 61",
+        "Completed audit cycles: 62",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -5504,7 +5546,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 61" in error for error in errors)
+    assert any("Completed audit cycles: 62" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
