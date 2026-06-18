@@ -351,49 +351,11 @@ Step & Operation & Required inputs or outputs & Audit role \\
 
 \subsection{Operational Complexity and Net Benefit}
 
-IAD-Risk is appropriate when false merges are more costly than additional review. The additional cost comes from three relation heads and explicit threshold records, rather than from a new end-to-end clustering system. In an operational scholarly index, this cost is justified when a false merge can contaminate citation counts, literature-review evidence, or recommendation signals. Net benefit also requires workload evidence: automatic merge coverage must be large enough to reduce reviewer work after accounting for blocked and deferred pairs. Low FMR or HNFMR alone is insufficient for productivity or cost-saving claims. In contrast, low-risk bulk cleanup tasks may prefer a simpler deduplication rule if occasional false merges have limited downstream effect.
-
-\begin{table}[H]
-\caption{Operational complexity and net-benefit boundary. The framework is intended for safety-sensitive scholarly identity decisions, not as a universal replacement for simple deduplication pipelines.}
-\label{tab:operational-net-benefit}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{L{0.23\linewidth}L{0.33\linewidth}L{0.34\linewidth}}
-\toprule
-Operational item & Required practice & Net-benefit boundary \\
-\midrule
-Model complexity & Train and audit same-work, same-agenda, and ANI heads under one pair schema. & The net benefit is strongest in high-stakes scholarly indexes where false merges are costly. \\
-Threshold governance & Select shared thresholds on validation evidence and record them in artifacts. & Thresholds are not tuned per pair or changed after test inspection. \\
-Deferral policy & Record the deferral budget and manual-review capacity before deployment. & A high defer rate is acceptable only when review capacity exists. \\
-Automation claim & Compare automatic merge coverage, block rate, defer rate, and manual-review capacity under the predeclared operating point. & Without workload evidence, the method should be interpreted as a conservative safety filter rather than as a throughput-improving pipeline. \\
-Simple alternatives & Retain simple rules for low-risk bulk cleanup or identifier-only reconciliation. & IAD-Risk is not a universal replacement for simple deduplication pipelines. \\
-\bottomrule
-\end{tabular}
-\end{table}
+IAD-Risk is appropriate when false merges are more costly than additional review. The additional cost comes from three relation heads and explicit threshold records, rather than from a new end-to-end clustering system. In an operational scholarly index, this cost is justified when a false merge can contaminate citation counts, literature-review evidence, or recommendation signals. Net benefit also requires workload evidence: automatic merge coverage must be large enough to reduce reviewer work after accounting for blocked and deferred pairs, and the deferral budget and manual-review capacity must be recorded before deployment. Low FMR or HNFMR alone is insufficient for productivity or cost-saving claims. Thresholds are shared operating-point parameters selected on validation evidence, not tuned per pair. Without workload evidence, IAD-Risk should be read as a conservative safety filter, not a universal replacement for simple deduplication pipelines. The net benefit is strongest in high-stakes scholarly indexes, whereas low-risk bulk cleanup tasks may prefer simpler rules. The full operational net-benefit matrix is reported in the supplementary material.
 
 \subsection{Version and Identifier Boundary}
 
-Version and identifier evidence is treated as merge-policy input rather than as a post-hoc cleanup rule. DOI, arXiv, and OpenAlex identifiers provide strong identity cues when they agree, but publication-lineage evidence is still needed when records describe preprint, conference, and journal versions of related work. IAD-Risk therefore separates identifier agreement, identifier conflict, and uncertain version boundaries before applying cluster-level merging.
-
-\begin{table}[H]
-\caption{Version and identifier boundary for merge decisions. The policy prevents related scholarly versions or conflicting identifiers from being silently collapsed into one work identity.}
-\label{tab:version-identifier-boundary}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{L{0.23\linewidth}L{0.33\linewidth}L{0.34\linewidth}}
-\toprule
-Evidence condition & Operational policy & Boundary statement \\
-\midrule
-Identifier agreement & DOI, arXiv, or OpenAlex agreement is positive identity evidence when other metadata do not contradict it. & identifier agreement supports merge eligibility, but it does not replace source and metadata checks. \\
-Identifier conflict & Conflicting DOI, arXiv, or OpenAlex fields are treated as risk evidence before any automatic merge. & identifier conflict creates cannot-link or defer evidence unless an audit log resolves the conflict. \\
-Version relationship & Related preprint, conference, and journal versions require an explicit version policy. & not every related version is automatically the same work. \\
-Ambiguous lineage & When lineage cannot be established from identifiers and metadata, the pair is not forced into a merge. & manual adjudication is required for ambiguous version boundaries. \\
-Cluster propagation & Version decisions are recorded before transitive clustering. & version policy must be declared before cluster-level merging. \\
-\bottomrule
-\end{tabular}
-\end{table}
+Version and identifier evidence is treated as merge-policy input rather than as a post-hoc cleanup rule. DOI, arXiv, and OpenAlex identifiers provide strong identity cues when they agree, but publication-lineage evidence is still needed when records describe preprint, conference, and journal versions of related work. In this policy, identifier agreement supports merge eligibility, identifier conflict creates cannot-link or defer evidence, and not every related version is automatically the same work. IAD-Risk therefore separates identifier agreement, identifier conflict, and uncertain version boundaries before applying cluster-level merging. The version policy must be declared before cluster-level merging, and manual adjudication is required for ambiguous version boundaries. The full version and identifier boundary table is reported in the supplementary material.
 
 \subsection{Failure-Control Rationale}
 

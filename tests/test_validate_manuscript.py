@@ -1612,7 +1612,7 @@ def test_check_operational_net_benefit_boundary_accepts_complete_boundary() -> N
     manuscript_text = "\n".join(
         [
             r"\subsection{Operational Complexity and Net Benefit}",
-            r"\label{tab:operational-net-benefit}",
+            "The full operational net-benefit matrix is reported in the supplementary material.",
             "IAD-Risk is appropriate when false merges are more costly than additional review.",
             "The additional cost comes from three relation heads and explicit threshold records.",
             "automatic merge coverage must be large enough to reduce reviewer work",
@@ -1639,7 +1639,7 @@ def test_check_operational_net_benefit_boundary_rejects_missing_cost_boundary() 
 
     errors = module.check_operational_net_benefit_boundary(manuscript_text)
 
-    assert any("operational-net-benefit" in error for error in errors)
+    assert any("operational net-benefit matrix" in error for error in errors)
     assert any("deferral budget" in error for error in errors)
     assert any("productivity or cost-saving claims" in error for error in errors)
     assert any("not a universal replacement" in error for error in errors)
@@ -1652,7 +1652,7 @@ def test_check_version_identifier_policy_accepts_complete_boundary() -> None:
     manuscript_text = "\n".join(
         [
             r"\subsection{Version and Identifier Boundary}",
-            r"\label{tab:version-identifier-boundary}",
+            "The full version and identifier boundary table is reported in the supplementary material.",
             "DOI, arXiv, and OpenAlex identifiers are used as identity cues.",
             "publication-lineage evidence is still required for related records.",
             "identifier agreement supports merge eligibility",
@@ -1680,6 +1680,47 @@ def test_check_version_identifier_policy_rejects_missing_defer_boundary() -> Non
     assert any("version and identifier boundary" in error for error in errors)
     assert any("identifier conflict creates cannot-link or defer evidence" in error for error in errors)
     assert any("manual adjudication" in error for error in errors)
+
+
+def test_check_method_design_supplementary_boundaries_accepts_complete_tables() -> None:
+    """验证补充材料保留方法设计边界表时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    supplementary_text = "\n".join(
+        [
+            r"\section{Method Design Boundaries}",
+            r"\label{tab:operational-net-benefit}",
+            r"\label{tab:version-identifier-boundary}",
+            "Operational complexity and net-benefit boundary",
+            "The net benefit is strongest in high-stakes scholarly indexes.",
+            "Thresholds are not tuned per pair.",
+            "The table records deferral budget and manual-review capacity.",
+            "The method is a conservative safety filter.",
+            "It is not a universal replacement.",
+            "Version and identifier boundary for merge decisions",
+            "identifier agreement supports merge eligibility",
+            "identifier conflict creates cannot-link or defer evidence",
+            "not every related version is automatically the same work",
+            "manual adjudication is required for ambiguous version boundaries",
+            "version policy must be declared before cluster-level merging",
+        ]
+    )
+
+    errors = module.check_method_design_supplementary_boundaries(supplementary_text)
+
+    assert errors == []
+
+
+def test_check_method_design_supplementary_boundaries_rejects_missing_tables() -> None:
+    """验证补充材料缺少方法设计边界表时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    supplementary_text = r"\section{Method Design Boundaries}"
+
+    errors = module.check_method_design_supplementary_boundaries(supplementary_text)
+
+    assert any("operational-net-benefit" in error for error in errors)
+    assert any("version-identifier-boundary" in error for error in errors)
 
 
 def test_check_method_pipeline_figure_accepts_complete_figure() -> None:

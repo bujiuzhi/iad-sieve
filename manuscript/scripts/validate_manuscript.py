@@ -111,6 +111,7 @@ REQUIRED_SUPPLEMENT_SECTIONS = [
     r"\section{Closest-Work Positioning}",
     r"\section{Reproduction Levels}",
     r"\section{IAD-Bench Schema Contracts}",
+    r"\section{Method Design Boundaries}",
     r"\section{Environment Setup}",
     r"\section{No-Network Fixture Rebuild}",
     r"\section{Public-Source Rebuild}",
@@ -1293,7 +1294,7 @@ def check_operational_net_benefit_boundary(manuscript_text: str) -> list[str]:
     """
     required_markers = [
         r"\subsection{Operational Complexity and Net Benefit}",
-        r"\label{tab:operational-net-benefit}",
+        "full operational net-benefit matrix is reported in the supplementary material",
         "false merges are more costly than additional review",
         "three relation heads and explicit threshold records",
         "automatic merge coverage must be large enough to reduce reviewer work",
@@ -1323,7 +1324,7 @@ def check_version_identifier_policy(manuscript_text: str) -> list[str]:
     """
     required_markers = [
         r"\subsection{Version and Identifier Boundary}",
-        r"\label{tab:version-identifier-boundary}",
+        "full version and identifier boundary table is reported in the supplementary material",
         "DOI, arXiv, and OpenAlex identifiers",
         "publication-lineage evidence",
         "identifier agreement supports merge eligibility",
@@ -1337,6 +1338,39 @@ def check_version_identifier_policy(manuscript_text: str) -> list[str]:
         f"version and identifier boundary missing marker: {marker}"
         for marker in required_markers
         if marker not in manuscript_text
+    ]
+
+
+def check_method_design_supplementary_boundaries(supplementary_text: str) -> list[str]:
+    """Check whether supplementary material preserves method-design boundary matrices.
+
+    参数:
+        supplementary_text: Supplementary LaTeX source.
+
+    返回:
+        list[str]: Error messages for missing method-design boundary markers.
+    """
+    required_markers = [
+        r"\section{Method Design Boundaries}",
+        r"\label{tab:operational-net-benefit}",
+        r"\label{tab:version-identifier-boundary}",
+        "Operational complexity and net-benefit boundary",
+        "The net benefit is strongest in high-stakes scholarly indexes",
+        "Thresholds are not tuned per pair",
+        "deferral budget and manual-review capacity",
+        "conservative safety filter",
+        "not a universal replacement",
+        "Version and identifier boundary for merge decisions",
+        "identifier agreement supports merge eligibility",
+        "identifier conflict creates cannot-link or defer evidence",
+        "not every related version is automatically the same work",
+        "manual adjudication is required for ambiguous version boundaries",
+        "version policy must be declared before cluster-level merging",
+    ]
+    return [
+        f"method design supplementary boundary missing marker: {marker}"
+        for marker in required_markers
+        if marker not in supplementary_text
     ]
 
 
@@ -4158,6 +4192,7 @@ def main() -> int:
     errors.extend(check_method_cluster_overclaims(manuscript_text))
     errors.extend(check_operational_net_benefit_boundary(manuscript_text))
     errors.extend(check_version_identifier_policy(manuscript_text))
+    errors.extend(check_method_design_supplementary_boundaries(supplementary_text))
     errors.extend(check_method_pipeline_figure(manuscript_text))
     errors.extend(check_scoring_merge_algorithm(manuscript_text))
     errors.extend(check_design_alternative_boundaries(manuscript_text))

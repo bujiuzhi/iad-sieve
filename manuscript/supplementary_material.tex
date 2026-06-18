@@ -100,6 +100,48 @@ Evaluation control & \texttt{split}, \texttt{hard\_negative\_level} & Controls t
 \end{tabular}
 \end{table}
 
+\section{Method Design Boundaries}
+
+The main manuscript summarizes method-design boundaries in prose. The tables below keep the operational net-benefit and version-identifier policies auditable without overloading the Method narrative.
+
+\begin{table}[H]
+\caption{Operational complexity and net-benefit boundary. The framework is intended for safety-sensitive scholarly identity decisions, not as a universal replacement for simple deduplication pipelines.}
+\label{tab:operational-net-benefit}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.23\linewidth}L{0.33\linewidth}L{0.34\linewidth}}
+\toprule
+Operational item & Required practice & Net-benefit boundary \\
+\midrule
+Model complexity & Train and audit same-work, same-agenda, and ANI heads under one pair schema. & The net benefit is strongest in high-stakes scholarly indexes where false merges are costly. \\
+Threshold governance & Select shared thresholds on validation evidence and record them in artifacts. & Thresholds are not tuned per pair or changed after test inspection. \\
+Deferral policy & Record the deferral budget and manual-review capacity before deployment. & A high defer rate is acceptable only when review capacity exists. \\
+Automation claim & Compare automatic merge coverage, block rate, defer rate, and manual-review capacity under the predeclared operating point. & Without workload evidence, the method should be interpreted as a conservative safety filter rather than as a throughput-improving pipeline. \\
+Simple alternatives & Retain simple rules for low-risk bulk cleanup or identifier-only reconciliation. & IAD-Risk is not a universal replacement for simple deduplication pipelines. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\caption{Version and identifier boundary for merge decisions. The policy prevents related scholarly versions or conflicting identifiers from being silently collapsed into one work identity.}
+\label{tab:version-identifier-boundary}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.23\linewidth}L{0.33\linewidth}L{0.34\linewidth}}
+\toprule
+Evidence condition & Operational policy & Boundary statement \\
+\midrule
+Identifier agreement & DOI, arXiv, or OpenAlex agreement is positive identity evidence when other metadata do not contradict it. & identifier agreement supports merge eligibility, but it does not replace source and metadata checks. \\
+Identifier conflict & Conflicting DOI, arXiv, or OpenAlex fields are treated as risk evidence before any automatic merge. & identifier conflict creates cannot-link or defer evidence unless an audit log resolves the conflict. \\
+Version relationship & Related preprint, conference, and journal versions require an explicit version policy. & not every related version is automatically the same work. \\
+Ambiguous lineage & When lineage cannot be established from identifiers and metadata, the pair is not forced into a merge. & manual adjudication is required for ambiguous version boundaries. \\
+Cluster propagation & Version decisions are recorded before transitive clustering. & version policy must be declared before cluster-level merging. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Environment Setup}
 
 The repository is designed to run from a standard Python environment without committing raw third-party data. Reviewers can validate the code and fixture-level reproduction path from the project root with the following commands:

@@ -434,6 +434,14 @@ This gate checks whether the closest-work positioning matrix interrupts the Rela
 
 The reviewer-facing boundary is novelty clarity without table overload. The edit keeps the Related Work section focused on mechanism differences rather than table scanning, while the validator still requires both the main-text novelty boundary and the supplementary positioning matrix.
 
+## Audit Cycle 43: Method Design Boundary Density Gate
+
+Outcome: pass for Method table-density reduction; blocked for final numerical audit until the external artifact release remains populated, finalized, checksum-validated, and publicly linked.
+
+This gate checks whether operational net-benefit and version-identifier policy tables make the Method section heavier than necessary for first-pass review. The main manuscript now states the cost, workload, threshold-governance, version-policy, and adjudication boundaries in prose, while the supplementary material preserves the full operational net-benefit and version-identifier matrices.
+
+The reviewer-facing boundary is design soundness without table overload. The edit keeps the Method section focused on the algorithm and decision policy, while the validator still requires both main-text boundary statements and supplementary method-design tables.
+
 ## Minimum Gate Before Final Upload
 
 The manuscript should not be uploaded to a journal system until all of the following are true:
