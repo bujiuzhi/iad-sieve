@@ -10,9 +10,9 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 12.
+Completed audit cycles: 13.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, live submission-system text consistency, Git-only fixture reproducibility, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.
 
@@ -190,6 +190,14 @@ Outcome: pass for no-network code-path evidence; blocked for full numerical repr
 This cycle checks whether the public repository can demonstrate executable data-processing paths without committing raw third-party data or full experiment outputs. The required command is `python manuscript/scripts/verify_fixture_rebuild.py`, which rebuilds DeepMatcher, SciRepEval-style, OpenAlex/OpenCitations, and assembled IAD-Bench fixture outputs in a temporary directory. The companion public-release command is `python scripts/check_public_release.py`, which verifies that `data/`, `outputs/`, caches, credentials, and large local artifacts remain outside the public package.
 
 The reviewer-facing boundary is explicit. Passing the fixture rebuild proves that the data adapters, CLI entry points, schema contracts, and IAD-Bench assembly path execute on small public fixtures. It does not prove the Open-v2 numerical table, threshold choices, model predictions, or bootstrap intervals. Those result-level claims remain tied to the L2/L3 public-source rebuild or external artifact release with manifests and checksums.
+
+## Audit Cycle 13: Submission Package Source-PDF Consistency Gate
+
+Outcome: pass for package-level validator coverage; blocked for final upload until the selected journal source and PDFs are rebuilt after all final source edits.
+
+This cycle checks whether the generated submission package can detect stale compiled files rather than relying on manual rebuild discipline. The package validator now compares packaged PDFs against their packaged source dependencies: the main PDF is checked against `main.tex` and `references.bib`, the supplementary PDF is checked against `supplementary_material.tex`, and the DKE/Elsevier preflight PDF is checked against `iad-risk-manuscript-elsevier.tex`, `keywords.md`, and `references.bib`. If a packaged PDF is older than any required source dependency, the package must be rejected with the action boundary: rebuild PDF before packaging.
+
+The reviewer-facing boundary is procedural but important. A passing package validation shows that the packaged PDFs are not older than the included source files and bibliography. It does not prove final journal-template correctness, author metadata completeness, external artifact availability, or stronger empirical evidence. Those remain gated by template binding, final-upload metadata, artifact release validation, and the Q2/B evidence checks.
 
 ## Minimum Gate Before Final Upload
 

@@ -66,6 +66,13 @@ DKE_PREFLIGHT_EXPECTED_MANIFEST_ROLES = {
     "dke_elsevier_latex_source",
     "dke_elsevier_pdf",
 }
+BASE_PDF_FRESHNESS_DEPENDENCIES = {
+    "iad-risk-manuscript-latex.pdf": ["main.tex", "references.bib"],
+    "iad-risk-supplementary-material.pdf": ["supplementary_material.tex"],
+}
+DKE_PREFLIGHT_PDF_FRESHNESS_DEPENDENCIES = {
+    "iad-risk-manuscript-elsevier.pdf": ["iad-risk-manuscript-elsevier.tex", "keywords.md", "references.bib"],
+}
 EXPECTED_MANIFEST_TOP_LEVEL_FIELDS = {
     "package_name",
     "package_type",
@@ -443,6 +450,39 @@ def check_forbidden_path_name(path_name: str, location: str) -> list[str]:
     return errors
 
 
+def check_package_pdf_freshness(package_dir: Path, dke_preflight: bool = False) -> list[str]:
+    """Check that packaged PDFs are newer than their packaged source dependencies.
+
+    参数:
+        package_dir: Generated package directory.
+        dke_preflight: Whether the package includes DKE/Elsevier files.
+
+    返回:
+        list[str]: Error messages for stale packaged PDFs.
+    """
+    dependency_map = dict(BASE_PDF_FRESHNESS_DEPENDENCIES)
+    if dke_preflight:
+        dependency_map.update(DKE_PREFLIGHT_PDF_FRESHNESS_DEPENDENCIES)
+    errors: list[str] = []
+    for pdf_name, dependency_names in dependency_map.items():
+        pdf_path = package_dir / pdf_name
+        if not pdf_path.exists():
+            continue
+        for dependency_name in dependency_names:
+            dependency_path = package_dir / dependency_name
+            if not dependency_path.exists():
+                continue
+            try:
+                pdf_mtime = pdf_path.stat().st_mtime
+                dependency_mtime = dependency_path.stat().st_mtime
+            except OSError as exc:
+                errors.append(f"cannot stat packaged PDF dependency {pdf_name} vs {dependency_name}: {exc}")
+                continue
+            if pdf_mtime < dependency_mtime:
+                errors.append(f"{package_dir}/{pdf_name} is older than {dependency_name}; rebuild PDF before packaging")
+    return errors
+
+
 def validate_package_directory(package_dir: Path, final_upload: bool = False, dke_preflight: bool = False) -> list[str]:
     """Validate the generated package directory.
 
@@ -462,6 +502,7 @@ def validate_package_directory(package_dir: Path, final_upload: bool = False, dk
     files = [path for path in entries if path.is_file()]
     directories = [path for path in entries if path.is_dir()]
     errors = check_file_membership({path.name for path in files}, str(package_dir), dke_preflight)
+    errors.extend(check_package_pdf_freshness(package_dir, dke_preflight))
     if directories:
         errors.append(f"{package_dir} has unexpected directories: {sorted(path.name for path in directories)}")
     for path in entries:

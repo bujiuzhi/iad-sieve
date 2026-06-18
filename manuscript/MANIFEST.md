@@ -74,6 +74,8 @@ python manuscript/scripts/validate_submission_package.py --dke-preflight
 
 `reviewer_readiness_audit.md` 用于记录投稿前审稿准备度、主要拒稿风险和最终上传门槛，不作为当前匿名预投稿包的替代物。
 
+`scripts/validate_submission_package.py` 会在投稿包目录层面校验 PDF 新鲜度：主稿 PDF 必须晚于 `main.tex` 和 `references.bib`，补充材料 PDF 必须晚于 `supplementary_material.tex`，DKE/Elsevier 预转换 PDF 必须晚于 `iad-risk-manuscript-elsevier.tex`、`keywords.md` 和 `references.bib`。该门禁用于避免源文件或参考文献更新后误打包旧 PDF。
+
 ## 正式上传检查项
 
 `submission_metadata.yml` 中的 `final_upload_checklist` 记录正式上传前必须完成的项目。当前预投稿包保持匿名预投稿状态；正式上传前应至少完成目标期刊选择、期刊模板套用、作者信息、通讯作者信息、经费声明文本、作者贡献声明、第三方材料许可声明、模板后 PDF 重建、投稿系统文件核对和 artifact release 链接。`scripts/submission_metadata_checks.py` 对最终上传元数据执行结构检查，包括作者邮箱、ORCID、经费声明文本、作者贡献声明、permissions statement 和 artifact release URL/DOI。

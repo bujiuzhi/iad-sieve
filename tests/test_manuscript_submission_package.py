@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 import zipfile
 from pathlib import Path
 
@@ -616,6 +617,50 @@ def test_validate_submission_package_accepts_generated_package(tmp_path) -> None
     errors = validator.validate_submission_package(output_dir, zip_path)
 
     assert errors == []
+
+
+def test_validate_submission_package_rejects_stale_main_pdf_against_references(tmp_path) -> None:
+    """验证主稿 PDF 早于包内参考文献时投稿包被拒绝。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path)
+    pdf_mtime = 1_700_000_000
+    source_mtime = pdf_mtime + 10
+    os.utime(output_dir / "iad-risk-manuscript-latex.pdf", (pdf_mtime, pdf_mtime))
+    os.utime(output_dir / "references.bib", (source_mtime, source_mtime))
+    errors = validator.validate_package_directory(output_dir)
+
+    assert any("iad-risk-manuscript-latex.pdf is older than references.bib" in error for error in errors)
+
+
+def test_validate_submission_package_rejects_stale_dke_pdf_against_elsevier_source(tmp_path) -> None:
+    """验证 DKE PDF 早于包内 Elsevier 源文件时投稿包被拒绝。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "dke_preflight_package"
+    zip_path = tmp_path / "dke_preflight_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_dke_preflight_files(manuscript_root)
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path, dke_preflight=True)
+    pdf_mtime = 1_700_000_000
+    source_mtime = pdf_mtime + 10
+    os.utime(output_dir / "iad-risk-manuscript-elsevier.pdf", (pdf_mtime, pdf_mtime))
+    os.utime(output_dir / "iad-risk-manuscript-elsevier.tex", (source_mtime, source_mtime))
+    errors = validator.validate_package_directory(output_dir, dke_preflight=True)
+
+    assert any(
+        "iad-risk-manuscript-elsevier.pdf is older than iad-risk-manuscript-elsevier.tex" in error
+        for error in errors
+    )
 
 
 def test_validate_submission_package_rejects_directory_text_hygiene_leaks(tmp_path) -> None:
