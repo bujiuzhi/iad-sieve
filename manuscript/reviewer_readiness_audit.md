@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 58.
+Completed audit cycles: 59.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -561,6 +561,14 @@ Outcome: pass for operating-point table-density reduction; blocked for full nume
 This gate checks whether the operating-point disclosure table is needed in the main manuscript. The main manuscript now states the operating-point boundary in prose: the result table uses fixed operating points rather than post-hoc best test thresholds; representation cosine baselines use cosine score thresholds; the RoBERTa pair classifier uses a pair match probability threshold; and IAD-Risk transformer variants use the risk gate with the default threshold contract unless the artifact config records an override. The supplementary material preserves the full operating-point disclosure table with row family decision fields, operating-point sources, and audit requirements.
 
 The reviewer-facing boundary is operating-point clarity without main-text table overload. The edit keeps the experiments section focused on result interpretation while the validator still requires the supplementary operating-point disclosure, including fixed operating points, post-hoc best test thresholds, row family decision fields, default threshold contract, score-file requirements, prediction-file requirements, model JSON, thresholds, and checksums.
+
+## Audit Cycle 59: Metric Formula Boundary Density Gate
+
+Outcome: pass for metric-formula table-density reduction; blocked for any metric reinterpretation until released artifacts preserve label strata, denominators, missing-label exclusions, and selective-decision outputs for every reported row.
+
+This gate checks whether the metric-formula boundary table is needed in the main manuscript. The main manuscript now states the metric boundary in prose: same-work F1 is computed from TP, FP, and FN on gold identity rows; defer and block decisions on true same-work rows enter FN; FMR denominator is all non-identity rows in the evaluated scope; HNFMR denominator is the agenda-level hard-negative subset; and rows excluded by missing labels are not silently added to denominators. The supplementary material preserves the full metric-formula boundary table with the same-work F1 denominator, FMR denominator, HNFMR denominator, and missing-label denominator rule.
+
+The reviewer-facing boundary is metric-formula clarity without main-text table overload. The edit keeps the evaluation section readable while the validator still requires the supplementary metric-formula boundary, including TP, FP, FN, the same-work F1 formula, FMR denominator, HNFMR denominator, missing-label denominator rule, and the distinction between unsafe automatic merges and manual-review workload.
 
 ## Minimum Gate Before Final Upload
 

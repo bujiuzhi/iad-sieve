@@ -1695,18 +1695,18 @@ def check_decision_metric_mapping(manuscript_text: str) -> list[str]:
     ]
 
 
-def check_metric_formula_boundary(manuscript_text: str) -> list[str]:
+def check_metric_formula_boundary(manuscript_text: str, supplementary_text: str = "") -> list[str]:
     """Check whether reported metrics define formulas and denominators.
 
     参数:
         manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
 
     返回:
         list[str]: Error messages for missing metric-formula boundary markers.
     """
-    required_markers = [
+    required_main_markers = [
         r"\subsection{Metric Formula Boundary}",
-        r"\label{tab:metric-formula-boundary}",
         "TP",
         "FP",
         "FN",
@@ -1714,12 +1714,34 @@ def check_metric_formula_boundary(manuscript_text: str) -> list[str]:
         "FMR denominator is all non-identity rows in the evaluated scope",
         "HNFMR denominator is the agenda-level hard-negative subset",
         "missing labels are not silently added to denominators",
+        "manual-review workload",
+        "identity-agenda false merges",
+        "full metric-formula boundary table is reported in the supplementary material",
     ]
-    return [
-        f"metric formula boundary missing marker: {marker}"
-        for marker in required_markers
+    required_supplement_markers = [
+        r"\section{Metric Formula Boundary}",
+        r"\label{tab:metric-formula-boundary}",
+        "Metric formula boundary",
+        "Metric",
+        "Formula or denominator",
+        "Boundary",
+        "Same-work F1",
+        "FMR",
+        "HNFMR",
+        "Defer and block decisions on true same-work rows enter FN",
+    ]
+    errors = [
+        f"metric formula boundary missing manuscript marker: {marker}"
+        for marker in required_main_markers
         if marker not in manuscript_text
     ]
+    evidence_text = supplementary_text or manuscript_text
+    errors.extend(
+        f"metric formula boundary missing supplementary marker: {marker}"
+        for marker in required_supplement_markers
+        if marker not in evidence_text
+    )
+    return errors
 
 
 def check_threshold_sensitivity_status(manuscript_text: str, supplementary_text: str = "") -> list[str]:
@@ -3151,7 +3173,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 58",
+        "Completed audit cycles: 59",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3267,6 +3289,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 56: Selective Decision Coverage Boundary Density Gate",
         "Audit Cycle 57: Threshold Sensitivity Evidence Status Density Gate",
         "Audit Cycle 58: Operating Point Disclosure Density Gate",
+        "Audit Cycle 59: Metric Formula Boundary Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
         "method-writing clarity",
@@ -3457,6 +3480,14 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "default threshold contract",
         "operating-point clarity without main-text table overload",
         "supplementary operating-point disclosure",
+        "metric-formula table-density reduction",
+        "full metric-formula boundary table",
+        "same-work F1 denominator",
+        "FMR denominator",
+        "HNFMR denominator",
+        "missing-label denominator rule",
+        "metric-formula clarity without main-text table overload",
+        "supplementary metric-formula boundary",
         "remote reproducibility",
         "strong model matrix",
         "model superiority",
@@ -4720,7 +4751,7 @@ def main() -> int:
     errors.extend(check_selective_decision_coverage_boundary(manuscript_text, supplementary_text))
     errors.extend(check_pair_cluster_evidence_boundary(manuscript_text, supplementary_text))
     errors.extend(check_decision_metric_mapping(manuscript_text))
-    errors.extend(check_metric_formula_boundary(manuscript_text))
+    errors.extend(check_metric_formula_boundary(manuscript_text, supplementary_text))
     errors.extend(check_threshold_uncertainty_reporting(manuscript_text))
     errors.extend(check_statistical_interpretation_boundary(manuscript_text))
     errors.extend(check_threshold_sensitivity_status(manuscript_text, supplementary_text))

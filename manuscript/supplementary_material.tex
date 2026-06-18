@@ -564,6 +564,27 @@ Model ranking & Restricted to mechanism interpretation rather than a universal r
 \end{tabular}
 \end{table}
 
+\section{Metric Formula Boundary}
+
+The main manuscript summarizes metric formulas in prose. Table~\ref{tab:metric-formula-boundary} preserves the denominator and label-stratum boundary used to interpret same-work F1, FMR, and HNFMR.
+
+\begin{table}[H]
+\caption{Metric formula boundary. Each metric is tied to a denominator and a label stratum so that missing labels, deferrals, and hard-negative rows are not mixed silently.}
+\label{tab:metric-formula-boundary}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.20\linewidth}L{0.34\linewidth}L{0.36\linewidth}}
+\toprule
+Metric & Formula or denominator & Boundary \\
+\midrule
+Same-work F1 & $2TP/(2TP+FP+FN)$ over gold identity rows. & Defer and block decisions on true same-work rows enter FN. \\
+FMR & Automatic merges among all non-identity rows divided by all non-identity rows in the evaluated scope. & Measures unsafe automatic merges, not manual-review workload. \\
+HNFMR & Automatic merges among agenda-level hard negatives divided by the agenda-level hard-negative subset. & Measures identity-agenda false merges under the hard-negative stratum. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Operating Point Disclosure}
 
 The main manuscript summarizes operating-point disclosure in prose. Table~\ref{tab:operating-point-disclosure} preserves how each Open-v2 row family obtains its decision field and which artifact is required for threshold audit.

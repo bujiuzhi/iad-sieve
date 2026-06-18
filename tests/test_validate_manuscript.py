@@ -2337,8 +2337,8 @@ def test_check_decision_metric_mapping_rejects_missing_defer_mapping() -> None:
     assert any("FMR and HNFMR count only automatic merges" in error for error in errors)
 
 
-def test_check_metric_formula_boundary_accepts_complete_formula_table() -> None:
-    """验证评价指标公式和分母边界完整时可通过检查。"""
+def test_check_metric_formula_boundary_accepts_supplementary_table() -> None:
+    """验证评价指标公式表迁入补充材料后可通过检查。"""
 
     module = _load_validate_manuscript_module()
     checker = getattr(module, "check_metric_formula_boundary", None)
@@ -2346,7 +2346,6 @@ def test_check_metric_formula_boundary_accepts_complete_formula_table() -> None:
     manuscript_text = "\n".join(
         [
             r"\subsection{Metric Formula Boundary}",
-            r"\label{tab:metric-formula-boundary}",
             "TP",
             "FP",
             "FN",
@@ -2354,27 +2353,57 @@ def test_check_metric_formula_boundary_accepts_complete_formula_table() -> None:
             "FMR denominator is all non-identity rows in the evaluated scope.",
             "HNFMR denominator is the agenda-level hard-negative subset.",
             "Rows excluded by missing labels are not silently added to denominators.",
+            "FMR measures unsafe automatic merges rather than manual-review workload.",
+            "HNFMR measures identity-agenda false merges.",
+            "The full metric-formula boundary table is reported in the supplementary material.",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Metric Formula Boundary}",
+            r"\label{tab:metric-formula-boundary}",
+            "Metric formula boundary.",
+            "Metric",
+            "Formula or denominator",
+            "Boundary",
+            "Same-work F1",
+            "FMR",
+            "HNFMR",
+            "Defer and block decisions on true same-work rows enter FN",
         ]
     )
 
-    errors = checker(manuscript_text)
+    errors = checker(manuscript_text, supplementary_text)
 
     assert errors == []
 
 
-def test_check_metric_formula_boundary_rejects_missing_denominators() -> None:
-    """验证缺少指标分母说明时会被拒绝。"""
+def test_check_metric_formula_boundary_rejects_missing_supplementary_table() -> None:
+    """验证缺少补充材料完整指标公式表时会被拒绝。"""
 
     module = _load_validate_manuscript_module()
     checker = getattr(module, "check_metric_formula_boundary", None)
     assert callable(checker)
-    manuscript_text = r"\subsection{Metric Formula Boundary}"
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Metric Formula Boundary}",
+            "TP",
+            "FP",
+            "FN",
+            r"$2TP/(2TP+FP+FN)$",
+            "FMR denominator is all non-identity rows in the evaluated scope.",
+            "HNFMR denominator is the agenda-level hard-negative subset.",
+            "Rows excluded by missing labels are not silently added to denominators.",
+            "FMR measures unsafe automatic merges rather than manual-review workload.",
+            "HNFMR measures identity-agenda false merges.",
+            "The full metric-formula boundary table is reported in the supplementary material.",
+        ]
+    )
 
-    errors = checker(manuscript_text)
+    errors = checker(manuscript_text, "")
 
-    assert any("FMR denominator" in error for error in errors)
-    assert any("HNFMR denominator" in error for error in errors)
-    assert any("missing labels" in error for error in errors)
+    assert any("tab:metric-formula-boundary" in error for error in errors)
+    assert any("Metric Formula Boundary" in error for error in errors)
 
 
 def test_check_threshold_sensitivity_status_accepts_supplementary_table() -> None:
@@ -4866,7 +4895,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 58.",
+            "Completed audit cycles: 59.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -5326,6 +5355,15 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "default threshold contract",
             "operating-point clarity without main-text table overload",
             "supplementary operating-point disclosure",
+            "## Audit Cycle 59: Metric Formula Boundary Density Gate",
+            "metric-formula table-density reduction",
+            "full metric-formula boundary table",
+            "same-work F1 denominator",
+            "FMR denominator",
+            "HNFMR denominator",
+            "missing-label denominator rule",
+            "metric-formula clarity without main-text table overload",
+            "supplementary metric-formula boundary",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -5344,7 +5382,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 58",
+        "Completed audit cycles: 59",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -5355,7 +5393,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 58" in error for error in errors)
+    assert any("Completed audit cycles: 59" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
