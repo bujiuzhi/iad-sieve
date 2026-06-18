@@ -30,6 +30,10 @@ from submission_metadata_checks import (
     scalar_value,
     target_journal_requires_elsevier_files,
 )
+from validate_artifact_release import (
+    DEFAULT_TEMPLATE_PATH as DEFAULT_ARTIFACT_MANIFEST_TEMPLATE_PATH,
+    validate_artifact_release as validate_external_artifact_release,
+)
 
 DEFAULT_PACKAGE_DIR = MANUSCRIPT_ROOT / "build" / "submission_package"
 DEFAULT_ZIP_PATH = MANUSCRIPT_ROOT / "build" / "iad-risk-submission-package.zip"
@@ -147,6 +151,11 @@ def parse_arguments() -> argparse.Namespace:
         "--artifact-dir",
         default="",
         help="Optional external artifact release directory to cross-check repository commit during final upload.",
+    )
+    parser.add_argument(
+        "--artifact-manifest-template",
+        default=str(DEFAULT_ARTIFACT_MANIFEST_TEMPLATE_PATH),
+        help="Artifact release manifest template used when --artifact-dir is provided.",
     )
     parser.add_argument("--log-level", default="INFO", help="Logging level.")
     return parser.parse_args()
@@ -386,6 +395,29 @@ def load_artifact_manifest(artifact_dir: Path | None) -> tuple[dict | None, list
     if not COMMIT_PATTERN.fullmatch(artifact_commit):
         return manifest, ["artifact release manifest repository.commit is invalid"]
     return manifest, []
+
+
+def load_validated_artifact_manifest(
+    artifact_dir: Path | None,
+    artifact_manifest_template_path: Path,
+) -> tuple[dict | None, list[str]]:
+    """Validate and load an external artifact release manifest.
+
+    参数:
+        artifact_dir: Optional artifact release directory.
+        artifact_manifest_template_path: Manifest template for artifact validation.
+
+    返回:
+        tuple[dict | None, list[str]]: Parsed manifest and validation errors.
+    """
+    if artifact_dir is None:
+        return None, []
+    validation_errors = [
+        f"artifact release validation failed: {error}"
+        for error in validate_external_artifact_release(artifact_dir, artifact_manifest_template_path)
+    ]
+    manifest, manifest_errors = load_artifact_manifest(artifact_dir)
+    return manifest, validation_errors + manifest_errors
 
 
 def check_final_upload_artifact_source_binding(
@@ -848,6 +880,7 @@ def validate_submission_package(
     final_upload: bool = False,
     dke_preflight: bool = False,
     artifact_dir: Path | None = None,
+    artifact_manifest_template_path: Path = DEFAULT_ARTIFACT_MANIFEST_TEMPLATE_PATH,
 ) -> list[str]:
     """Validate the package directory and zip archive.
 
@@ -857,11 +890,14 @@ def validate_submission_package(
         final_upload: Whether to require journal and author metadata for final upload.
         dke_preflight: Whether the package should include DKE/Elsevier files.
         artifact_dir: Optional external artifact release directory.
+        artifact_manifest_template_path: Artifact manifest template used when artifact_dir is provided.
 
     返回:
         list[str]: Error messages.
     """
-    artifact_manifest, artifact_errors = load_artifact_manifest(artifact_dir) if final_upload else (None, [])
+    artifact_manifest, artifact_errors = (
+        load_validated_artifact_manifest(artifact_dir, artifact_manifest_template_path) if final_upload else (None, [])
+    )
     errors = list(artifact_errors)
     errors.extend(validate_package_directory(package_dir, final_upload, dke_preflight, artifact_manifest))
     errors.extend(validate_zip_archive(
@@ -898,6 +934,7 @@ def main() -> int:
             args.final_upload,
             args.dke_preflight,
             Path(args.artifact_dir).resolve() if args.artifact_dir else None,
+            Path(args.artifact_manifest_template).resolve(),
         )
     except Exception as exc:  # noqa: BLE001
         LOGGER.error("submission package validation failed: %s", exc)

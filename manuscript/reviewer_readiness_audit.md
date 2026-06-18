@@ -10,9 +10,9 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 27.
+Completed audit cycles: 28.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.
 
@@ -313,6 +313,14 @@ Outcome: pass for final-upload instruction coverage; blocked for final upload un
 This cycle removes a workflow inconsistency introduced by the stronger package-artifact binding gate. The final-upload information request and submission-system checklist now both instruct authors to run `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release`, and the final-upload information request collects the artifact release directory path used for that validation. The manuscript validator also rejects these documents if they revert to the older command without `--artifact-dir`.
 
 The reviewer-facing boundary is procedural. This gate ensures that authors do not accidentally validate only the manuscript package while skipping the external artifact commit binding. It does not replace artifact release validation, target-journal template binding, live submission-system checks, or the external artifact URL or DOI.
+
+## Audit Cycle 28: Final-Upload Artifact Release Validation Gate
+
+Outcome: pass for integrated artifact-release validation coverage; blocked for final upload until the real artifact release validates.
+
+This cycle closes the remaining `--artifact-dir` gap. The submission package validator now calls the artifact release validator whenever final-upload validation receives an artifact release directory, so the final upload gate checks release file membership, checksums, README markers, manifest policy, required artifact IDs, Open-v2 row-level audit columns, prediction JSONL fields, and claim-dependent artifact requirements before applying package-artifact commit binding.
+
+The reviewer-facing boundary is stronger but still procedural. Passing this integrated gate means the manuscript package names an artifact release that is structurally valid and source-bound to the final package; it still does not make stronger empirical claims unless the released files contain the required bootstrap, ablation, manual-validation, threshold-grid, or cluster-level evidence.
 
 ## Minimum Gate Before Final Upload
 

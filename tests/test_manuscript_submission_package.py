@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 import os
@@ -74,6 +75,18 @@ def _write_file(path: Path, content: bytes | str) -> None:
         path.write_bytes(content)
     else:
         path.write_text(content, encoding="utf-8")
+
+
+def _sha256_file(path: Path) -> str:
+    """计算文件 SHA256。
+
+    参数:
+        path: 文件路径。
+
+    返回:
+        str: SHA256 十六进制摘要。
+    """
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def _write_required_manuscript_files(manuscript_root: Path) -> None:
@@ -514,8 +527,115 @@ def _write_malformed_final_upload_metadata(manuscript_root: Path) -> None:
     )
 
 
+def _artifact_jsonl_row(row: dict) -> str:
+    """序列化 artifact release 测试 JSONL 行。
+
+    参数:
+        row: 测试记录。
+
+    返回:
+        str: JSONL 文本行。
+    """
+    return json.dumps(row, sort_keys=True) + "\n"
+
+
+def _required_artifact_content(artifact_id: str) -> str:
+    """生成满足 artifact release schema 的测试文件内容。
+
+    参数:
+        artifact_id: Artifact 标识。
+
+    返回:
+        str: Artifact 文件内容。
+    """
+    if artifact_id == "open_v2_main_results":
+        return (
+            "\n".join(
+                [
+                    "system,scope_type,same_work_f1,fmr,hnfmr,same_work_f1_denominator,fmr_denominator,hnfmr_denominator,threshold_source,automatic_merge_count,block_count,defer_count,automatic_merge_coverage,defer_rate",
+                    "IAD-Risk,Open-v2,0.61,0.08,0.12,100,200,50,threshold_selection_logs,64,120,16,0.32,0.08",
+                ]
+            )
+            + "\n"
+        )
+    if artifact_id == "iad_risk_predictions":
+        return _artifact_jsonl_row(
+            {
+                "system": "iad_risk_transformer",
+                "pair_id": "p1",
+                "source_document_id": "d1",
+                "target_document_id": "d2",
+                "expected_label": 0,
+                "expected_agenda_label": 1,
+                "label_strength": "silver",
+                "hard_negative_level": "high",
+                "split": "test",
+                "p_same_work": 0.42,
+                "p_same_agenda": 0.91,
+                "p_agenda_non_identity": 0.88,
+                "p_false_merge_risk": 0.88,
+                "work_threshold": 0.5,
+                "agenda_block_threshold": 0.5,
+                "risk_threshold": 0.5,
+                "threshold_source": "model_config",
+                "merge_prediction": 0,
+            }
+        )
+    if artifact_id == "representation_baseline_scores":
+        return _artifact_jsonl_row(
+            {
+                "system": "scincl_cosine_open_v2",
+                "pair_id": "p1",
+                "source_document_id": "d1",
+                "target_document_id": "d2",
+                "expected_label": 0,
+                "expected_agenda_label": 1,
+                "label_strength": "silver",
+                "hard_negative_level": "high",
+                "split": "test",
+                "score": 0.93,
+                "score_field": "score",
+                "threshold_value": 0.9,
+                "threshold_source": "threshold_selection_logs",
+                "merge_prediction": 1,
+            }
+        )
+    if artifact_id == "supervised_baseline_predictions":
+        return _artifact_jsonl_row(
+            {
+                "system": "roberta_pair_open_v2",
+                "pair_id": "p1",
+                "source_document_id": "d1",
+                "target_document_id": "d2",
+                "expected_label": 0,
+                "expected_agenda_label": 1,
+                "label_strength": "silver",
+                "hard_negative_level": "high",
+                "split": "test",
+                "match_probability": 0.87,
+                "threshold_value": 0.8,
+                "threshold_source": "threshold_selection_logs",
+                "merge_prediction": 1,
+            }
+        )
+    if artifact_id == "threshold_selection_logs":
+        return _artifact_jsonl_row(
+            {
+                "system": "scincl_cosine_open_v2",
+                "threshold_name": "automatic_merge",
+                "threshold_value": 0.9,
+                "selection_split": "dev",
+                "selection_metric": "f1_under_fmr_constraint",
+                "selection_rule": "maximize_f1_subject_to_fmr",
+                "applied_scope": "open_v2_test",
+                "score_field": "score",
+            }
+        )
+    return _artifact_jsonl_row({"artifact_id": artifact_id, "status": "present"})
+
+
 def _write_artifact_release_manifest(artifact_dir: Path, repository_commit: str = "abcdef1234567890") -> None:
-    """写入测试用外部 artifact release manifest。
+    """写入测试用完整外部 artifact release。
 
     参数:
         artifact_dir: Artifact release 目录。
@@ -524,10 +644,98 @@ def _write_artifact_release_manifest(artifact_dir: Path, repository_commit: str 
     返回:
         无。
     """
+    artifact_locations = {
+        "open_v2_main_results": "tables/open_v2_main_results.csv",
+        "iad_risk_predictions": "predictions/iad_risk_transformer_predictions.jsonl",
+        "representation_baseline_scores": "predictions/representation_baseline_scores.jsonl",
+        "supervised_baseline_predictions": "predictions/roberta_pair_classifier_predictions.jsonl",
+        "threshold_selection_logs": "logs/threshold_selection_logs.jsonl",
+        "iad_bench_split_summary": "reports/iad_bench_split_summary.jsonl",
+    }
     _write_file(
-        artifact_dir / "manifest.json",
-        json.dumps({"repository": {"commit": repository_commit}}, indent=2) + "\n",
+        artifact_dir / "README.md",
+        "\n".join(
+            [
+                "# IAD-Risk Artifact Release",
+                "",
+                "Do not include raw third-party data.",
+                "Required files include README.md, manifest.json, and checksums.sha256.",
+                "Run sha256sum -c checksums.sha256 before manuscript validation.",
+                "Run python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release.",
+                f"Repository commit: {repository_commit}.",
+                "## Claim Boundaries",
+                "Full numerical audit requires external artifacts.",
+                "## Reproduction Levels",
+                "L3 result audit checks released tables, predictions, logs, manifests, checksums, and commit identifiers.",
+                "",
+            ]
+        )
+        + "\n",
     )
+    _write_file(artifact_dir / "configs" / "model_config.json", '{"seed": 7}\n')
+    for artifact_id, relative_path in artifact_locations.items():
+        _write_file(artifact_dir / relative_path, _required_artifact_content(artifact_id))
+    required_artifacts = [
+        {
+            "artifact_id": artifact_id,
+            "required": True,
+            "expected_location": relative_path,
+            "sha256": _sha256_file(artifact_dir / relative_path),
+            "claim_support": f"{artifact_id} claim support.",
+        }
+        for artifact_id, relative_path in artifact_locations.items()
+    ]
+    manifest = {
+        "package_name": "iad-risk-paper-artifacts",
+        "package_type": "result_artifact_release",
+        "release_status": "release_candidate",
+        "manuscript_title": "IAD-Risk: Risk-Aware Identity-Agenda Disentanglement",
+        "repository": {
+            "url": "https://example.org/iad-sieve.git",
+            "commit": repository_commit,
+            "branch": "main",
+            "source_tree_clean": True,
+        },
+        "data_policy": {
+            "raw_third_party_data_included": False,
+            "model_checkpoints_included": False,
+            "personal_or_secret_material_included": False,
+            "derived_evaluation_artifacts_included": True,
+            "source_licenses_respected": True,
+        },
+        "required_top_level_files": ["README.md", "manifest.json", "checksums.sha256"],
+        "required_directories": ["configs", "tables", "predictions", "reports", "logs"],
+        "required_artifacts": required_artifacts,
+        "minimum_validation_commands": [
+            "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
+            "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
+            "sha256sum -c checksums.sha256",
+            "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
+            "python manuscript/scripts/validate_manuscript.py --strict-latex",
+            "python manuscript/scripts/verify_fixture_rebuild.py",
+            "python scripts/check_public_release.py",
+        ],
+        "claim_boundaries": {
+            "silver_labels_are_not_human_gold": True,
+            "manual_validation_required_for_human_gold_claims": True,
+            "same_scope_prediction_files_required_for_broad_ranking": True,
+            "threshold_grid_required_for_threshold_stability_claims": True,
+            "cluster_artifacts_required_for_cluster_level_quality_claims": True,
+            "confidence_intervals_claimed": False,
+            "component_causality_claimed": False,
+            "human_validation_claimed": False,
+            "threshold_stability_claimed": False,
+            "broad_method_ranking_claimed": False,
+            "cluster_level_quality_claimed": False,
+        },
+    }
+    _write_file(artifact_dir / "manifest.json", json.dumps(manifest, indent=2) + "\n")
+    checksum_lines = []
+    for path in sorted(artifact_dir.rglob("*")):
+        if path.is_file() and path.name != "checksums.sha256":
+            relative_path = path.relative_to(artifact_dir).as_posix()
+            checksum_lines.append(f"{_sha256_file(path)}  {relative_path}")
+    _write_file(artifact_dir / "checksums.sha256", "\n".join(checksum_lines) + "\n")
 
 
 def test_build_submission_package_writes_manifest_checksums_and_zip(tmp_path) -> None:
@@ -1013,6 +1221,28 @@ def test_validate_submission_package_rejects_final_upload_artifact_commit_mismat
 
     assert any("submission_metadata.yml repository_commit" in error for error in errors)
     assert any("artifact manifest repository.commit" in error for error in errors)
+
+
+def test_validate_submission_package_rejects_invalid_final_upload_artifact_release(tmp_path) -> None:
+    """验证正式上传包会拒绝未通过完整校验的 artifact release。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    artifact_dir = tmp_path / "artifact_release"
+    _write_required_manuscript_files(manuscript_root)
+    _write_final_upload_metadata(manuscript_root)
+    _write_final_upload_cover_letter(manuscript_root)
+    _write_artifact_release_manifest(artifact_dir)
+    (artifact_dir / "checksums.sha256").unlink()
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
+    errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True, artifact_dir=artifact_dir)
+
+    assert any("artifact release validation failed" in error for error in errors)
+    assert any("checksums.sha256" in error for error in errors)
 
 
 def test_validate_submission_package_rejects_final_upload_dirty_source_control(tmp_path, monkeypatch) -> None:
