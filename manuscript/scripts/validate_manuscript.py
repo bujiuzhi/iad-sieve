@@ -1306,12 +1306,34 @@ def extract_first_page_text(pdf_path: Path) -> tuple[str, list[str]]:
         return "", [f"pdftotext failed with exit code {exc.returncode}: {exc.stderr.strip()}"]
 
 
-def check_pdf(pdf_path: Path, required_text: str = "IAD-Risk") -> list[str]:
+def check_pdf_first_page_markers(pdf_name: str, first_page_text: str, required_texts: list[str]) -> list[str]:
+    """Check required text markers in extracted PDF first-page text.
+
+    参数:
+        pdf_name: PDF file name for diagnostics.
+        first_page_text: Extracted first-page text.
+        required_texts: Text markers expected on the first page.
+
+    返回:
+        list[str]: Error messages for missing or unresolved first-page text markers.
+    """
+    errors: list[str] = []
+    for required_text in required_texts:
+        if required_text not in first_page_text:
+            errors.append(f"{pdf_name} first page text does not contain required text: {required_text}")
+    unresolved_markers = ["undefined references", "LaTeX Warning", "[?]", "??"]
+    for marker in unresolved_markers:
+        if marker in first_page_text:
+            errors.append(f"{pdf_name} may contain unresolved marker on first page: {marker}")
+    return errors
+
+
+def check_pdf(pdf_path: Path, required_text: str | list[str] = "IAD-Risk") -> list[str]:
     """Check whether a generated PDF is readable.
 
     参数:
         pdf_path: Path to the generated PDF.
-        required_text: Text expected on the first page.
+        required_text: Text marker or markers expected on the first page.
 
     返回:
         list[str]: Error messages for PDF readability issues.
@@ -1321,13 +1343,8 @@ def check_pdf(pdf_path: Path, required_text: str = "IAD-Risk") -> list[str]:
     errors.extend(f"{pdf_path.name} is not readable: {error}" for error in extraction_errors)
     if extraction_errors:
         return errors
-    if required_text not in first_page_text:
-        errors.append(f"{pdf_path.name} first page text does not contain required text: {required_text}")
-    unresolved_markers = ["undefined references", "LaTeX Warning", "[?]", "??"]
-    for marker in unresolved_markers:
-        if marker in first_page_text:
-            errors.append(f"{pdf_path.name} may contain unresolved marker on first page: {marker}")
-    return errors
+    required_texts = [required_text] if isinstance(required_text, str) else required_text
+    return errors + check_pdf_first_page_markers(pdf_path.name, first_page_text, list(required_texts))
 
 
 def check_pdf_freshness(pdf_path: Path, source_path: Path) -> list[str]:
@@ -1501,12 +1518,26 @@ def main() -> int:
     latex_pdf_path = ROOT / "build" / "iad-risk-manuscript-latex.pdf"
     elsevier_pdf_path = ROOT / "build" / "iad-risk-manuscript-elsevier.pdf"
     supplementary_pdf_path = ROOT / "build" / "iad-risk-supplementary-material.pdf"
-    errors.extend(check_pdf(latex_pdf_path))
+    main_pdf_markers = [
+        "IAD-Risk: Risk-Aware",
+        "Scholarly Work Deduplication",
+        "Anonymous Authors",
+        "Abstract",
+        "Open-v2 evidence snapshot",
+        "same-work F1=0.980",
+        "HNFMR=0.000",
+    ]
+    errors.extend(check_pdf(latex_pdf_path, main_pdf_markers))
     errors.extend(check_pdf_freshness(latex_pdf_path, manuscript_path))
-    errors.extend(check_pdf(elsevier_pdf_path))
+    errors.extend(check_pdf(elsevier_pdf_path, main_pdf_markers + ["Keywords:", "Data & Knowledge Engineering"]))
     errors.extend(check_pdf_freshness(elsevier_pdf_path, manuscript_path))
     errors.extend(check_pdf_freshness(elsevier_pdf_path, keywords_path))
-    errors.extend(check_pdf(supplementary_pdf_path, "Supplementary Material"))
+    errors.extend(
+        check_pdf(
+            supplementary_pdf_path,
+            ["Supplementary Material for IAD-Risk", "Anonymous Authors", "Scope", "Reproduction Levels"],
+        )
+    )
     errors.extend(check_pdf_freshness(supplementary_pdf_path, supplementary_path))
     latex_warnings, latex_errors = check_latex_toolchain(args.strict_latex)
     warnings.extend(latex_warnings)

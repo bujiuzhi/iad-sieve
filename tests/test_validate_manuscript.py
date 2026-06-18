@@ -1155,3 +1155,44 @@ def test_check_final_upload_metadata_accepts_filled_metadata() -> None:
     errors = module.check_final_upload_metadata(metadata_text)
 
     assert errors == []
+
+
+def test_check_pdf_first_page_markers_accepts_expected_text() -> None:
+    """验证 PDF 首页包含全部关键文本时可通过。"""
+
+    module = _load_validate_manuscript_module()
+    first_page_text = "\n".join(
+        [
+            "IAD-Risk: Risk-Aware Identity-Agenda",
+            "Scholarly Work Deduplication",
+            "Anonymous Authors",
+            "Abstract",
+            "Open-v2 evidence snapshot",
+            "same-work F1=0.980 and HNFMR=0.000",
+        ]
+    )
+
+    errors = module.check_pdf_first_page_markers(
+        "main.pdf",
+        first_page_text,
+        ["IAD-Risk: Risk-Aware", "Scholarly Work Deduplication", "HNFMR=0.000"],
+    )
+
+    assert errors == []
+
+
+def test_check_pdf_first_page_markers_rejects_missing_and_unresolved_text() -> None:
+    """验证 PDF 首页缺少关键文本或含未解析标记时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    first_page_text = "IAD-Risk\nAbstract\nSee Table ?? for details."
+
+    errors = module.check_pdf_first_page_markers(
+        "main.pdf",
+        first_page_text,
+        ["Scholarly Work Deduplication", "HNFMR=0.000"],
+    )
+
+    assert any("Scholarly Work Deduplication" in error for error in errors)
+    assert any("HNFMR=0.000" in error for error in errors)
+    assert any("unresolved marker" in error and "??" in error for error in errors)
