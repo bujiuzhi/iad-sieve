@@ -49,6 +49,16 @@ Before using the DKE/Elsevier preflight package, verify:
 4. The DKE/Elsevier preflight package remains anonymous and does not include `data/`, `outputs/`, raw third-party files, local caches, credentials, artifact outputs, author emails, ORCID values, personal account URLs, local absolute paths, or development process notes.
 5. Passing the DKE/Elsevier preflight package check does not complete the final-upload gate; author metadata, target confirmation, live submission-system fields, and artifact release URL or DOI remain required.
 
+## Publisher Declaration Checks
+
+Before upload, verify:
+
+1. The declaration text matches submission_metadata.yml, the manuscript declaration sections, and the live submission system.
+2. No declaration placeholder remains before final upload.
+3. The funding role is stated when funding exists, including whether sponsors influenced study design, analysis, writing, or the decision to submit.
+4. Permission files are listed when third-party permission is required.
+5. The data availability statement matches artifact release status, including whether the release has a real URL or DOI.
+
 ## Final Metadata Checks
 
 Before upload, verify:
