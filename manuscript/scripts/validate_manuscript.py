@@ -163,6 +163,12 @@ FORBIDDEN_PHRASES = [
     "Universal method superiority",
     "all scholarly domains",
 ]
+UNSUPPORTED_RISK_CALIBRATION_PATTERNS = [
+    re.compile(r"\brisk[-\s]?calibrated\b", re.IGNORECASE),
+    re.compile(r"\bcalibrated\s+false[-\s]?merge\s+risk\b", re.IGNORECASE),
+    re.compile(r"\bcalibrated\s+risk\s+(?:score|estimate|probability)\b", re.IGNORECASE),
+    re.compile(r"\bwell[-\s]?calibrated\s+(?:risk|probability|score)\b", re.IGNORECASE),
+]
 AUXILIARY_MODEL_EVIDENCE_PHRASES = [
     "LLM",
     "GPT",
@@ -899,6 +905,22 @@ def check_risk_score_design_rationale(manuscript_text: str) -> list[str]:
         for marker in required_markers
         if marker not in manuscript_text
     ]
+
+
+def check_risk_calibration_overclaims(manuscript_text: str) -> list[str]:
+    """Check whether the manuscript avoids unsupported risk-calibration wording.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for calibration wording that requires unavailable evidence.
+    """
+    errors: list[str] = []
+    for pattern in UNSUPPORTED_RISK_CALIBRATION_PATTERNS:
+        for match in pattern.finditer(manuscript_text):
+            errors.append(f"unsupported risk calibration wording found: {match.group(0)}")
+    return errors
 
 
 def check_operational_net_benefit_boundary(manuscript_text: str) -> list[str]:
@@ -2786,6 +2808,7 @@ def main() -> int:
     errors.extend(check_method_feature_contract(manuscript_text))
     errors.extend(check_training_objective_masking(manuscript_text))
     errors.extend(check_risk_score_design_rationale(manuscript_text))
+    errors.extend(check_risk_calibration_overclaims(manuscript_text))
     errors.extend(check_operational_net_benefit_boundary(manuscript_text))
     errors.extend(check_version_identifier_policy(manuscript_text))
     errors.extend(check_method_pipeline_figure(manuscript_text))

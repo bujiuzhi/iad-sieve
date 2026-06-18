@@ -784,6 +784,36 @@ def test_check_risk_score_design_rationale_rejects_missing_boundary() -> None:
     assert any("not a calibrated probability" in error for error in errors)
 
 
+def test_check_risk_calibration_overclaims_accepts_negated_calibration_boundary() -> None:
+    """验证否定式校准边界表述不会被误判为过度声明。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_risk_calibration_overclaims", None)
+    assert checker is not None
+    manuscript_text = (
+        "The product term is not a calibrated probability unless validated against held-out artifacts. "
+        "Threshold transfer must be rechecked under new source distributions."
+    )
+
+    errors = checker(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_risk_calibration_overclaims_rejects_unsupported_calibration_wording() -> None:
+    """验证未提供校准证据的风险校准表述会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_risk_calibration_overclaims", None)
+    assert checker is not None
+    manuscript_text = "This selective decision rule turns deduplication into a risk-calibrated safety problem."
+
+    errors = checker(manuscript_text)
+
+    assert any("unsupported risk calibration wording" in error for error in errors)
+    assert any("risk-calibrated" in error for error in errors)
+
+
 def test_check_operational_net_benefit_boundary_accepts_complete_boundary() -> None:
     """验证方法复杂度和净收益边界完整时可通过检查。"""
 
