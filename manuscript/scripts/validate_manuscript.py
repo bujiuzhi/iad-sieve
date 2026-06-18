@@ -862,6 +862,9 @@ def check_training_objective_masking(manuscript_text: str) -> list[str]:
         r"\sum_{(i,j)}(m^w_{ij}+m^a_{ij}+m^n_{ij})",
         "valid supervision channels",
         "Missing labels therefore do not create negative examples",
+        "Z=0",
+        "skipped before the optimizer update",
+        "positive mask coverage in the declared training split",
         "false-merge risk score is not directly supervised",
     ]
     return [f"training objective masking missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]

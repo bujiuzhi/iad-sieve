@@ -680,6 +680,8 @@ def test_check_training_objective_masking_accepts_explicit_masked_loss() -> None
             r"\sum_{(i,j)}(m^w_{ij}+m^a_{ij}+m^n_{ij})",
             "valid supervision channels",
             "Missing labels therefore do not create negative examples.",
+            "A mini-batch with Z=0 is skipped before the optimizer update.",
+            "Each reported relation head requires positive mask coverage in the declared training split.",
             "The false-merge risk score is not directly supervised.",
         ]
     )
@@ -707,6 +709,8 @@ def test_check_training_objective_masking_rejects_unmasked_loss() -> None:
 
     assert any("m^w_{ij}" in error for error in errors)
     assert any("Missing labels" in error for error in errors)
+    assert any("Z=0" in error for error in errors)
+    assert any("positive mask coverage" in error for error in errors)
     assert any("risk score is not directly supervised" in error for error in errors)
 
 
