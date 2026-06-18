@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 from pathlib import Path
 
 
@@ -6282,6 +6283,44 @@ def test_check_pdf_first_page_markers_rejects_missing_and_unresolved_text() -> N
     assert any("Scholarly Work Deduplication" in error for error in errors)
     assert any("HNFMR=0.000" in error for error in errors)
     assert any("unresolved marker" in error and "??" in error for error in errors)
+
+
+def test_check_pdf_freshness_accepts_pdf_newer_than_source(tmp_path) -> None:
+    """验证 PDF 晚于源依赖文件时新鲜度检查通过。"""
+
+    module = _load_validate_manuscript_module()
+    source_path = tmp_path / "references.bib"
+    pdf_path = tmp_path / "main.pdf"
+    source_path.write_text("@article{a, title={A}}\n", encoding="utf-8")
+    pdf_path.write_bytes(b"%PDF-1.5\n")
+    source_mtime = 1_700_000_000
+    pdf_mtime = source_mtime + 10
+
+    os.utime(source_path, (source_mtime, source_mtime))
+    os.utime(pdf_path, (pdf_mtime, pdf_mtime))
+
+    errors = module.check_pdf_freshness(pdf_path, source_path)
+
+    assert errors == []
+
+
+def test_check_pdf_freshness_rejects_pdf_older_than_references(tmp_path) -> None:
+    """验证 references.bib 晚于 PDF 时会要求重建。"""
+
+    module = _load_validate_manuscript_module()
+    source_path = tmp_path / "references.bib"
+    pdf_path = tmp_path / "main.pdf"
+    source_path.write_text("@article{a, title={A}}\n", encoding="utf-8")
+    pdf_path.write_bytes(b"%PDF-1.5\n")
+    pdf_mtime = 1_700_000_000
+    source_mtime = pdf_mtime + 10
+
+    os.utime(pdf_path, (pdf_mtime, pdf_mtime))
+    os.utime(source_path, (source_mtime, source_mtime))
+
+    errors = module.check_pdf_freshness(pdf_path, source_path)
+
+    assert any("main.pdf is older than references.bib" in error for error in errors)
 
 
 def test_check_pdf_full_text_markers_rejects_missing_marker(monkeypatch, tmp_path) -> None:

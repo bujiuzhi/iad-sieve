@@ -3169,11 +3169,11 @@ def check_pdf(pdf_path: Path, required_text: str | list[str] = "IAD-Risk") -> li
 
 
 def check_pdf_freshness(pdf_path: Path, source_path: Path) -> list[str]:
-    """Check whether the generated PDF is newer than the LaTeX source.
+    """Check whether the generated PDF is newer than a source dependency.
 
     参数:
         pdf_path: Generated PDF path.
-        source_path: Main LaTeX source path.
+        source_path: Source dependency path.
 
     返回:
         list[str]: Error messages for stale PDF output.
@@ -3452,10 +3452,12 @@ def main() -> int:
     ]
     errors.extend(check_pdf_full_text_markers(latex_pdf_path, main_full_text_markers))
     errors.extend(check_pdf_freshness(latex_pdf_path, manuscript_path))
+    errors.extend(check_pdf_freshness(latex_pdf_path, bibliography_path))
     errors.extend(check_pdf(elsevier_pdf_path, main_pdf_markers + ["Keywords:", "Data & Knowledge Engineering"]))
     errors.extend(check_pdf_full_text_markers(elsevier_pdf_path, main_full_text_markers))
     errors.extend(check_pdf_freshness(elsevier_pdf_path, manuscript_path))
     errors.extend(check_pdf_freshness(elsevier_pdf_path, keywords_path))
+    errors.extend(check_pdf_freshness(elsevier_pdf_path, bibliography_path))
     errors.extend(
         check_pdf(
             supplementary_pdf_path,
