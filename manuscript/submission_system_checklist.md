@@ -54,10 +54,11 @@ Before using the DKE/Elsevier preflight package, verify:
 Before upload, verify:
 
 1. The selected target journal and article type match the submission system.
-2. The author list, order, affiliations, ORCID values, and corresponding author match the title page.
-3. The funding statement, competing-interest statement, data/code availability statement, and ethics statement are consistent across the manuscript and system fields.
-4. The artifact release URL or DOI resolves publicly or according to the journal's access policy.
-5. The manuscript does not claim human gold labels, broad method superiority, or threshold stability unless the corresponding artifact evidence exists.
+2. For single-anonymized routes such as DKE and Information Systems, the final title page and submission-system fields include author identities; the anonymous package is only a preflight package.
+3. The author list, order, affiliations, ORCID values, and corresponding author match the title page.
+4. The funding statement, competing-interest statement, data/code availability statement, and ethics statement are consistent across the manuscript and system fields.
+5. The artifact release URL or DOI resolves publicly or according to the journal's access policy.
+6. The manuscript does not claim human gold labels, broad method superiority, or threshold stability unless the corresponding artifact evidence exists.
 
 ## File Hygiene Checks
 

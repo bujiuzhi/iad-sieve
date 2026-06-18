@@ -31,13 +31,23 @@ Official guide rechecked: 2026-06-18.
 | Requirement area | DKE preparation status | Remaining action before final upload |
 | --- | --- | --- |
 | Scope fit | The manuscript is positioned around data engineering, knowledge engineering, entity matching, benchmark construction, and reproducible data-processing contracts. | Keep the paper framed as a data/knowledge-engineering method paper during template conversion. |
-| Review model | The current anonymous author placeholder is compatible with single anonymized review preparation. | Replace placeholders with real author metadata only when the title page and submission system are filled. |
+| Review model | DKE uses single anonymized review. The current anonymous package is only an internal preflight and hygiene check. | Replace placeholders with real author metadata before final upload unless the live system requests anonymization. |
 | Abstract | The current abstract is checked against a 250-word limit by `validate_manuscript.py`. | Recheck after any target-template edits. |
 | Keywords | `keywords.md` currently contains 1--7 semicolon-separated keywords. | Recheck if journal-specific keyword wording is changed. |
 | Highlights | `highlights.md` currently contains 3--5 highlights and is checked against the 85-character limit. | Upload as a separate editable file if required by the Elsevier system. |
 | LaTeX route | The generic article draft remains the editable pre-template source. | Convert to Elsevier `elsarticle` only after the authors confirm DKE as the target. |
 | Research data statement | The manuscript states that raw third-party data are not redistributed and that full numerical audit requires an external artifact release. | Add the real artifact URL or DOI before final upload. |
 | Submission checklist | The project already tracks corresponding-author details, uploaded files, reference consistency, permissions, and artifact release status. | Complete all checklist fields inside the live submission system. |
+
+## Official Source Audit
+
+This audit records the publisher-facing constraints that determine the next manuscript pass. It does not replace author confirmation of institutional rankings, journal class, or final submission-system fields.
+
+| Candidate | Officially verified constraints | Project implication |
+| --- | --- | --- |
+| Data & Knowledge Engineering | Elsevier lists 6.4 CiteScore and 2.6 Impact Factor, describes the journal as covering data engineering, knowledge engineering, and their interface, and uses single anonymized review. The author guide requests editable source files, supports LaTeX, limits the abstract to 250 words, requires 1--7 keywords, encourages 3--5 highlights with a maximum of 85 characters each, and applies research-data deposit/linking or an explanatory data statement. | Keep DKE as the primary practical route. The current DKE package is a preflight artifact only; final upload still needs author metadata, target-template binding, and a real artifact URL or DOI. |
+| Information Systems | Elsevier lists 9.8 CiteScore and 3.4 Impact Factor. Its scope covers data-intensive applications, data models, algorithms, data mining/machine learning, information retrieval with structured data, web semantics, scientific computing, and data science. The guide emphasizes serious experimentation and reproducibility for systems papers, uses single anonymized review, and follows the same editable-source, abstract, keyword, highlight, and data-statement requirements as the Elsevier route. | Treat this as a stretch route. Do not target it until the L3 artifact release, same-scope baseline files, threshold logs, and stronger reproducibility evidence are complete. |
+| Scientometrics | Springer identifies the journal as covering quantitative aspects of the science of science, communication in science, and science policy, and reports a 2024 Impact Factor of 3.5. The journal uses single-blind review, requests title-page author information, recommends ORCID, requires a 150--250 word abstract and 4--6 keywords, allows LaTeX for mathematical content, and requires a data availability statement for original research. | Keep it as a domain backup. Selecting this route would require a stronger science-of-science framing, de-anonymized title-page metadata, Springer formatting, and a repository or artifact link that supports the data availability statement. |
 
 ## Candidate Matrix
 
@@ -64,7 +74,7 @@ If the selected target is Scientometrics, the next manuscript pass should:
 1. Check Springer Nature submission formatting and title-page requirements.
 2. Preserve the current conservative claim boundaries around silver labels and manual validation.
 3. Strengthen the domain-facing interpretation for scholarly communication and science-of-science readers.
-4. Decide whether the paper should remain anonymized, because Scientometrics uses single-blind peer review.
+4. Prepare a de-anonymized title page for single-blind review unless the live submission system explicitly requests anonymization.
 
 ## Source Links
 
