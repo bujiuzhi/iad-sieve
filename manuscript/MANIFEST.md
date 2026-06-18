@@ -21,6 +21,7 @@
 | `scripts/build_submission_package.py` | 投稿包构建脚本 |
 | `scripts/validate_submission_package.py` | 投稿包完整性校验 |
 | `scripts/validate_artifact_release.py` | 外部结果 artifact release 校验 |
+| `scripts/build_artifact_release_skeleton.py` | 外部结果 artifact release 骨架生成 |
 | `scripts/build_elsevier_draft.py` | Elsevier/DKE 预转换稿生成脚本 |
 | `scripts/check_latex_warnings.py` | LaTeX 构建日志与严重版面警告校验 |
 | `scripts/check_pdf_rendering.py` | PDF 抽样渲染与空白页/黑页校验 |
@@ -37,6 +38,7 @@ python manuscript/scripts/validate_manuscript.py
 python manuscript/scripts/verify_fixture_rebuild.py
 python manuscript/scripts/build_submission_package.py
 python manuscript/scripts/validate_submission_package.py
+python manuscript/scripts/build_artifact_release_skeleton.py --output-dir /path/to/release --repository-commit <commit>
 python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release
 ./manuscript/scripts/build_latex_pdf.sh
 python manuscript/scripts/check_latex_warnings.py
@@ -56,7 +58,7 @@ python manuscript/scripts/validate_submission_package.py --dke-preflight
 
 `build/dke_preflight_package/` 和 `build/iad-risk-dke-preflight-package.zip` 是 DKE/Elsevier 匿名预投稿包的生成产物，不纳入 Git 跟踪；它们用于检查投稿文件组合，不替代最终上传门禁。
 
-`artifact_release_manifest.template.json` 和 `artifact_release_README.template.md` 用于准备正式 artifact release，不作为当前匿名预投稿包的替代物。正式上传前应生成真实 artifact manifest、README、checksum 和公开链接，并用 `scripts/validate_artifact_release.py` 校验 release 目录。
+`artifact_release_manifest.template.json` 和 `artifact_release_README.template.md` 用于准备正式 artifact release，不作为当前匿名预投稿包的替代物。`scripts/build_artifact_release_skeleton.py` 只生成外部 release 骨架；正式上传前应填入真实结果 artifact、刷新 manifest 和 checksum、创建公开链接，并用 `scripts/validate_artifact_release.py` 校验 release 目录。
 
 `submission_system_checklist.md` 用于正式上传前逐项核对文件、元数据、PDF 和 artifact release，不作为当前匿名预投稿包的替代物。
 

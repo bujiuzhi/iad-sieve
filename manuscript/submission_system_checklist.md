@@ -29,11 +29,13 @@ The checklist intentionally remains incomplete until the authors confirm the tar
 
 Before linking an external artifact release, verify:
 
-1. The release directory contains `README.md`, `manifest.json`, `checksums.sha256`, `configs/`, `tables/`, `predictions/`, `reports/`, and `logs/`.
-2. `python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release` passes.
-3. `manifest.json` records the release commit, source-tree cleanliness, required artifact IDs, claim boundaries, and SHA256 values for required artifacts.
-4. `checksums.sha256` covers every release file except itself and matches the file contents.
-5. The release excludes `data/`, `outputs/`, cache files, credentials, raw third-party files, and model checkpoints.
+1. `python manuscript/scripts/build_artifact_release_skeleton.py --output-dir /path/to/release --repository-commit <commit>` creates the release scaffold before artifact files are copied.
+2. The release directory contains `README.md`, `manifest.json`, `checksums.sha256`, `configs/`, `tables/`, `predictions/`, `reports/`, and `logs/`.
+3. Required tables, predictions, reports, configs, and logs have replaced all skeleton placeholders.
+4. `python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release` passes.
+5. `manifest.json` records the release commit, source-tree cleanliness, required artifact IDs, claim boundaries, and SHA256 values for required artifacts.
+6. `checksums.sha256` covers every release file except itself and matches the file contents.
+7. The release excludes `data/`, `outputs/`, cache files, credentials, raw third-party files, and model checkpoints.
 
 ## DKE/Elsevier Preflight Package Checks
 

@@ -1177,6 +1177,45 @@ def test_check_artifact_release_readme_template_rejects_missing_release_boundari
     assert any("threshold_sensitivity_grid" in error for error in errors)
 
 
+def test_check_artifact_release_skeleton_builder_accepts_required_markers() -> None:
+    """验证 artifact release 骨架生成脚本包含必要入口和安全边界。"""
+
+    module = _load_validate_manuscript_module()
+    script_text = "\n".join(
+        [
+            "import argparse",
+            "import logging",
+            "SKELETON_RELEASE_STATUS = \"skeleton_pending_artifacts\"",
+            "ARTIFACT_SHA256_PLACEHOLDER = \"fill-after-artifact-export\"",
+            "artifact_release_manifest.template.json",
+            "artifact_release_README.template.md",
+            "checksums.sha256",
+            "REQUIRED_DIRECTORIES",
+            "def build_artifact_release_skeleton(",
+            "def write_checksums(",
+            "def parse_arguments(",
+            "--repository-commit",
+            "--force",
+        ]
+    )
+
+    errors = module.check_artifact_release_skeleton_builder(script_text)
+
+    assert errors == []
+
+
+def test_check_artifact_release_skeleton_builder_rejects_missing_force_guard() -> None:
+    """验证 artifact release 骨架生成脚本缺少覆盖保护时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    script_text = "def build_artifact_release_skeleton():\n    pass\n"
+
+    errors = module.check_artifact_release_skeleton_builder(script_text)
+
+    assert any("--force" in error for error in errors)
+    assert any("checksums.sha256" in error for error in errors)
+
+
 def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
     """验证投稿系统上传清单覆盖文件、元数据和阻断项时可通过。"""
 
@@ -1199,6 +1238,7 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "Submission metadata",
             "Artifact release manifest",
             "## Artifact Release Package Checks",
+            "python manuscript/scripts/build_artifact_release_skeleton.py --output-dir /path/to/release --repository-commit",
             "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
             "## DKE/Elsevier Preflight Package Checks",
             "python manuscript/scripts/build_submission_package.py --dke-preflight",

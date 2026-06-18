@@ -221,6 +221,19 @@ def test_validate_artifact_release_rejects_template_status_and_placeholder_commi
     assert any("repository.commit" in error for error in errors)
 
 
+def test_validate_artifact_release_rejects_skeleton_status(tmp_path) -> None:
+    """验证真实 release 不得保留骨架生成状态。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir, release_status="skeleton_pending_artifacts")
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("release_status" in error for error in errors)
+    assert any("skeleton_pending_artifacts" in error for error in errors)
+
+
 def test_validate_artifact_release_rejects_claimed_confidence_without_bootstrap_artifact(tmp_path) -> None:
     """验证声明置信区间时必须提供 bootstrap artifact。"""
 

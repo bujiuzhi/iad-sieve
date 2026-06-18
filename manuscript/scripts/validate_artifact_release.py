@@ -22,6 +22,7 @@ DEFAULT_ARTIFACT_DIR = MANUSCRIPT_ROOT / "build" / "artifact_release"
 DEFAULT_TEMPLATE_PATH = MANUSCRIPT_ROOT / "artifact_release_manifest.template.json"
 REQUIRED_DIRECTORIES = {"configs", "tables", "predictions", "reports", "logs"}
 REQUIRED_TOP_LEVEL_FILES = {"README.md", "manifest.json", "checksums.sha256"}
+FORBIDDEN_RELEASE_STATUSES = {"template_pending_external_artifact", "skeleton_pending_artifacts"}
 REQUIRED_ARTIFACT_IDS = {
     "open_v2_main_results",
     "iad_risk_predictions",
@@ -445,8 +446,9 @@ def check_manifest_structure(
     errors: list[str] = []
     if manifest.get("package_type") != "result_artifact_release":
         errors.append("manifest.json package_type must be result_artifact_release")
-    if manifest.get("release_status") == "template_pending_external_artifact":
-        errors.append("manifest.json release_status must not remain template_pending_external_artifact")
+    release_status = str(manifest.get("release_status", "")).strip()
+    if release_status in FORBIDDEN_RELEASE_STATUSES:
+        errors.append(f"manifest.json release_status must not remain {release_status}")
     if not manifest.get("package_name"):
         errors.append("manifest.json package_name is empty")
     required_directories = set(manifest.get("required_directories", []))
