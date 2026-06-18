@@ -638,6 +638,31 @@ Reporting & The artifact package reports inter-annotator agreement, per-stratum 
 \end{tabular}
 \end{table}
 
+\section{Data and Code Availability Boundary}
+
+The main manuscript states the data and code availability boundary in prose. Table~\ref{tab:data-code-availability-boundary} preserves the full availability matrix that separates version-controlled source files from public-source inputs and released result artifacts.
+
+\begin{table}[H]
+\caption{Data and code availability boundary. The table separates what is version-controlled in Git from what must be obtained from public sources or a released artifact package.}
+\label{tab:data-code-availability-boundary}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.25\linewidth}L{0.30\linewidth}L{0.35\linewidth}}
+\toprule
+Availability class & Included location & Evaluation use \\
+\midrule
+Source code and CLI entry points & Project repository. & Supports installation, schema checks, fixture rebuilds, baseline execution, model training entry points, and manuscript builds. \\
+Small public fixtures and schema contracts & Project repository. & Supports L0/L1 code-level reproduction without downloading full raw datasets. \\
+Raw third-party source files & Excluded from Git; obtained from original providers. & Raw third-party data remain governed by original provider licenses and access conditions. \\
+Full prediction files and model checkpoints & Excluded from Git unless provided through an external artifact release. & Prevents large local outputs from being treated as repository source files. \\
+Derived evaluation artifacts & External artifact release. & Supports L2/L3 result-level audit through source input manifests, processing run logs, prediction files, threshold logs, manifests, checksums, and commit identifiers. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Full numerical reproduction requires public-source rebuilds or released artifacts; the Git repository alone supports code-level checks, fixture behavior, schema validation, and manuscript builds.
+
 \section{Claim Boundary}
 
 The main manuscript treats DeepMatcher-style labels as gold identity evidence. It treats SciRepEval and SciDocs-style proximity as same-agenda proxy evidence. It treats OpenAlex and OpenCitations-derived pairs as silver hard-negative evidence. OpenAlex and OpenCitations signals are not human gold labels. Cluster-level quality is not claimed unless the released artifact package includes cluster assignments, \path{cluster_metric_summary}, \path{cannot_link_audit}, cannot-link coverage, and cluster contamination rate. Broad method-ranking claims require stronger source-heldout evidence and manual validation beyond the current manuscript package.

@@ -443,31 +443,36 @@ def check_final_upload_information_request(request_text: str) -> list[str]:
     ]
 
 
-def check_data_code_availability_boundary(manuscript_text: str) -> list[str]:
+def check_data_code_availability_boundary(manuscript_text: str, supplementary_text: str = "") -> list[str]:
     """Check whether the data/code availability statement separates repository and artifact scope.
 
     参数:
         manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
 
     返回:
         list[str]: Error messages for missing data/code availability boundary markers.
     """
-    required_markers = [
+    required_main_markers = [
         r"\section*{Data and Code Availability}",
-        r"\label{tab:data-code-availability-boundary}",
         r"\path{src/iad_sieve}",
         r"\path{pyproject.toml}",
         r"\texttt{iad-sieve = iad\_sieve.cli:main}",
         r"\texttt{python -m iad\_sieve.cli --help}",
         "verifies command discovery",
-        "Source code and CLI entry points",
-        "Small public fixtures and schema contracts",
-        "Raw third-party source files",
-        "Full prediction files and model checkpoints",
-        "Derived evaluation artifacts",
-        "source input manifests",
-        "processing run logs",
-        "prediction files, threshold logs, manifests, checksums, and commit identifiers",
+        "full data and code availability boundary table is reported in the supplementary material",
+        "source code and CLI entry points",
+        "small public fixtures",
+        "schema contracts",
+        "data-processing commands",
+        "version-controlled in Git",
+        "raw third-party source files",
+        "full prediction files",
+        "model checkpoints",
+        "derived evaluation artifacts",
+        "remain outside Git",
+        "external artifact package",
+        "data-processing path",
         r"\path{manuscript/scripts/populate_artifact_release.py}",
         r"\texttt{--artifact-dir}",
         r"\path{/path/to/release}",
@@ -480,15 +485,39 @@ def check_data_code_availability_boundary(manuscript_text: str) -> list[str]:
         r"\path{processing_run_log}",
         "L0/L1 code-level reproduction",
         "L2/L3 result-level audit",
+        "raw data or full experiment outputs",
+        "full numerical reproduction requires public-source rebuilds or released artifacts",
+    ]
+    required_supplement_markers = [
+        r"\section{Data and Code Availability Boundary}",
+        r"\label{tab:data-code-availability-boundary}",
+        "Data and code availability boundary",
+        "Source code and CLI entry points",
+        "Small public fixtures and schema contracts",
+        "Raw third-party source files",
+        "Full prediction files and model checkpoints",
+        "Derived evaluation artifacts",
+        "source input manifests",
+        "processing run logs",
+        "prediction files, threshold logs, manifests, checksums, and commit identifiers",
+        "L0/L1 code-level reproduction",
+        "L2/L3 result-level audit",
         "raw third-party data remain governed by original provider licenses",
         "full numerical reproduction requires public-source rebuilds or released artifacts",
     ]
     lowered_text = manuscript_text.lower()
-    return [
-        f"data/code availability boundary missing marker: {marker}"
-        for marker in required_markers
+    errors = [
+        f"data/code availability boundary missing manuscript marker: {marker}"
+        for marker in required_main_markers
         if marker.lower() not in lowered_text
     ]
+    evidence_text = (supplementary_text or manuscript_text).lower()
+    errors.extend(
+        f"data/code availability boundary missing supplementary marker: {marker}"
+        for marker in required_supplement_markers
+        if marker.lower() not in evidence_text
+    )
+    return errors
 
 
 def check_cli_entrypoint_contract(pyproject_text: str, cli_text: str) -> list[str]:
@@ -3027,7 +3056,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 51",
+        "Completed audit cycles: 52",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3136,6 +3165,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 49: Claim-Evidence Boundary Density Gate",
         "Audit Cycle 50: Validity Threats Density Gate",
         "Audit Cycle 51: Claim Interpretation Boundary Density Gate",
+        "Audit Cycle 52: Data and Code Availability Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
         "method-writing clarity",
@@ -3267,6 +3297,16 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "method design soundness",
         "claim-interpretation clarity without main-text table overload",
         "supplementary claim-interpretation boundary",
+        "data/code availability table-density reduction",
+        "full data and code availability boundary table",
+        "L0/L1 code-level reproduction",
+        "L2/L3 result-level audit",
+        "data-processing commands",
+        "data-processing path",
+        "raw third-party source files",
+        "derived evaluation artifacts",
+        "data/code availability clarity without main-text table overload",
+        "supplementary data/code availability boundary",
         "remote reproducibility",
         "strong model matrix",
         "model superiority",
@@ -4454,7 +4494,7 @@ def main() -> int:
     errors.extend(check_validity_threats(manuscript_text, supplementary_text))
     errors.extend(check_claim_interpretation_boundary(manuscript_text, supplementary_text))
     errors.extend(check_declaration_statements(manuscript_text))
-    errors.extend(check_data_code_availability_boundary(manuscript_text))
+    errors.extend(check_data_code_availability_boundary(manuscript_text, supplementary_text))
     errors.extend(check_cli_entrypoint_contract(pyproject_text, cli_entrypoint_text))
     errors.extend(check_operating_point_disclosure(manuscript_text))
     errors.extend(check_selective_decision_coverage_boundary(manuscript_text))

@@ -286,20 +286,23 @@ def test_check_data_code_availability_boundary_accepts_complete_boundary() -> No
     manuscript_text = "\n".join(
         [
             r"\section*{Data and Code Availability}",
-            r"\label{tab:data-code-availability-boundary}",
             r"The source lives under \path{src/iad_sieve}.",
             r"The package is configured in \path{pyproject.toml}.",
             r"The package exposes \texttt{iad-sieve = iad\_sieve.cli:main}.",
             r"Reviewers can run \texttt{python -m iad\_sieve.cli --help}.",
             "The help command verifies command discovery.",
-            "The repository includes Source code and CLI entry points.",
-            "The repository includes Small public fixtures and schema contracts.",
-            "The repository excludes Raw third-party source files.",
-            "The repository excludes Full prediction files and model checkpoints.",
-            "The external artifact release should contain Derived evaluation artifacts.",
-            "The external artifact release should contain source input manifests.",
-            "The external artifact release should contain processing run logs.",
-            "The external artifact release should contain prediction files, threshold logs, manifests, checksums, and commit identifiers.",
+            "The full data and code availability boundary table is reported in the supplementary material.",
+            "The repository includes source code and CLI entry points.",
+            "The repository includes small public fixtures.",
+            "The repository includes schema contracts.",
+            "The repository includes data-processing commands.",
+            "These files are version-controlled in Git.",
+            "The repository excludes raw third-party source files.",
+            "The repository excludes full prediction files.",
+            "The repository excludes model checkpoints.",
+            "The repository excludes derived evaluation artifacts.",
+            "These files remain outside Git.",
+            "They require an external artifact package.",
             r"The external artifact release uses \path{manuscript/scripts/populate_artifact_release.py}.",
             r"Reviewers can run \texttt{--artifact-dir} \path{/path/to/release}.",
             r"Reviewers can run \texttt{--source-dir} \path{/path/to/source-artifacts}.",
@@ -309,12 +312,32 @@ def test_check_data_code_availability_boundary_accepts_complete_boundary() -> No
             r"The external artifact release should include \path{source_input_manifest}.",
             r"The external artifact release should include \path{processing_run_log}.",
             "The statement distinguishes L0/L1 code-level reproduction from L2/L3 result-level audit.",
-            "The statement says raw third-party data remain governed by original provider licenses.",
+            "The statement names the data-processing path.",
+            "The statement says raw data or full experiment outputs are not redistributed.",
             "The statement says full numerical reproduction requires public-source rebuilds or released artifacts.",
         ]
     )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Data and Code Availability Boundary}",
+            r"\label{tab:data-code-availability-boundary}",
+            "Data and code availability boundary.",
+            "Source code and CLI entry points",
+            "Small public fixtures and schema contracts",
+            "Raw third-party source files",
+            "Full prediction files and model checkpoints",
+            "Derived evaluation artifacts",
+            "L0/L1 code-level reproduction",
+            "L2/L3 result-level audit",
+            "source input manifests",
+            "processing run logs",
+            "prediction files, threshold logs, manifests, checksums, and commit identifiers",
+            "raw third-party data remain governed by original provider licenses",
+            "full numerical reproduction requires public-source rebuilds or released artifacts",
+        ]
+    )
 
-    errors = module.check_data_code_availability_boundary(manuscript_text)
+    errors = module.check_data_code_availability_boundary(manuscript_text, supplementary_text)
 
     assert errors == []
 
@@ -4604,7 +4627,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 51.",
+            "Completed audit cycles: 52.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -4998,6 +5021,17 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "method design soundness",
             "claim-interpretation clarity without main-text table overload",
             "supplementary claim-interpretation boundary",
+            "## Audit Cycle 52: Data and Code Availability Density Gate",
+            "data/code availability table-density reduction",
+            "full data and code availability boundary table",
+            "L0/L1 code-level reproduction",
+            "L2/L3 result-level audit",
+            "data-processing commands",
+            "data-processing path",
+            "raw third-party source files",
+            "derived evaluation artifacts",
+            "data/code availability clarity without main-text table overload",
+            "supplementary data/code availability boundary",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -5016,7 +5050,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 51",
+        "Completed audit cycles: 52",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -5027,7 +5061,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 51" in error for error in errors)
+    assert any("Completed audit cycles: 52" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

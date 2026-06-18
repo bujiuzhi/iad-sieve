@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 51.
+Completed audit cycles: 52.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -505,6 +505,14 @@ Outcome: pass for claim-interpretation table-density reduction; blocked for fina
 This gate checks whether the claim-interpretation boundary table is needed in the main manuscript. The main manuscript now states the boundary in prose: contribution clarity is tied to the IAD-Bench contract and identity-agenda false-merge problem, writing reproducibility is limited to code-level checks and fixture rebuilds, experimental strength is limited to the Open-v2 evidence snapshot, evaluation completeness depends on artifact-backed ablations and manual validation, and method design soundness remains bounded by source-heldout validation, topic-heldout checks, and failure-case analysis. The supplementary material preserves the full claim-interpretation boundary table with the five review dimensions, main evidence locations, supported wording, and stronger-wording boundary.
 
 The reviewer-facing boundary is claim-interpretation clarity without main-text table overload. The edit keeps the end of the main manuscript closer to an ordinary journal narrative while the validator still requires the supplementary claim-interpretation boundary, including contribution clarity, writing reproducibility, experimental strength, evaluation completeness, method design soundness, and the explicit stronger-evidence requirements.
+
+## Audit Cycle 52: Data and Code Availability Density Gate
+
+Outcome: pass for data/code availability table-density reduction; blocked for final numerical audit until the external artifact release is populated, checksum-validated, and publicly linked.
+
+This gate checks whether the data/code availability matrix is needed in the main manuscript. The main manuscript now states the availability boundary in prose and the supplementary material preserves the full data and code availability boundary table. Source code, CLI entry points, small public fixtures, schema contracts, and data-processing commands are version-controlled in Git; raw third-party source files, full prediction files, model checkpoints, and derived evaluation artifacts remain outside Git unless released through an external artifact package. The same paragraph keeps the L0/L1 code-level reproduction and L2/L3 result-level audit distinction and states that full numerical reproduction requires public-source rebuilds or released artifacts.
+
+The reviewer-facing boundary is data/code availability clarity without main-text table overload. The edit keeps the journal data availability statement readable while the validator still requires the supplementary data/code availability boundary, including source code and CLI entry points, public fixtures, raw third-party source files, derived evaluation artifacts, data-processing path, manifests, checksums, and commit identifiers.
 
 ## Minimum Gate Before Final Upload
 

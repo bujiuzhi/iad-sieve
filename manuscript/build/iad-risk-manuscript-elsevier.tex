@@ -861,26 +861,7 @@ For reviewers or readers who evaluate only the Git repository, the executable ch
 
 An external artifact package should be treated as result evidence only after it passes both artifact-level and manuscript-package validation. Before copying generated result files into a release scaffold, \texttt{python} \path{manuscript/scripts/populate_artifact_release.py} with \texttt{--artifact-dir} \path{/path/to/release}, \texttt{--source-dir} \path{/path/to/source-artifacts}, and \texttt{--preflight-only} checks that the source artifact directory contains the files required by the release manifest without writing release files. This source preflight can detect missing tables, predictions, reports, configurations, or logs early, but it is not itself result evidence. The command \texttt{python} \path{manuscript/scripts/validate_artifact_release.py} \texttt{--artifact-dir /path/to/release} checks the release manifest, checksums, required result identifiers, row-level schemas, prediction schemas, claim-boundary flags, and raw-data exclusions. The command \texttt{python} \path{manuscript/scripts/validate_submission_package.py} \texttt{--final-upload --artifact-dir /path/to/release} then checks that the final manuscript package, submission metadata, source-control commit, and artifact manifest refer to the same source commit. If either validation fails, the artifact package should not be used to support the Open-v2 numerical table or any stronger claim.
 
-\begin{table}[H]
-\caption{Data and code availability boundary. The table separates what is version-controlled in Git from what must be obtained from public sources or a released artifact package.}
-\label{tab:data-code-availability-boundary}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{L{0.25\linewidth}L{0.30\linewidth}L{0.35\linewidth}}
-\toprule
-Availability class & Included location & Evaluation use \\
-\midrule
-Source code and CLI entry points & Project repository. & Supports installation, schema checks, fixture rebuilds, baseline execution, model training entry points, and manuscript builds. \\
-Small public fixtures and schema contracts & Project repository. & Supports L0/L1 code-level reproduction without downloading full raw datasets. \\
-Raw third-party source files & Excluded from Git; obtained from original providers. & Raw third-party data remain governed by original provider licenses and access conditions. \\
-Full prediction files and model checkpoints & Excluded from Git unless provided through an external artifact release. & Prevents large local outputs from being treated as repository source files. \\
-Derived evaluation artifacts & External artifact release. & Supports L2/L3 result-level audit through source input manifests, processing run logs, prediction files, threshold logs, manifests, checksums, and commit identifiers. \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-This boundary distinguishes L0/L1 code-level reproduction from L2/L3 result-level audit. Full numerical reproduction requires public-source rebuilds or released artifacts; the Git repository alone verifies the executable contracts, fixture behavior, and manuscript build rather than redistributing raw data or full experiment outputs.
+The full data and code availability boundary table is reported in the supplementary material. The boundary distinguishes L0/L1 code-level reproduction from L2/L3 result-level audit: source code and CLI entry points, small public fixtures, schema contracts, and data-processing commands are version-controlled in Git, while raw third-party source files, full prediction files, model checkpoints, and derived evaluation artifacts remain outside Git unless released through the external artifact package. Full numerical reproduction requires public-source rebuilds or released artifacts; the Git repository alone verifies the executable contracts, fixture behavior, data-processing path, and manuscript build rather than redistributing raw data or full experiment outputs.
 
 \section*{Ethics Statement}
 
