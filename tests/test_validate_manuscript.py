@@ -2370,6 +2370,34 @@ def test_check_final_upload_cover_letter_rejects_missing_artifact_link_value() -
     assert any("cover letter missing artifact release URL or DOI value" in error for error in errors)
 
 
+def test_check_final_upload_cover_letter_rejects_article_type_mismatch() -> None:
+    """验证 final-upload 投稿信文章类型与元数据不一致时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = "\n".join(
+        [
+            'target_journal: "Data & Knowledge Engineering"',
+            'article_type: "research_article"',
+            "artifact_boundary:",
+            '  artifact_release_url: "https://doi.org/10.0000/iad-risk-artifact"',
+            '  artifact_release_doi: "10.0000/iad-risk-artifact"',
+        ]
+    )
+    cover_letter_text = "\n".join(
+        [
+            "Dear Data & Knowledge Engineering Editors,",
+            "We submit the manuscript as a review article in Data & Knowledge Engineering.",
+            "The artifact release is available at https://doi.org/10.0000/iad-risk-artifact.",
+            "Sincerely,",
+            "Example Author",
+        ]
+    )
+
+    errors = module.check_final_upload_cover_letter(cover_letter_text, metadata_text)
+
+    assert any("cover letter missing article type: research article" in error for error in errors)
+
+
 def test_check_pdf_first_page_markers_accepts_expected_text() -> None:
     """验证 PDF 首页包含全部关键文本时可通过。"""
 

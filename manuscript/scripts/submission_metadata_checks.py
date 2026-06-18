@@ -47,6 +47,9 @@ FINAL_UPLOAD_TRUE_FIELDS = {
     "submission_system_files_verified": "submission system file checklist item is incomplete",
     "artifact_release_prepared_or_linked": "artifact release checklist item is incomplete",
 }
+ARTICLE_TYPE_COVER_LETTER_MARKERS = {
+    "research_article": "research article",
+}
 
 
 def strip_yaml_value(value: str) -> str:
@@ -465,6 +468,13 @@ def check_final_upload_cover_letter_text(cover_letter_text: str, metadata_text: 
     target_journal = scalar_value(metadata_text, "target_journal")
     if target_journal and target_journal not in cover_letter_text:
         errors.append(f"final upload cover letter unresolved: cover letter missing target journal: {target_journal}")
+    article_type = scalar_value(metadata_text, "article_type")
+    expected_article_type = ARTICLE_TYPE_COVER_LETTER_MARKERS.get(article_type)
+    if expected_article_type and expected_article_type not in cover_letter_text.lower():
+        errors.append(
+            "final upload cover letter unresolved: "
+            f"cover letter missing article type: {expected_article_type}"
+        )
     if "Dear Editor," in cover_letter_text:
         errors.append("final upload cover letter unresolved: cover letter uses generic editor greeting")
     if "Anonymous Authors" in cover_letter_text:
