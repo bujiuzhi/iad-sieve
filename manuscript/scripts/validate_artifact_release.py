@@ -454,6 +454,54 @@ def check_repository_fields(manifest: dict[str, Any]) -> list[str]:
     return errors
 
 
+def extract_readme_repository_commit(readme_text: str) -> str | None:
+    """Extract the repository commit recorded in the release README.
+
+    参数:
+        readme_text: README.md content from the artifact release root.
+
+    返回:
+        str | None: Parsed Git commit, or None when no valid commit is recorded.
+    """
+    for line in readme_text.splitlines():
+        match = re.match(r"^\s*-?\s*Repository commit\s*:\s*(?P<value>.+?)\s*$", line, re.IGNORECASE)
+        if not match:
+            continue
+        value = match.group("value")
+        commit_match = re.search(r"\b[0-9a-f]{7,40}\b", value, re.IGNORECASE)
+        if commit_match:
+            return commit_match.group(0)
+        return None
+    return None
+
+
+def check_readme_repository_commit_binding(readme_text: str, manifest: dict[str, Any]) -> list[str]:
+    """Check README and manifest repository-commit consistency.
+
+    参数:
+        readme_text: README.md content from the artifact release root.
+        manifest: Parsed release manifest.
+
+    返回:
+        list[str]: Error messages.
+    """
+    readme_commit = extract_readme_repository_commit(readme_text)
+    if readme_commit is None:
+        return ["README.md repository commit is missing or not a 7 to 40 character hexadecimal Git commit"]
+    repository = manifest.get("repository")
+    if not isinstance(repository, dict):
+        return []
+    manifest_commit = str(repository.get("commit", "")).strip()
+    if not COMMIT_PATTERN.fullmatch(manifest_commit):
+        return []
+    if readme_commit.lower() != manifest_commit.lower():
+        return [
+            "README.md repository commit does not match manifest.json repository.commit: "
+            f"{readme_commit} != {manifest_commit}"
+        ]
+    return []
+
+
 def check_open_v2_main_results_schema(csv_path: Path) -> list[str]:
     """Check the Open-v2 main result table row-level audit schema.
 
@@ -757,6 +805,7 @@ def validate_artifact_release(artifact_dir: Path, template_path: Path) -> list[s
     if errors:
         return errors
 
+    readme_text = ""
     try:
         readme_text = (artifact_dir / "README.md").read_text(encoding="utf-8")
     except OSError as exc:
@@ -774,6 +823,8 @@ def validate_artifact_release(artifact_dir: Path, template_path: Path) -> list[s
     errors.extend(template_errors)
     if manifest is not None:
         errors.extend(check_manifest_structure(manifest, template, artifact_dir, checksums))
+        if readme_text:
+            errors.extend(check_readme_repository_commit_binding(readme_text, manifest))
     return errors
 
 

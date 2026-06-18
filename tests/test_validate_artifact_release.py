@@ -449,6 +449,24 @@ def test_validate_artifact_release_rejects_malformed_repository_commit(tmp_path)
     assert any("hexadecimal Git commit" in error for error in errors)
 
 
+def test_validate_artifact_release_rejects_readme_manifest_commit_mismatch(tmp_path) -> None:
+    """验证 release README 和 manifest 必须记录同一个 Git 提交号。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    manifest_path = artifact_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["repository"]["commit"] = "abcdef1234567890abcdef1234567890abcdef12"
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    _refresh_checksums(artifact_dir)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("README.md repository commit" in error for error in errors)
+    assert any("manifest.json repository.commit" in error for error in errors)
+
+
 def test_validate_artifact_release_rejects_skeleton_status(tmp_path) -> None:
     """验证真实 release 不得保留骨架生成状态。"""
 

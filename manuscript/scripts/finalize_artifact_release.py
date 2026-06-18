@@ -12,6 +12,7 @@ import hashlib
 import importlib.util
 import json
 import logging
+import re
 from pathlib import Path
 from typing import Any
 
@@ -227,6 +228,45 @@ def ensure_minimum_validation_commands(manifest: dict[str, Any]) -> None:
     manifest["minimum_validation_commands"] = commands
 
 
+def update_readme_repository_commit(artifact_dir: Path, manifest: dict[str, Any]) -> None:
+    """Synchronize README repository commit with the release manifest.
+
+    参数:
+        artifact_dir: Artifact release directory.
+        manifest: Parsed and finalized release manifest.
+
+    返回:
+        无。
+
+    异常:
+        FileNotFoundError: Raised when README.md is missing.
+        ValueError: Raised when manifest repository.commit is not usable.
+        OSError: Raised when README.md cannot be read or written.
+    """
+    repository = manifest.get("repository")
+    if not isinstance(repository, dict):
+        raise ValueError("manifest.json missing repository object")
+    repository_commit = str(repository.get("commit", "")).strip()
+    if not re.fullmatch(r"[0-9a-fA-F]{7,40}", repository_commit):
+        raise ValueError("manifest.json repository.commit must be a 7 to 40 character hexadecimal Git commit")
+    readme_path = artifact_dir / "README.md"
+    if not readme_path.is_file():
+        raise FileNotFoundError(f"artifact release README missing: {readme_path}")
+    readme_lines = readme_path.read_text(encoding="utf-8").splitlines()
+    marker_pattern = re.compile(r"^(?P<prefix>\s*-?\s*Repository commit\s*:\s*)(?P<value>.*)$", re.IGNORECASE)
+    updated = False
+    for index, line in enumerate(readme_lines):
+        match = marker_pattern.match(line)
+        if not match:
+            continue
+        readme_lines[index] = f"{match.group('prefix')}{repository_commit}"
+        updated = True
+        break
+    if not updated:
+        readme_lines.extend(["", f"Repository commit: {repository_commit}"])
+    readme_path.write_text("\n".join(readme_lines) + "\n", encoding="utf-8")
+
+
 def write_checksums(artifact_dir: Path) -> Path:
     """Refresh checksums.sha256 for every release file except itself.
 
@@ -324,6 +364,7 @@ def finalize_artifact_release(
     mark_manifest_finalized(manifest, normalized_status)
     ensure_minimum_validation_commands(manifest)
     write_json(manifest_path, manifest)
+    update_readme_repository_commit(artifact_dir, manifest)
     write_checksums(artifact_dir)
     if validate:
         run_artifact_validator(artifact_dir, manifest_template_path)

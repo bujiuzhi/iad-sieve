@@ -3805,8 +3805,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 24.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release README completeness, artifact release commit validity, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
+            "Completed audit cycles: 25.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -4018,6 +4018,13 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "first_screen_claim_lockdown_confirmed",
             "metadata-validator coverage",
             "live system preview",
+            "## Audit Cycle 25: Artifact README-Manifest Commit Consistency Gate",
+            "README.md",
+            "Repository commit",
+            "manifest.json",
+            "repository.commit",
+            "commit-consistency coverage",
+            "same source revision",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload",
@@ -4036,7 +4043,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 24",
+        "Completed audit cycles: 25",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -4047,7 +4054,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 24" in error for error in errors)
+    assert any("Completed audit cycles: 25" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -4338,6 +4345,28 @@ def test_check_reviewer_readiness_audit_rejects_missing_artifact_readme_gate() -
     assert any("README.md" in error for error in errors)
     assert any("checksums.sha256" in error for error in errors)
     assert any("raw third-party data exclusions" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_artifact_readme_manifest_commit_gate() -> None:
+    """验证审稿准备度审计必须覆盖 artifact README 与 manifest 提交号一致性门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Audit Cycle 25: Artifact README-Manifest Commit Consistency Gate",
+        "Repository commit",
+        "manifest.json",
+        "repository.commit",
+        "commit-consistency coverage",
+        "same source revision",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Artifact README-Manifest Commit Consistency Gate" in error for error in errors)
+    assert any("Repository commit" in error for error in errors)
+    assert any("repository.commit" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_final_upload_source_control_package_gate() -> None:

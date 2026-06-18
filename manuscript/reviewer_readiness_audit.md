@@ -10,9 +10,9 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 24.
+Completed audit cycles: 25.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release README completeness, artifact release commit validity, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.
 
@@ -290,6 +290,14 @@ This cycle turns the first-screen claim lockdown from a checklist instruction in
 
 The reviewer-facing boundary remains conservative. Setting this field to true confirms text consistency and claim discipline; it does not confirm target-journal acceptance, Q2/B completion, artifact evidence, or stronger empirical claims.
 
+## Audit Cycle 25: Artifact README-Manifest Commit Consistency Gate
+
+Outcome: pass for artifact-validator and commit-consistency coverage; blocked for final numerical audit until the external artifact release is populated, finalized, validated, and linked.
+
+This cycle closes a traceability gap in the external artifact release. The artifact release validator now requires `README.md` to record a parseable `Repository commit` value and requires that value to match `manifest.json` field `repository.commit`. The README template also states that the repository commit must match the manifest and the final manuscript package commit.
+
+The reviewer-facing boundary is source traceability. A matching README and manifest commit prevents reviewers from receiving two different source anchors for the same artifact release. It does not prove that the result files were generated from that commit; that stronger guarantee still depends on command logs, checksums, prediction files, threshold logs, and the final package metadata naming the same source revision.
+
 ## Minimum Gate Before Final Upload
 
 The manuscript should not be uploaded to a journal system until all of the following are true:
@@ -297,7 +305,7 @@ The manuscript should not be uploaded to a journal system until all of the follo
 1. `submission_metadata.yml` contains the selected target journal, `target_journal_template_bound: true`, completed author metadata, and author biography/photo readiness when the selected route requires it.
 2. `main.tex` or the selected journal source is converted to the selected journal template and rebuilt.
 3. `supplementary_material.tex` is rebuilt after any final source edits.
-4. The artifact release has a real URL or DOI, validates against its checksum file, and records the same repository commit used by the final manuscript package.
+4. The artifact release has a real URL or DOI, validates against its checksum file, and records the same repository commit used by the final manuscript package in both `README.md` and `manifest.json`.
 5. The funding statement text, author contribution statement, permissions statement, generative AI declaration, data/code availability statement, and journal-specific research data statement are complete and consistent with the live submission system, with CRediT roles covering every listed author and with the repository URL, repository commit, and artifact URL or DOI embedded in the availability statements.
 6. `python manuscript/scripts/verify_fixture_rebuild.py` passes from the public source tree without requiring raw third-party data.
 7. `python scripts/check_public_release.py` passes and confirms that `data/`, `outputs/`, caches, credentials, and large local artifacts are outside the public package.

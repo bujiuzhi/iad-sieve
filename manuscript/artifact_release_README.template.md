@@ -87,6 +87,7 @@ Cluster-level quality is not claimed unless cluster artifacts are complete.
 - Release URL:
 - Release DOI:
 - Repository commit:
+  - Must match `manifest.json` field `repository.commit` and the final manuscript package commit.
 - Release date:
 - Source data versions:
 - Command logs location:

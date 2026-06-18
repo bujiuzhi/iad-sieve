@@ -245,6 +245,9 @@ def test_finalize_artifact_release_updates_manifest_and_passes_validator(tmp_pat
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     assert manifest["release_status"] == "release_candidate"
     assert manifest["generated_from_template"]["artifact_files_pending"] is False
+    readme_text = (artifact_dir / "README.md").read_text(encoding="utf-8")
+    assert "Repository commit:" in readme_text
+    assert manifest["repository"]["commit"] in readme_text
     artifact_rows = {row["artifact_id"]: row for row in manifest["required_artifacts"]}
     for row in artifact_rows.values():
         if row.get("required") is True:
