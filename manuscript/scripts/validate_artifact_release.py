@@ -129,6 +129,47 @@ MANUAL_VALIDATION_ALLOWED_AGREEMENT_STATUSES = {"agreement", "disagreement"}
 MANUAL_VALIDATION_ALLOWED_ADJUDICATION_STATUSES = {"agreement_confirmed", "adjudicated"}
 MANUAL_VALIDATION_MIN_ROWS = 500
 MANUAL_VALIDATION_MAX_ROWS = 1000
+THRESHOLD_SENSITIVITY_GRID_REQUIRED_COLUMNS = {
+    "system",
+    "threshold_grid_id",
+    "prediction_artifact_id",
+    "prediction_file_sha256",
+    "threshold_range_source",
+    "threshold_source",
+    "selection_split",
+    "evaluation_split",
+    "work_threshold",
+    "agenda_block_threshold",
+    "risk_threshold",
+    "selected_operating_point",
+    "same_work_f1",
+    "fmr",
+    "hnfmr",
+    "same_work_f1_denominator",
+    "fmr_denominator",
+    "hnfmr_denominator",
+    "automatic_merge_count",
+    "block_count",
+    "defer_count",
+    "random_seed",
+    "command_line",
+}
+THRESHOLD_SENSITIVITY_RATIO_FIELDS = {
+    "work_threshold",
+    "agenda_block_threshold",
+    "risk_threshold",
+    "same_work_f1",
+    "fmr",
+    "hnfmr",
+}
+THRESHOLD_SENSITIVITY_COUNT_FIELDS = {
+    "same_work_f1_denominator",
+    "fmr_denominator",
+    "hnfmr_denominator",
+    "automatic_merge_count",
+    "block_count",
+    "defer_count",
+}
 JSONL_REQUIRED_FIELDS_BY_ARTIFACT = {
     "iad_risk_predictions": {
         "system",
@@ -769,6 +810,133 @@ def check_manual_validation_slice_schema(csv_path: Path) -> list[str]:
     return errors
 
 
+def _parse_float(value: Any) -> float | None:
+    """Parse a CSV value as float.
+
+    参数:
+        value: CSV cell value.
+
+    返回:
+        float | None: Parsed float, or None when parsing fails.
+    """
+    try:
+        return float(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+
+
+def _parse_int(value: Any) -> int | None:
+    """Parse a CSV value as integer.
+
+    参数:
+        value: CSV cell value.
+
+    返回:
+        int | None: Parsed integer, or None when parsing fails.
+    """
+    try:
+        text = str(value).strip()
+        if not text:
+            return None
+        parsed = float(text)
+    except (TypeError, ValueError):
+        return None
+    if not parsed.is_integer():
+        return None
+    return int(parsed)
+
+
+def check_threshold_sensitivity_grid_schema(csv_path: Path) -> list[str]:
+    """Check threshold-sensitivity grid columns and row-level audit fields.
+
+    参数:
+        csv_path: Path to reports/threshold_sensitivity_grid.csv.
+
+    返回:
+        list[str]: Error messages for missing threshold-stability evidence.
+    """
+    try:
+        with csv_path.open("r", encoding="utf-8", newline="") as file_handle:
+            reader = csv.DictReader(file_handle)
+            header = [column.strip() for column in (reader.fieldnames or []) if column and column.strip()]
+            rows = [{str(key).strip(): value for key, value in raw_row.items() if key is not None} for raw_row in reader]
+    except OSError as exc:
+        return [f"threshold_sensitivity_grid CSV cannot be read: {exc}"]
+    if not header:
+        return ["threshold_sensitivity_grid CSV is empty or missing a header row"]
+
+    errors: list[str] = []
+    actual_columns = set(header)
+    missing_columns = THRESHOLD_SENSITIVITY_GRID_REQUIRED_COLUMNS - actual_columns
+    for column in sorted(missing_columns):
+        errors.append(f"threshold_sensitivity_grid CSV missing stability audit column: {column}")
+    if missing_columns:
+        return errors
+    if len(rows) < 2:
+        return ["threshold_sensitivity_grid CSV must include at least two threshold rows"]
+
+    prediction_artifact_ids: set[str] = set()
+    prediction_checksums: set[str] = set()
+    selected_operating_point_count = 0
+    required_text_fields = [
+        "system",
+        "threshold_grid_id",
+        "prediction_artifact_id",
+        "prediction_file_sha256",
+        "threshold_range_source",
+        "threshold_source",
+        "selection_split",
+        "evaluation_split",
+        "command_line",
+    ]
+    for line_number, row in enumerate(rows, start=2):
+        for field in required_text_fields:
+            if not str(row.get(field, "")).strip():
+                errors.append(f"threshold_sensitivity_grid CSV line {line_number} missing required value: {field}")
+
+        prediction_artifact_id = str(row.get("prediction_artifact_id", "")).strip()
+        if prediction_artifact_id:
+            prediction_artifact_ids.add(prediction_artifact_id)
+        prediction_checksum = str(row.get("prediction_file_sha256", "")).strip().lower()
+        if prediction_checksum:
+            prediction_checksums.add(prediction_checksum)
+            if not SHA256_PATTERN.fullmatch(prediction_checksum):
+                errors.append(f"threshold_sensitivity_grid CSV line {line_number} has invalid prediction_file_sha256")
+
+        if str(row.get("threshold_range_source", "")).strip() not in {"predefined_grid", "registered_grid_config"}:
+            errors.append(
+                f"threshold_sensitivity_grid CSV line {line_number} must use threshold_range_source="
+                "predefined_grid or registered_grid_config"
+            )
+        if str(row.get("selection_split", "")).strip() == str(row.get("evaluation_split", "")).strip():
+            errors.append(f"threshold_sensitivity_grid CSV line {line_number} must separate selection_split and evaluation_split")
+
+        for field in sorted(THRESHOLD_SENSITIVITY_RATIO_FIELDS):
+            parsed_value = _parse_float(row.get(field))
+            if parsed_value is None or not 0.0 <= parsed_value <= 1.0:
+                errors.append(f"threshold_sensitivity_grid CSV line {line_number} must set {field} between 0 and 1")
+        for field in sorted(THRESHOLD_SENSITIVITY_COUNT_FIELDS):
+            parsed_value = _parse_int(row.get(field))
+            if parsed_value is None or parsed_value < 0:
+                errors.append(f"threshold_sensitivity_grid CSV line {line_number} must set {field} to a non-negative integer")
+        random_seed = _parse_int(row.get("random_seed"))
+        if random_seed is None:
+            errors.append(f"threshold_sensitivity_grid CSV line {line_number} must set random_seed to an integer")
+        if _csv_truthy(row.get("selected_operating_point")):
+            selected_operating_point_count += 1
+        if len(errors) >= 30:
+            errors.append("threshold_sensitivity_grid CSV schema check stopped after 30 errors")
+            return errors
+
+    if not selected_operating_point_count:
+        errors.append("threshold_sensitivity_grid CSV must mark at least one selected_operating_point=true row")
+    if len(prediction_artifact_ids) != 1:
+        errors.append("threshold_sensitivity_grid CSV must be generated from exactly one prediction_artifact_id")
+    if len(prediction_checksums) != 1:
+        errors.append("threshold_sensitivity_grid CSV must be generated from exactly one prediction_file_sha256")
+    return errors
+
+
 def _missing_jsonl_required_fields(row: dict[str, Any], required_fields: set[str]) -> list[str]:
     """Return required JSONL fields that are absent or empty.
 
@@ -942,6 +1110,18 @@ def check_manifest_artifacts(
             and (artifact_dir / manual_validation_location).is_file()
         ):
             errors.extend(check_manual_validation_slice_schema(artifact_dir / manual_validation_location))
+
+    threshold_grid_row = artifact_rows.get("threshold_sensitivity_grid")
+    if isinstance(threshold_grid_row, dict):
+        threshold_grid_location = str(threshold_grid_row.get("expected_location", "")).strip()
+        threshold_grid_location_path = Path(threshold_grid_location)
+        if (
+            threshold_grid_location
+            and not threshold_grid_location_path.is_absolute()
+            and ".." not in threshold_grid_location_path.parts
+            and (artifact_dir / threshold_grid_location).is_file()
+        ):
+            errors.extend(check_threshold_sensitivity_grid_schema(artifact_dir / threshold_grid_location))
 
     claim_boundaries = manifest.get("claim_boundaries")
     if isinstance(claim_boundaries, dict):

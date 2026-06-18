@@ -369,6 +369,114 @@ def _add_manual_validation_slice_artifact(
     _refresh_checksums(artifact_dir)
 
 
+def _complete_threshold_sensitivity_grid_csv(
+    row_count: int = 3,
+    same_split: bool = False,
+    mixed_prediction_checksums: bool = False,
+) -> str:
+    """生成满足阈值敏感性协议 schema 的 CSV 内容。
+
+    参数:
+        row_count: 阈值网格行数。
+        same_split: 是否故意让 selection_split 与 evaluation_split 相同。
+        mixed_prediction_checksums: 是否故意混用不同预测文件校验和。
+
+    返回:
+        str: threshold_sensitivity_grid CSV 内容。
+    """
+    header = [
+        "system",
+        "threshold_grid_id",
+        "prediction_artifact_id",
+        "prediction_file_sha256",
+        "threshold_range_source",
+        "threshold_source",
+        "selection_split",
+        "evaluation_split",
+        "work_threshold",
+        "agenda_block_threshold",
+        "risk_threshold",
+        "selected_operating_point",
+        "same_work_f1",
+        "fmr",
+        "hnfmr",
+        "same_work_f1_denominator",
+        "fmr_denominator",
+        "hnfmr_denominator",
+        "automatic_merge_count",
+        "block_count",
+        "defer_count",
+        "random_seed",
+        "command_line",
+    ]
+    lines = [",".join(header)]
+    for index in range(row_count):
+        threshold_value = 0.35 + index * 0.1
+        prediction_checksum = "1" * 64
+        if mixed_prediction_checksums and index == row_count - 1:
+            prediction_checksum = "2" * 64
+        row = [
+            "iad_risk_transformer",
+            "open_v2_iad_risk_grid",
+            "iad_risk_predictions",
+            prediction_checksum,
+            "predefined_grid",
+            "threshold_selection_logs",
+            "dev",
+            "dev" if same_split else "test",
+            f"{threshold_value:.2f}",
+            "0.50",
+            f"{threshold_value:.2f}",
+            "true" if index == 1 else "false",
+            f"{0.70 + index * 0.01:.2f}",
+            f"{0.05 + index * 0.01:.2f}",
+            f"{0.10 + index * 0.01:.2f}",
+            "100",
+            "200",
+            "50",
+            str(60 + index),
+            str(20 + index),
+            str(10 + index),
+            "42",
+            "python -m iad_sieve.cli run-threshold-sensitivity",
+        ]
+        lines.append(",".join(row))
+    return "\n".join(lines) + "\n"
+
+
+def _add_threshold_sensitivity_grid_artifact(
+    artifact_dir: Path,
+    csv_content: str | None = None,
+    threshold_stability_claimed: bool = True,
+) -> None:
+    """向测试 release 添加 threshold_sensitivity_grid artifact。
+
+    参数:
+        artifact_dir: Release 目录。
+        csv_content: 可选 threshold_sensitivity_grid CSV 内容。
+        threshold_stability_claimed: 是否打开 threshold_stability_claimed。
+
+    返回:
+        无。
+    """
+    threshold_grid_path = artifact_dir / "reports" / "threshold_sensitivity_grid.csv"
+    _write_file(threshold_grid_path, csv_content or _complete_threshold_sensitivity_grid_csv())
+    manifest_path = artifact_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["claim_boundaries"]["threshold_stability_claimed"] = threshold_stability_claimed
+    manifest["required_artifacts"].append(
+        {
+            "artifact_id": "threshold_sensitivity_grid",
+            "required": threshold_stability_claimed,
+            "expected_location": "reports/threshold_sensitivity_grid.csv",
+            "sha256": _sha256_file(threshold_grid_path),
+            "claim_support": "Threshold-stability artifact with predefined grid and prediction checksum binding.",
+        }
+    )
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    _refresh_checksums(artifact_dir)
+
+
 def _complete_readme_text() -> str:
     """生成包含必需复现说明的测试 README。
 
@@ -837,3 +945,58 @@ def test_validate_artifact_release_rejects_manual_validation_slice_without_blind
     errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
 
     assert any("manual_validation_slice CSV line 2 must set reviewer_blinding_confirmed=true" in error for error in errors)
+
+
+def test_validate_artifact_release_accepts_claimed_threshold_stability_with_protocol_grid(tmp_path) -> None:
+    """验证 threshold stability claim 只有在阈值网格字段完整时通过。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    _add_threshold_sensitivity_grid_artifact(artifact_dir)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert errors == []
+
+
+def test_validate_artifact_release_rejects_threshold_grid_with_single_row(tmp_path) -> None:
+    """验证阈值敏感性网格少于两个阈值行时会被拒绝。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    _add_threshold_sensitivity_grid_artifact(artifact_dir, _complete_threshold_sensitivity_grid_csv(row_count=1))
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("threshold_sensitivity_grid CSV must include at least two threshold rows" in error for error in errors)
+
+
+def test_validate_artifact_release_rejects_threshold_grid_with_selection_leakage(tmp_path) -> None:
+    """验证阈值网格不得使用同一 split 选择和评估阈值。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    _add_threshold_sensitivity_grid_artifact(artifact_dir, _complete_threshold_sensitivity_grid_csv(same_split=True))
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("must separate selection_split and evaluation_split" in error for error in errors)
+
+
+def test_validate_artifact_release_rejects_threshold_grid_from_mixed_prediction_files(tmp_path) -> None:
+    """验证阈值网格必须绑定同一个预测文件校验和。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    _add_threshold_sensitivity_grid_artifact(
+        artifact_dir,
+        _complete_threshold_sensitivity_grid_csv(mixed_prediction_checksums=True),
+    )
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("exactly one prediction_file_sha256" in error for error in errors)

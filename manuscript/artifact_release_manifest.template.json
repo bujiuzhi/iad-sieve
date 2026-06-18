@@ -98,7 +98,7 @@
       "artifact_id": "threshold_sensitivity_grid",
       "required": false,
       "expected_location": "reports/threshold_sensitivity_grid.csv",
-      "claim_support": "Threshold-stability claims only if cited by the final manuscript."
+      "claim_support": "Threshold-stability claims only if cited by the final manuscript. The CSV must include at least two predefined threshold rows generated from exactly one prediction_artifact_id and prediction_file_sha256, with system, threshold_grid_id, threshold_range_source, threshold_source, selection_split, evaluation_split, work_threshold, agenda_block_threshold, risk_threshold, selected_operating_point, same_work_f1, fmr, hnfmr, denominator counts, automatic_merge_count, block_count, defer_count, random_seed, command_line, and separate selection and evaluation splits."
     },
     {
       "artifact_id": "ablation_suite",
