@@ -1518,28 +1518,55 @@ def check_design_alternative_boundaries(manuscript_text: str) -> list[str]:
     ]
 
 
-def check_operating_point_disclosure(manuscript_text: str) -> list[str]:
+def check_operating_point_disclosure(manuscript_text: str, supplementary_text: str = "") -> list[str]:
     """Check whether result operating points are disclosed for review.
 
     参数:
         manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
 
     返回:
         list[str]: Error messages for missing operating-point markers.
     """
-    required_markers = [
+    required_main_markers = [
         r"\subsection{Operating Point Disclosure}",
-        r"\label{tab:operating-point-disclosure}",
+        "full operating-point disclosure table is reported in the supplementary material",
         "fixed operating points",
         "post-hoc best test thresholds",
         "Representation cosine baselines",
         "RoBERTa pair classifier",
         "IAD-Risk transformer variants",
         r"default $\tau_w=\tau_a=\tau_r=0.5$",
+        "score file, metric summary, and threshold entry",
+        "prediction file, metric summary, and model log",
+        "prediction file, model JSON, thresholds, and checksums",
+    ]
+    required_supplement_markers = [
+        r"\section{Operating Point Disclosure}",
+        r"\label{tab:operating-point-disclosure}",
+        "Operating point disclosure for the Open-v2 result table",
+        "Row family",
+        "Decision field",
+        "Operating point source",
+        "Audit requirement",
+        "Representation cosine baselines",
+        "RoBERTa pair classifier",
+        "IAD-Risk transformer variants",
         "Score file, metric summary, and threshold entry",
         "Prediction file, model JSON, thresholds, and checksums",
     ]
-    return [f"operating point disclosure missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+    errors = [
+        f"operating point disclosure missing manuscript marker: {marker}"
+        for marker in required_main_markers
+        if marker not in manuscript_text
+    ]
+    evidence_text = supplementary_text or manuscript_text
+    errors.extend(
+        f"operating point disclosure missing supplementary marker: {marker}"
+        for marker in required_supplement_markers
+        if marker not in evidence_text
+    )
+    return errors
 
 
 def check_selective_decision_coverage_boundary(manuscript_text: str, supplementary_text: str = "") -> list[str]:
@@ -3124,7 +3151,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 57",
+        "Completed audit cycles: 58",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3239,6 +3266,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 55: Pair-to-Cluster Evidence Boundary Density Gate",
         "Audit Cycle 56: Selective Decision Coverage Boundary Density Gate",
         "Audit Cycle 57: Threshold Sensitivity Evidence Status Density Gate",
+        "Audit Cycle 58: Operating Point Disclosure Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
         "method-writing clarity",
@@ -3421,6 +3449,14 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "threshold-stable ranking",
         "threshold-sensitivity clarity without main-text table overload",
         "supplementary threshold-sensitivity evidence boundary",
+        "operating-point table-density reduction",
+        "full operating-point disclosure table",
+        "fixed operating points",
+        "post-hoc best test thresholds",
+        "row family decision fields",
+        "default threshold contract",
+        "operating-point clarity without main-text table overload",
+        "supplementary operating-point disclosure",
         "remote reproducibility",
         "strong model matrix",
         "model superiority",
@@ -4680,7 +4716,7 @@ def main() -> int:
     errors.extend(check_declaration_statements(manuscript_text))
     errors.extend(check_data_code_availability_boundary(manuscript_text, supplementary_text))
     errors.extend(check_cli_entrypoint_contract(pyproject_text, cli_entrypoint_text))
-    errors.extend(check_operating_point_disclosure(manuscript_text))
+    errors.extend(check_operating_point_disclosure(manuscript_text, supplementary_text))
     errors.extend(check_selective_decision_coverage_boundary(manuscript_text, supplementary_text))
     errors.extend(check_pair_cluster_evidence_boundary(manuscript_text, supplementary_text))
     errors.extend(check_decision_metric_mapping(manuscript_text))

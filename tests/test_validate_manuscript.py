@@ -1885,39 +1885,69 @@ def test_check_design_alternative_boundaries_rejects_missing_shortcut_boundaries
     assert any("released grid and checksums" in error for error in errors)
 
 
-def test_check_operating_point_disclosure_accepts_complete_disclosure() -> None:
-    """验证运行点披露完整时可通过检查。"""
+def test_check_operating_point_disclosure_accepts_supplementary_table() -> None:
+    """验证运行点披露表迁入补充材料后可通过检查。"""
 
     module = _load_validate_manuscript_module()
     manuscript_text = "\n".join(
         [
             r"\subsection{Operating Point Disclosure}",
-            r"\label{tab:operating-point-disclosure}",
+            "The full operating-point disclosure table is reported in the supplementary material.",
             "The table reports fixed operating points, not post-hoc best test thresholds.",
             "Representation cosine baselines use a fixed score threshold.",
             "RoBERTa pair classifier uses a pair probability threshold.",
             "IAD-Risk transformer variants use a risk gate.",
             r"The default $\tau_w=\tau_a=\tau_r=0.5$ applies unless overridden.",
-            "Score file, metric summary, and threshold entry are required.",
-            "Prediction file, model JSON, thresholds, and checksums are required.",
+            "A score file, metric summary, and threshold entry are required.",
+            "A prediction file, metric summary, and model log are required.",
+            "A prediction file, model JSON, thresholds, and checksums are required.",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Operating Point Disclosure}",
+            r"\label{tab:operating-point-disclosure}",
+            "Operating point disclosure for the Open-v2 result table.",
+            "Row family",
+            "Decision field",
+            "Operating point source",
+            "Audit requirement",
+            "Representation cosine baselines",
+            "RoBERTa pair classifier",
+            "IAD-Risk transformer variants",
+            "Score file, metric summary, and threshold entry",
+            "Prediction file, model JSON, thresholds, and checksums",
         ]
     )
 
-    errors = module.check_operating_point_disclosure(manuscript_text)
+    errors = module.check_operating_point_disclosure(manuscript_text, supplementary_text)
 
     assert errors == []
 
 
-def test_check_operating_point_disclosure_rejects_missing_threshold_boundary() -> None:
-    """验证缺少运行点边界会被拒绝。"""
+def test_check_operating_point_disclosure_rejects_missing_supplementary_table() -> None:
+    """验证缺少补充材料完整运行点表时会被拒绝。"""
 
     module = _load_validate_manuscript_module()
-    manuscript_text = r"\subsection{Operating Point Disclosure}"
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Operating Point Disclosure}",
+            "The full operating-point disclosure table is reported in the supplementary material.",
+            "The table reports fixed operating points, not post-hoc best test thresholds.",
+            "Representation cosine baselines use a fixed score threshold.",
+            "RoBERTa pair classifier uses a pair probability threshold.",
+            "IAD-Risk transformer variants use a risk gate.",
+            r"The default $\tau_w=\tau_a=\tau_r=0.5$ applies unless overridden.",
+            "A score file, metric summary, and threshold entry are required.",
+            "A prediction file, metric summary, and model log are required.",
+            "A prediction file, model JSON, thresholds, and checksums are required.",
+        ]
+    )
 
-    errors = module.check_operating_point_disclosure(manuscript_text)
+    errors = module.check_operating_point_disclosure(manuscript_text, "")
 
     assert any("operating-point-disclosure" in error for error in errors)
-    assert any("post-hoc best test thresholds" in error for error in errors)
+    assert any("Operating Point Disclosure" in error for error in errors)
 
 
 def test_check_selective_decision_coverage_boundary_accepts_supplementary_table() -> None:
@@ -4836,7 +4866,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 57.",
+            "Completed audit cycles: 58.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -5287,6 +5317,15 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "threshold-stable ranking",
             "threshold-sensitivity clarity without main-text table overload",
             "supplementary threshold-sensitivity evidence boundary",
+            "## Audit Cycle 58: Operating Point Disclosure Density Gate",
+            "operating-point table-density reduction",
+            "full operating-point disclosure table",
+            "fixed operating points",
+            "post-hoc best test thresholds",
+            "row family decision fields",
+            "default threshold contract",
+            "operating-point clarity without main-text table overload",
+            "supplementary operating-point disclosure",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -5305,7 +5344,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 57",
+        "Completed audit cycles: 58",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -5316,7 +5355,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 57" in error for error in errors)
+    assert any("Completed audit cycles: 58" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

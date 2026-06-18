@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 57.
+Completed audit cycles: 58.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -553,6 +553,14 @@ Outcome: pass for threshold-sensitivity table-density reduction; blocked for thr
 This gate checks whether the threshold-sensitivity evidence table is needed in the main manuscript. The main manuscript now states the threshold boundary in prose: the current results use fixed operating points, the threshold grid is not reported as primary evidence, and metric stability requires the same prediction files, predefined threshold ranges, per-threshold F1, FMR, HNFMR, pair counts, random seeds, command logs, a manifest, and checksums. The supplementary material preserves the full threshold-sensitivity evidence status table with each audit item, current manuscript status, and required artifact before stronger claims.
 
 The reviewer-facing boundary is threshold-sensitivity clarity without main-text table overload. The edit keeps the experiments section focused on the Open-v2 evidence snapshot while the validator still requires the supplementary threshold-sensitivity evidence boundary, including fixed operating points, threshold grid requirements, metric stability requirements, artifact manifest requirements, and the explicit rule that the paper does not claim threshold-stable ranking across all operating points.
+
+## Audit Cycle 58: Operating Point Disclosure Density Gate
+
+Outcome: pass for operating-point table-density reduction; blocked for full numerical threshold audit until released artifacts bind row family decision fields, threshold sources, command logs, manifests, and checksums to the reported Open-v2 rows.
+
+This gate checks whether the operating-point disclosure table is needed in the main manuscript. The main manuscript now states the operating-point boundary in prose: the result table uses fixed operating points rather than post-hoc best test thresholds; representation cosine baselines use cosine score thresholds; the RoBERTa pair classifier uses a pair match probability threshold; and IAD-Risk transformer variants use the risk gate with the default threshold contract unless the artifact config records an override. The supplementary material preserves the full operating-point disclosure table with row family decision fields, operating-point sources, and audit requirements.
+
+The reviewer-facing boundary is operating-point clarity without main-text table overload. The edit keeps the experiments section focused on result interpretation while the validator still requires the supplementary operating-point disclosure, including fixed operating points, post-hoc best test thresholds, row family decision fields, default threshold contract, score-file requirements, prediction-file requirements, model JSON, thresholds, and checksums.
 
 ## Minimum Gate Before Final Upload
 

@@ -564,6 +564,27 @@ Model ranking & Restricted to mechanism interpretation rather than a universal r
 \end{tabular}
 \end{table}
 
+\section{Operating Point Disclosure}
+
+The main manuscript summarizes operating-point disclosure in prose. Table~\ref{tab:operating-point-disclosure} preserves how each Open-v2 row family obtains its decision field and which artifact is required for threshold audit.
+
+\begin{table}[H]
+\caption{Operating point disclosure for the Open-v2 result table. The table records how merge decisions are produced and what artifact is required for threshold audit.}
+\label{tab:operating-point-disclosure}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.24\linewidth}L{0.24\linewidth}L{0.24\linewidth}L{0.18\linewidth}}
+\toprule
+Row family & Decision field & Operating point source & Audit requirement \\
+\midrule
+Representation cosine baselines & Cosine score threshold on scientific document embeddings. & Fixed baseline metric summary; threshold chosen before final test reporting. & Score file, metric summary, and threshold entry. \\
+RoBERTa pair classifier & Pair match probability threshold. & Fixed pair-classifier metric summary under the same pair schema. & Prediction file, metric summary, and model log. \\
+IAD-Risk transformer variants & $p_{\mathrm{work}}$, $p_{\mathrm{ani}}$, and $p_{\mathrm{risk}}$ under the risk gate. & Model configuration; default $\tau_w=\tau_a=\tau_r=0.5$ unless the artifact config records an override. & Prediction file, model JSON, thresholds, and checksums. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Threshold Sensitivity Evidence Status}
 
 The main manuscript summarizes the threshold-sensitivity evidence status in prose. Table~\ref{tab:threshold-sensitivity-status} preserves the audit items required before fixed-threshold results can be upgraded to threshold-stability claims.
