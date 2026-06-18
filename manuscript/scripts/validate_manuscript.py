@@ -522,6 +522,13 @@ def check_abstract_cluster_overclaim(manuscript_text: str) -> list[str]:
     for pattern in UNSUPPORTED_ABSTRACT_CLUSTER_PATTERNS:
         for match in pattern.finditer(abstract_text):
             errors.append(f"unsupported abstract cluster-level claim found: {match.group(0)}")
+    required_markers = [
+        "pair-level",
+        "cluster artifacts",
+    ]
+    for marker in required_markers:
+        if marker not in abstract_text:
+            errors.append(f"abstract missing pair-level claim boundary marker: {marker}")
     return errors
 
 

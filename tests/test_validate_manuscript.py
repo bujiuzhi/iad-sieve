@@ -322,7 +322,8 @@ def test_check_abstract_cluster_overclaim_accepts_pair_stage_boundary() -> None:
     manuscript_text = (
         r"\begin{abstract}"
         "IAD-Risk uses false-merge risk gating to block risky automatic pair merges before clustering. "
-        "The manuscript keeps cluster-level quality claims conditional on cluster artifacts."
+        "The manuscript keeps pair-level quality claims separated from cluster-level quality claims. "
+        "Cluster-level quality claims remain conditional on cluster artifacts."
         r"\end{abstract}"
     )
 
@@ -347,6 +348,26 @@ def test_check_abstract_cluster_overclaim_rejects_cluster_prevention_claim() -> 
 
     assert any("unsupported abstract cluster-level claim" in error for error in errors)
     assert any("automatic merge clusters" in error for error in errors)
+
+
+def test_check_abstract_cluster_overclaim_rejects_missing_pair_level_boundary() -> None:
+    """验证摘要结论必须说明 pair-level 与 cluster artifact 边界。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_abstract_cluster_overclaim", None)
+    assert callable(checker)
+    manuscript_text = (
+        r"\begin{abstract}"
+        "IAD-Risk uses false-merge risk gating to block risky automatic pair merges before clustering. "
+        "The results support a conservative conclusion: identity-agenda disentanglement is a practical "
+        "mechanism for safer scholarly deduplication."
+        r"\end{abstract}"
+    )
+
+    errors = checker(manuscript_text)
+
+    assert any("abstract missing pair-level claim boundary" in error for error in errors)
+    assert any("cluster artifacts" in error for error in errors)
 
 
 def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
