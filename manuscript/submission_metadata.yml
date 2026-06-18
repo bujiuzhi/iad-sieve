@@ -46,6 +46,7 @@ artifact_boundary:
 
 upload_preparation:
   submission_system_checklist_file: "submission_system_checklist.md"
+  reviewer_readiness_audit_file: "reviewer_readiness_audit.md"
   live_submission_system_verified: false
   final_upload_package_verified_against_system: false
 

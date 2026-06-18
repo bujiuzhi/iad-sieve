@@ -17,6 +17,7 @@ manuscript/
   target_journal_shortlist.md
   artifact_release_manifest.template.json
   submission_system_checklist.md
+  reviewer_readiness_audit.md
   submission_metadata.yml
   MANIFEST.md
   scripts/
@@ -70,5 +71,7 @@ python manuscript/scripts/validate_submission_package.py
 `artifact_release_manifest.template.json` 记录结果 artifact release 应包含的表格、预测、日志、校验命令和 claim boundary。正式上传前应据此生成真实 release manifest，并在 `submission_metadata.yml` 中填写 artifact 链接。
 
 `submission_system_checklist.md` 记录最终上传到期刊系统前需要核对的文件、元数据、PDF 和 artifact release 项。该文件用于最终上传前检查，不作为当前预投稿包附件。
+
+`reviewer_readiness_audit.md` 记录投稿前的审稿准备度、主要拒稿风险、证据边界和最终上传门槛。该文件用于质量控制，不作为最终投稿附件。
 
 `submission_metadata.yml` 中的 `final_upload_checklist` 是正式上传门禁。只有目标期刊、期刊模板、作者元数据、通讯作者元数据、模板后 PDF 重建、投稿系统文件核对和 artifact release 信息均完成后，才应使用 `--final-upload` 生成或校验最终投稿包。

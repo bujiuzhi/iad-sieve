@@ -650,6 +650,50 @@ def test_check_submission_system_checklist_rejects_missing_hygiene_boundary() ->
     assert any("Artifact release URL or DOI" in error for error in errors)
 
 
+def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
+    """验证审稿准备度审计覆盖维度、风险和最终门槛时可通过。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = "\n".join(
+        [
+            "# Reviewer Readiness Audit",
+            "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
+            "## Audit Dimensions",
+            "Contribution",
+            "Writing clarity",
+            "Experimental strength",
+            "Evaluation completeness",
+            "Method design soundness",
+            "## Reviewer Risk Register",
+            "Silver hard negatives may not be true non-identity labels.",
+            "Threshold results may be sensitive.",
+            "Reproducibility depends on files outside Git.",
+            "## Claim-Evidence Check",
+            "## Audit Cycle 1: Claim Discipline",
+            "## Audit Cycle 2: Submission Readiness",
+            "## Minimum Gate Before Final Upload",
+            "python manuscript/scripts/validate_submission_package.py --final-upload",
+        ]
+    )
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert errors == []
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_final_gate() -> None:
+    """验证审稿准备度审计缺少最终上传门槛时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = "# Reviewer Readiness Audit\n## Audit Dimensions\nContribution"
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Reviewer Risk Register" in error for error in errors)
+    assert any("Minimum Gate Before Final Upload" in error for error in errors)
+    assert any("--final-upload" in error for error in errors)
+
+
 def test_check_cover_letter_accepts_required_submission_statements() -> None:
     """验证 cover letter 含正式投稿声明时可通过检查。"""
 

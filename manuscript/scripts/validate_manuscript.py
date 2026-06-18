@@ -29,6 +29,7 @@ REQUIRED_FILES = [
     ROOT / "target_journal_shortlist.md",
     ROOT / "artifact_release_manifest.template.json",
     ROOT / "submission_system_checklist.md",
+    ROOT / "reviewer_readiness_audit.md",
     ROOT / "submission_metadata.yml",
     ROOT / "scripts" / "validate_manuscript.py",
     ROOT / "scripts" / "verify_fixture_rebuild.py",
@@ -732,6 +733,41 @@ def check_submission_system_checklist(checklist_text: str) -> list[str]:
     ]
 
 
+def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
+    """Check whether reviewer-readiness audit covers rejection risks and final gates.
+
+    参数:
+        audit_text: Reviewer readiness audit Markdown text.
+
+    返回:
+        list[str]: Error messages for missing reviewer-readiness markers.
+    """
+    required_markers = [
+        "# Reviewer Readiness Audit",
+        "conditionally ready for target-journal selection; not ready for final upload",
+        "Audit Dimensions",
+        "Reviewer Risk Register",
+        "Claim-Evidence Check",
+        "Audit Cycle 1: Claim Discipline",
+        "Audit Cycle 2: Submission Readiness",
+        "Minimum Gate Before Final Upload",
+        "Contribution",
+        "Writing clarity",
+        "Experimental strength",
+        "Evaluation completeness",
+        "Method design soundness",
+        "Silver hard negatives may not be true non-identity labels",
+        "Threshold results may be sensitive",
+        "Reproducibility depends on files outside Git",
+        "python manuscript/scripts/validate_submission_package.py --final-upload",
+    ]
+    return [
+        f"reviewer readiness audit missing marker: {marker}"
+        for marker in required_markers
+        if marker not in audit_text
+    ]
+
+
 def check_related_work_positioning(manuscript_text: str) -> list[str]:
     """Check whether related work includes closest-work positioning.
 
@@ -931,6 +967,7 @@ def check_submission_metadata(metadata_text: str) -> list[str]:
         "artifact_release_required_before_final_upload: true",
         "upload_preparation:",
         "submission_system_checklist_file: \"submission_system_checklist.md\"",
+        "reviewer_readiness_audit_file: \"reviewer_readiness_audit.md\"",
         "live_submission_system_verified: false",
         "final_upload_package_verified_against_system: false",
         "final_upload_checklist:",
@@ -1107,6 +1144,10 @@ def main() -> int:
     submission_system_checklist_text = (
         submission_system_checklist_path.read_text(encoding="utf-8") if submission_system_checklist_path.exists() else ""
     )
+    reviewer_readiness_audit_path = ROOT / "reviewer_readiness_audit.md"
+    reviewer_readiness_audit_text = (
+        reviewer_readiness_audit_path.read_text(encoding="utf-8") if reviewer_readiness_audit_path.exists() else ""
+    )
     cover_letter_path = ROOT / "cover_letter.md"
     cover_letter_text = cover_letter_path.read_text(encoding="utf-8") if cover_letter_path.exists() else ""
     submission_metadata_path = ROOT / "submission_metadata.yml"
@@ -1147,6 +1188,7 @@ def main() -> int:
     errors.extend(check_target_journal_shortlist(target_journal_shortlist_text))
     errors.extend(check_artifact_release_manifest_template(artifact_release_template_text))
     errors.extend(check_submission_system_checklist(submission_system_checklist_text))
+    errors.extend(check_reviewer_readiness_audit(reviewer_readiness_audit_text))
     errors.extend(check_manual_validation_protocol(supplementary_text))
     errors.extend(check_result_claim_boundary(manuscript_text, supplementary_text))
     errors.extend(check_highlights(highlights_text))
