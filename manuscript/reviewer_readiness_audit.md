@@ -10,9 +10,9 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 19.
+Completed audit cycles: 20.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, artifact release README completeness, artifact release commit validity, prediction artifact schema drift, generative AI declaration consistency, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, artifact release README completeness, artifact release commit validity, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.
 
@@ -42,6 +42,7 @@ Next revision trigger: repeat the editorial desk check after target-journal temp
 | First-screen submission materials may drift in claim scope. | Medium | Title, abstract, conclusion, cover letter, highlights, and keywords are checked for editorial claim alignment around the same problem, method, evidence snapshot, and claim boundary. | Re-run the editorial alignment gate after template conversion or journal-specific cover-letter edits. |
 | Live submission-system text may drift from source files. | Medium | The final-upload information request and submission-system checklist require title, abstract, keywords, and highlights to be copied from source files and previewed in the live submission system. | Mark `submission_system_files_verified` true only after these fields match `main.tex`, `keywords.md`, and `highlights.md` in the live system. |
 | Generative AI declaration may be missing or inconsistent with the publisher policy. | Medium | Submission metadata, final-upload information request, target-journal shortlist, and submission-system checklist now require AI-tool use status, author responsibility confirmation, AI authorship exclusion, and machine-generated figure/artwork status. | Complete the final journal-specific declaration wording and keep it consistent across the manuscript, metadata, and live submission system. |
+| Test fixtures may be mistaken for current Q2/B evidence. | Medium | The manuscript and audit package distinguish fixture-level code-path checks from live result artifacts and final-upload metadata. | Treat test fixtures, example summaries, and generated fixture rows as validator coverage only unless they are regenerated from current live artifacts, current commit metadata, and the selected target-journal route. |
 | Reproducibility depends on files outside Git. | Medium | Fixture rebuild, public-source commands, artifact manifest template, and checksums policy are documented. | Publish the L3 artifact release and link it in submission metadata. |
 | Final upload may mismatch journal template or system fields. | High | A submission-system checklist records file, metadata, PDF, artifact, source-archive, and template-binding checks. | Confirm target journal, set `target_journal_template_bound`, rebuild the final template source and PDFs, and verify the live system fields. |
 
@@ -248,6 +249,14 @@ This cycle separates publisher-required AI-tool disclosure from removable proces
 
 The reviewer-facing boundary is compliance rather than scientific evidence. A completed generative AI declaration does not strengthen the method or experiments, but a missing or inconsistent declaration can trigger desk-check or production-stage issues. The declaration must therefore match `submission_metadata.yml`, `final_upload_information_request.md`, the manuscript declaration section if required by the target journal, and the live submission-system field before `generative_ai_declaration_complete` can be set to true.
 
+## Audit Cycle 20: Fixture Evidence Isolation Gate
+
+Outcome: pass for documentation and validator coverage; blocked for Q2/B completion until live artifacts replace example fixture evidence.
+
+This cycle prevents test fixtures from being mistaken for current manuscript evidence. Unit-test fixtures, example JSONL summaries, and generated fixture reports verify that audit builders, validators, and CLI paths behave correctly. They do not prove that the current manuscript has completed the external artifact release, live submission-system checks, same-scope prediction package, author metadata, target-journal template binding, or Q2/B completion gate.
+
+The reviewer-facing boundary is strict: fixture rows can support software reliability and reproducibility-path claims, but they cannot be cited as scientific result evidence or final-upload readiness evidence. A Q2/B or final-upload claim requires live outputs regenerated from the current repository commit, tied to the selected target-journal route, and linked to the external artifact release and final `submission_metadata.yml`.
+
 ## Minimum Gate Before Final Upload
 
 The manuscript should not be uploaded to a journal system until all of the following are true:
@@ -263,3 +272,4 @@ The manuscript should not be uploaded to a journal system until all of the follo
 9. `python manuscript/scripts/validate_submission_package.py --final-upload` passes.
 10. `submission_system_checklist.md` has been checked against the live journal system; the selected journal template matches the final manuscript source; and the title, abstract, keywords, highlights, uploaded files, and live system preview have been verified against the final source package.
 11. The Q2/B acceptance gate is either fully ready or the manuscript title, abstract, cover letter, and conclusion avoid any Q2/B-complete or broad-superiority wording.
+12. Test fixtures, example summaries, and generated fixture rows are not used as proof of Q2/B completion unless they are regenerated from current live artifacts and current commit metadata.

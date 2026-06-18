@@ -3753,8 +3753,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 19.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, artifact release README completeness, artifact release commit validity, prediction artifact schema drift, generative AI declaration consistency, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
+            "Completed audit cycles: 20.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, external artifact release, artifact release README completeness, artifact release commit validity, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -3931,6 +3931,14 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "AI tools are not listed as authors",
             "machine-generated figures, images, or artwork",
             "generative_ai_declaration_complete",
+            "## Audit Cycle 20: Fixture Evidence Isolation Gate",
+            "test fixtures from being mistaken for current manuscript evidence",
+            "Unit-test fixtures",
+            "generated fixture reports",
+            "validator coverage only",
+            "live outputs regenerated from the current repository commit",
+            "current live artifacts",
+            "current commit metadata",
             "data/",
             "outputs/",
             "## Minimum Gate Before Final Upload",
@@ -3951,7 +3959,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 19",
+        "Completed audit cycles: 20",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -3962,7 +3970,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 19" in error for error in errors)
+    assert any("Completed audit cycles: 20" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -4335,6 +4343,32 @@ def test_check_reviewer_readiness_audit_rejects_missing_generative_ai_declaratio
     assert any("generative AI declaration consistency" in error for error in errors)
     assert any("AI-tool use status" in error for error in errors)
     assert any("machine-generated figures, images, or artwork" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_fixture_evidence_isolation_gate() -> None:
+    """验证审稿准备度审计必须隔离测试夹具和真实投稿证据。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Audit Cycle 20: Fixture Evidence Isolation Gate",
+        "fixture/live evidence confusion",
+        "test fixtures from being mistaken for current manuscript evidence",
+        "Unit-test fixtures",
+        "generated fixture reports",
+        "validator coverage only",
+        "live outputs regenerated from the current repository commit",
+        "current live artifacts",
+        "current commit metadata",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Fixture Evidence Isolation Gate" in error for error in errors)
+    assert any("fixture/live evidence confusion" in error for error in errors)
+    assert any("Unit-test fixtures" in error for error in errors)
+    assert any("live outputs regenerated from the current repository commit" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_final_gate() -> None:
