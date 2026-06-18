@@ -3,8 +3,26 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 mkdir -p build
-tectonic main.tex
+mkdir -p build/logs
+
+run_and_log() {
+  local log_path="$1"
+  shift
+  if "$@" >"$log_path" 2>&1; then
+    cat "$log_path"
+  else
+    local status=$?
+    cat "$log_path"
+    return "$status"
+  fi
+}
+
+run_and_log build/logs/main.log tectonic main.tex
 mv main.pdf build/iad-risk-manuscript-latex.pdf
-tectonic supplementary_material.tex
+run_and_log build/logs/supplementary_material.log tectonic supplementary_material.tex
 mv supplementary_material.pdf build/iad-risk-supplementary-material.pdf
-python scripts/build_elsevier_draft.py
+run_and_log build/logs/elsevier_draft.log python scripts/build_elsevier_draft.py
+python scripts/check_latex_warnings.py \
+  --log build/logs/main.log \
+  --log build/logs/supplementary_material.log \
+  --log build/logs/elsevier_draft.log

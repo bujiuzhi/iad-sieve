@@ -38,6 +38,7 @@ REQUIRED_FILES = [
     ROOT / "scripts" / "validate_submission_package.py",
     ROOT / "scripts" / "validate_artifact_release.py",
     ROOT / "scripts" / "build_elsevier_draft.py",
+    ROOT / "scripts" / "check_latex_warnings.py",
     ROOT / "scripts" / "build_latex_pdf.sh",
     ROOT / "build" / "iad-risk-manuscript-latex.pdf",
     ROOT / "build" / "iad-risk-manuscript-elsevier.tex",
