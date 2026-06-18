@@ -2957,6 +2957,7 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "Highlights",
             "Keywords",
             "Submission metadata",
+            "target_journal_template_bound",
             "Artifact release manifest",
             "## Artifact Release Package Checks",
             "python manuscript/scripts/build_artifact_release_skeleton.py --output-dir /path/to/release --repository-commit",
@@ -2994,6 +2995,7 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "The source archive excludes build caches and generated zip files.",
             "The source archive is rebuilt after template conversion.",
             "## Final Metadata Checks",
+            "The selected journal template matches the final manuscript source.",
             "The funding statement is completed and matches the manuscript and submission system.",
             "The author contribution statement is completed before final upload.",
             "The permissions statement records third-party material permission status.",
@@ -3023,6 +3025,20 @@ def test_check_submission_system_checklist_rejects_missing_hygiene_boundary() ->
     assert any("raw third-party file" in error for error in errors)
     assert any("author email addresses" in error for error in errors)
     assert any("Artifact release URL or DOI" in error for error in errors)
+
+
+def test_check_submission_system_checklist_rejects_missing_template_bound_field() -> None:
+    """验证投稿系统清单必须显式核对目标期刊模板绑定字段。"""
+
+    module = _load_validate_manuscript_module()
+    checklist_text = Path("manuscript/submission_system_checklist.md").read_text(encoding="utf-8")
+    checklist_text = checklist_text.replace("target_journal_template_bound", "target_journal_template")
+    checklist_text = checklist_text.replace("selected journal template matches the final manuscript source", "template is checked")
+
+    errors = module.check_submission_system_checklist(checklist_text)
+
+    assert any("target_journal_template_bound" in error for error in errors)
+    assert any("selected journal template matches the final manuscript source" in error for error in errors)
 
 
 def test_check_submission_system_checklist_rejects_missing_publisher_declarations() -> None:

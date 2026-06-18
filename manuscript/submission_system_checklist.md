@@ -22,7 +22,7 @@ The checklist intentionally remains incomplete until the authors confirm the tar
 | Cover letter | `cover_letter.md` | Replace the generic greeting and add target-journal-specific fit only after journal selection. |
 | Highlights | `highlights.md` | Keep 3--5 bullets, each at most 85 characters, if the selected journal uses Elsevier-style highlights. |
 | Keywords | `keywords.md` | Keep 1--7 keywords for the current Elsevier candidate route unless the selected journal specifies otherwise. |
-| Submission metadata | `submission_metadata.yml` | Fill target journal, authors, corresponding author, funding statement text, author contribution statement, permissions statement, third-party material permission status, artifact URL, and final-upload checklist fields. |
+| Submission metadata | `submission_metadata.yml` | Fill target journal, `target_journal_template_bound`, authors, corresponding author, funding statement text, author contribution statement, permissions statement, third-party material permission status, artifact URL, and final-upload checklist fields. |
 | Artifact release manifest | `artifact_release_manifest.template.json` | Replace with the real release manifest, DOI or URL, and SHA256 checksum file. |
 
 ## Artifact Release Package Checks
@@ -86,14 +86,15 @@ Before upload, verify:
 Before upload, verify:
 
 1. The selected target journal and article type match the submission system.
-2. For single-anonymized routes such as DKE and Information Systems, the final title page and submission-system fields include author identities; the anonymous package is only a preflight package.
-3. The author list, order, affiliations, ORCID values, and corresponding author match the title page.
-4. The funding statement text is completed and matches the manuscript and submission system.
-5. The author contribution statement is completed and matches the final author list.
-6. The permissions statement records whether third-party material permission is not required or lists the permission files needed by the journal.
-7. The competing-interest statement, data/code availability statement, and ethics statement are consistent across the manuscript and system fields.
-8. The artifact release URL or DOI resolves publicly or according to the journal's access policy.
-9. The manuscript does not claim human gold labels, broad method superiority, or threshold stability unless the corresponding artifact evidence exists.
+2. `target_journal_template_bound` is true and the selected journal template matches the final manuscript source.
+3. For single-anonymized routes such as DKE and Information Systems, the final title page and submission-system fields include author identities; the anonymous package is only a preflight package.
+4. The author list, order, affiliations, ORCID values, and corresponding author match the title page.
+5. The funding statement text is completed and matches the manuscript and submission system.
+6. The author contribution statement is completed and matches the final author list.
+7. The permissions statement records whether third-party material permission is not required or lists the permission files needed by the journal.
+8. The competing-interest statement, data/code availability statement, and ethics statement are consistent across the manuscript and system fields.
+9. The artifact release URL or DOI resolves publicly or according to the journal's access policy.
+10. The manuscript does not claim human gold labels, broad method superiority, or threshold stability unless the corresponding artifact evidence exists.
 
 ## File Hygiene Checks
 
