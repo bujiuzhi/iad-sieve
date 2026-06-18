@@ -123,11 +123,13 @@ def _write_complete_release(artifact_dir: Path, release_status: str = "release_c
             "manual_validation_required_for_human_gold_claims": True,
             "same_scope_prediction_files_required_for_broad_ranking": True,
             "threshold_grid_required_for_threshold_stability_claims": True,
+            "cluster_artifacts_required_for_cluster_level_quality_claims": True,
             "confidence_intervals_claimed": False,
             "component_causality_claimed": False,
             "human_validation_claimed": False,
             "threshold_stability_claimed": False,
             "broad_method_ranking_claimed": False,
+            "cluster_level_quality_claimed": False,
         },
     }
     _write_file(artifact_dir / "manifest.json", json.dumps(manifest, indent=2) + "\n")
@@ -252,3 +254,22 @@ def test_validate_artifact_release_rejects_claimed_confidence_without_bootstrap_
 
     assert any("confidence_intervals_claimed" in error for error in errors)
     assert any("bootstrap_intervals" in error for error in errors)
+
+
+def test_validate_artifact_release_rejects_claimed_cluster_quality_without_cluster_artifacts(tmp_path) -> None:
+    """验证声明 cluster-level 质量时必须提供 cluster audit artifact。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    manifest_path = artifact_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["claim_boundaries"]["cluster_level_quality_claimed"] = True
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    _refresh_checksums(artifact_dir)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("cluster_level_quality_claimed" in error for error in errors)
+    assert any("cluster_metric_summary" in error for error in errors)
+    assert any("cannot_link_audit" in error for error in errors)

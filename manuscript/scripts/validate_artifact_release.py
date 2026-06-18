@@ -45,6 +45,7 @@ REQUIRED_TRUE_CLAIM_BOUNDARY_FIELDS = {
     "manual_validation_required_for_human_gold_claims",
     "same_scope_prediction_files_required_for_broad_ranking",
     "threshold_grid_required_for_threshold_stability_claims",
+    "cluster_artifacts_required_for_cluster_level_quality_claims",
 }
 EXPECTED_FALSE_CLAIM_STATUS_FIELDS = {
     "confidence_intervals_claimed",
@@ -52,12 +53,14 @@ EXPECTED_FALSE_CLAIM_STATUS_FIELDS = {
     "human_validation_claimed",
     "threshold_stability_claimed",
     "broad_method_ranking_claimed",
+    "cluster_level_quality_claimed",
 }
 CLAIM_DEPENDENT_ARTIFACTS = {
     "confidence_intervals_claimed": {"bootstrap_intervals"},
     "component_causality_claimed": {"ablation_suite"},
     "human_validation_claimed": {"manual_validation_slice"},
     "threshold_stability_claimed": {"threshold_sensitivity_grid"},
+    "cluster_level_quality_claimed": {"cluster_metric_summary", "cannot_link_audit"},
     "broad_method_ranking_claimed": {
         "bootstrap_intervals",
         "manual_validation_slice",

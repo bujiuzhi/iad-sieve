@@ -1773,6 +1773,8 @@ def test_check_artifact_release_manifest_template_accepts_complete_template() ->
                 {"artifact_id": "ablation_suite"},
                 {"artifact_id": "manual_validation_slice"},
                 {"artifact_id": "threshold_sensitivity_grid"},
+                {"artifact_id": "cluster_metric_summary"},
+                {"artifact_id": "cannot_link_audit"},
             ],
             "minimum_validation_commands": [
                 "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
@@ -1788,17 +1790,20 @@ def test_check_artifact_release_manifest_template_accepts_complete_template() ->
                 "manual_validation_required_for_human_gold_claims": True,
                 "same_scope_prediction_files_required_for_broad_ranking": True,
                 "threshold_grid_required_for_threshold_stability_claims": True,
+                "cluster_artifacts_required_for_cluster_level_quality_claims": True,
                 "confidence_intervals_claimed": False,
                 "component_causality_claimed": False,
                 "human_validation_claimed": False,
                 "threshold_stability_claimed": False,
                 "broad_method_ranking_claimed": False,
+                "cluster_level_quality_claimed": False,
             },
             "conditional_claim_artifacts": {
                 "confidence_intervals_claimed": ["bootstrap_intervals"],
                 "component_causality_claimed": ["ablation_suite"],
                 "human_validation_claimed": ["manual_validation_slice"],
                 "threshold_stability_claimed": ["threshold_sensitivity_grid"],
+                "cluster_level_quality_claimed": ["cluster_metric_summary", "cannot_link_audit"],
                 "broad_method_ranking_claimed": [
                     "bootstrap_intervals",
                     "manual_validation_slice",
@@ -1842,6 +1847,76 @@ def test_check_artifact_release_manifest_template_rejects_unsafe_data_policy() -
     assert any("sha256sum -c checksums.sha256" in error for error in errors)
 
 
+def test_check_artifact_release_manifest_template_rejects_missing_cluster_claim_artifacts() -> None:
+    """验证 artifact release 模板必须定义 cluster-level 条件 artifact。"""
+
+    module = _load_validate_manuscript_module()
+    template_text = json.dumps(
+        {
+            "package_type": "result_artifact_release",
+            "release_status": "template_pending_external_artifact",
+            "data_policy": {
+                "raw_third_party_data_included": False,
+                "model_checkpoints_included": False,
+                "personal_or_secret_material_included": False,
+                "derived_evaluation_artifacts_included": True,
+            },
+            "required_directories": ["configs", "tables", "predictions", "reports", "logs"],
+            "required_top_level_files": ["README.md", "manifest.json", "checksums.sha256"],
+            "required_artifacts": [
+                {"artifact_id": "open_v2_main_results"},
+                {"artifact_id": "iad_risk_predictions"},
+                {"artifact_id": "representation_baseline_scores"},
+                {"artifact_id": "supervised_baseline_predictions"},
+                {"artifact_id": "threshold_selection_logs"},
+                {"artifact_id": "iad_bench_split_summary"},
+                {"artifact_id": "bootstrap_intervals"},
+                {"artifact_id": "ablation_suite"},
+                {"artifact_id": "manual_validation_slice"},
+                {"artifact_id": "threshold_sensitivity_grid"},
+            ],
+            "minimum_validation_commands": [
+                "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
+                "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
+                "sha256sum -c checksums.sha256",
+                "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
+                "python manuscript/scripts/validate_manuscript.py --strict-latex",
+                "python manuscript/scripts/verify_fixture_rebuild.py",
+                "python scripts/check_public_release.py",
+            ],
+            "claim_boundaries": {
+                "silver_labels_are_not_human_gold": True,
+                "manual_validation_required_for_human_gold_claims": True,
+                "same_scope_prediction_files_required_for_broad_ranking": True,
+                "threshold_grid_required_for_threshold_stability_claims": True,
+                "cluster_artifacts_required_for_cluster_level_quality_claims": True,
+                "confidence_intervals_claimed": False,
+                "component_causality_claimed": False,
+                "human_validation_claimed": False,
+                "threshold_stability_claimed": False,
+                "broad_method_ranking_claimed": False,
+            },
+            "conditional_claim_artifacts": {
+                "confidence_intervals_claimed": ["bootstrap_intervals"],
+                "component_causality_claimed": ["ablation_suite"],
+                "human_validation_claimed": ["manual_validation_slice"],
+                "threshold_stability_claimed": ["threshold_sensitivity_grid"],
+                "broad_method_ranking_claimed": [
+                    "bootstrap_intervals",
+                    "manual_validation_slice",
+                    "threshold_sensitivity_grid",
+                ],
+            },
+        }
+    )
+
+    errors = module.check_artifact_release_manifest_template(template_text)
+
+    assert any("cluster_metric_summary" in error for error in errors)
+    assert any("cannot_link_audit" in error for error in errors)
+    assert any("cluster_level_quality_claimed" in error for error in errors)
+
+
 def test_check_artifact_release_manifest_template_rejects_missing_conditional_claim_artifacts() -> None:
     """验证 artifact release 模板必须定义强主张条件 artifact。"""
 
@@ -1868,6 +1943,8 @@ def test_check_artifact_release_manifest_template_rejects_missing_conditional_cl
                 {"artifact_id": "bootstrap_intervals"},
                 {"artifact_id": "ablation_suite"},
                 {"artifact_id": "manual_validation_slice"},
+                {"artifact_id": "cluster_metric_summary"},
+                {"artifact_id": "cannot_link_audit"},
             ],
             "minimum_validation_commands": [
                 "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
@@ -1883,11 +1960,13 @@ def test_check_artifact_release_manifest_template_rejects_missing_conditional_cl
                 "manual_validation_required_for_human_gold_claims": True,
                 "same_scope_prediction_files_required_for_broad_ranking": True,
                 "threshold_grid_required_for_threshold_stability_claims": True,
+                "cluster_artifacts_required_for_cluster_level_quality_claims": True,
                 "confidence_intervals_claimed": False,
                 "component_causality_claimed": False,
                 "human_validation_claimed": False,
                 "threshold_stability_claimed": False,
                 "broad_method_ranking_claimed": False,
+                "cluster_level_quality_claimed": False,
             },
         }
     )
@@ -1934,16 +2013,20 @@ def test_check_artifact_release_readme_template_accepts_complete_template() -> N
             "supervised_baseline_predictions",
             "threshold_selection_logs",
             "iad_bench_split_summary",
+            "cluster_metric_summary",
+            "cannot_link_audit",
             "## Conditional Claim Artifacts",
             "confidence_intervals_claimed requires bootstrap_intervals.",
             "component_causality_claimed requires ablation_suite.",
             "human_validation_claimed requires manual_validation_slice.",
             "threshold_stability_claimed requires threshold_sensitivity_grid.",
+            "cluster_level_quality_claimed requires cluster_metric_summary and cannot_link_audit.",
             "broad_method_ranking_claimed requires bootstrap_intervals, manual_validation_slice, and threshold_sensitivity_grid.",
             "## Claim Boundaries",
             "silver labels are not human gold.",
             "full numerical audit requires external artifacts.",
             "broad method ranking is not claimed unless conditional artifacts are complete.",
+            "cluster-level quality is not claimed unless cluster artifacts are complete.",
             "## Reproduction Levels",
             "L0 code check",
             "L1 fixture rebuild",
@@ -1968,6 +2051,7 @@ def test_check_artifact_release_readme_template_rejects_missing_release_boundari
     assert any("raw third-party data" in error for error in errors)
     assert any("validate_artifact_release.py" in error for error in errors)
     assert any("threshold_sensitivity_grid" in error for error in errors)
+    assert any("cluster_metric_summary" in error for error in errors)
 
 
 def test_check_data_processing_pipeline_document_accepts_reproducible_pipeline() -> None:

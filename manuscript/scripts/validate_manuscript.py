@@ -1610,6 +1610,8 @@ def check_artifact_release_manifest_template(template_text: str) -> list[str]:
         "ablation_suite",
         "manual_validation_slice",
         "threshold_sensitivity_grid",
+        "cluster_metric_summary",
+        "cannot_link_audit",
     }
     for artifact_id in required_artifact_ids:
         if artifact_id not in artifact_ids:
@@ -1644,6 +1646,7 @@ def check_artifact_release_manifest_template(template_text: str) -> list[str]:
             "manual_validation_required_for_human_gold_claims",
             "same_scope_prediction_files_required_for_broad_ranking",
             "threshold_grid_required_for_threshold_stability_claims",
+            "cluster_artifacts_required_for_cluster_level_quality_claims",
         ]:
             if claim_boundaries.get(field) is not True:
                 errors.append(f"artifact release claim boundary must be true: {field}")
@@ -1653,6 +1656,7 @@ def check_artifact_release_manifest_template(template_text: str) -> list[str]:
             "human_validation_claimed",
             "threshold_stability_claimed",
             "broad_method_ranking_claimed",
+            "cluster_level_quality_claimed",
         ]:
             if claim_boundaries.get(field) is not False:
                 errors.append(f"artifact release claim boundary must default false: {field}")
@@ -1663,6 +1667,7 @@ def check_artifact_release_manifest_template(template_text: str) -> list[str]:
         "component_causality_claimed": {"ablation_suite"},
         "human_validation_claimed": {"manual_validation_slice"},
         "threshold_stability_claimed": {"threshold_sensitivity_grid"},
+        "cluster_level_quality_claimed": {"cluster_metric_summary", "cannot_link_audit"},
         "broad_method_ranking_claimed": {
             "bootstrap_intervals",
             "manual_validation_slice",
@@ -1733,11 +1738,15 @@ def check_artifact_release_readme_template(readme_text: str) -> list[str]:
         "manual_validation_slice",
         "threshold_stability_claimed",
         "threshold_sensitivity_grid",
+        "cluster_level_quality_claimed",
+        "cluster_metric_summary",
+        "cannot_link_audit",
         "broad_method_ranking_claimed",
         "Claim Boundaries",
         "silver labels are not human gold",
         "full numerical audit requires external artifacts",
         "broad method ranking is not claimed unless conditional artifacts are complete",
+        "cluster-level quality is not claimed unless cluster artifacts are complete",
         "Reproduction Levels",
         "L0 code check",
         "L1 fixture rebuild",

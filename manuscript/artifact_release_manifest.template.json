@@ -94,6 +94,18 @@
       "required": false,
       "expected_location": "reports/manual_validation_slice.csv",
       "claim_support": "Human label-precision claims only if cited by the final manuscript."
+    },
+    {
+      "artifact_id": "cluster_metric_summary",
+      "required": false,
+      "expected_location": "reports/cluster_metric_summary.csv",
+      "claim_support": "Cluster-level quality claims only if cited by the final manuscript."
+    },
+    {
+      "artifact_id": "cannot_link_audit",
+      "required": false,
+      "expected_location": "reports/cannot_link_audit.csv",
+      "claim_support": "Cannot-link and transitive-merge safety claims only if cited by the final manuscript."
     }
   ],
   "checksum_policy": {
@@ -117,11 +129,13 @@
     "manual_validation_required_for_human_gold_claims": true,
     "same_scope_prediction_files_required_for_broad_ranking": true,
     "threshold_grid_required_for_threshold_stability_claims": true,
+    "cluster_artifacts_required_for_cluster_level_quality_claims": true,
     "confidence_intervals_claimed": false,
     "component_causality_claimed": false,
     "human_validation_claimed": false,
     "threshold_stability_claimed": false,
-    "broad_method_ranking_claimed": false
+    "broad_method_ranking_claimed": false,
+    "cluster_level_quality_claimed": false
   },
   "conditional_claim_artifacts": {
     "confidence_intervals_claimed": [
@@ -135,6 +149,10 @@
     ],
     "threshold_stability_claimed": [
       "threshold_sensitivity_grid"
+    ],
+    "cluster_level_quality_claimed": [
+      "cluster_metric_summary",
+      "cannot_link_audit"
     ],
     "broad_method_ranking_claimed": [
       "bootstrap_intervals",

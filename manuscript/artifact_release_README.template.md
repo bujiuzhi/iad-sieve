@@ -48,6 +48,8 @@ python scripts/check_public_release.py
 - supervised_baseline_predictions
 - threshold_selection_logs
 - iad_bench_split_summary
+- cluster_metric_summary
+- cannot_link_audit
 
 ## Conditional Claim Artifacts
 
@@ -55,6 +57,7 @@ python scripts/check_public_release.py
 - component_causality_claimed requires ablation_suite.
 - human_validation_claimed requires manual_validation_slice.
 - threshold_stability_claimed requires threshold_sensitivity_grid.
+- cluster_level_quality_claimed requires cluster_metric_summary and cannot_link_audit.
 - broad_method_ranking_claimed requires bootstrap_intervals, manual_validation_slice, and threshold_sensitivity_grid.
 
 ## Claim Boundaries
@@ -65,6 +68,7 @@ Broad method ranking is not claimed unless conditional artifacts are complete.
 Threshold-stability claims require threshold_sensitivity_grid and threshold_selection_logs.
 Component-causality claims require ablation_suite.
 Human-validation claims require manual_validation_slice and adjudication records.
+Cluster-level quality is not claimed unless cluster artifacts are complete.
 
 ## Reproduction Levels
 
