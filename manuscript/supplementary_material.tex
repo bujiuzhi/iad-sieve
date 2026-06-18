@@ -333,6 +333,29 @@ Threshold-stability claims & \path{threshold_sensitivity_grid}, \path{threshold_
 \end{tabular}
 \end{table}
 
+\section{Selective Decision Coverage Boundary}
+
+The main manuscript summarizes the selective-decision coverage boundary in prose. Table~\ref{tab:selective-decision-coverage} preserves the coverage and review-load quantities that must be released before false-merge control can be read as operational automation evidence.
+
+\begin{table}[H]
+\caption{Selective decision coverage boundary. Coverage and review-load quantities must be computed from the same prediction files as the reported risk metrics before operational deployment claims are made.}
+\label{tab:selective-decision-coverage}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.24\linewidth}L{0.32\linewidth}L{0.34\linewidth}}
+\toprule
+Quantity & Required artifact source & Interpretation boundary \\
+\midrule
+Automatic merge coverage & Merge decisions from the same prediction files and thresholds. & Needed before claiming that the system resolves a large fraction of pairs automatically. \\
+Block rate & Blocked decisions under the reported risk gate. & Separates safety-driven blocking from improved identity recognition. \\
+Defer rate & Deferred decisions under the fixed operating point. & High defer rate shifts work to manual review and must be reported with FMR/HNFMR. \\
+Review load & Counts by label stratum, source, and hard-negative level. & Needed before claiming operational throughput reduction or review-cost savings. \\
+Capacity-normalized review load & Review workload after subtracting automatic merges and adding blocked or deferred pairs requiring review. & Required before interpreting low false-merge rates as operational cost savings. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Pair-to-Cluster Evidence Boundary}
 
 The main manuscript summarizes the pair-to-cluster evidence boundary in prose. Table~\ref{tab:pair-cluster-evidence-boundary} preserves the artifact requirements that separate pair-level risk control from cluster-level deployment claims.

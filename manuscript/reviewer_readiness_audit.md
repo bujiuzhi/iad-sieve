@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 55.
+Completed audit cycles: 56.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -537,6 +537,14 @@ Outcome: pass for pair-to-cluster table-density reduction; blocked for cluster-l
 This gate checks whether the pair-to-cluster evidence boundary table is needed in the main manuscript. The main manuscript now states the deployment boundary in prose: pair-level metrics do not prove cluster-level deduplication quality, transitive merge propagation can move a pair error into a larger component, and cluster assignments, cannot-link violations, `cannot_link_audit`, `cluster_metric_summary`, pair-to-cluster trace files, and cluster contamination rate are required before stronger deployment claims are made. The supplementary material preserves the full pair-to-cluster evidence boundary table with each artifact source and interpretation boundary.
 
 The reviewer-facing boundary is pair-to-cluster clarity without main-text table overload. The edit keeps the experiments section focused on reported pair-level evidence while the validator still requires the supplementary pair-to-cluster evidence boundary, including cluster assignments, cannot-link violations, `cannot_link_audit`, `cluster_metric_summary`, pair-to-cluster trace files, cluster contamination rate, and the explicit rule that the paper does not claim cluster-level contamination is eliminated.
+
+## Audit Cycle 56: Selective Decision Coverage Boundary Density Gate
+
+Outcome: pass for selective-decision coverage table-density reduction; blocked for operational throughput or review-cost claims until automatic merge coverage, block rate, defer rate, review-load counts, and capacity-normalized review load are released from the same prediction files.
+
+This gate checks whether the selective-decision coverage table is needed in the main manuscript. The main manuscript now states the operational boundary in prose: low FMR or HNFMR with high deferral is a conservative triage result, and automatic merge coverage, block rate, defer rate, review load, capacity-normalized review load, same prediction files, and a predeclared manual-review capacity and deferral budget are required before operational automation claims are made. The supplementary material preserves the full selective-decision coverage boundary table with the required artifact sources and interpretation boundaries.
+
+The reviewer-facing boundary is selective-decision coverage clarity without main-text table overload. The edit keeps the experiments section focused on reported false-merge evidence while the validator still requires the supplementary selective-decision coverage boundary, including automatic merge coverage, block rate, defer rate, review load, capacity-normalized review load, and the explicit rule that the paper does not claim throughput reduction or all-pair automatic resolution.
 
 ## Minimum Gate Before Final Upload
 

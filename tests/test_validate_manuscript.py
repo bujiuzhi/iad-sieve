@@ -1920,8 +1920,8 @@ def test_check_operating_point_disclosure_rejects_missing_threshold_boundary() -
     assert any("post-hoc best test thresholds" in error for error in errors)
 
 
-def test_check_selective_decision_coverage_boundary_accepts_complete_boundary() -> None:
-    """验证选择性决策覆盖率边界完整时可通过检查。"""
+def test_check_selective_decision_coverage_boundary_accepts_supplementary_table() -> None:
+    """验证选择性决策覆盖率边界表迁入补充材料后可通过检查。"""
 
     module = _load_validate_manuscript_module()
     checker = getattr(module, "check_selective_decision_coverage_boundary", None)
@@ -1929,12 +1929,55 @@ def test_check_selective_decision_coverage_boundary_accepts_complete_boundary() 
     manuscript_text = "\n".join(
         [
             r"\subsection{Selective Decision Coverage Boundary}",
+            "The full selective-decision coverage boundary table is reported in the supplementary material.",
+            "automatic merge coverage",
+            "block rate",
+            "defer rate",
+            "review load",
+            "capacity-normalized review load",
+            "same prediction files",
+            "A result with low FMR or HNFMR but high deferral is a conservative triage result.",
+            "Results must be compared with a predeclared manual-review capacity and deferral budget.",
+            "The current manuscript does not claim throughput reduction.",
+            "It does not claim all-pair automatic resolution.",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Selective Decision Coverage Boundary}",
             r"\label{tab:selective-decision-coverage}",
+            "Selective decision coverage boundary.",
+            "Quantity",
+            "Required artifact source",
+            "Interpretation boundary",
             "Automatic merge coverage",
             "Block rate",
-            "defer rate",
+            "Defer rate",
             "Review load",
             "Capacity-normalized review load",
+        ]
+    )
+
+    errors = checker(manuscript_text, supplementary_text)
+
+    assert errors == []
+
+
+def test_check_selective_decision_coverage_boundary_rejects_missing_supplementary_table() -> None:
+    """验证选择性决策缺少补充材料完整表时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_selective_decision_coverage_boundary", None)
+    assert callable(checker)
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Selective Decision Coverage Boundary}",
+            "The full selective-decision coverage boundary table is reported in the supplementary material.",
+            "automatic merge coverage",
+            "block rate",
+            "defer rate",
+            "review load",
+            "capacity-normalized review load",
             "same prediction files",
             "A result with low FMR or HNFMR but high deferral is a conservative triage result.",
             "Results must be compared with a predeclared manual-review capacity and deferral budget.",
@@ -1943,27 +1986,10 @@ def test_check_selective_decision_coverage_boundary_accepts_complete_boundary() 
         ]
     )
 
-    errors = checker(manuscript_text)
+    errors = checker(manuscript_text, "")
 
-    assert errors == []
-
-
-def test_check_selective_decision_coverage_boundary_rejects_missing_defer_boundary() -> None:
-    """验证选择性决策缺少 defer 与吞吐边界时会被拒绝。"""
-
-    module = _load_validate_manuscript_module()
-    checker = getattr(module, "check_selective_decision_coverage_boundary", None)
-    assert callable(checker)
-    manuscript_text = r"\subsection{Selective Decision Coverage Boundary}"
-
-    errors = checker(manuscript_text)
-
-    assert any("defer rate" in error for error in errors)
-    assert any("Capacity-normalized review load" in error for error in errors)
-    assert any("conservative triage result" in error for error in errors)
-    assert any("manual-review capacity" in error for error in errors)
-    assert any("throughput reduction" in error for error in errors)
-    assert any("all-pair automatic resolution" in error for error in errors)
+    assert any("tab:selective-decision-coverage" in error for error in errors)
+    assert any("Selective Decision Coverage Boundary" in error for error in errors)
 
 
 def test_check_pair_cluster_evidence_boundary_accepts_supplementary_table() -> None:
@@ -4775,7 +4801,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 55.",
+            "Completed audit cycles: 56.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -5208,6 +5234,15 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "cluster contamination rate",
             "pair-to-cluster clarity without main-text table overload",
             "supplementary pair-to-cluster evidence boundary",
+            "## Audit Cycle 56: Selective Decision Coverage Boundary Density Gate",
+            "selective-decision coverage table-density reduction",
+            "full selective-decision coverage boundary table",
+            "automatic merge coverage",
+            "block rate",
+            "defer rate",
+            "capacity-normalized review load",
+            "selective-decision coverage clarity without main-text table overload",
+            "supplementary selective-decision coverage boundary",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -5226,7 +5261,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 55",
+        "Completed audit cycles: 56",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -5237,7 +5272,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 55" in error for error in errors)
+    assert any("Completed audit cycles: 56" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

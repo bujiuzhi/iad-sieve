@@ -1542,34 +1542,55 @@ def check_operating_point_disclosure(manuscript_text: str) -> list[str]:
     return [f"operating point disclosure missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
 
 
-def check_selective_decision_coverage_boundary(manuscript_text: str) -> list[str]:
+def check_selective_decision_coverage_boundary(manuscript_text: str, supplementary_text: str = "") -> list[str]:
     """Check whether selective merge decisions state coverage and deferral boundaries.
 
     参数:
         manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
 
     返回:
         list[str]: Error messages for missing selective-decision coverage markers.
     """
-    required_markers = [
+    required_main_markers = [
         r"\subsection{Selective Decision Coverage Boundary}",
-        r"\label{tab:selective-decision-coverage}",
-        "Automatic merge coverage",
-        "Block rate",
+        "full selective-decision coverage boundary table is reported in the supplementary material",
+        "automatic merge coverage",
+        "block rate",
         "defer rate",
-        "Review load",
-        "Capacity-normalized review load",
+        "review load",
+        "capacity-normalized review load",
         "same prediction files",
         "low FMR or HNFMR but high deferral is a conservative triage result",
         "predeclared manual-review capacity and deferral budget",
         "does not claim throughput reduction",
         "does not claim all-pair automatic resolution",
     ]
-    return [
-        f"selective decision coverage boundary missing marker: {marker}"
-        for marker in required_markers
+    required_supplement_markers = [
+        r"\section{Selective Decision Coverage Boundary}",
+        r"\label{tab:selective-decision-coverage}",
+        "Selective decision coverage boundary",
+        "Quantity",
+        "Required artifact source",
+        "Interpretation boundary",
+        "Automatic merge coverage",
+        "Block rate",
+        "Defer rate",
+        "Review load",
+        "Capacity-normalized review load",
+    ]
+    errors = [
+        f"selective decision coverage boundary missing manuscript marker: {marker}"
+        for marker in required_main_markers
         if marker not in manuscript_text
     ]
+    evidence_text = supplementary_text or manuscript_text
+    errors.extend(
+        f"selective decision coverage boundary missing supplementary marker: {marker}"
+        for marker in required_supplement_markers
+        if marker not in evidence_text
+    )
+    return errors
 
 
 def check_pair_cluster_evidence_boundary(manuscript_text: str, supplementary_text: str = "") -> list[str]:
@@ -3078,7 +3099,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 55",
+        "Completed audit cycles: 56",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3191,6 +3212,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 53: Error Taxonomy Density Gate",
         "Audit Cycle 54: Mechanism Evidence Boundary Density Gate",
         "Audit Cycle 55: Pair-to-Cluster Evidence Boundary Density Gate",
+        "Audit Cycle 56: Selective Decision Coverage Boundary Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
         "method-writing clarity",
@@ -3357,6 +3379,14 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "cluster contamination rate",
         "pair-to-cluster clarity without main-text table overload",
         "supplementary pair-to-cluster evidence boundary",
+        "selective-decision coverage table-density reduction",
+        "full selective-decision coverage boundary table",
+        "automatic merge coverage",
+        "block rate",
+        "defer rate",
+        "capacity-normalized review load",
+        "selective-decision coverage clarity without main-text table overload",
+        "supplementary selective-decision coverage boundary",
         "remote reproducibility",
         "strong model matrix",
         "model superiority",
@@ -4617,7 +4647,7 @@ def main() -> int:
     errors.extend(check_data_code_availability_boundary(manuscript_text, supplementary_text))
     errors.extend(check_cli_entrypoint_contract(pyproject_text, cli_entrypoint_text))
     errors.extend(check_operating_point_disclosure(manuscript_text))
-    errors.extend(check_selective_decision_coverage_boundary(manuscript_text))
+    errors.extend(check_selective_decision_coverage_boundary(manuscript_text, supplementary_text))
     errors.extend(check_pair_cluster_evidence_boundary(manuscript_text, supplementary_text))
     errors.extend(check_decision_metric_mapping(manuscript_text))
     errors.extend(check_metric_formula_boundary(manuscript_text))
