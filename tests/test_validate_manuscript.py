@@ -251,6 +251,7 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
             r"\path{bootstrap_intervals}",
             r"\path{ablation_suite}",
             r"\path{manual_validation_slice}",
+            r"\path{threshold_sensitivity_grid}",
             "Each row uses a prediction or score file, metric summary, and checksum or manifest.",
             "The evidence does not support a broad method-ranking claim.",
             r"\label{tab:openv2-results}",
@@ -263,6 +264,8 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
             "The released artifact package includes checksums.sha256.",
             "Reviewers can run python manuscript/scripts/validate_artifact_release.py.",
             "The validator checks required result identifiers.",
+            "The validator checks conditional claim artifacts.",
+            r"The package documents \path{threshold_sensitivity_grid}.",
             "The validator checks exclusion of raw third-party data.",
         ]
     )
@@ -305,6 +308,7 @@ def test_check_result_claim_boundary_rejects_missing_artifact_validator_command(
             r"\path{bootstrap_intervals}",
             r"\path{ablation_suite}",
             r"\path{manual_validation_slice}",
+            r"\path{threshold_sensitivity_grid}",
             r"\label{tab:claim-evidence-boundary-main}",
             "Each row needs a prediction or score file, metric summary, and checksum or manifest.",
             "The result does not support a broad method-ranking claim.",
@@ -978,6 +982,10 @@ def test_check_artifact_release_manifest_template_accepts_complete_template() ->
                 {"artifact_id": "supervised_baseline_predictions"},
                 {"artifact_id": "threshold_selection_logs"},
                 {"artifact_id": "iad_bench_split_summary"},
+                {"artifact_id": "bootstrap_intervals"},
+                {"artifact_id": "ablation_suite"},
+                {"artifact_id": "manual_validation_slice"},
+                {"artifact_id": "threshold_sensitivity_grid"},
             ],
             "minimum_validation_commands": [
                 "sha256sum -c checksums.sha256",
@@ -991,6 +999,22 @@ def test_check_artifact_release_manifest_template_accepts_complete_template() ->
                 "manual_validation_required_for_human_gold_claims": True,
                 "same_scope_prediction_files_required_for_broad_ranking": True,
                 "threshold_grid_required_for_threshold_stability_claims": True,
+                "confidence_intervals_claimed": False,
+                "component_causality_claimed": False,
+                "human_validation_claimed": False,
+                "threshold_stability_claimed": False,
+                "broad_method_ranking_claimed": False,
+            },
+            "conditional_claim_artifacts": {
+                "confidence_intervals_claimed": ["bootstrap_intervals"],
+                "component_causality_claimed": ["ablation_suite"],
+                "human_validation_claimed": ["manual_validation_slice"],
+                "threshold_stability_claimed": ["threshold_sensitivity_grid"],
+                "broad_method_ranking_claimed": [
+                    "bootstrap_intervals",
+                    "manual_validation_slice",
+                    "threshold_sensitivity_grid",
+                ],
             },
         }
     )
@@ -1027,6 +1051,60 @@ def test_check_artifact_release_manifest_template_rejects_unsafe_data_policy() -
     assert any("raw_third_party_data_included" in error for error in errors)
     assert any("iad_risk_predictions" in error for error in errors)
     assert any("sha256sum -c checksums.sha256" in error for error in errors)
+
+
+def test_check_artifact_release_manifest_template_rejects_missing_conditional_claim_artifacts() -> None:
+    """验证 artifact release 模板必须定义强主张条件 artifact。"""
+
+    module = _load_validate_manuscript_module()
+    template_text = json.dumps(
+        {
+            "package_type": "result_artifact_release",
+            "release_status": "template_pending_external_artifact",
+            "data_policy": {
+                "raw_third_party_data_included": False,
+                "model_checkpoints_included": False,
+                "personal_or_secret_material_included": False,
+                "derived_evaluation_artifacts_included": True,
+            },
+            "required_directories": ["configs", "tables", "predictions", "reports", "logs"],
+            "required_top_level_files": ["README.md", "manifest.json", "checksums.sha256"],
+            "required_artifacts": [
+                {"artifact_id": "open_v2_main_results"},
+                {"artifact_id": "iad_risk_predictions"},
+                {"artifact_id": "representation_baseline_scores"},
+                {"artifact_id": "supervised_baseline_predictions"},
+                {"artifact_id": "threshold_selection_logs"},
+                {"artifact_id": "iad_bench_split_summary"},
+                {"artifact_id": "bootstrap_intervals"},
+                {"artifact_id": "ablation_suite"},
+                {"artifact_id": "manual_validation_slice"},
+            ],
+            "minimum_validation_commands": [
+                "sha256sum -c checksums.sha256",
+                "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
+                "python manuscript/scripts/validate_manuscript.py --strict-latex",
+                "python manuscript/scripts/verify_fixture_rebuild.py",
+                "python scripts/check_public_release.py",
+            ],
+            "claim_boundaries": {
+                "silver_labels_are_not_human_gold": True,
+                "manual_validation_required_for_human_gold_claims": True,
+                "same_scope_prediction_files_required_for_broad_ranking": True,
+                "threshold_grid_required_for_threshold_stability_claims": True,
+                "confidence_intervals_claimed": False,
+                "component_causality_claimed": False,
+                "human_validation_claimed": False,
+                "threshold_stability_claimed": False,
+                "broad_method_ranking_claimed": False,
+            },
+        }
+    )
+
+    errors = module.check_artifact_release_manifest_template(template_text)
+
+    assert any("threshold_sensitivity_grid" in error for error in errors)
+    assert any("conditional_claim_artifacts" in error for error in errors)
 
 
 def test_check_submission_system_checklist_accepts_complete_checklist() -> None:

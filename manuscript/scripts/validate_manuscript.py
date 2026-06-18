@@ -676,6 +676,7 @@ def check_result_claim_boundary(manuscript_text: str, supplementary_text: str) -
         r"\path{bootstrap_intervals}",
         r"\path{ablation_suite}",
         r"\path{manual_validation_slice}",
+        r"\path{threshold_sensitivity_grid}",
         "does not support a broad method-ranking claim",
     ]
     required_supplement_markers = [
@@ -685,6 +686,8 @@ def check_result_claim_boundary(manuscript_text: str, supplementary_text: str) -
         "released artifact package",
         "python manuscript/scripts/validate_artifact_release.py",
         "required result identifiers",
+        "conditional claim artifacts",
+        r"\path{threshold_sensitivity_grid}",
         "exclusion of raw third-party data",
     ]
     errors: list[str] = []
@@ -1080,16 +1083,26 @@ def check_artifact_release_manifest_template(template_text: str) -> list[str]:
         artifact_ids: set[str] = set()
     else:
         artifact_ids = {str(row.get("artifact_id", "")) for row in artifacts if isinstance(row, dict)}
-    for artifact_id in {
+    required_artifact_ids = {
         "open_v2_main_results",
         "iad_risk_predictions",
         "representation_baseline_scores",
         "supervised_baseline_predictions",
         "threshold_selection_logs",
         "iad_bench_split_summary",
-    }:
+    }
+    conditional_artifact_ids = {
+        "bootstrap_intervals",
+        "ablation_suite",
+        "manual_validation_slice",
+        "threshold_sensitivity_grid",
+    }
+    for artifact_id in required_artifact_ids:
         if artifact_id not in artifact_ids:
             errors.append(f"artifact release manifest template missing required artifact: {artifact_id}")
+    for artifact_id in conditional_artifact_ids:
+        if artifact_id not in artifact_ids:
+            errors.append(f"artifact release manifest template missing conditional artifact: {artifact_id}")
 
     validation_commands = template.get("minimum_validation_commands")
     if not isinstance(validation_commands, list):
@@ -1118,6 +1131,39 @@ def check_artifact_release_manifest_template(template_text: str) -> list[str]:
         ]:
             if claim_boundaries.get(field) is not True:
                 errors.append(f"artifact release claim boundary must be true: {field}")
+        for field in [
+            "confidence_intervals_claimed",
+            "component_causality_claimed",
+            "human_validation_claimed",
+            "threshold_stability_claimed",
+            "broad_method_ranking_claimed",
+        ]:
+            if claim_boundaries.get(field) is not False:
+                errors.append(f"artifact release claim boundary must default false: {field}")
+
+    conditional_claim_artifacts = template.get("conditional_claim_artifacts")
+    expected_conditional_claim_artifacts = {
+        "confidence_intervals_claimed": {"bootstrap_intervals"},
+        "component_causality_claimed": {"ablation_suite"},
+        "human_validation_claimed": {"manual_validation_slice"},
+        "threshold_stability_claimed": {"threshold_sensitivity_grid"},
+        "broad_method_ranking_claimed": {
+            "bootstrap_intervals",
+            "manual_validation_slice",
+            "threshold_sensitivity_grid",
+        },
+    }
+    if not isinstance(conditional_claim_artifacts, dict):
+        errors.append("artifact release manifest template missing conditional_claim_artifacts object")
+    else:
+        for claim_field, expected_ids in expected_conditional_claim_artifacts.items():
+            actual_ids = set(conditional_claim_artifacts.get(claim_field, []))
+            missing_ids = expected_ids - actual_ids
+            if missing_ids:
+                errors.append(
+                    "artifact release manifest template conditional_claim_artifacts "
+                    f"missing {claim_field}: {sorted(missing_ids)}"
+                )
 
     return errors
 

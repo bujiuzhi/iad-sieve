@@ -121,6 +121,11 @@ def _write_complete_release(artifact_dir: Path, release_status: str = "release_c
             "manual_validation_required_for_human_gold_claims": True,
             "same_scope_prediction_files_required_for_broad_ranking": True,
             "threshold_grid_required_for_threshold_stability_claims": True,
+            "confidence_intervals_claimed": False,
+            "component_causality_claimed": False,
+            "human_validation_claimed": False,
+            "threshold_stability_claimed": False,
+            "broad_method_ranking_claimed": False,
         },
     }
     _write_file(artifact_dir / "manifest.json", json.dumps(manifest, indent=2) + "\n")
@@ -130,6 +135,23 @@ def _write_complete_release(artifact_dir: Path, release_status: str = "release_c
             relative_path = path.relative_to(artifact_dir).as_posix()
             checksum_lines.append(f"{_sha256_file(path)}  {relative_path}")
     _write_file(artifact_dir / "checksums.sha256", "\n".join(checksum_lines) + "\n")
+
+
+def _refresh_checksums(artifact_dir: Path) -> None:
+    """重新写入测试 release 的 checksums.sha256。
+
+    参数:
+        artifact_dir: Release 目录。
+
+    返回:
+        无。
+    """
+    checksum_lines = []
+    for path in sorted(artifact_dir.rglob("*")):
+        if path.is_file() and path.name != "checksums.sha256":
+            relative_path = path.relative_to(artifact_dir).as_posix()
+            checksum_lines.append(f"{_sha256_file(path)}  {relative_path}")
+    (artifact_dir / "checksums.sha256").write_text("\n".join(checksum_lines) + "\n", encoding="utf-8")
 
 
 def test_validate_artifact_release_accepts_complete_release(tmp_path) -> None:
@@ -197,3 +219,21 @@ def test_validate_artifact_release_rejects_template_status_and_placeholder_commi
 
     assert any("release_status" in error for error in errors)
     assert any("repository.commit" in error for error in errors)
+
+
+def test_validate_artifact_release_rejects_claimed_confidence_without_bootstrap_artifact(tmp_path) -> None:
+    """验证声明置信区间时必须提供 bootstrap artifact。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    manifest_path = artifact_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["claim_boundaries"]["confidence_intervals_claimed"] = True
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    _refresh_checksums(artifact_dir)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("confidence_intervals_claimed" in error for error in errors)
+    assert any("bootstrap_intervals" in error for error in errors)

@@ -45,6 +45,24 @@ REQUIRED_TRUE_CLAIM_BOUNDARY_FIELDS = {
     "same_scope_prediction_files_required_for_broad_ranking",
     "threshold_grid_required_for_threshold_stability_claims",
 }
+EXPECTED_FALSE_CLAIM_STATUS_FIELDS = {
+    "confidence_intervals_claimed",
+    "component_causality_claimed",
+    "human_validation_claimed",
+    "threshold_stability_claimed",
+    "broad_method_ranking_claimed",
+}
+CLAIM_DEPENDENT_ARTIFACTS = {
+    "confidence_intervals_claimed": {"bootstrap_intervals"},
+    "component_causality_claimed": {"ablation_suite"},
+    "human_validation_claimed": {"manual_validation_slice"},
+    "threshold_stability_claimed": {"threshold_sensitivity_grid"},
+    "broad_method_ranking_claimed": {
+        "bootstrap_intervals",
+        "manual_validation_slice",
+        "threshold_sensitivity_grid",
+    },
+}
 FORBIDDEN_PATH_PARTS = {
     ".git",
     ".pytest_cache",
@@ -288,6 +306,9 @@ def check_claim_boundaries(manifest: dict[str, Any]) -> list[str]:
     for field in sorted(REQUIRED_TRUE_CLAIM_BOUNDARY_FIELDS):
         if claim_boundaries.get(field) is not True:
             errors.append(f"manifest.json claim boundary must be true: {field}")
+    for field in sorted(EXPECTED_FALSE_CLAIM_STATUS_FIELDS):
+        if claim_boundaries.get(field) not in {False, True}:
+            errors.append(f"manifest.json claim boundary status must be explicit boolean: {field}")
     return errors
 
 
@@ -343,31 +364,64 @@ def check_manifest_artifacts(
     if missing_ids:
         errors.append(f"manifest.json missing required artifact IDs: {sorted(missing_ids)}")
 
-    for artifact_id in sorted(required_ids & set(artifact_rows)):
-        row = artifact_rows[artifact_id]
-        if row.get("required") is not True:
-            errors.append(f"manifest.json required_artifacts row must mark required=true: {artifact_id}")
+    def check_artifact_payload(artifact_id: str, row: dict[str, Any], context: str, require_required_flag: bool) -> None:
+        """Validate a manifest artifact row in the surrounding check context.
+
+        参数:
+            artifact_id: Artifact identifier used in the manifest row.
+            row: Parsed artifact row from manifest.json.
+            context: Diagnostic context for error messages.
+            require_required_flag: Whether the row must set required=true.
+
+        返回:
+            无。
+        """
+        if require_required_flag and row.get("required") is not True:
+            errors.append(f"manifest.json {context} row must mark required=true: {artifact_id}")
         location = str(row.get("expected_location", "")).strip()
         if not location:
-            errors.append(f"manifest.json required_artifacts row missing expected_location: {artifact_id}")
-            continue
+            errors.append(f"manifest.json {context} row missing expected_location: {artifact_id}")
+            return
         location_path = Path(location)
         if location_path.is_absolute() or ".." in location_path.parts:
-            errors.append(f"manifest.json required_artifacts row has unsafe location: {artifact_id} -> {location}")
-            continue
+            errors.append(f"manifest.json {context} row has unsafe location: {artifact_id} -> {location}")
+            return
         if not (artifact_dir / location).is_file():
-            errors.append(f"required artifact file missing: {location}")
-            continue
+            errors.append(f"{context} file missing: {location}")
+            return
         checksum_value = str(row.get("sha256", "")).strip().lower()
         if not SHA256_PATTERN.fullmatch(checksum_value):
-            errors.append(f"manifest.json required_artifacts row missing valid sha256: {artifact_id}")
-            continue
+            errors.append(f"manifest.json {context} row missing valid sha256: {artifact_id}")
+            return
         checksum_file_value = checksums.get(location)
         if checksum_file_value is None:
-            errors.append(f"checksums.sha256 missing required artifact entry: {location}")
-            continue
+            errors.append(f"checksums.sha256 missing {context} entry: {location}")
+            return
         if checksum_file_value != checksum_value:
             errors.append(f"manifest.json sha256 does not match checksums.sha256 for {location}")
+
+    for artifact_id in sorted(required_ids & set(artifact_rows)):
+        check_artifact_payload(artifact_id, artifact_rows[artifact_id], "required_artifacts", True)
+
+    claim_boundaries = manifest.get("claim_boundaries")
+    if isinstance(claim_boundaries, dict):
+        for claim_field, artifact_ids in sorted(CLAIM_DEPENDENT_ARTIFACTS.items()):
+            if claim_boundaries.get(claim_field) is not True:
+                continue
+            for artifact_id in sorted(artifact_ids):
+                row = artifact_rows.get(artifact_id)
+                if row is None:
+                    errors.append(
+                        "manifest.json conditional claim "
+                        f"{claim_field} requires artifact ID: {artifact_id}"
+                    )
+                    continue
+                check_artifact_payload(
+                    artifact_id,
+                    row,
+                    f"conditional claim {claim_field}",
+                    True,
+                )
     return errors
 
 
