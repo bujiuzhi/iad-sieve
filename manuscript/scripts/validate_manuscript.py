@@ -2247,6 +2247,12 @@ def check_highlights(highlights_text: str) -> list[str]:
     errors: list[str] = []
     if not 3 <= len(bullet_lines) <= 5:
         errors.append(f"highlights has {len(bullet_lines)} bullet lines; expected 3 to 5")
+    required_markers = [
+        "Cluster-level claims require artifact-backed audits",
+    ]
+    for marker in required_markers:
+        if marker not in highlights_text:
+            errors.append(f"highlights missing cluster-level claims boundary marker: {marker}")
     for line in bullet_lines:
         highlight = line[2:]
         word_count = len(highlight.split())
@@ -2502,7 +2508,7 @@ def check_editorial_claim_alignment(
                 "IAD-Bench",
                 "Open-v2 scope-bounded evidence",
                 "IAD-Risk HNFMR=0.000",
-                "artifact rules",
+                "artifact-backed audits",
             ],
         ),
         "keywords": (

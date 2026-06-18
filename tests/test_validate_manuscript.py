@@ -121,7 +121,7 @@ def test_check_highlights_accepts_five_concise_bullets() -> None:
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
             "- Open-v2 scope-bounded evidence reports IAD-Risk HNFMR=0.000.",
-            "- Fixtures and artifact rules support reproducible review.",
+            "- Cluster-level claims require artifact-backed audits.",
         ]
     )
 
@@ -177,6 +177,28 @@ def test_check_highlights_rejects_unscoped_hnfmr_numbers() -> None:
 
     assert any("HNFMR highlight must mention Open-v2" in error for error in errors)
     assert any("scope" in error for error in errors)
+
+
+def test_check_highlights_rejects_missing_cluster_artifact_boundary() -> None:
+    """验证 highlights 必须包含 cluster-level artifact 边界。"""
+
+    module = _load_validate_manuscript_module()
+    highlights_text = "\n".join(
+        [
+            "# Highlights",
+            "",
+            "- Identity-agenda confusion causes risky scholarly work merges.",
+            "- IAD-Risk separates identity, agenda, and ANI evidence.",
+            "- IAD-Bench keeps gold, proxy, and silver labels separate.",
+            "- Open-v2 scope-bounded evidence reports IAD-Risk HNFMR=0.000.",
+            "- Fixtures and artifact rules support reproducible review.",
+        ]
+    )
+
+    errors = module.check_highlights(highlights_text)
+
+    assert any("cluster-level claims" in error for error in errors)
+    assert any("artifact-backed audits" in error for error in errors)
 
 
 def test_check_keywords_accepts_semicolon_separated_terms() -> None:
@@ -3197,7 +3219,7 @@ def test_check_submission_material_quantitative_summary_accepts_scoped_highlight
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
             "- Open-v2 scope-bounded evidence reports IAD-Risk HNFMR=0.000.",
-            "- Fixtures and artifact rules support reproducible review.",
+            "- Cluster-level claims require artifact-backed audits.",
         ]
     )
     cover_letter_text = "\n".join(
@@ -3270,7 +3292,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
             "- Open-v2 scope-bounded evidence reports IAD-Risk HNFMR=0.000.",
-            "- Fixtures and artifact rules support reproducible review.",
+            "- Cluster-level claims require artifact-backed audits.",
         ]
     )
     keywords_text = (
@@ -3334,7 +3356,7 @@ def test_check_editorial_claim_alignment_rejects_conclusion_without_cluster_boun
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
             "- Open-v2 scope-bounded evidence reports IAD-Risk HNFMR=0.000.",
-            "- Fixtures and artifact rules support reproducible review.",
+            "- Cluster-level claims require artifact-backed audits.",
         ]
     )
     keywords_text = (
