@@ -1446,7 +1446,7 @@ def check_baseline_fairness_controls(manuscript_text: str) -> list[str]:
         "same metric implementation",
         "not predictive features",
         "same-scope released prediction files",
-        "not be read as a single leaderboard",
+        "not be read as a single comparative ranking",
     ]
     return [
         f"baseline fairness controls missing marker: {marker}"
@@ -1473,12 +1473,12 @@ def check_result_interpretation_guardrails(manuscript_text: str) -> list[str]:
         "Scope type",
         "full available Open-v2 scope",
         "held-out Open-v2 test scope",
-        "Scope labels prevent leaderboard reading",
+        "Scope labels prevent ranking interpretation",
         "representation rows test false-merge exposure",
         "RoBERTa row is a strong supervised comparator",
         "IAD-Risk rows test split-held-out risk gating",
         "not a claim of broad method superiority",
-        "not a same-scope leaderboard",
+        "not a same-scope comparative ranking",
         "not evidence of threshold stability or zero risk",
     ]
     return [
@@ -1636,7 +1636,7 @@ def check_scope_compatibility(manuscript_text: str) -> list[str]:
         r"\subsection{Scope Compatibility of the Open-v2 Table}",
         r"\label{tab:scope-compatibility}",
         "scope-bounded evidence table",
-        "not a single leaderboard",
+        "not a single comparative ranking",
         "Full pair-scope representation baselines",
         "Held-out IAD-Risk rows",
         "same released prediction scope",
@@ -2428,7 +2428,7 @@ def check_related_work_positioning(manuscript_text: str) -> list[str]:
         "false-merge risk gates",
         "gold, proxy, and silver strata",
         "not a replacement for end-to-end entity resolution workflows",
-        "not a leaderboard over all neural matching methods",
+        "not a comparative ranking over all neural matching methods",
         "does not claim that OpenAlex/OpenCitations silver evidence is human gold",
         "merge-safety framing",
     ]
@@ -2776,7 +2776,7 @@ def check_editorial_claim_alignment(
                 "IAD-Bench",
                 "Open-v2 evidence snapshot",
                 "scope-bounded mechanism evidence",
-                "same-scope leaderboard",
+                "same-scope comparative ranking",
                 "HNFMR 0.790--0.999",
                 "HNFMR=0.000",
                 "pair-level conclusion",

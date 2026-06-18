@@ -1768,7 +1768,7 @@ def test_check_baseline_fairness_controls_accepts_complete_controls() -> None:
             "All systems report same-work F1, FMR, and HNFMR from the same metric implementation.",
             "Label source, provenance, and split identifiers are audit fields, not predictive features.",
             "A stricter ranking requires same-scope released prediction files.",
-            "The table should not be read as a single leaderboard.",
+            "The table should not be read as a single comparative ranking.",
         ]
     )
 
@@ -1804,12 +1804,12 @@ def test_check_result_interpretation_guardrails_accepts_complete_boundaries() ->
             "The main result table includes Scope type.",
             "It distinguishes full available Open-v2 scope.",
             "It distinguishes held-out Open-v2 test scope.",
-            "Scope labels prevent leaderboard reading.",
+            "Scope labels prevent ranking interpretation.",
             "The representation rows test false-merge exposure.",
             "The RoBERTa row is a strong supervised comparator.",
             "The IAD-Risk rows test split-held-out risk gating.",
             "The result is not a claim of broad method superiority.",
-            "The table is not a same-scope leaderboard.",
+            "The table is not a same-scope comparative ranking.",
             "The table is not evidence of threshold stability or zero risk.",
         ]
     )
@@ -1828,7 +1828,7 @@ def test_check_result_interpretation_guardrails_rejects_missing_unsupported_read
     errors = module.check_result_interpretation_guardrails(manuscript_text)
 
     assert any("Unsupported reading" in error for error in errors)
-    assert any("not a same-scope leaderboard" in error for error in errors)
+    assert any("not a same-scope comparative ranking" in error for error in errors)
 
 
 def test_check_result_interpretation_guardrails_rejects_missing_scope_type_labels() -> None:
@@ -1846,7 +1846,7 @@ def test_check_result_interpretation_guardrails_rejects_missing_scope_type_label
             "The RoBERTa row is a strong supervised comparator.",
             "The IAD-Risk rows test split-held-out risk gating.",
             "The result is not a claim of broad method superiority.",
-            "The table is not a same-scope leaderboard.",
+            "The table is not a same-scope comparative ranking.",
             "The table is not evidence of threshold stability or zero risk.",
         ]
     )
@@ -2777,7 +2777,7 @@ def test_check_related_work_positioning_rejects_missing_novelty_boundaries() -> 
     errors = module.check_related_work_positioning(manuscript_text)
 
     assert any("not a replacement for end-to-end entity resolution workflows" in error for error in errors)
-    assert any("not a leaderboard over all neural matching methods" in error for error in errors)
+    assert any("not a comparative ranking over all neural matching methods" in error for error in errors)
     assert any("OpenAlex/OpenCitations silver evidence is human gold" in error for error in errors)
 
 
@@ -4047,7 +4047,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
             r"\begin{abstract}",
             "This paper studies identity-agenda confusion and proposes IAD-Risk.",
             "It evaluates IAD-Bench under an Open-v2 evidence snapshot.",
-            "The result rows are scope-bounded mechanism evidence rather than a same-scope leaderboard.",
+            "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
             "The results include HNFMR 0.790--0.999 and HNFMR=0.000.",
             "The results support a conservative pair-level conclusion.",
             "Cluster-level quality claims require cluster artifacts before broad method-ranking claims.",
@@ -4103,7 +4103,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
     assert errors == []
 
 
-def test_check_editorial_claim_alignment_rejects_abstract_without_scope_leaderboard_boundary() -> None:
+def test_check_editorial_claim_alignment_rejects_abstract_without_scope_ranking_boundary() -> None:
     """验证摘要必须说明 Open-v2 结果不是同范围排行榜。"""
 
     module = _load_validate_manuscript_module()
@@ -4156,7 +4156,7 @@ def test_check_editorial_claim_alignment_rejects_abstract_without_scope_leaderbo
     )
 
     assert any("scope-bounded mechanism evidence" in error for error in errors)
-    assert any("same-scope leaderboard" in error for error in errors)
+    assert any("same-scope comparative ranking" in error for error in errors)
 
 
 def test_check_editorial_claim_alignment_rejects_abstract_without_pair_cluster_boundary() -> None:
@@ -4418,7 +4418,7 @@ def test_check_formal_source_typography_hygiene_accepts_ascii_submission_text() 
 
     module = _load_validate_manuscript_module()
     document_texts = {
-        "main manuscript": "IAD-Risk uses risk-aware merge gating -- not a leaderboard claim.",
+        "main manuscript": "IAD-Risk uses risk-aware merge gating -- not a comparative ranking claim.",
         "cover letter": "The manuscript is complete as an anonymous pre-submission draft.",
     }
 

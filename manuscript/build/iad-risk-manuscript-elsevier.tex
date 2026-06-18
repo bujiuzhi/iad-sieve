@@ -23,7 +23,7 @@
 \author{Anonymous Authors}
 
 \begin{abstract}
-Scholarly entity matching must distinguish whether two records describe the same work, not merely whether they discuss the same research agenda. Modern scientific representations and pair classifiers often improve semantic matching, but a high semantic score can also connect different papers in the same task, benchmark, or citation community. This paper studies this failure mode as \emph{identity-agenda confusion} and proposes IAD-Risk, a risk-aware framework that separates identity evidence from agenda evidence before making merge decisions. IAD-Risk combines stratified data provenance, identity and agenda relation heads, and false-merge risk gating to block risky automatic pair merges before clustering. We evaluate the framework with IAD-Bench, a benchmark contract that separates DeepMatcher gold labels, SciRepEval/SciDocs-style proxy labels, and OpenAlex/OpenCitations silver hard negatives. In the Open-v2 evidence snapshot, the result rows are scope-bounded mechanism evidence rather than a same-scope leaderboard: single-space scientific representation baselines show HNFMR 0.790--0.999 on the full pair scope, whereas transformer-backed IAD-Risk variants report HNFMR=0.000 and same-work F1=0.980 on the held-out test scope. The results support a conservative pair-level conclusion: identity-agenda disentanglement can control risky automatic merges in the reported setting, while cluster-level quality claims require cluster artifacts and broader manual or source-heldout validation before broad method-ranking claims.
+Scholarly entity matching must distinguish whether two records describe the same work, not merely whether they discuss the same research agenda. Modern scientific representations and pair classifiers often improve semantic matching, but a high semantic score can also connect different papers in the same task, benchmark, or citation community. This paper studies this failure mode as \emph{identity-agenda confusion} and proposes IAD-Risk, a risk-aware framework that separates identity evidence from agenda evidence before making merge decisions. IAD-Risk combines stratified data provenance, identity and agenda relation heads, and false-merge risk gating to block risky automatic pair merges before clustering. We evaluate the framework with IAD-Bench, a benchmark contract that separates DeepMatcher gold labels, SciRepEval/SciDocs-style proxy labels, and OpenAlex/OpenCitations silver hard negatives. In the Open-v2 evidence snapshot, the result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking: single-space scientific representation baselines show HNFMR 0.790--0.999 on the full pair scope, whereas transformer-backed IAD-Risk variants report HNFMR=0.000 and same-work F1=0.980 on the held-out test scope. The results support a conservative pair-level conclusion: identity-agenda disentanglement can control risky automatic merges in the reported setting, while cluster-level quality claims require cluster artifacts and broader manual or source-heldout validation before broad method-ranking claims.
 \end{abstract}
 
 \begin{keyword}
@@ -110,7 +110,7 @@ Open scholarly metadata benchmarks & Public metadata, citation, and topic signal
 \end{tabular}
 \end{table}
 
-This positioning narrows the novelty claim. IAD-Risk is not a replacement for end-to-end entity resolution workflows; it inserts a risk-aware relation layer into scholarly matching when agenda relatedness can make automatic merges unsafe. It is also not a leaderboard over all neural matching methods; the reported comparisons test the merge-safety framing under the available Open-v2 evidence snapshot. Finally, IAD-Bench does not claim that OpenAlex/OpenCitations silver evidence is human gold, but uses those rows as provenance-marked stress evidence for agenda-level false-merge risk.
+This positioning narrows the novelty claim. IAD-Risk is not a replacement for end-to-end entity resolution workflows; it inserts a risk-aware relation layer into scholarly matching when agenda relatedness can make automatic merges unsafe. It is also not a comparative ranking over all neural matching methods; the reported comparisons test the merge-safety framing under the available Open-v2 evidence snapshot. Finally, IAD-Bench does not claim that OpenAlex/OpenCitations silver evidence is human gold, but uses those rows as provenance-marked stress evidence for agenda-level false-merge risk.
 
 \section{Problem Formulation}
 
@@ -587,7 +587,7 @@ Point estimates & Reported for the fixed Open-v2 scope, split, and operating poi
 Confidence intervals & Not reported as primary evidence in the current manuscript. & \path{bootstrap_intervals} generated from the same prediction files, with command logs and random seeds. \\
 Statistical significance & Not claimed for baseline ranking or model superiority. & Predefined tests, multiplicity handling, input artifacts, and reproducible analysis logs. \\
 Zero HNFMR rows & Interpreted as no observed hard-negative false merge in the reported scope. & Larger source-heldout evidence and manual validation before any zero-risk wording. \\
-Model ranking & Restricted to mechanism interpretation rather than a universal leaderboard. & Same-scope predictions, interval estimates, ablations, and manual-validation slice. \\
+Model ranking & Restricted to mechanism interpretation rather than a universal ranking. & Same-scope predictions, interval estimates, ablations, and manual-validation slice. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -712,7 +712,7 @@ Omitting a baseline family from Table~\ref{tab:openv2-results} is not a claim th
 
 \subsection{Baseline Fairness Controls}
 
-Baseline comparison is controlled through the pair contract rather than through a broad leaderboard claim. All baselines consume the same IAD-Bench pair records for the row scope being reported, and each row uses the same train/dev/test split field when training is required. Threshold-sensitive rows use validation-selected operating points before held-out reporting. All systems report same-work F1, FMR, and HNFMR from the same metric implementation.
+Baseline comparison is controlled through the pair contract rather than through a broad comparative-ranking claim. All baselines consume the same IAD-Bench pair records for the row scope being reported, and each row uses the same train/dev/test split field when training is required. Threshold-sensitive rows use validation-selected operating points before held-out reporting. All systems report same-work F1, FMR, and HNFMR from the same metric implementation.
 
 \begin{table}[H]
 \caption{Baseline fairness controls for the Open-v2 evidence snapshot. The controls make the reported comparison auditable while preserving the scope boundary of each row family.}
@@ -725,7 +725,7 @@ Baseline comparison is controlled through the pair contract rather than through 
 Control & Application in the reported table & Interpretation boundary \\
 \midrule
 Input rows & Baselines use the same IAD-Bench pair records within each reported row scope. & A stricter ranking requires same-scope released prediction files for all rows. \\
-Split use & Trainable rows use the same train/dev/test split field; non-trainable representation rows are reported as fixed score baselines. & Different available scopes should not be read as a single leaderboard. \\
+Split use & Trainable rows use the same train/dev/test split field; non-trainable representation rows are reported as fixed score baselines. & Different available scopes should not be read as a single comparative ranking. \\
 Threshold selection & Threshold-sensitive rows use validation-selected operating points or recorded fixed thresholds. & Post-hoc test-threshold selection is not used for the reported claims. \\
 Feature boundary & Label source, provenance, and split identifiers are audit fields, not predictive features. & Provenance can explain evidence strength but cannot be used as a shortcut feature. \\
 Metric implementation & All systems report same-work F1, FMR, and HNFMR from the same metric implementation. & Metric comparability does not remove the need for released predictions and checksums. \\
@@ -735,7 +735,7 @@ Metric implementation & All systems report same-work F1, FMR, and HNFMR from the
 
 \subsection{Implementation and Reproducibility}
 
-All reported systems are evaluated through the same pair-level schema, split field, and metric implementation. Threshold-sensitive baselines select merge thresholds on validation evidence and are then evaluated on held-out evidence. The main metrics are same-work F1 on gold identity pairs, ordinary false-merge rate, and HNFMR on agenda-level hard negatives. Rows with different pair counts in Table~\ref{tab:openv2-results} should therefore be read as evidence for the same mechanism under different available result scopes, not as a single leaderboard.
+All reported systems are evaluated through the same pair-level schema, split field, and metric implementation. Threshold-sensitive baselines select merge thresholds on validation evidence and are then evaluated on held-out evidence. The main metrics are same-work F1 on gold identity pairs, ordinary false-merge rate, and HNFMR on agenda-level hard negatives. Rows with different pair counts in Table~\ref{tab:openv2-results} should therefore be read as evidence for the same mechanism under different available result scopes, not as a single comparative ranking.
 
 The repository separates executable code from large data artifacts: raw third-party data remain outside Git, while processing scripts, fixture tests, schema contracts, and artifact-release rules remain version controlled. Reproduction starts from public sources, rebuilds IAD-Bench pair files through the documented CLI, and checks generated outputs with manifests and checksums. This organization is intended to make the main evidence reproducible without redistributing restricted or large source files. The supplementary material states the claim-evidence boundary for each major conclusion so that code-level reproducibility, artifact-level reproducibility, and manual-validation requirements are not conflated.
 
@@ -830,7 +830,7 @@ The Open-v2 evidence shows why identity-agenda disentanglement is necessary. Sin
 
 \subsection{Result Interpretation Guardrails}
 
-Table~\ref{tab:result-interpretation-guardrails} states how the Open-v2 table should be read before external artifact release and same-scope prediction files are available. The main result table includes Scope type labels to distinguish full available Open-v2 scope rows from held-out Open-v2 test scope rows. Scope labels prevent leaderboard reading when row families are supported by different available prediction scopes. The intended interpretation is mechanism-oriented; the table labels this as a Mechanism-supported reading rather than a leaderboard-oriented reading.
+Table~\ref{tab:result-interpretation-guardrails} states how the Open-v2 table should be read before external artifact release and same-scope prediction files are available. The main result table includes Scope type labels to distinguish full available Open-v2 scope rows from held-out Open-v2 test scope rows. Scope labels prevent ranking interpretation when row families are supported by different available prediction scopes. The intended interpretation is mechanism-oriented; the table labels this as a Mechanism-supported reading rather than a ranking-oriented reading.
 
 \begin{table}[H]
 \caption{Result interpretation guardrails for the Open-v2 evidence snapshot. The table separates direct evidence, mechanism-supported reading, and unsupported reading.}
@@ -842,10 +842,10 @@ Table~\ref{tab:result-interpretation-guardrails} states how the Open-v2 table sh
 \toprule
 Result row family & Directly supported reading & Unsupported reading \\
 \midrule
-Representation baselines & The representation rows test false-merge exposure when one-space scientific relatedness is used as merge evidence. & They do not define the best possible representation-threshold system under a fully tuned, same-scope leaderboard. \\
+Representation baselines & The representation rows test false-merge exposure when one-space scientific relatedness is used as merge evidence. & They do not define the best possible representation-threshold system under a fully tuned, same-scope comparative ranking. \\
 RoBERTa pair classifier & The RoBERTa row is a strong supervised comparator that shows pair classification can suppress many hard-negative merges. & It is not a component-level explanation of identity-agenda risk control. \\
 IAD-Risk transformer variants & The IAD-Risk rows test split-held-out risk gating with explicit identity, agenda, and ANI signals. & The rows are not a claim of broad method superiority without same-scope predictions, intervals, and artifact checksums. \\
-Whole table & The table gives a mechanism-supported reading that semantic relatedness alone can be unsafe and risk gating can block hard-negative merges in the reported setting. & The table is not a same-scope leaderboard and is not evidence of threshold stability or zero risk. \\
+Whole table & The table gives a mechanism-supported reading that semantic relatedness alone can be unsafe and risk gating can block hard-negative merges in the reported setting. & The table is not a same-scope comparative ranking and is not evidence of threshold stability or zero risk. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -874,7 +874,7 @@ Manuscript claim & Supports bounded false-merge stress testing under Open-v2. & 
 
 \subsection{Scope Compatibility of the Open-v2 Table}
 
-The Open-v2 table is a scope-bounded evidence table, not a single leaderboard. Full pair-scope representation baselines test whether single-space scientific relatedness can over-merge agenda-level hard negatives across the available Open-v2 pairs. Held-out IAD-Risk rows test whether risk-gated transformer variants preserve same-work performance and suppress hard-negative merges under a split-based model-evaluation protocol. The valid comparison is therefore mechanistic: semantic relatedness alone is unsafe as automatic merge evidence, while explicit risk gating can block hard-negative merges in the reported held-out setting.
+The Open-v2 table is a scope-bounded evidence table, not a single comparative ranking. Full pair-scope representation baselines test whether single-space scientific relatedness can over-merge agenda-level hard negatives across the available Open-v2 pairs. Held-out IAD-Risk rows test whether risk-gated transformer variants preserve same-work performance and suppress hard-negative merges under a split-based model-evaluation protocol. The valid comparison is therefore mechanistic: semantic relatedness alone is unsafe as automatic merge evidence, while explicit risk gating can block hard-negative merges in the reported held-out setting.
 
 \begin{table}[H]
 \caption{Scope compatibility for interpreting the Open-v2 evidence snapshot. The table states what each row family supports and which stronger comparison remains outside the current evidence.}
@@ -889,7 +889,7 @@ Row family & Pair scope & Supported interpretation & Not supported \\
 Representation baselines & Full available Open-v2 pair scope. & Tests whether one-space scientific relatedness creates hard-negative merge risk. & A tuned neural pair-classifier ranking under the same held-out prediction file. \\
 RoBERTa pair classifier & Full available Open-v2 pair scope. & Shows that a strong supervised pair classifier can suppress most hard-negative merges. & A component-level explanation of identity-agenda risk control. \\
 IAD-Risk transformer variants & Held-out Open-v2 test scope. & Tests whether explicit identity, agenda, and ANI heads support risk-gated held-out decisions. & A general ranking over every baseline before all rows share the same released prediction scope. \\
-Future stronger comparison & Same released prediction scope plus manual-validation slice. & Would support a stricter leaderboard and stronger label-precision claims. & A claim that this stronger comparison has already been completed by the current evidence snapshot. \\
+Future stronger comparison & Same released prediction scope plus manual-validation slice. & Would support a stricter comparative ranking and stronger label-precision claims. & A claim that this stronger comparison has already been completed by the current evidence snapshot. \\
 \bottomrule
 \end{tabular}
 \end{table}
