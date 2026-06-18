@@ -723,9 +723,14 @@ def check_permissions_statement(metadata_text: str) -> list[str]:
     requires_permission = permissions_row.get("third_party_material_requires_permission", "").lower() == "true"
     permission_files = permissions_row.get("permission_files", "")
     has_permission_files = bool(permission_files and permission_files != "[]")
-    if permissions_statement or no_permission_required or (requires_permission and has_permission_files):
-        return []
-    return ["permissions statement is missing"]
+    errors: list[str] = []
+    if not permissions_statement:
+        errors.append("permissions statement is missing")
+    if not no_permission_required and not requires_permission:
+        errors.append("permissions status is missing")
+    if requires_permission and not has_permission_files:
+        errors.append("permission files are missing")
+    return errors
 
 
 def check_final_upload_cover_letter_text(cover_letter_text: str, metadata_text: str) -> list[str]:

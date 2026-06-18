@@ -54,6 +54,7 @@ For each author, select the applicable CRediT roles and then draft the final aut
 
 - Third-party material used in the manuscript:
 - Permission status:
+- Permissions statement text finalized even when no third-party material permission is required:
 - License or approval record:
 - Figure/table reuse notes:
 
