@@ -75,7 +75,7 @@ def test_check_highlights_rejects_long_bullet() -> None:
 
 
 def test_check_keywords_accepts_semicolon_separated_terms() -> None:
-    """验证 4 到 8 个分号分隔关键词可通过检查。"""
+    """验证 1 到 7 个分号分隔关键词可通过检查。"""
 
     module = _load_validate_manuscript_module()
     keywords_text = (
@@ -89,15 +89,15 @@ def test_check_keywords_accepts_semicolon_separated_terms() -> None:
     assert errors == []
 
 
-def test_check_keywords_rejects_too_few_terms() -> None:
-    """验证关键词数量不足会被拒绝。"""
+def test_check_keywords_rejects_too_many_terms() -> None:
+    """验证关键词数量超过候选期刊上限会被拒绝。"""
 
     module = _load_validate_manuscript_module()
-    keywords_text = "# Keywords\n\nwork deduplication; false-merge risk"
+    keywords_text = "# Keywords\n\n" + "; ".join(f"keyword {index}" for index in range(8))
 
     errors = module.check_keywords(keywords_text)
 
-    assert any("expected 4 to 8" in error for error in errors)
+    assert any("expected 1 to 7" in error for error in errors)
 
 
 def test_check_keywords_rejects_long_keyword() -> None:
@@ -113,6 +113,28 @@ def test_check_keywords_rejects_long_keyword() -> None:
     errors = module.check_keywords(keywords_text)
 
     assert any("keyword is too long" in error for error in errors)
+
+
+def test_check_abstract_length_accepts_abstract_within_limit() -> None:
+    """验证摘要不超过 250 词时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\begin{abstract}" + " ".join(["evidence"] * 250) + r"\end{abstract}"
+
+    errors = module.check_abstract_length(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_abstract_length_rejects_over_limit_abstract() -> None:
+    """验证摘要超过 250 词时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\begin{abstract}" + " ".join(["evidence"] * 251) + r"\end{abstract}"
+
+    errors = module.check_abstract_length(manuscript_text)
+
+    assert any("expected at most 250" in error for error in errors)
 
 
 def test_check_result_claim_boundary_accepts_audited_result_table() -> None:

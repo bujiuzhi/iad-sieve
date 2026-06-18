@@ -206,6 +206,27 @@ def check_abstract_quantitative_evidence(manuscript_text: str) -> list[str]:
     return [f"abstract missing bounded quantitative evidence marker: {marker}" for marker in required_markers if marker not in abstract_text]
 
 
+def check_abstract_length(manuscript_text: str, max_words: int = 250) -> list[str]:
+    """Check whether the abstract stays within common journal word limits.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+        max_words: Maximum allowed abstract word count.
+
+    返回:
+        list[str]: Error messages for abstract length violations.
+    """
+    begin_marker = r"\begin{abstract}"
+    end_marker = r"\end{abstract}"
+    if begin_marker not in manuscript_text or end_marker not in manuscript_text:
+        return ["abstract length check could not locate abstract environment"]
+    abstract_text = manuscript_text.split(begin_marker, 1)[1].split(end_marker, 1)[0]
+    word_count = len(abstract_text.split())
+    if word_count > max_words:
+        return [f"abstract has {word_count} words; expected at most {max_words}"]
+    return []
+
+
 def check_contribution_evidence_summary(manuscript_text: str) -> list[str]:
     """Check whether the introduction aligns contributions with evidence and claim boundaries.
 
@@ -778,8 +799,8 @@ def check_keywords(keywords_text: str) -> list[str]:
     keyword_text = " ".join(keyword_lines)
     keywords = [keyword.strip() for keyword in keyword_text.split(";") if keyword.strip()]
     errors: list[str] = []
-    if not 4 <= len(keywords) <= 8:
-        errors.append(f"keywords has {len(keywords)} entries; expected 4 to 8")
+    if not 1 <= len(keywords) <= 7:
+        errors.append(f"keywords has {len(keywords)} entries; expected 1 to 7")
     for keyword in keywords:
         word_count = len(keyword.split())
         if word_count > 5:
@@ -1063,6 +1084,7 @@ def main() -> int:
         )
     )
     errors.extend(check_abstract_quantitative_evidence(manuscript_text))
+    errors.extend(check_abstract_length(manuscript_text))
     errors.extend(check_contribution_evidence_summary(manuscript_text))
     errors.extend(check_openv2_benchmark_composition(manuscript_text))
     errors.extend(check_method_feature_contract(manuscript_text))
