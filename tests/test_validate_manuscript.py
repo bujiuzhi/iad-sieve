@@ -291,6 +291,42 @@ def test_check_abstract_length_rejects_over_limit_abstract() -> None:
     assert any("expected at most 250" in error for error in errors)
 
 
+def test_check_abstract_cluster_overclaim_accepts_pair_stage_boundary() -> None:
+    """验证摘要中的 pair-stage 聚类前边界表述可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_abstract_cluster_overclaim", None)
+    assert callable(checker)
+    manuscript_text = (
+        r"\begin{abstract}"
+        "IAD-Risk uses false-merge risk gating to block risky automatic pair merges before clustering. "
+        "The manuscript keeps cluster-level quality claims conditional on cluster artifacts."
+        r"\end{abstract}"
+    )
+
+    errors = checker(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_abstract_cluster_overclaim_rejects_cluster_prevention_claim() -> None:
+    """验证摘要不得把 pair-level 风险控制写成 cluster-level 防止声明。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_abstract_cluster_overclaim", None)
+    assert callable(checker)
+    manuscript_text = (
+        r"\begin{abstract}"
+        "False-merge risk gating prevents agenda-level hard negatives from entering automatic merge clusters."
+        r"\end{abstract}"
+    )
+
+    errors = checker(manuscript_text)
+
+    assert any("unsupported abstract cluster-level claim" in error for error in errors)
+    assert any("automatic merge clusters" in error for error in errors)
+
+
 def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
     """验证主结果表具备审计边界时可通过检查。"""
 
@@ -4069,6 +4105,30 @@ def test_check_pdf_first_page_markers_accepts_expected_text() -> None:
         "main.pdf",
         first_page_text,
         ["IAD-Risk: Risk-Aware", "Scholarly Work Deduplication", "HNFMR=0.000"],
+    )
+
+    assert errors == []
+
+
+def test_check_pdf_first_page_markers_accepts_wrapped_marker_text() -> None:
+    """验证 PDF 抽取文本换行或断词时仍能识别关键文本。"""
+
+    module = _load_validate_manuscript_module()
+    first_page_text = "\n".join(
+        [
+            "IAD-Risk: Risk-Aware Identity-Agenda",
+            "single-space baselines show HNFMR 0.790-0.999.",
+            "IAD-Risk variants report same-",
+            "work F1=0.980 and HNFMR=0.000.",
+            "A later extraction may also contain same-work",
+            "F1=0.980 on a new line.",
+        ]
+    )
+
+    errors = module.check_pdf_first_page_markers(
+        "main.pdf",
+        first_page_text,
+        ["same-work F1=0.980", "HNFMR=0.000"],
     )
 
     assert errors == []

@@ -170,6 +170,11 @@ UNSUPPORTED_RISK_CALIBRATION_PATTERNS = [
     re.compile(r"\bcalibrated\s+risk\s+(?:score|estimate|probability)\b", re.IGNORECASE),
     re.compile(r"\bwell[-\s]?calibrated\s+(?:risk|probability|score)\b", re.IGNORECASE),
 ]
+UNSUPPORTED_ABSTRACT_CLUSTER_PATTERNS = [
+    re.compile(r"\bprevent\w*\b.{0,120}\bautomatic\s+merge\s+clusters\b", re.IGNORECASE),
+    re.compile(r"\beliminat\w*\b.{0,120}\bcluster[-\s]?level\s+contamination\b", re.IGNORECASE),
+    re.compile(r"\bguarantee\w*\b.{0,120}\bcluster[-\s]?level\b", re.IGNORECASE),
+]
 AUXILIARY_MODEL_EVIDENCE_PHRASES = [
     "LLM",
     "GPT",
@@ -493,6 +498,27 @@ def check_abstract_length(manuscript_text: str, max_words: int = 250) -> list[st
     if word_count > max_words:
         return [f"abstract has {word_count} words; expected at most {max_words}"]
     return []
+
+
+def check_abstract_cluster_overclaim(manuscript_text: str) -> list[str]:
+    """Check whether the abstract avoids unsupported cluster-level guarantees.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for cluster-level claims that exceed current evidence.
+    """
+    begin_marker = r"\begin{abstract}"
+    end_marker = r"\end{abstract}"
+    if begin_marker not in manuscript_text or end_marker not in manuscript_text:
+        return ["abstract cluster claim check could not locate abstract environment"]
+    abstract_text = manuscript_text.split(begin_marker, 1)[1].split(end_marker, 1)[0]
+    errors: list[str] = []
+    for pattern in UNSUPPORTED_ABSTRACT_CLUSTER_PATTERNS:
+        for match in pattern.finditer(abstract_text):
+            errors.append(f"unsupported abstract cluster-level claim found: {match.group(0)}")
+    return errors
 
 
 def check_contribution_evidence_summary(manuscript_text: str) -> list[str]:
@@ -2621,6 +2647,19 @@ def extract_pdf_text(pdf_path: Path) -> tuple[str, list[str]]:
         return "", [f"pdftotext failed with exit code {exc.returncode}: {exc.stderr.strip()}"]
 
 
+def normalize_pdf_marker_text(text: str) -> str:
+    """Normalize extracted PDF text for stable marker matching.
+
+    参数:
+        text: Extracted PDF text or expected marker text.
+
+    返回:
+        str: Text with line-break hyphenation and whitespace normalized.
+    """
+    text_without_hyphen_linebreaks = re.sub(r"-\s*\n\s*", "-", text)
+    return re.sub(r"\s+", " ", text_without_hyphen_linebreaks).strip()
+
+
 def check_pdf_first_page_markers(pdf_name: str, first_page_text: str, required_texts: list[str]) -> list[str]:
     """Check required text markers in extracted PDF first-page text.
 
@@ -2633,8 +2672,9 @@ def check_pdf_first_page_markers(pdf_name: str, first_page_text: str, required_t
         list[str]: Error messages for missing or unresolved first-page text markers.
     """
     errors: list[str] = []
+    normalized_first_page_text = normalize_pdf_marker_text(first_page_text)
     for required_text in required_texts:
-        if required_text not in first_page_text:
+        if normalize_pdf_marker_text(required_text) not in normalized_first_page_text:
             errors.append(f"{pdf_name} first page text does not contain required text: {required_text}")
     unresolved_markers = ["undefined references", "LaTeX Warning", "[?]", "??"]
     for marker in unresolved_markers:
@@ -2657,8 +2697,9 @@ def check_pdf_full_text_markers(pdf_path: Path, required_texts: list[str]) -> li
     errors = [f"{pdf_path.name} full text is not readable: {error}" for error in extraction_errors]
     if extraction_errors:
         return errors
+    normalized_full_text = normalize_pdf_marker_text(full_text)
     for required_text in required_texts:
-        if required_text not in full_text:
+        if normalize_pdf_marker_text(required_text) not in normalized_full_text:
             errors.append(f"{pdf_path.name} full text does not contain required text: {required_text}")
     return errors
 
@@ -2838,6 +2879,7 @@ def main() -> int:
     errors.extend(check_formal_manuscript_review_language(supplementary_text, "supplementary material"))
     errors.extend(check_abstract_quantitative_evidence(manuscript_text))
     errors.extend(check_abstract_length(manuscript_text))
+    errors.extend(check_abstract_cluster_overclaim(manuscript_text))
     errors.extend(check_contribution_evidence_summary(manuscript_text))
     errors.extend(check_motivating_failure_case(manuscript_text))
     errors.extend(check_openv2_benchmark_composition(manuscript_text))
