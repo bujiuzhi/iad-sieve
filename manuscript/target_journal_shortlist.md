@@ -48,8 +48,10 @@ This audit records the publisher-facing constraints that determine the next manu
 Official source snapshot date: 2026-06-19.
 
 - DKE guide verified: 2026-06-19.
-- Information Systems guide verified: 2026-06-18.
-- Scientometrics guide verified: 2026-06-18.
+- Information Systems guide verified: 2026-06-19.
+- Scientometrics guide verified: 2026-06-19.
+
+All publisher-page facts in this shortlist were rechecked on 2026-06-19 from the official source links listed below. These checks support manuscript-preparation decisions only; JCR quartile, Chinese Academy of Sciences zone, CCF class, and local institutional category must still be rechecked in the authors' authorized ranking systems before final upload.
 
 | Candidate | Officially verified constraints | Project implication |
 | --- | --- | --- |
