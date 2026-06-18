@@ -307,6 +307,30 @@ def check_corresponding_author(metadata_text: str) -> list[str]:
     return errors
 
 
+def check_corresponding_author_matches_author_rows(metadata_text: str) -> list[str]:
+    """Check whether the corresponding author is present in the author list.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages.
+    """
+    corresponding_author = parse_mapping_section(metadata_text, "corresponding_author")
+    corresponding_name = corresponding_author.get("name", "").strip().lower()
+    corresponding_email = corresponding_author.get("email", "").strip().lower()
+    if not corresponding_name and not corresponding_email:
+        return []
+    for author_row in parse_author_rows(metadata_text):
+        author_name = author_row.get("name", "").strip().lower()
+        author_email = author_row.get("email", "").strip().lower()
+        if corresponding_name and author_name == corresponding_name:
+            return []
+        if corresponding_email and author_email == corresponding_email:
+            return []
+    return ["corresponding author must match an author row by name or email"]
+
+
 def check_artifact_release_link(metadata_text: str) -> list[str]:
     """Check final-upload artifact release URL or DOI fields.
 
@@ -435,6 +459,10 @@ def check_final_upload_metadata_text(metadata_text: str) -> list[str]:
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_true_fields(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_author_rows(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_corresponding_author(metadata_text))
+    errors.extend(
+        f"final upload metadata unresolved: {message}"
+        for message in check_corresponding_author_matches_author_rows(metadata_text)
+    )
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_artifact_release_link(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_final_upload_review_mode(metadata_text))
     return sorted(set(errors))

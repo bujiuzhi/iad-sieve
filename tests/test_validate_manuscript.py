@@ -1978,6 +1978,44 @@ def test_check_final_upload_metadata_accepts_filled_metadata() -> None:
     assert errors == []
 
 
+def test_check_final_upload_metadata_rejects_corresponding_author_outside_author_list() -> None:
+    """验证通讯作者不在作者列表中时 final-upload 门禁会拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = "\n".join(
+        [
+            'target_journal: "Journal of Scholarly Data"',
+            "target_journal_template_bound: true",
+            "authors:",
+            '  - name: "Example Author"',
+            '    affiliation: "Example University"',
+            '    email: "author@example.edu"',
+            '    orcid: "0000-0002-1825-0097"',
+            "corresponding_author:",
+            '  name: "Different Author"',
+            '  affiliation: "Example University"',
+            '  email: "different@example.edu"',
+            '  orcid: "0000-0002-1825-0097"',
+            "artifact_boundary:",
+            '  artifact_release_url: "https://doi.org/10.0000/example"',
+            '  artifact_release_doi: "10.0000/example"',
+            "final_upload_checklist:",
+            "  target_journal_selected: true",
+            "  target_journal_template_applied: true",
+            "  author_metadata_completed: true",
+            "  corresponding_author_completed: true",
+            "  manuscript_pdf_rebuilt_after_template: true",
+            "  supplementary_pdf_rebuilt_after_template: true",
+            "  submission_system_files_verified: true",
+            "  artifact_release_prepared_or_linked: true",
+        ]
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any("corresponding author must match an author row by name or email" in error for error in errors)
+
+
 def test_check_final_upload_metadata_rejects_malformed_author_and_artifact_fields() -> None:
     """验证 final-upload 门禁拒绝结构不完整的作者和 artifact 字段。"""
 
