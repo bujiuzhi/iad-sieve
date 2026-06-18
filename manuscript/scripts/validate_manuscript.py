@@ -1093,6 +1093,35 @@ def check_result_interpretation_guardrails(manuscript_text: str) -> list[str]:
     ]
 
 
+def check_manual_validation_boundary(manuscript_text: str) -> list[str]:
+    """Check whether the main manuscript states manual-validation limits for silver labels.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing manual-validation boundary markers.
+    """
+    required_markers = [
+        r"\subsection{Manual Validation Boundary}",
+        r"\label{tab:manual-validation-boundary}",
+        "Manual validation is not completed in the current manuscript package",
+        "Silver hard negatives are stress-test evidence",
+        "not human-gold non-identity labels",
+        "500--1,000 pair reviewed slice",
+        "two independent reviewers",
+        "blind to model scores",
+        "adjudication log",
+        "agreement report",
+        "does not claim complete human validation",
+    ]
+    return [
+        f"manual validation boundary missing marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
+
+
 def check_split_leakage_controls(manuscript_text: str) -> list[str]:
     """Check whether evaluation split and leakage boundaries are stated.
 
@@ -2464,6 +2493,7 @@ def main() -> int:
     errors.extend(check_baseline_inclusion_rationale(manuscript_text))
     errors.extend(check_baseline_fairness_controls(manuscript_text))
     errors.extend(check_result_interpretation_guardrails(manuscript_text))
+    errors.extend(check_manual_validation_boundary(manuscript_text))
     errors.extend(check_split_leakage_controls(manuscript_text))
     errors.extend(check_scope_compatibility(manuscript_text))
     errors.extend(check_extended_protocol_boundary(manuscript_text))

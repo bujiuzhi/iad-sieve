@@ -734,6 +734,28 @@ Whole table & The table gives a mechanism-supported reading that semantic relate
 \end{tabular}
 \end{table}
 
+\subsection{Manual Validation Boundary}
+
+Manual validation is not completed in the current manuscript package. Silver hard negatives are stress-test evidence for identity-agenda false-merge risk, but they are not human-gold non-identity labels. Table~\ref{tab:manual-validation-boundary} states what the current evidence supports and what must be added before making stronger label-precision claims.
+
+\begin{table}[H]
+\caption{Manual validation boundary for interpreting silver hard negatives. The current manuscript reports stress-test evidence and reserves human-validation claims for a released reviewed slice.}
+\label{tab:manual-validation-boundary}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.25\linewidth}L{0.30\linewidth}L{0.35\linewidth}}
+\toprule
+Evidence item & Current role & Requirement before stronger claim \\
+\midrule
+Silver hard negatives & Stress-test evidence for agenda-related false-merge risk. & A 500--1,000 pair reviewed slice covering hard negatives, high-score false-merge candidates, blocked or deferred pairs, version boundaries, identifier conflicts, and sparse metadata. \\
+Human review process & Specified as a future validation layer rather than current result evidence. & The protocol requires two independent reviewers to inspect records while blind to model scores and merge decisions. \\
+Adjudication artifacts & Not present in the current Git package or main result table. & The release must include an adjudication log, an agreement report, pair-level notes, and checksums before claiming label precision. \\
+Manuscript claim & Supports bounded false-merge stress testing under Open-v2. & The paper does not claim complete human validation or that silver rows replace human-gold non-identity labels. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Scope Compatibility of the Open-v2 Table}
 
 The Open-v2 table is a scope-bounded evidence table, not a single leaderboard. Full pair-scope representation baselines test whether single-space scientific relatedness can over-merge agenda-level hard negatives across the available Open-v2 pairs. Held-out IAD-Risk rows test whether risk-gated transformer variants preserve same-work performance and suppress hard-negative merges under a split-based model-evaluation protocol. The valid comparison is therefore mechanistic: semantic relatedness alone is unsafe as automatic merge evidence, while explicit risk gating can block hard-negative merges in the reported held-out setting.

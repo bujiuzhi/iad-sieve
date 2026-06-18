@@ -1043,6 +1043,43 @@ def test_check_result_interpretation_guardrails_rejects_missing_unsupported_read
     assert any("not a same-scope leaderboard" in error for error in errors)
 
 
+def test_check_manual_validation_boundary_accepts_complete_boundary() -> None:
+    """验证主文人工验证边界完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Manual Validation Boundary}",
+            r"\label{tab:manual-validation-boundary}",
+            "Manual validation is not completed in the current manuscript package.",
+            "Silver hard negatives are stress-test evidence.",
+            "They are not human-gold non-identity labels.",
+            "A 500--1,000 pair reviewed slice is required before stronger label-precision claims.",
+            "The protocol needs two independent reviewers.",
+            "The reviewers must be blind to model scores.",
+            "The release must include an adjudication log.",
+            "The release must include an agreement report.",
+            "The paper does not claim complete human validation.",
+        ]
+    )
+
+    errors = module.check_manual_validation_boundary(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_manual_validation_boundary_rejects_missing_human_gold_boundary() -> None:
+    """验证主文缺少人工 gold 边界时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\subsection{Manual Validation Boundary}"
+
+    errors = module.check_manual_validation_boundary(manuscript_text)
+
+    assert any("not completed in the current manuscript package" in error for error in errors)
+    assert any("not human-gold non-identity labels" in error for error in errors)
+
+
 def test_check_extended_protocol_boundary_accepts_follow_up_protocol_scope() -> None:
     """验证 Open-v3/source-heldout 作为后续协议边界时可通过检查。"""
 
