@@ -185,6 +185,29 @@ def check_email(value: str, label: str) -> list[str]:
     return []
 
 
+def is_valid_orcid_checksum(value: str) -> bool:
+    """Validate an ORCID checksum with ISO 7064 11,2.
+
+    参数:
+        value: Hyphenated ORCID value.
+
+    返回:
+        bool: True when the final checksum character is valid.
+    """
+    compact_value = value.replace("-", "")
+    if len(compact_value) != 16:
+        return False
+    total = 0
+    for character in compact_value[:15]:
+        if not character.isdigit():
+            return False
+        total = (total + int(character)) * 2
+    remainder = total % 11
+    checksum_value = (12 - remainder) % 11
+    expected_character = "X" if checksum_value == 10 else str(checksum_value)
+    return compact_value[-1] == expected_character
+
+
 def check_orcid(value: str, label: str) -> list[str]:
     """Check an optional ORCID value.
 
@@ -197,7 +220,7 @@ def check_orcid(value: str, label: str) -> list[str]:
     """
     if not value:
         return []
-    if ORCID_PATTERN.fullmatch(value) is None:
+    if ORCID_PATTERN.fullmatch(value) is None or not is_valid_orcid_checksum(value):
         return [f"{label} ORCID is invalid"]
     return []
 

@@ -1899,12 +1899,12 @@ def test_check_final_upload_metadata_accepts_filled_metadata() -> None:
             '  - name: "Example Author"',
             '    affiliation: "Example University"',
             '    email: "author@example.edu"',
-            '    orcid: "0000-0000-0000-0000"',
+            '    orcid: "0000-0002-1825-0097"',
             "corresponding_author:",
             '  name: "Example Author"',
             '  affiliation: "Example University"',
             '  email: "author@example.edu"',
-            '  orcid: "0000-0000-0000-0000"',
+            '  orcid: "0000-0002-1825-0097"',
             "artifact_boundary:",
             '  artifact_release_url: "https://doi.org/10.0000/example"',
             '  artifact_release_doi: "10.0000/example"',
@@ -1962,6 +1962,45 @@ def test_check_final_upload_metadata_rejects_malformed_author_and_artifact_field
     assert any("corresponding author email is invalid" in error for error in errors)
     assert any("corresponding author ORCID is invalid" in error for error in errors)
     assert any("artifact release URL or DOI is required" in error for error in errors)
+
+
+def test_check_final_upload_metadata_rejects_orcid_checksum_error() -> None:
+    """验证 final-upload 门禁拒绝格式正确但校验位错误的 ORCID。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = "\n".join(
+        [
+            'target_journal: "Journal of Scholarly Data"',
+            "target_journal_template_bound: true",
+            "authors:",
+            '  - name: "Example Author"',
+            '    affiliation: "Example University"',
+            '    email: "author@example.edu"',
+            '    orcid: "0000-0000-0000-0000"',
+            "corresponding_author:",
+            '  name: "Example Author"',
+            '  affiliation: "Example University"',
+            '  email: "author@example.edu"',
+            '  orcid: "0000-0000-0000-0000"',
+            "artifact_boundary:",
+            '  artifact_release_url: "https://doi.org/10.0000/example"',
+            '  artifact_release_doi: "10.0000/example"',
+            "final_upload_checklist:",
+            "  target_journal_selected: true",
+            "  target_journal_template_applied: true",
+            "  author_metadata_completed: true",
+            "  corresponding_author_completed: true",
+            "  manuscript_pdf_rebuilt_after_template: true",
+            "  supplementary_pdf_rebuilt_after_template: true",
+            "  submission_system_files_verified: true",
+            "  artifact_release_prepared_or_linked: true",
+        ]
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any("author row 1 ORCID is invalid" in error for error in errors)
+    assert any("corresponding author ORCID is invalid" in error for error in errors)
 
 
 def test_check_final_upload_metadata_rejects_missing_template_and_checklist_fields() -> None:
