@@ -93,7 +93,7 @@ The current manuscript therefore keeps its strongest claims limited to identity-
 
 Outcome: pass for anonymous pre-submission package hygiene; blocked for final upload metadata.
 
-The anonymous package hygiene gate checks that generated submission packages exclude raw data, experiment outputs, local caches, credentials, author email addresses, ORCID values, personal account URLs, local absolute paths, and tool-generated process notes. This closes a common desk-check risk for anonymous review, but it does not replace the final-upload metadata gate because the target journal, authors, corresponding author, final template-specific PDFs, and artifact release URL or DOI remain unresolved.
+The anonymous package hygiene gate checks that generated submission packages exclude raw data, experiment outputs, local caches, credentials, author email addresses, ORCID values, personal account URLs, local absolute paths, and development process notes. This closes a common desk-check risk for anonymous review, but it does not replace the final-upload metadata gate because the target journal, authors, corresponding author, final template-specific PDFs, and artifact release URL or DOI remain unresolved.
 
 ## Audit Cycle 5: Editorial Desk Check
 
