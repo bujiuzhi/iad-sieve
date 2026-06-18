@@ -3056,7 +3056,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 53",
+        "Completed audit cycles: 54",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3167,6 +3167,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 51: Claim Interpretation Boundary Density Gate",
         "Audit Cycle 52: Data and Code Availability Density Gate",
         "Audit Cycle 53: Error Taxonomy Density Gate",
+        "Audit Cycle 54: Mechanism Evidence Boundary Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
         "method-writing clarity",
@@ -3317,6 +3318,14 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "sparse metadata cases",
         "error-taxonomy clarity without main-text table overload",
         "supplementary error taxonomy boundary",
+        "mechanism-evidence table-density reduction",
+        "full mechanism-evidence boundary table",
+        "topical relatedness",
+        "explicit risk gating",
+        "component-causality claims",
+        "cluster-level contamination claims",
+        "mechanism-evidence clarity without main-text table overload",
+        "supplementary mechanism-evidence boundary",
         "remote reproducibility",
         "strong model matrix",
         "model superiority",
@@ -3610,6 +3619,51 @@ def check_error_taxonomy(manuscript_text: str, supplementary_text: str = "") -> 
     evidence_text = supplementary_text or manuscript_text
     errors.extend(
         f"error taxonomy missing supplementary marker: {marker}"
+        for marker in required_supplement_markers
+        if marker not in evidence_text
+    )
+    return errors
+
+
+def check_mechanism_evidence_boundary(manuscript_text: str, supplementary_text: str = "") -> list[str]:
+    """Check whether mechanism evidence boundaries remain complete after table migration.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
+
+    返回:
+        list[str]: Error messages for missing mechanism-evidence markers.
+    """
+    required_main_markers = [
+        r"\section{Mechanism and Error Analysis}",
+        "full mechanism-evidence boundary table is reported in the supplementary material",
+        "topical relatedness creates merge risk",
+        "explicit risk gating supports the reported Open-v2 contract",
+        "component-causality claims require ablations",
+        "cluster-level contamination claims require sufficient cannot-link coverage",
+        "cluster-level artifact audits",
+    ]
+    required_supplement_markers = [
+        r"\section{Mechanism Evidence Boundary}",
+        r"\label{tab:mechanism-evidence}",
+        "Mechanism evidence and interpretation boundary",
+        "Mechanism question",
+        "Current evidence",
+        "Interpretation boundary",
+        "Does topical relatedness create merge risk?",
+        "Does explicit risk gating suppress hard-negative merges?",
+        "Is the gain caused by each IAD-Risk component?",
+        "Can cluster-level contamination be eliminated?",
+    ]
+    errors = [
+        f"mechanism evidence boundary missing manuscript marker: {marker}"
+        for marker in required_main_markers
+        if marker not in manuscript_text
+    ]
+    evidence_text = supplementary_text or manuscript_text
+    errors.extend(
+        f"mechanism evidence boundary missing supplementary marker: {marker}"
         for marker in required_supplement_markers
         if marker not in evidence_text
     )
@@ -4570,6 +4624,7 @@ def main() -> int:
     errors.extend(check_reviewer_evidence_gate(supplementary_text))
     errors.extend(check_experiment_reporting_supplementary_boundaries(supplementary_text))
     errors.extend(check_result_claim_boundary(manuscript_text, supplementary_text))
+    errors.extend(check_mechanism_evidence_boundary(manuscript_text, supplementary_text))
     errors.extend(check_highlights(highlights_text))
     errors.extend(check_keywords(keywords_text))
     errors.extend(check_elsevier_draft_source(manuscript_text, keywords_text, elsevier_draft_source_text))

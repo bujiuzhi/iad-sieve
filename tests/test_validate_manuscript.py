@@ -2069,6 +2069,63 @@ def test_check_error_taxonomy_rejects_missing_supplementary_table() -> None:
     assert any("Error Taxonomy Boundary" in error for error in errors)
 
 
+def test_check_mechanism_evidence_boundary_accepts_supplementary_table() -> None:
+    """验证机制证据边界表迁入补充材料后仍可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\section{Mechanism and Error Analysis}",
+            "The full mechanism-evidence boundary table is reported in the supplementary material.",
+            "The prose states that topical relatedness creates merge risk only as a targeted claim.",
+            "It states that explicit risk gating supports the reported Open-v2 contract.",
+            "It states that component-causality claims require ablations.",
+            "It states that cluster-level contamination claims require sufficient cannot-link coverage.",
+            "It requires cluster-level artifact audits before deployment-level claims.",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Mechanism Evidence Boundary}",
+            r"\label{tab:mechanism-evidence}",
+            "Mechanism evidence and interpretation boundary.",
+            "Mechanism question",
+            "Current evidence",
+            "Interpretation boundary",
+            "Does topical relatedness create merge risk?",
+            "Does explicit risk gating suppress hard-negative merges?",
+            "Is the gain caused by each IAD-Risk component?",
+            "Can cluster-level contamination be eliminated?",
+        ]
+    )
+
+    errors = module.check_mechanism_evidence_boundary(manuscript_text, supplementary_text)
+
+    assert errors == []
+
+
+def test_check_mechanism_evidence_boundary_rejects_missing_supplementary_table() -> None:
+    """验证机制证据缺少补充材料完整表时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\section{Mechanism and Error Analysis}",
+            "The full mechanism-evidence boundary table is reported in the supplementary material.",
+            "The prose states that topical relatedness creates merge risk only as a targeted claim.",
+            "It states that explicit risk gating supports the reported Open-v2 contract.",
+            "It states that component-causality claims require ablations.",
+            "It states that cluster-level contamination claims require sufficient cannot-link coverage.",
+            "It requires cluster-level artifact audits before deployment-level claims.",
+        ]
+    )
+
+    errors = module.check_mechanism_evidence_boundary(manuscript_text, "")
+
+    assert any("tab:mechanism-evidence" in error for error in errors)
+    assert any("Mechanism Evidence Boundary" in error for error in errors)
+
+
 def test_check_validity_threats_accepts_supplementary_matrix() -> None:
     """验证 validity threats 迁入补充材料后仍可通过完整检查。"""
 
@@ -4689,7 +4746,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 53.",
+            "Completed audit cycles: 54.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -5104,6 +5161,15 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "sparse metadata cases",
             "error-taxonomy clarity without main-text table overload",
             "supplementary error taxonomy boundary",
+            "## Audit Cycle 54: Mechanism Evidence Boundary Density Gate",
+            "mechanism-evidence table-density reduction",
+            "full mechanism-evidence boundary table",
+            "topical relatedness",
+            "explicit risk gating",
+            "component-causality claims",
+            "cluster-level contamination claims",
+            "mechanism-evidence clarity without main-text table overload",
+            "supplementary mechanism-evidence boundary",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -5122,7 +5188,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 53",
+        "Completed audit cycles: 54",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -5133,7 +5199,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 53" in error for error in errors)
+    assert any("Completed audit cycles: 54" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

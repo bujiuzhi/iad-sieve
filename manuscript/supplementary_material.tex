@@ -598,6 +598,27 @@ Reproducibility & Git supports code-level checks, fixture rebuilds, schema valid
 
 The practical rule is a do not upgrade claims rule: do not strengthen the title, abstract, conclusion, cover letter, or reviewer response beyond the bounded Open-v2 mechanism claim unless the corresponding evidence row in Table~\ref{tab:reviewer-evidence-gate} is satisfied by released artifacts.
 
+\section{Mechanism Evidence Boundary}
+
+The main manuscript summarizes the mechanism-evidence boundary in prose. Table~\ref{tab:mechanism-evidence} preserves the mechanism questions, current evidence, and interpretation boundary needed before stronger causal or deployment claims are made.
+
+\begin{table}[H]
+\caption{Mechanism evidence and interpretation boundary. The table separates current evidence from ablation outputs that would be required for a stronger causal claim.}
+\label{tab:mechanism-evidence}
+\centering
+\small
+\begin{tabular}{L{0.26\linewidth}L{0.32\linewidth}L{0.32\linewidth}}
+\toprule
+Mechanism question & Current evidence & Interpretation boundary \\
+\midrule
+Does topical relatedness create merge risk? & Representation baselines show high false-merge rates on OpenAlex silver hard negatives. & Supports a targeted failure mode, not a universal prevalence estimate. \\
+Does explicit risk gating suppress hard-negative merges? & IAD-Risk transformer variants keep low HNFMR under the reported Open-v2 split. & Supports the reported contract and thresholds; transfer must be rechecked on new source mixes. \\
+Is the gain caused by each IAD-Risk component? & The current manuscript reports mechanism-consistent HNFMR evidence. & A full causal claim requires ablations removing risk gating, ANI supervision, and single-space separation. \\
+Can cluster-level contamination be eliminated? & The method supports cannot-link-aware constrained union-find. & Guarantees require sufficient cannot-link coverage and cluster-level artifact audits. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Error Taxonomy Boundary}
 
 The main manuscript summarizes the identity-agenda error taxonomy in prose. Table~\ref{tab:error-taxonomy} preserves the full taxonomy, the IAD-Risk control associated with each failure mode, and the audit evidence needed before stronger error-distribution claims are made.

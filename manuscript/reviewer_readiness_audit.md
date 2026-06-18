@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 53.
+Completed audit cycles: 54.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -521,6 +521,14 @@ Outcome: pass for error-taxonomy table-density reduction; blocked for measured e
 This gate checks whether the qualitative error taxonomy table is needed in the main manuscript. The main manuscript now states the error taxonomy in prose: same task, different contribution pairs, citation-neighborhood neighbors, version or extension boundaries, identifier conflicts, and sparse metadata cases are the failure modes the framework is designed to expose. The supplementary material preserves the full error taxonomy table with typical confusion sources, IAD-Risk controls, and stronger audit evidence.
 
 The reviewer-facing boundary is error-taxonomy clarity without main-text table overload. The edit keeps the mechanism section focused on evidence interpretation while the validator still requires the supplementary error taxonomy boundary, including same task, different contribution, citation-neighborhood neighbors, version or extension boundaries, identifier conflicts, sparse metadata cases, and the explicit rule that the taxonomy is diagnostic rather than a measured error distribution.
+
+## Audit Cycle 54: Mechanism Evidence Boundary Density Gate
+
+Outcome: pass for mechanism-evidence table-density reduction; blocked for full causal-mechanism claims until ablations removing risk gating, ANI supervision, and single-space separation are released with checksum-fixed artifacts.
+
+This gate checks whether the mechanism-evidence table is needed in the main manuscript. The main manuscript now states the mechanism boundary in prose: topical relatedness creates merge risk only as a targeted failure-mode claim, explicit risk gating supports the reported Open-v2 contract and thresholds, component-causality claims require ablations, and cluster-level contamination claims require sufficient cannot-link coverage and cluster-level artifact audits. The supplementary material preserves the full mechanism-evidence boundary table with the mechanism questions, current evidence, and interpretation boundaries.
+
+The reviewer-facing boundary is mechanism-evidence clarity without main-text table overload. The edit keeps the mechanism section closer to a journal narrative while the validator still requires the supplementary mechanism-evidence boundary, including topical relatedness, explicit risk gating, component-causality claims, cluster-level contamination claims, and the explicit boundary that stronger causal or deployment claims require additional artifact-backed evidence.
 
 ## Minimum Gate Before Final Upload
 
