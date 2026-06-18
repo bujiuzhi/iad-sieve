@@ -20,6 +20,7 @@ from pathlib import Path
 LOGGER = logging.getLogger(__name__)
 
 ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = ROOT.parent
 SCRIPT_ROOT = Path(__file__).resolve().parent
 if str(SCRIPT_ROOT) not in sys.path:
     sys.path.insert(0, str(SCRIPT_ROOT))
@@ -1295,6 +1296,39 @@ def check_artifact_release_readme_template(readme_text: str) -> list[str]:
     ]
 
 
+def check_data_processing_pipeline_document(document_text: str) -> list[str]:
+    """Check whether the repository documents data processing without committing raw data.
+
+    参数:
+        document_text: Data processing pipeline Markdown text.
+
+    返回:
+        list[str]: Error messages for missing reproducible data-processing markers.
+    """
+    required_markers = [
+        "# 数据处理流水线",
+        "远程仓库不提交原始数据",
+        "python -m iad_sieve.cli --help",
+        "tests/fixtures/",
+        "outputs/repro_fixture",
+        "data/raw/",
+        "prepare-deepmatcher",
+        "prepare-scirepeval-proximity",
+        "fetch-openalex-works",
+        "prepare-openalex-weak-labels",
+        "build-iad-bench",
+        "Artifact release",
+        "manifest",
+        "checksum",
+    ]
+    lowered_text = document_text.lower()
+    return [
+        f"data processing pipeline document missing marker: {marker}"
+        for marker in required_markers
+        if marker.lower() not in lowered_text
+    ]
+
+
 def check_artifact_release_skeleton_builder(script_text: str) -> list[str]:
     """Check whether the artifact release scaffold builder keeps required safeguards.
 
@@ -2143,6 +2177,10 @@ def main() -> int:
         if artifact_release_readme_template_path.exists()
         else ""
     )
+    data_processing_pipeline_path = PROJECT_ROOT / "docs" / "data-processing-pipeline.md"
+    data_processing_pipeline_text = (
+        data_processing_pipeline_path.read_text(encoding="utf-8") if data_processing_pipeline_path.exists() else ""
+    )
     artifact_release_skeleton_builder_path = ROOT / "scripts" / "build_artifact_release_skeleton.py"
     artifact_release_skeleton_builder_text = (
         artifact_release_skeleton_builder_path.read_text(encoding="utf-8")
@@ -2240,6 +2278,7 @@ def main() -> int:
     errors.extend(check_target_journal_shortlist(target_journal_shortlist_text))
     errors.extend(check_artifact_release_manifest_template(artifact_release_template_text))
     errors.extend(check_artifact_release_readme_template(artifact_release_readme_template_text))
+    errors.extend(check_data_processing_pipeline_document(data_processing_pipeline_text))
     errors.extend(check_artifact_release_skeleton_builder(artifact_release_skeleton_builder_text))
     errors.extend(check_artifact_release_populator(artifact_release_populator_text))
     errors.extend(check_artifact_release_finalizer(artifact_release_finalizer_text))

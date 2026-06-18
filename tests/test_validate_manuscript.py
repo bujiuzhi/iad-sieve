@@ -1223,6 +1223,47 @@ def test_check_artifact_release_readme_template_rejects_missing_release_boundari
     assert any("threshold_sensitivity_grid" in error for error in errors)
 
 
+def test_check_data_processing_pipeline_document_accepts_reproducible_pipeline() -> None:
+    """验证数据处理文档保留无数据提交时的可复现处理入口。"""
+
+    module = _load_validate_manuscript_module()
+    document_text = "\n".join(
+        [
+            "# 数据处理流水线",
+            "远程仓库不提交原始数据时，复现能力不能依赖口头说明。",
+            "python -m iad_sieve.cli --help",
+            "tests/fixtures/",
+            "outputs/repro_fixture",
+            "data/raw/",
+            "prepare-deepmatcher",
+            "prepare-scirepeval-proximity",
+            "fetch-openalex-works",
+            "prepare-openalex-weak-labels",
+            "build-iad-bench",
+            "Artifact release",
+            "manifest",
+            "checksum",
+        ]
+    )
+
+    errors = module.check_data_processing_pipeline_document(document_text)
+
+    assert errors == []
+
+
+def test_check_data_processing_pipeline_document_rejects_missing_cli_and_artifact_boundary() -> None:
+    """验证数据处理文档缺少 CLI 或 artifact 边界时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    document_text = "# 数据处理流水线\n远程仓库不提交原始数据。\n"
+
+    errors = module.check_data_processing_pipeline_document(document_text)
+
+    assert any("python -m iad_sieve.cli --help" in error for error in errors)
+    assert any("prepare-deepmatcher" in error for error in errors)
+    assert any("Artifact release" in error for error in errors)
+
+
 def test_check_artifact_release_skeleton_builder_accepts_required_markers() -> None:
     """验证 artifact release 骨架生成脚本包含必要入口和安全边界。"""
 
