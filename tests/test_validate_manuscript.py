@@ -1192,11 +1192,65 @@ def test_check_extended_protocol_boundary_rejects_unreported_extended_results() 
     assert any("extended validation" in error for error in errors)
 
 
-def test_check_reviewer_facing_claim_checklist_accepts_complete_checklist() -> None:
-    """验证主稿包含审稿人视角 claim checklist 时可通过检查。"""
+def test_check_claim_interpretation_boundary_accepts_complete_boundary() -> None:
+    """验证主稿包含正式论文风格的 claim interpretation boundary 时可通过检查。"""
 
     module = _load_validate_manuscript_module()
-    checker = getattr(module, "check_reviewer_facing_claim_checklist", None)
+    checker = getattr(module, "check_claim_interpretation_boundary", None)
+    assert callable(checker)
+    manuscript_text = "\n".join(
+        [
+            r"\section{Claim Interpretation Boundary}",
+            r"\label{tab:claim-interpretation-boundary}",
+            "Claim interpretation boundary.",
+            "Contribution clarity",
+            "Writing reproducibility",
+            "Experimental strength",
+            "Evaluation completeness",
+            "Method design soundness",
+            "Main evidence location",
+            "Supported wording",
+            "Boundary before stronger wording",
+            "identity-agenda confusion",
+            "IAD-Bench contract",
+            "Open-v2 evidence snapshot",
+            "artifact-backed ablations",
+            "manual-validation slice",
+            "source-heldout validation",
+        ]
+    )
+
+    errors = checker(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_claim_interpretation_boundary_rejects_missing_boundaries() -> None:
+    """验证主稿缺少正式 claim interpretation boundary 时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_claim_interpretation_boundary", None)
+    assert callable(checker)
+    manuscript_text = "\n".join(
+        [
+            r"\section{Claim Interpretation Boundary}",
+            "Contribution clarity",
+            "Experimental strength",
+        ]
+    )
+
+    errors = checker(manuscript_text)
+
+    assert any("claim-interpretation-boundary" in error for error in errors)
+    assert any("Boundary before stronger wording" in error for error in errors)
+    assert any("manual-validation slice" in error for error in errors)
+
+
+def test_check_claim_interpretation_boundary_rejects_reviewer_facing_title() -> None:
+    """验证主稿不得继续使用内部审稿辅助式标题。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_claim_interpretation_boundary", None)
     assert callable(checker)
     manuscript_text = "\n".join(
         [
@@ -1222,28 +1276,8 @@ def test_check_reviewer_facing_claim_checklist_accepts_complete_checklist() -> N
 
     errors = checker(manuscript_text)
 
-    assert errors == []
-
-
-def test_check_reviewer_facing_claim_checklist_rejects_missing_boundaries() -> None:
-    """验证主稿缺少审稿人视角 claim checklist 边界时会被拒绝。"""
-
-    module = _load_validate_manuscript_module()
-    checker = getattr(module, "check_reviewer_facing_claim_checklist", None)
-    assert callable(checker)
-    manuscript_text = "\n".join(
-        [
-            r"\section{Reviewer-Facing Claim Checklist}",
-            "Contribution clarity",
-            "Experimental strength",
-        ]
-    )
-
-    errors = checker(manuscript_text)
-
+    assert any("Reviewer-Facing Claim Checklist" in error for error in errors)
     assert any("reviewer-facing-claim-checklist" in error for error in errors)
-    assert any("Boundary before stronger wording" in error for error in errors)
-    assert any("manual-validation slice" in error for error in errors)
 
 
 def test_check_manual_validation_protocol_accepts_complete_protocol() -> None:

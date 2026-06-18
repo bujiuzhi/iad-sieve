@@ -91,7 +91,7 @@ REQUIRED_SECTIONS = [
     r"\section{Mechanism and Error Analysis}",
     r"\section{Limitations}",
     r"\section{Threats to Validity}",
-    r"\section{Reviewer-Facing Claim Checklist}",
+    r"\section{Claim Interpretation Boundary}",
     r"\section{Conclusion}",
     r"\section*{Data and Code Availability}",
     r"\section*{Ethics Statement}",
@@ -1921,19 +1921,19 @@ def check_validity_threats(manuscript_text: str) -> list[str]:
     return [f"validity threats missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
 
 
-def check_reviewer_facing_claim_checklist(manuscript_text: str) -> list[str]:
-    """Check whether the main manuscript contains an end-of-paper reviewer claim checklist.
+def check_claim_interpretation_boundary(manuscript_text: str) -> list[str]:
+    """Check whether the main manuscript contains a formal claim-interpretation boundary.
 
     参数:
         manuscript_text: Main LaTeX manuscript source.
 
     返回:
-        list[str]: Error messages for missing reviewer-facing claim-checklist markers.
+        list[str]: Error messages for missing claim-interpretation boundary markers.
     """
     required_markers = [
-        r"\section{Reviewer-Facing Claim Checklist}",
-        r"\label{tab:reviewer-facing-claim-checklist}",
-        "Reviewer-facing claim checklist",
+        r"\section{Claim Interpretation Boundary}",
+        r"\label{tab:claim-interpretation-boundary}",
+        "Claim interpretation boundary",
         "Contribution clarity",
         "Writing reproducibility",
         "Experimental strength",
@@ -1949,11 +1949,22 @@ def check_reviewer_facing_claim_checklist(manuscript_text: str) -> list[str]:
         "manual-validation slice",
         "source-heldout validation",
     ]
-    return [
-        f"reviewer-facing claim checklist missing marker: {marker}"
+    forbidden_markers = [
+        "Reviewer-Facing Claim Checklist",
+        "reviewer-facing-claim-checklist",
+        "Reviewer-facing claim checklist",
+    ]
+    errors = [
+        f"claim interpretation boundary missing marker: {marker}"
         for marker in required_markers
         if marker not in manuscript_text
     ]
+    errors.extend(
+        f"claim interpretation boundary uses internal-review marker: {marker}"
+        for marker in forbidden_markers
+        if marker in manuscript_text
+    )
+    return errors
 
 
 def check_highlights(highlights_text: str) -> list[str]:
@@ -2615,7 +2626,7 @@ def main() -> int:
     errors.extend(check_related_work_positioning(manuscript_text))
     errors.extend(check_error_taxonomy(manuscript_text))
     errors.extend(check_validity_threats(manuscript_text))
-    errors.extend(check_reviewer_facing_claim_checklist(manuscript_text))
+    errors.extend(check_claim_interpretation_boundary(manuscript_text))
     errors.extend(check_declaration_statements(manuscript_text))
     errors.extend(check_data_code_availability_boundary(manuscript_text))
     errors.extend(check_operating_point_disclosure(manuscript_text))
