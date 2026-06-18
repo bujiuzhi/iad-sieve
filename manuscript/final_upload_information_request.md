@@ -74,7 +74,7 @@ For each author, select the applicable CRediT roles and then draft the final aut
 - Repository commit matches artifact release manifest:
 - Data boundary:
 - Artifact boundary:
-- Final statement for submission system:
+- Final data/code availability statement, including repository URL, commit, artifact URL or DOI, and raw-data redistribution boundary:
 - Research data statement for submission system:
 - Artifact URL or DOI embedded in research data statement:
 - Raw third-party data redistribution boundary included:

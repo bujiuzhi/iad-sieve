@@ -555,6 +555,41 @@ def check_submission_statement_fields(metadata_text: str) -> list[str]:
     ]
 
 
+def check_data_code_availability_statement(metadata_text: str) -> list[str]:
+    """Check whether the data/code availability statement carries release references.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages for missing repository or artifact references in the statement.
+    """
+    statements = parse_mapping_section(metadata_text, "statements")
+    data_code_availability = statements.get("data_code_availability", "")
+    if not data_code_availability:
+        return []
+    repository_row = parse_mapping_section(metadata_text, "repository_reference")
+    artifact_row = parse_mapping_section(metadata_text, "artifact_boundary")
+    errors: list[str] = []
+    repository_url = repository_row.get("repository_url", "")
+    repository_commit = repository_row.get("repository_commit", "")
+    artifact_values = [
+        value
+        for value in (
+            artifact_row.get("artifact_release_url", ""),
+            artifact_row.get("artifact_release_doi", ""),
+        )
+        if value
+    ]
+    if repository_url and repository_url not in data_code_availability:
+        errors.append("data/code availability statement missing repository URL value")
+    if repository_commit and repository_commit not in data_code_availability:
+        errors.append("data/code availability statement missing repository commit value")
+    if artifact_values and not any(value in data_code_availability for value in artifact_values):
+        errors.append("data/code availability statement missing artifact release URL or DOI value")
+    return errors
+
+
 def check_research_data_statement(metadata_text: str) -> list[str]:
     """Check whether target-specific research data statement metadata is usable.
 
@@ -715,6 +750,7 @@ def check_final_upload_metadata_text(metadata_text: str) -> list[str]:
     )
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_funding_statement(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_submission_statement_fields(metadata_text))
+    errors.extend(f"final upload metadata unresolved: {message}" for message in check_data_code_availability_statement(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_research_data_statement(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_author_contribution_statement(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_permissions_statement(metadata_text))

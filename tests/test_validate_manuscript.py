@@ -4246,7 +4246,7 @@ def test_check_final_upload_metadata_accepts_filled_metadata() -> None:
             '  author_approval: "All listed authors have approved the submitted version."',
             '  competing_interests: "The authors declare no competing interests."',
             '  ethics: "This study uses public scholarly metadata and does not involve human participants."',
-            '  data_code_availability: "The repository provides source code, fixtures, and artifact-release instructions."',
+            '  data_code_availability: "Source code and fixtures are available at https://example.org/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
             "author_contributions:",
             "  credit_taxonomy_required_before_final_upload: true",
             '  contribution_statement: "Example Author: conceptualization, methodology, software, validation, and writing - original draft."',
@@ -4310,7 +4310,7 @@ def test_check_final_upload_metadata_rejects_missing_repository_reference() -> N
             '  author_approval: "All listed authors have approved the submitted version."',
             '  competing_interests: "The authors declare no competing interests."',
             '  ethics: "This study uses public scholarly metadata and does not involve human participants."',
-            '  data_code_availability: "The repository provides source code, fixtures, and artifact-release instructions."',
+            '  data_code_availability: "Source code and fixtures are available at https://example.org/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
             "author_contributions:",
             "  credit_taxonomy_required_before_final_upload: true",
             '  contribution_statement: "Example Author: conceptualization, methodology, software, validation, and writing - original draft."',
@@ -4341,6 +4341,72 @@ def test_check_final_upload_metadata_rejects_missing_repository_reference() -> N
 
     assert any("repository URL is missing" in error for error in errors)
     assert any("repository commit is missing" in error for error in errors)
+
+
+def test_check_final_upload_metadata_rejects_data_code_statement_without_release_references() -> None:
+    """验证 data/code availability 必须写入仓库版本和 artifact 链接。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = "\n".join(
+        [
+            'target_journal: "Journal of Scholarly Data"',
+            "target_journal_template_bound: true",
+            "authors:",
+            '  - name: "Example Author"',
+            '    affiliation: "Example University"',
+            '    email: "author@example.edu"',
+            '    orcid: "0000-0002-1825-0097"',
+            "corresponding_author:",
+            '  name: "Example Author"',
+            '  affiliation: "Example University"',
+            '  email: "author@example.edu"',
+            '  orcid: "0000-0002-1825-0097"',
+            "funding:",
+            "  no_external_funding_declared: true",
+            '  funding_statement: "The authors received no external funding for this work."',
+            "  funding_sources: []",
+            "  grant_numbers: []",
+            "statements:",
+            '  originality: "The manuscript is original, has not been published previously, and is not under consideration elsewhere."',
+            '  author_approval: "All listed authors have approved the submitted version."',
+            '  competing_interests: "The authors declare no competing interests."',
+            '  ethics: "This study uses public scholarly metadata and does not involve human participants."',
+            '  data_code_availability: "The repository provides source code, fixtures, and artifact-release instructions."',
+            "author_contributions:",
+            "  credit_taxonomy_required_before_final_upload: true",
+            '  contribution_statement: "Example Author: conceptualization, methodology, software, validation, and writing - original draft."',
+            "  roles:",
+            '    - author: "Example Author"',
+            '      credit_roles: "Conceptualization; Methodology; Software; Validation; Writing - original draft"',
+            "permissions:",
+            "  no_third_party_material_requiring_permission_declared: true",
+            "  third_party_material_requires_permission: false",
+            '  permissions_statement: "No third-party material requiring permission is included."',
+            "  permission_files: []",
+            "repository_reference:",
+            '  repository_url: "https://example.org/iad-sieve.git"',
+            '  repository_commit: "abcdef1234567890"',
+            '  repository_branch: "main"',
+            "artifact_boundary:",
+            '  artifact_release_url: "https://doi.org/10.0000/example"',
+            '  artifact_release_doi: "10.0000/example"',
+            "final_upload_checklist:",
+            "  target_journal_selected: true",
+            "  target_journal_template_applied: true",
+            "  author_metadata_completed: true",
+            "  corresponding_author_completed: true",
+            "  manuscript_pdf_rebuilt_after_template: true",
+            "  supplementary_pdf_rebuilt_after_template: true",
+            "  submission_system_files_verified: true",
+            "  artifact_release_prepared_or_linked: true",
+        ]
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any("data/code availability statement missing repository URL value" in error for error in errors)
+    assert any("data/code availability statement missing repository commit value" in error for error in errors)
+    assert any("data/code availability statement missing artifact release URL or DOI value" in error for error in errors)
 
 
 def test_check_final_upload_metadata_rejects_corresponding_author_outside_author_list() -> None:
@@ -4690,7 +4756,7 @@ def test_check_final_upload_metadata_accepts_dke_research_data_statement_with_ar
             '  author_approval: "All listed authors have approved the submitted version."',
             '  competing_interests: "The authors declare no competing interests."',
             '  ethics: "This study uses public scholarly metadata and does not involve human participants."',
-            '  data_code_availability: "The repository provides source code, fixtures, and artifact-release instructions."',
+            '  data_code_availability: "Source code and fixtures are available at https://example.org/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
             '  research_data_statement: "Source code and small fixtures are available in the repository; the full result artifact is available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
             "author_contributions:",
             "  credit_taxonomy_required_before_final_upload: true",
