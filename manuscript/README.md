@@ -25,6 +25,7 @@ manuscript/
     verify_fixture_rebuild.py
     build_submission_package.py
     validate_submission_package.py
+    validate_artifact_release.py
     build_elsevier_draft.py
     build_latex_pdf.sh
   build/
@@ -65,6 +66,12 @@ python manuscript/scripts/build_submission_package.py
 python manuscript/scripts/validate_submission_package.py
 ```
 
+Artifact release 校验：
+
+```bash
+python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release
+```
+
 Elsevier/DKE 预转换稿构建：
 
 ```bash
@@ -88,7 +95,7 @@ python manuscript/scripts/validate_submission_package.py --dke-preflight
 
 `build/dke_preflight_package/` 和 `build/iad-risk-dke-preflight-package.zip` 由 `build_submission_package.py --dke-preflight` 生成，包含模板无关材料和 DKE/Elsevier 预转换源/PDF。该包用于投稿前检查，不表示最终上传门禁已通过。
 
-`artifact_release_manifest.template.json` 记录结果 artifact release 应包含的表格、预测、日志、校验命令和 claim boundary。正式上传前应据此生成真实 release manifest，并在 `submission_metadata.yml` 中填写 artifact 链接。
+`artifact_release_manifest.template.json` 记录结果 artifact release 应包含的表格、预测、日志、校验命令和 claim boundary。正式上传前应据此生成真实 release manifest，使用 `scripts/validate_artifact_release.py` 校验 release 目录，并在 `submission_metadata.yml` 中填写 artifact 链接。
 
 `submission_system_checklist.md` 记录最终上传到期刊系统前需要核对的文件、元数据、PDF 和 artifact release 项。该文件用于最终上传前检查，不作为当前预投稿包附件。
 

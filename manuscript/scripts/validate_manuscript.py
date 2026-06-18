@@ -36,6 +36,7 @@ REQUIRED_FILES = [
     ROOT / "scripts" / "verify_fixture_rebuild.py",
     ROOT / "scripts" / "build_submission_package.py",
     ROOT / "scripts" / "validate_submission_package.py",
+    ROOT / "scripts" / "validate_artifact_release.py",
     ROOT / "scripts" / "build_elsevier_draft.py",
     ROOT / "scripts" / "build_latex_pdf.sh",
     ROOT / "build" / "iad-risk-manuscript-latex.pdf",
@@ -687,6 +688,7 @@ def check_artifact_release_manifest_template(template_text: str) -> list[str]:
         validation_text = "\n".join(str(command) for command in validation_commands)
         for command in [
             "sha256sum -c checksums.sha256",
+            "python manuscript/scripts/validate_artifact_release.py --artifact-dir",
             "python manuscript/scripts/validate_manuscript.py --strict-latex",
             "python manuscript/scripts/verify_fixture_rebuild.py",
             "python scripts/check_public_release.py",
@@ -738,6 +740,8 @@ def check_submission_system_checklist(checklist_text: str) -> list[str]:
         "Keywords",
         "Submission metadata",
         "Artifact release manifest",
+        "Artifact Release Package Checks",
+        "python manuscript/scripts/validate_artifact_release.py --artifact-dir",
         "DKE/Elsevier Preflight Package Checks",
         "python manuscript/scripts/build_submission_package.py --dke-preflight",
         "python manuscript/scripts/validate_submission_package.py --dke-preflight",

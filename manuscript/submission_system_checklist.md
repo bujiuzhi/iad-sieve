@@ -25,6 +25,16 @@ The checklist intentionally remains incomplete until the authors confirm the tar
 | Submission metadata | `submission_metadata.yml` | Fill target journal, authors, corresponding author, funding, artifact URL, and final-upload checklist fields. |
 | Artifact release manifest | `artifact_release_manifest.template.json` | Replace with the real release manifest, DOI or URL, and SHA256 checksum file. |
 
+## Artifact Release Package Checks
+
+Before linking an external artifact release, verify:
+
+1. The release directory contains `README.md`, `manifest.json`, `checksums.sha256`, `configs/`, `tables/`, `predictions/`, `reports/`, and `logs/`.
+2. `python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release` passes.
+3. `manifest.json` records the release commit, source-tree cleanliness, required artifact IDs, claim boundaries, and SHA256 values for required artifacts.
+4. `checksums.sha256` covers every release file except itself and matches the file contents.
+5. The release excludes `data/`, `outputs/`, cache files, credentials, raw third-party files, and model checkpoints.
+
 ## DKE/Elsevier Preflight Package Checks
 
 Before using the DKE/Elsevier preflight package, verify:
