@@ -7,6 +7,7 @@ coverage, PDF readability, and local LaTeX toolchain availability.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import logging
 import shutil
@@ -35,8 +36,11 @@ REQUIRED_FILES = [
     ROOT / "scripts" / "verify_fixture_rebuild.py",
     ROOT / "scripts" / "build_submission_package.py",
     ROOT / "scripts" / "validate_submission_package.py",
+    ROOT / "scripts" / "build_elsevier_draft.py",
     ROOT / "scripts" / "build_latex_pdf.sh",
     ROOT / "build" / "iad-risk-manuscript-latex.pdf",
+    ROOT / "build" / "iad-risk-manuscript-elsevier.tex",
+    ROOT / "build" / "iad-risk-manuscript-elsevier.pdf",
     ROOT / "build" / "iad-risk-supplementary-material.pdf",
 ]
 REQUIRED_SECTIONS = [
@@ -892,6 +896,63 @@ def check_keywords(keywords_text: str) -> list[str]:
     return errors
 
 
+def load_elsevier_draft_builder():
+    """Load the Elsevier draft builder module used by the manuscript package.
+
+    参数:
+        无。
+
+    返回:
+        module: Loaded build_elsevier_draft module.
+
+    异常:
+        ImportError: Raised when the builder module cannot be loaded.
+    """
+    builder_path = ROOT / "scripts" / "build_elsevier_draft.py"
+    spec = importlib.util.spec_from_file_location("build_elsevier_draft", builder_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"cannot load Elsevier draft builder: {builder_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def parse_keyword_entries(keywords_text: str) -> list[str]:
+    """Parse semicolon-separated keyword entries from Markdown text.
+
+    参数:
+        keywords_text: Keyword Markdown text.
+
+    返回:
+        list[str]: Parsed keyword entries.
+    """
+    keyword_lines = [line.strip() for line in keywords_text.splitlines() if line.strip() and not line.startswith("#")]
+    return [keyword.strip() for keyword in " ".join(keyword_lines).split(";") if keyword.strip()]
+
+
+def check_elsevier_draft_source(manuscript_text: str, keywords_text: str, generated_text: str) -> list[str]:
+    """Check whether the generated Elsevier source matches the current manuscript.
+
+    参数:
+        manuscript_text: Main manuscript LaTeX source.
+        keywords_text: Keyword Markdown text.
+        generated_text: Generated Elsevier LaTeX source.
+
+    返回:
+        list[str]: Error messages for stale or invalid generated Elsevier source.
+    """
+    if not generated_text.strip():
+        return ["Elsevier draft source is empty or missing"]
+    try:
+        builder = load_elsevier_draft_builder()
+        expected_text = builder.build_elsevier_latex(manuscript_text, parse_keyword_entries(keywords_text))
+    except Exception as exc:  # noqa: BLE001
+        return [f"Elsevier draft source could not be regenerated: {exc}"]
+    if generated_text.strip() != expected_text.strip():
+        return ["Elsevier draft source is stale; rerun python manuscript/scripts/build_elsevier_draft.py"]
+    return []
+
+
 def check_cover_letter(cover_letter_text: str) -> list[str]:
     """Check cover letter completeness for journal submission.
 
@@ -1171,6 +1232,10 @@ def main() -> int:
     cover_letter_text = cover_letter_path.read_text(encoding="utf-8") if cover_letter_path.exists() else ""
     submission_metadata_path = ROOT / "submission_metadata.yml"
     submission_metadata_text = submission_metadata_path.read_text(encoding="utf-8") if submission_metadata_path.exists() else ""
+    elsevier_draft_source_path = ROOT / "build" / "iad-risk-manuscript-elsevier.tex"
+    elsevier_draft_source_text = (
+        elsevier_draft_source_path.read_text(encoding="utf-8") if elsevier_draft_source_path.exists() else ""
+    )
     errors.extend(check_sections(supplementary_text, REQUIRED_SUPPLEMENT_SECTIONS, "supplementary material"))
     errors.extend(check_forbidden_claims(manuscript_text))
     errors.extend(check_forbidden_claims(supplementary_text))
@@ -1212,6 +1277,7 @@ def main() -> int:
     errors.extend(check_result_claim_boundary(manuscript_text, supplementary_text))
     errors.extend(check_highlights(highlights_text))
     errors.extend(check_keywords(keywords_text))
+    errors.extend(check_elsevier_draft_source(manuscript_text, keywords_text, elsevier_draft_source_text))
     errors.extend(check_cover_letter(cover_letter_text))
     errors.extend(check_submission_material_quantitative_summary(highlights_text, cover_letter_text))
     errors.extend(check_submission_metadata(submission_metadata_text))
@@ -1219,9 +1285,13 @@ def main() -> int:
         errors.extend(check_final_upload_metadata(submission_metadata_text))
     errors.extend(check_bibliography_depth(bibliography_text))
     latex_pdf_path = ROOT / "build" / "iad-risk-manuscript-latex.pdf"
+    elsevier_pdf_path = ROOT / "build" / "iad-risk-manuscript-elsevier.pdf"
     supplementary_pdf_path = ROOT / "build" / "iad-risk-supplementary-material.pdf"
     errors.extend(check_pdf(latex_pdf_path))
     errors.extend(check_pdf_freshness(latex_pdf_path, manuscript_path))
+    errors.extend(check_pdf(elsevier_pdf_path))
+    errors.extend(check_pdf_freshness(elsevier_pdf_path, manuscript_path))
+    errors.extend(check_pdf_freshness(elsevier_pdf_path, keywords_path))
     errors.extend(check_pdf(supplementary_pdf_path, "Supplementary Material"))
     errors.extend(check_pdf_freshness(supplementary_pdf_path, supplementary_path))
     latex_warnings, latex_errors = check_latex_toolchain(args.strict_latex)

@@ -19,8 +19,11 @@
 | `scripts/verify_fixture_rebuild.py` | 无网络 fixture 重建校验 |
 | `scripts/build_submission_package.py` | 投稿包构建脚本 |
 | `scripts/validate_submission_package.py` | 投稿包完整性校验 |
+| `scripts/build_elsevier_draft.py` | Elsevier/DKE 预转换稿生成脚本 |
 | `scripts/build_latex_pdf.sh` | 正式 PDF 构建脚本 |
 | `build/iad-risk-manuscript-latex.pdf` | 主稿 PDF |
+| `build/iad-risk-manuscript-elsevier.tex` | DKE/Elsevier 匿名预转换 LaTeX 源 |
+| `build/iad-risk-manuscript-elsevier.pdf` | DKE/Elsevier 匿名预转换 PDF |
 | `build/iad-risk-supplementary-material.pdf` | 补充材料 PDF |
 
 ## 构建命令
@@ -31,6 +34,7 @@ python manuscript/scripts/verify_fixture_rebuild.py
 python manuscript/scripts/build_submission_package.py
 python manuscript/scripts/validate_submission_package.py
 cd manuscript && ./scripts/build_latex_pdf.sh
+python manuscript/scripts/build_elsevier_draft.py
 ```
 
 ## 投稿边界
@@ -38,6 +42,8 @@ cd manuscript && ./scripts/build_latex_pdf.sh
 该材料包当前不绑定具体期刊模板。正式上传前，应按目标期刊要求调整 `main.tex` 文档类并补充作者元数据。
 
 `target_journal_shortlist.md` 用于记录候选期刊和模板前置要求，不作为正式投稿附件。目标期刊和分区/分类应在最终上传前由作者按所在单位认可的数据源重新确认。
+
+`build/iad-risk-manuscript-elsevier.tex` 和 `build/iad-risk-manuscript-elsevier.pdf` 是 Data & Knowledge Engineering 路线的匿名 `elsarticle` 预转换预览，用于模板适配检查和源文件上传准备；正式上传前仍需作者确认目标期刊、作者元数据、artifact release 和实时投稿系统字段。
 
 `artifact_release_manifest.template.json` 用于准备正式 artifact release，不作为当前匿名预投稿包的替代物。正式上传前应生成真实 artifact manifest、checksum 和公开链接。
 

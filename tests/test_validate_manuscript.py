@@ -115,6 +115,55 @@ def test_check_keywords_rejects_long_keyword() -> None:
     assert any("keyword is too long" in error for error in errors)
 
 
+def test_check_elsevier_draft_source_accepts_current_generated_text() -> None:
+    """验证Elsevier预转换源与主稿和关键词一致时可通过。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"""
+\documentclass[11pt]{article}
+\title{IAD-Risk: Test Title}
+\author{Anonymous Authors}
+\begin{document}
+\maketitle
+\begin{abstract}
+This abstract states the bounded evidence.
+\end{abstract}
+\section{Introduction}
+The body starts here.
+\bibliographystyle{plainnat}
+\bibliography{references}
+\end{document}
+"""
+    keywords_text = "# Keywords\n\nentity matching; risk gating\n"
+    builder = module.load_elsevier_draft_builder()
+    generated_text = builder.build_elsevier_latex(manuscript_text, ["entity matching", "risk gating"])
+
+    errors = module.check_elsevier_draft_source(manuscript_text, keywords_text, generated_text)
+
+    assert errors == []
+
+
+def test_check_elsevier_draft_source_rejects_stale_text() -> None:
+    """验证Elsevier预转换源与当前主稿不一致时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"""
+\title{IAD-Risk}
+\begin{abstract}
+Abstract text.
+\end{abstract}
+\section{Introduction}
+Body.
+\bibliographystyle{plainnat}
+\bibliography{references}
+"""
+    keywords_text = "# Keywords\n\nentity matching\n"
+
+    errors = module.check_elsevier_draft_source(manuscript_text, keywords_text, "stale source")
+
+    assert any("stale" in error for error in errors)
+
+
 def test_check_abstract_length_accepts_abstract_within_limit() -> None:
     """验证摘要不超过 250 词时可通过检查。"""
 
