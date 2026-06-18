@@ -976,6 +976,50 @@ def test_check_auxiliary_model_evidence_absent_rejects_unsupported_model_phrases
     assert any("cover letter" in error and "GPT" in error for error in errors)
 
 
+def test_check_formal_submission_claim_lockdown_accepts_conservative_boundaries() -> None:
+    """验证正式投稿材料中的保守主张边界不会被误判。"""
+
+    module = _load_validate_manuscript_module()
+    document_texts = {
+        "main manuscript": "The paper does not make broad method-ranking claims.",
+        "cover letter": "The claims remain bounded to the current evidence snapshot.",
+    }
+
+    errors = module.check_formal_submission_claim_lockdown(document_texts)
+
+    assert errors == []
+
+
+def test_check_formal_submission_claim_lockdown_rejects_q2b_completion_claims() -> None:
+    """验证正式投稿材料中提前宣称 Q2/B 达标会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    document_texts = {
+        "abstract": "The manuscript is Q2/B-ready for submission.",
+        "cover letter": "The paper meets Q2/B acceptance expectations.",
+    }
+
+    errors = module.check_formal_submission_claim_lockdown(document_texts)
+
+    assert any("abstract" in error and "Q2/B completion claim" in error for error in errors)
+    assert any("cover letter" in error and "Q2/B completion claim" in error for error in errors)
+
+
+def test_check_formal_submission_claim_lockdown_rejects_chinese_completion_claims() -> None:
+    """验证正式投稿材料中中文二区/B类达标措辞会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    document_texts = {
+        "cover letter": "本文已经达到二区/B类投稿标准。",
+        "main manuscript": "The journal-submission-ready package is complete.",
+    }
+
+    errors = module.check_formal_submission_claim_lockdown(document_texts)
+
+    assert any("cover letter" in error and "Q2/B completion claim" in error for error in errors)
+    assert any("main manuscript" in error and "final-upload completion claim" in error for error in errors)
+
+
 def test_check_final_upload_metadata_rejects_placeholders() -> None:
     """验证 final-upload 门禁会拒绝未填写的投稿元数据。"""
 

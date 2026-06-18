@@ -10,6 +10,7 @@ import argparse
 import importlib.util
 import json
 import logging
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -107,6 +108,27 @@ AUXILIARY_MODEL_EVIDENCE_PHRASES = [
     "ChatGPT",
     "pair-judge",
 ]
+FORMAL_COMPLETION_OVERCLAIM_PATTERNS = [
+    (
+        re.compile(
+            r"\bQ2\s*/?\s*B(?:[-_\s]*(?:complete|ready|accepted|acceptance\s+ready|standard\s+met|submission\s+ready))\b",
+            re.IGNORECASE,
+        ),
+        "Q2/B completion claim",
+    ),
+    (
+        re.compile(r"\b(?:meets?|reaches?|achieves?|satisfies?)\s+(?:the\s+)?Q2\s*/?\s*B\b", re.IGNORECASE),
+        "Q2/B completion claim",
+    ),
+    (
+        re.compile(r"(?:达到|满足|符合).{0,16}(?:二区\s*/?\s*B\s*类|二区|B\s*类).{0,16}(?:标准|要求|接收|投稿|水平)"),
+        "Q2/B completion claim",
+    ),
+    (
+        re.compile(r"\b(?:final[-\s]*upload|journal[-\s]*submission)[-\s]*(?:ready|complete)\b", re.IGNORECASE),
+        "final-upload completion claim",
+    ),
+]
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -186,6 +208,26 @@ def check_auxiliary_model_evidence_absent(document_texts: dict[str, str]) -> lis
         for phrase in AUXILIARY_MODEL_EVIDENCE_PHRASES:
             if phrase.lower() in lowered_text:
                 errors.append(f"{document_name} contains unsupported auxiliary model evidence phrase: {phrase}")
+    return errors
+
+
+def check_formal_submission_claim_lockdown(document_texts: dict[str, str]) -> list[str]:
+    """Check formal submission materials for premature completion claims.
+
+    参数:
+        document_texts: Mapping from formal submission document name to text.
+
+    返回:
+        list[str]: Error messages for unsafe Q2/B or final-upload completion claims.
+    """
+    errors: list[str] = []
+    for document_name, document_text in document_texts.items():
+        for pattern, label in FORMAL_COMPLETION_OVERCLAIM_PATTERNS:
+            match = pattern.search(document_text)
+            if match is None:
+                continue
+            line_number = document_text.count("\n", 0, match.start()) + 1
+            errors.append(f"{document_name} contains unsafe formal completion claim ({label}) on line {line_number}")
     return errors
 
 
@@ -1281,6 +1323,18 @@ def main() -> int:
                 "keywords": keywords_text,
                 "target journal shortlist": target_journal_shortlist_text,
                 "cover letter": cover_letter_text,
+            }
+        )
+    )
+    errors.extend(
+        check_formal_submission_claim_lockdown(
+            {
+                "main manuscript": manuscript_text,
+                "supplementary material": supplementary_text,
+                "highlights": highlights_text,
+                "keywords": keywords_text,
+                "cover letter": cover_letter_text,
+                "DKE/Elsevier draft source": elsevier_draft_source_text,
             }
         )
     )
