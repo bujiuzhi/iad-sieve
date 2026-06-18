@@ -404,6 +404,40 @@ def test_check_manual_validation_protocol_rejects_vague_manual_review() -> None:
     assert any("inter-annotator agreement" in error for error in errors)
 
 
+def test_check_environment_setup_accepts_complete_setup() -> None:
+    """验证补充材料包含环境准备命令时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    supplementary_text = "\n".join(
+        [
+            r"\section{Environment Setup}",
+            "conda create -n iad-sieve python=3.11 -y",
+            "python -m pip install -e .",
+            "python -m iad_sieve.cli --help",
+            "python scripts/check_public_release.py",
+            "python manuscript/scripts/verify_fixture_rebuild.py",
+            "The check does not download full raw datasets.",
+            "Full numerical result reproduction still requires the L2/L3 data and artifact requirements.",
+        ]
+    )
+
+    errors = module.check_environment_setup(supplementary_text)
+
+    assert errors == []
+
+
+def test_check_environment_setup_rejects_missing_fixture_command() -> None:
+    """验证环境准备说明缺少 fixture 重建命令时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    supplementary_text = r"\section{Environment Setup}" + "\nconda create -n iad-sieve python=3.11 -y"
+
+    errors = module.check_environment_setup(supplementary_text)
+
+    assert any("verify_fixture_rebuild.py" in error for error in errors)
+    assert any("does not download full raw datasets" in error for error in errors)
+
+
 def test_check_cover_letter_accepts_required_submission_statements() -> None:
     """验证 cover letter 含正式投稿声明时可通过检查。"""
 

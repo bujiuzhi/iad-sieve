@@ -38,6 +38,23 @@ L3 & Released artifact package & Fixed tables, predictions, logs, manifests, che
 \end{tabular}
 \end{table}
 
+\section{Environment Setup}
+
+The repository is designed to run from a standard Python environment without committing raw third-party data. Reviewers can validate the code and fixture-level reproduction path from the project root with the following commands:
+
+\small
+\begin{verbatim}
+conda create -n iad-sieve python=3.11 -y
+conda activate iad-sieve
+python -m pip install -e .
+python -m iad_sieve.cli --help
+python scripts/check_public_release.py
+python manuscript/scripts/verify_fixture_rebuild.py
+\end{verbatim}
+\normalsize
+
+The environment check does not download full raw datasets. It verifies package installation, CLI availability, public-release boundaries, and no-network fixture rebuilding. Full numerical result reproduction still requires the L2/L3 data and artifact requirements described below.
+
 \section{No-Network Fixture Rebuild}
 
 The fixture rebuild validates the data adapters and IAD-Bench schema without depending on external network access. It is not a substitute for the full paper experiment.

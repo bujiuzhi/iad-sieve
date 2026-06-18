@@ -65,6 +65,7 @@ REQUIRED_SECTIONS = [
 REQUIRED_SUPPLEMENT_SECTIONS = [
     r"\section{Scope}",
     r"\section{Reproduction Levels}",
+    r"\section{Environment Setup}",
     r"\section{No-Network Fixture Rebuild}",
     r"\section{Public-Source Rebuild}",
     r"\section{Artifact Package Requirements}",
@@ -496,6 +497,32 @@ def check_manual_validation_protocol(supplementary_text: str) -> list[str]:
     ]
 
 
+def check_environment_setup(supplementary_text: str) -> list[str]:
+    """Check whether the supplementary material documents environment setup.
+
+    参数:
+        supplementary_text: Supplementary LaTeX source.
+
+    返回:
+        list[str]: Error messages for missing environment setup markers.
+    """
+    required_markers = [
+        r"\section{Environment Setup}",
+        "conda create -n iad-sieve python=3.11 -y",
+        "python -m pip install -e .",
+        "python -m iad_sieve.cli --help",
+        "python scripts/check_public_release.py",
+        "python manuscript/scripts/verify_fixture_rebuild.py",
+        "does not download full raw datasets",
+        "Full numerical result reproduction still requires the L2/L3 data and artifact requirements",
+    ]
+    return [
+        f"environment setup missing marker: {marker}"
+        for marker in required_markers
+        if marker not in supplementary_text
+    ]
+
+
 def check_related_work_positioning(manuscript_text: str) -> list[str]:
     """Check whether related work includes closest-work positioning.
 
@@ -875,6 +902,7 @@ def main() -> int:
     errors.extend(check_split_leakage_controls(manuscript_text))
     errors.extend(check_scope_compatibility(manuscript_text))
     errors.extend(check_extended_protocol_boundary(manuscript_text))
+    errors.extend(check_environment_setup(supplementary_text))
     errors.extend(check_manual_validation_protocol(supplementary_text))
     errors.extend(check_result_claim_boundary(manuscript_text, supplementary_text))
     errors.extend(check_highlights(highlights_text))
