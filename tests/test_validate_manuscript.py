@@ -2775,6 +2775,71 @@ def test_check_baseline_supplementary_tables_rejects_missing_tables() -> None:
     assert any("baseline-fairness-controls" in error for error in errors)
 
 
+def test_check_split_leakage_controls_accepts_supplementary_table() -> None:
+    """验证 split 与泄漏控制表迁入补充材料后可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Split and Leakage Controls}",
+            "The full split and leakage controls table is reported in the supplementary material.",
+            "Training uses only the declared training split.",
+            "threshold selection uses validation evidence.",
+            "Metadata fields that identify source, provenance, or split are excluded from model features.",
+            "Unordered pair leakage guard.",
+            "Label-stratum coverage audit.",
+            "Source-heldout readiness audit.",
+            "Topic-heldout readiness audit.",
+            "topic-stability claims.",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Split and Leakage Controls}",
+            r"\label{tab:split-leakage-controls}",
+            "Split and leakage controls used to interpret IAD-Bench results.",
+            "Control",
+            "Manuscript role",
+            "Stronger evidence boundary",
+            "Train/dev/test split field",
+            "Unordered pair leakage guard",
+            "Label-stratum coverage audit",
+            "Source-heldout readiness audit",
+            "Topic-heldout readiness audit",
+            "Cross-topic stability should not be claimed when topic coverage is insufficient.",
+        ]
+    )
+
+    errors = module.check_split_leakage_controls(manuscript_text, supplementary_text)
+
+    assert errors == []
+
+
+def test_check_split_leakage_controls_rejects_missing_supplementary_table() -> None:
+    """验证缺少补充材料 split 与泄漏控制表时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Split and Leakage Controls}",
+            "The full split and leakage controls table is reported in the supplementary material.",
+            "Training uses only the declared training split.",
+            "threshold selection uses validation evidence.",
+            "Metadata fields that identify source, provenance, or split are excluded from model features.",
+            "Unordered pair leakage guard.",
+            "Label-stratum coverage audit.",
+            "Source-heldout readiness audit.",
+            "Topic-heldout readiness audit.",
+            "topic-stability claims.",
+        ]
+    )
+
+    errors = module.check_split_leakage_controls(manuscript_text, "")
+
+    assert any("Split and Leakage Controls" in error for error in errors)
+    assert any("tab:split-leakage-controls" in error for error in errors)
+
+
 def test_check_result_interpretation_guardrails_accepts_complete_boundaries() -> None:
     """验证主结果表判读规则完整时可通过检查。"""
 
@@ -4921,7 +4986,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 60.",
+            "Completed audit cycles: 61.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -5399,6 +5464,17 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "FMR/HNFMR count only automatic merges",
             "decision-to-metric clarity without main-text table overload",
             "supplementary decision-to-metric mapping",
+            "## Audit Cycle 61: Split and Leakage Controls Density Gate",
+            "split-control table-density reduction",
+            "full split and leakage controls table",
+            "Training uses only the declared training split",
+            "threshold selection uses validation evidence",
+            "Unordered pair leakage guard",
+            "Label-stratum coverage audit",
+            "Source-heldout readiness audit",
+            "Topic-heldout readiness audit",
+            "split-control clarity without main-text table overload",
+            "supplementary split and leakage controls table",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -5417,7 +5493,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 60",
+        "Completed audit cycles: 61",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -5428,7 +5504,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 60" in error for error in errors)
+    assert any("Completed audit cycles: 61" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

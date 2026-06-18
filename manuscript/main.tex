@@ -441,24 +441,7 @@ The benchmark therefore has two roles. The gold layer measures ordinary duplicat
 
 The evaluation protocol treats split assignment as part of the evidence contract rather than as a preprocessing detail. Each pair carries a split field, label strength, label source, relation label, provenance, and hard-negative level. Training uses only the declared training split, threshold selection uses validation evidence when available, and held-out metrics are reported only after the operating point has been fixed. Metadata fields that identify source, provenance, or split are retained for auditing but are excluded from model features.
 
-\begin{table}[H]
-\caption{Split and leakage controls used to interpret IAD-Bench results. The controls define what the current evidence supports and what stronger follow-up evidence would require.}
-\label{tab:split-leakage-controls}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{L{0.24\linewidth}L{0.30\linewidth}L{0.34\linewidth}}
-\toprule
-Control & Manuscript role & Stronger evidence boundary \\
-\midrule
-Train/dev/test split field & Separates fitting, threshold selection, and held-out reporting. & Full numerical reproduction requires released prediction files, configs, and split summaries. \\
-Unordered pair leakage guard & Detects whether the same document pair appears across multiple splits. & A blocked leakage audit prevents held-out claims until duplicate pair assignments are removed. \\
-Label-stratum coverage audit & Checks whether gold, proxy, and silver evidence appear in the intended evaluation strata. & Missing strata must be reported as evidence gaps rather than averaged into a single score. \\
-Source-heldout readiness audit & Tests whether relation labels have enough independent label sources for source-heldout claims. & Broad source generalization remains conditional until source-heldout coverage is defensible. \\
-Topic-heldout readiness audit & Tests whether enough topics exist to reserve unseen-topic evaluation slices. & Cross-topic stability should not be claimed when topic coverage is insufficient. \\
-\bottomrule
-\end{tabular}
-\end{table}
+The full split and leakage controls table is reported in the supplementary material. The control set includes the train/dev/test split field, an Unordered pair leakage guard, a Label-stratum coverage audit, a Source-heldout readiness audit, and a Topic-heldout readiness audit. These controls define what the current evidence supports and what stronger follow-up evidence would require before held-out, source-generalization, or topic-stability claims are made.
 
 These controls reduce two common validity risks. First, the model cannot gain accuracy from explicit provenance or split identifiers because those fields are audit metadata rather than predictive features. Second, a held-out result is interpreted only within the split and coverage regime that generated it. If a split-readiness audit blocks source-heldout or topic-heldout claims, the manuscript keeps the conclusion at the level of random-split or mechanism evidence instead of presenting it as broad generalization.
 

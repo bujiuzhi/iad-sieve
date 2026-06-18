@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 60.
+Completed audit cycles: 61.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -577,6 +577,14 @@ Outcome: pass for decision-to-metric table-density reduction; blocked for operat
 This gate checks whether the decision-to-metric mapping table is needed in the main manuscript. The main manuscript now states the mapping in prose: automatic merge is the positive decision, block and defer are non-merge decisions, deferred same-work pairs reduce recall in same-work F1, and FMR/HNFMR count only automatic merges among non-identity rows. The supplementary material preserves the full decision-to-metric mapping table for merge, block, and defer outputs.
 
 The reviewer-facing boundary is decision-to-metric clarity without main-text table overload. The validator still requires the supplementary decision-to-metric mapping, including decision outputs, metric treatment, interpretation boundary, merge, block, defer, and the rule that coverage and defer rate must be reported separately before operational automation claims.
+
+## Audit Cycle 61: Split and Leakage Controls Density Gate
+
+Outcome: pass for split-control table-density reduction; blocked for broad held-out or source-generalization claims until released split summaries, leakage audits, label-stratum coverage, and prediction artifacts are available for the same evaluated rows.
+
+This gate checks whether the split and leakage controls table is needed in the main manuscript. The main manuscript now states the control set in prose: Training uses only the declared training split, threshold selection uses validation evidence, provenance and split identifiers are audit metadata rather than predictive features, and the control set covers the train/dev/test split field, Unordered pair leakage guard, Label-stratum coverage audit, Source-heldout readiness audit, and Topic-heldout readiness audit. The supplementary material preserves the full split and leakage controls table with each control, manuscript role, and stronger evidence boundary.
+
+The reviewer-facing boundary is split-control clarity without main-text table overload. The validator still requires the supplementary split and leakage controls table, including the train/dev/test split field, Unordered pair leakage guard, Label-stratum coverage audit, Source-heldout readiness audit, Topic-heldout readiness audit, and the rule that cross-topic stability should not be claimed when topic coverage is insufficient.
 
 ## Minimum Gate Before Final Upload
 

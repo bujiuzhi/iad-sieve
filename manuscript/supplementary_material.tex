@@ -408,6 +408,29 @@ The artifact manifest uses conditional claim flags so that optional stronger cla
 
 Cluster-level quality claims require evidence beyond pair-level prediction files. The \path{cluster_metric_summary} artifact should include cluster assignments, cluster contamination rate, singleton rate, merge coverage, conflict counts, and a pair-to-cluster trace from accepted links to connected components. The \path{cannot_link_audit} artifact should report cannot-link coverage, violations, unresolved conflicts, and identifier-conflict rules under the same threshold and merge policy used for the reported results. Without both files and their checksums, the manuscript should discuss pair-level false-merge control only and should not claim cluster-level contamination reduction.
 
+\section{Split and Leakage Controls}
+
+The main manuscript summarizes split and leakage controls in prose. Table~\ref{tab:split-leakage-controls} preserves the controls used to interpret IAD-Bench results and the stronger evidence required before broader held-out or generalization claims are made.
+
+\begin{table}[H]
+\caption{Split and leakage controls used to interpret IAD-Bench results. The controls define what the current evidence supports and what stronger follow-up evidence would require.}
+\label{tab:split-leakage-controls}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.24\linewidth}L{0.30\linewidth}L{0.34\linewidth}}
+\toprule
+Control & Manuscript role & Stronger evidence boundary \\
+\midrule
+Train/dev/test split field & Separates fitting, threshold selection, and held-out reporting. & Full numerical reproduction requires released prediction files, configs, and split summaries. \\
+Unordered pair leakage guard & Detects whether the same document pair appears across multiple splits. & A blocked leakage audit prevents held-out claims until duplicate pair assignments are removed. \\
+Label-stratum coverage audit & Checks whether gold, proxy, and silver evidence appear in the intended evaluation strata. & Missing strata must be reported as evidence gaps rather than averaged into a single score. \\
+Source-heldout readiness audit & Tests whether relation labels have enough independent label sources for source-heldout claims. & Broad source generalization remains conditional until source-heldout coverage is defensible. \\
+Topic-heldout readiness audit & Tests whether enough topics exist to reserve unseen-topic evaluation slices. & Cross-topic stability should not be claimed when topic coverage is insufficient. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Baseline Audit Boundary}
 
 The main manuscript reports the baseline decision rule in prose to keep the result narrative readable. The full audit matrices below define which baseline families enter the primary result table and which comparison controls must hold before a broad ranking claim is made.

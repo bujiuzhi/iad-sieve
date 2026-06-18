@@ -2207,18 +2207,19 @@ def check_manual_validation_boundary(manuscript_text: str) -> list[str]:
     ]
 
 
-def check_split_leakage_controls(manuscript_text: str) -> list[str]:
+def check_split_leakage_controls(manuscript_text: str, supplementary_text: str = "") -> list[str]:
     """Check whether evaluation split and leakage boundaries are stated.
 
     参数:
         manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
 
     返回:
         list[str]: Error messages for missing split-control markers.
     """
-    required_markers = [
+    required_main_markers = [
         r"\subsection{Split and Leakage Controls}",
-        r"\label{tab:split-leakage-controls}",
+        "full split and leakage controls table is reported in the supplementary material",
         "Training uses only the declared training split",
         "threshold selection uses validation evidence",
         "Metadata fields that identify source, provenance, or split",
@@ -2226,9 +2227,34 @@ def check_split_leakage_controls(manuscript_text: str) -> list[str]:
         "Label-stratum coverage audit",
         "Source-heldout readiness audit",
         "Topic-heldout readiness audit",
-        "not be claimed when topic coverage is insufficient",
+        "topic-stability claims",
     ]
-    return [f"split and leakage controls missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+    required_supplement_markers = [
+        r"\section{Split and Leakage Controls}",
+        r"\label{tab:split-leakage-controls}",
+        "Split and leakage controls used to interpret IAD-Bench results",
+        "Control",
+        "Manuscript role",
+        "Stronger evidence boundary",
+        "Train/dev/test split field",
+        "Unordered pair leakage guard",
+        "Label-stratum coverage audit",
+        "Source-heldout readiness audit",
+        "Topic-heldout readiness audit",
+        "Cross-topic stability should not be claimed when topic coverage is insufficient",
+    ]
+    errors = [
+        f"split and leakage controls missing manuscript marker: {marker}"
+        for marker in required_main_markers
+        if marker not in manuscript_text
+    ]
+    evidence_text = supplementary_text or manuscript_text
+    errors.extend(
+        f"split and leakage controls missing supplementary marker: {marker}"
+        for marker in required_supplement_markers
+        if marker not in evidence_text
+    )
+    return errors
 
 
 def check_scope_compatibility(manuscript_text: str, supplementary_text: str) -> list[str]:
@@ -3194,7 +3220,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 60",
+        "Completed audit cycles: 61",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3312,8 +3338,19 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 58: Operating Point Disclosure Density Gate",
         "Audit Cycle 59: Metric Formula Boundary Density Gate",
         "Audit Cycle 60: Decision-to-Metric Mapping Density Gate",
+        "Audit Cycle 61: Split and Leakage Controls Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
+        "split-control table-density reduction",
+        "full split and leakage controls table",
+        "Training uses only the declared training split",
+        "threshold selection uses validation evidence",
+        "Unordered pair leakage guard",
+        "Label-stratum coverage audit",
+        "Source-heldout readiness audit",
+        "Topic-heldout readiness audit",
+        "split-control clarity without main-text table overload",
+        "supplementary split and leakage controls table",
         "decision-to-metric table-density reduction",
         "full decision-to-metric mapping table",
         "automatic merge is the positive decision",
@@ -4792,7 +4829,7 @@ def main() -> int:
     errors.extend(check_result_interpretation_guardrails(manuscript_text, supplementary_text))
     errors.extend(check_openv2_result_table_scope_labels(manuscript_text))
     errors.extend(check_manual_validation_boundary(manuscript_text))
-    errors.extend(check_split_leakage_controls(manuscript_text))
+    errors.extend(check_split_leakage_controls(manuscript_text, supplementary_text))
     errors.extend(check_scope_compatibility(manuscript_text, supplementary_text))
     errors.extend(check_extended_protocol_boundary(manuscript_text))
     errors.extend(check_environment_setup(supplementary_text))
