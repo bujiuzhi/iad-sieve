@@ -108,8 +108,8 @@ def _write_complete_release(artifact_dir: Path, release_status: str = "release_c
                 artifact_dir / relative_path,
                 "\n".join(
                     [
-                        "system,scope_type,same_work_f1,fmr,hnfmr,same_work_f1_denominator,fmr_denominator,hnfmr_denominator,threshold_source",
-                        "IAD-Risk,Open-v2,0.61,0.08,0.12,100,200,50,threshold_selection_logs",
+                        "system,scope_type,same_work_f1,fmr,hnfmr,same_work_f1_denominator,fmr_denominator,hnfmr_denominator,threshold_source,automatic_merge_count,block_count,defer_count,automatic_merge_coverage,defer_rate",
+                        "IAD-Risk,Open-v2,0.61,0.08,0.12,100,200,50,threshold_selection_logs,64,120,16,0.32,0.08",
                     ]
                 )
                 + "\n",
@@ -259,6 +259,8 @@ def test_validate_artifact_release_rejects_open_v2_results_without_row_audit_col
     assert any("scope_type" in error for error in errors)
     assert any("same_work_f1_denominator" in error for error in errors)
     assert any("threshold_source" in error for error in errors)
+    assert any("automatic_merge_coverage" in error for error in errors)
+    assert any("defer_rate" in error for error in errors)
 
 
 def test_validate_artifact_release_rejects_missing_checksum_entry(tmp_path) -> None:

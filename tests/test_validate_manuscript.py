@@ -569,6 +569,11 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
             "Each row records per-row denominator counts.",
             "Each row records the per-row threshold source.",
             "Each row records the scope label used in the main table.",
+            "Each row records automatic merge count.",
+            "Each row records block count.",
+            "Each row records defer count.",
+            "Each row records automatic merge coverage.",
+            "Each row records defer rate.",
             "The evidence does not support a broad method-ranking claim.",
             r"\label{tab:openv2-results}",
         ]
@@ -588,6 +593,11 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
             "The artifact package records per-row denominator counts.",
             "The artifact package records the per-row threshold source.",
             "The artifact package records the scope label used in the main table.",
+            "The artifact package records automatic merge count.",
+            "The artifact package records block count.",
+            "The artifact package records defer count.",
+            "The artifact package records automatic merge coverage.",
+            "The artifact package records defer rate.",
             r"The package documents \path{threshold_sensitivity_grid}.",
             r"The package documents \path{cluster_metric_summary}.",
             r"The package documents \path{cannot_link_audit}.",
@@ -668,6 +678,8 @@ def test_check_result_claim_boundary_rejects_missing_row_level_audit_binding() -
     assert any("per-row denominator counts" in error for error in errors)
     assert any("per-row threshold source" in error for error in errors)
     assert any("scope label used in the main table" in error for error in errors)
+    assert any("automatic merge coverage" in error for error in errors)
+    assert any("defer rate" in error for error in errors)
 
 
 def test_check_result_claim_boundary_rejects_missing_supplementary_row_schema() -> None:
@@ -695,6 +707,11 @@ def test_check_result_claim_boundary_rejects_missing_supplementary_row_schema() 
             "Each row records per-row denominator counts.",
             "Each row records the per-row threshold source.",
             "Each row records the scope label used in the main table.",
+            "Each row records automatic merge count.",
+            "Each row records block count.",
+            "Each row records defer count.",
+            "Each row records automatic merge coverage.",
+            "Each row records defer rate.",
             "The evidence does not support a broad method-ranking claim.",
         ]
     )
@@ -725,6 +742,8 @@ def test_check_result_claim_boundary_rejects_missing_supplementary_row_schema() 
     assert any("per-row denominator counts" in error for error in errors)
     assert any("per-row threshold source" in error for error in errors)
     assert any("scope label used in the main table" in error for error in errors)
+    assert any("automatic merge coverage" in error for error in errors)
+    assert any("defer rate" in error for error in errors)
 
 
 def test_check_result_claim_boundary_rejects_missing_artifact_validator_command() -> None:
@@ -2532,7 +2551,8 @@ def test_check_artifact_release_manifest_template_accepts_complete_template() ->
                     "artifact_id": "open_v2_main_results",
                     "claim_support": (
                         "Main Open-v2 result table with same-work F1, FMR, HNFMR, pair counts, row scopes, "
-                        "per-row denominator counts, per-row threshold source, and scope label used in the main table."
+                        "per-row denominator counts, per-row threshold source, scope label used in the main table, "
+                        "automatic merge count, block count, defer count, automatic merge coverage, and defer rate."
                     ),
                 },
                 {"artifact_id": "iad_risk_predictions"},
@@ -2605,6 +2625,8 @@ def test_check_artifact_release_manifest_template_rejects_missing_result_row_aud
     assert any("per-row denominator counts" in error for error in errors)
     assert any("per-row threshold source" in error for error in errors)
     assert any("scope label used in the main table" in error for error in errors)
+    assert any("automatic merge coverage" in error for error in errors)
+    assert any("defer rate" in error for error in errors)
 
 
 def test_check_artifact_release_manifest_template_rejects_unsafe_data_policy() -> None:
@@ -2800,6 +2822,11 @@ def test_check_artifact_release_readme_template_accepts_complete_template() -> N
             "per-row denominator counts",
             "per-row threshold source",
             "scope label used in the main table",
+            "automatic merge count",
+            "block count",
+            "defer count",
+            "automatic merge coverage",
+            "defer rate",
             "iad_risk_predictions",
             "representation_baseline_scores",
             "supervised_baseline_predictions",
@@ -2842,6 +2869,11 @@ def test_check_artifact_release_readme_template_rejects_missing_result_row_audit
         "per-row denominator counts",
         "per-row threshold source",
         "scope label used in the main table",
+        "automatic merge count",
+        "block count",
+        "defer count",
+        "automatic merge coverage",
+        "defer rate",
     ]:
         readme_text = readme_text.replace(marker, "")
 
@@ -2850,6 +2882,8 @@ def test_check_artifact_release_readme_template_rejects_missing_result_row_audit
     assert any("per-row denominator counts" in error for error in errors)
     assert any("per-row threshold source" in error for error in errors)
     assert any("scope label used in the main table" in error for error in errors)
+    assert any("automatic merge coverage" in error for error in errors)
+    assert any("defer rate" in error for error in errors)
 
 
 def test_check_artifact_release_readme_template_rejects_missing_release_boundaries() -> None:
@@ -2889,6 +2923,11 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
         "per-row denominator counts",
         "per-row threshold source",
         "scope label used in the main table",
+        "automatic merge count",
+        "block count",
+        "defer count",
+        "automatic merge coverage",
+        "defer rate",
         "final_upload_information_request.md",
         "Author list",
         "Corresponding author",
@@ -2904,6 +2943,8 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
     assert any("per-row denominator counts" in error for error in errors)
     assert any("per-row threshold source" in error for error in errors)
     assert any("scope label used in the main table" in error for error in errors)
+    assert any("automatic merge coverage" in error for error in errors)
+    assert any("defer rate" in error for error in errors)
     assert any("final_upload_information_request.md" in error for error in errors)
     assert any("Author list" in error for error in errors)
     assert any("Corresponding author" in error for error in errors)
@@ -3122,6 +3163,11 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "per-row denominator counts",
             "per-row threshold source",
             "scope label used in the main table",
+            "automatic merge count",
+            "block count",
+            "defer count",
+            "automatic merge coverage",
+            "defer rate",
             "## DKE/Elsevier Preflight Package Checks",
             "python manuscript/scripts/build_submission_package.py --dke-preflight",
             "python manuscript/scripts/validate_submission_package.py --dke-preflight",
@@ -3462,6 +3508,11 @@ def test_check_submission_system_checklist_rejects_missing_artifact_row_schema_c
         "per-row denominator counts",
         "per-row threshold source",
         "scope label used in the main table",
+        "automatic merge count",
+        "block count",
+        "defer count",
+        "automatic merge coverage",
+        "defer rate",
     ]:
         checklist_text = checklist_text.replace(marker, "")
 
@@ -3471,6 +3522,8 @@ def test_check_submission_system_checklist_rejects_missing_artifact_row_schema_c
     assert any("per-row denominator counts" in error for error in errors)
     assert any("per-row threshold source" in error for error in errors)
     assert any("scope label used in the main table" in error for error in errors)
+    assert any("automatic merge coverage" in error for error in errors)
+    assert any("defer rate" in error for error in errors)
 
 
 def test_check_submission_system_checklist_rejects_missing_declaration_gate_fields() -> None:
@@ -3658,6 +3711,11 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "per-row denominator counts",
             "per-row threshold source",
             "scope label used in the main table",
+            "automatic merge count",
+            "block count",
+            "defer count",
+            "automatic merge coverage",
+            "defer rate",
             "validate_artifact_release.py",
             "## Audit Cycle 10: Final Template Binding and System Metadata Gate",
             "target_journal_template_bound",
@@ -3849,6 +3907,11 @@ def test_check_reviewer_readiness_audit_rejects_missing_artifact_row_level_audit
         "per-row denominator counts",
         "per-row threshold source",
         "scope label used in the main table",
+        "automatic merge count",
+        "block count",
+        "defer count",
+        "automatic merge coverage",
+        "defer rate",
         "validate_artifact_release.py",
     ]:
         audit_text = audit_text.replace(marker, "")
@@ -3860,6 +3923,8 @@ def test_check_reviewer_readiness_audit_rejects_missing_artifact_row_level_audit
     assert any("per-row denominator counts" in error for error in errors)
     assert any("per-row threshold source" in error for error in errors)
     assert any("scope label used in the main table" in error for error in errors)
+    assert any("automatic merge coverage" in error for error in errors)
+    assert any("defer rate" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_template_binding_gate() -> None:

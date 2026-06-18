@@ -54,6 +54,11 @@ OPEN_V2_MAIN_RESULTS_REQUIRED_COLUMNS = {
     "fmr_denominator",
     "hnfmr_denominator",
     "threshold_source",
+    "automatic_merge_count",
+    "block_count",
+    "defer_count",
+    "automatic_merge_coverage",
+    "defer_rate",
 }
 EXPECTED_FALSE_DATA_POLICY_FIELDS = {
     "raw_third_party_data_included",

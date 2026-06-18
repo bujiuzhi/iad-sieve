@@ -68,7 +68,7 @@ python manuscript/scripts/validate_submission_package.py --dke-preflight
 
 Artifact release 的 `repository.commit` 必须是 7 到 40 位十六进制 Git 提交号。`scripts/build_artifact_release_skeleton.py` 和 `scripts/validate_artifact_release.py` 都会拒绝默认模板值或非 Git SHA 文本，避免外部结果包无法追溯到明确代码版本。
 
-`open_v2_main_results` 是主结果表对应的外部结果 artifact。正式 artifact release 中的 CSV 必须包含 per-row denominator counts、per-row threshold source 和 scope label used in the main table，确保主结果表不是仅由文件名和 checksum 支撑，而是可按行追溯 denominator、阈值来源和评价范围。
+`open_v2_main_results` 是主结果表对应的外部结果 artifact。正式 artifact release 中的 CSV 必须包含 per-row denominator counts、per-row threshold source、scope label used in the main table、automatic merge count、block count、defer count、automatic merge coverage 和 defer rate，确保主结果表不是仅由文件名和 checksum 支撑，而是可按行追溯 denominator、阈值来源、评价范围和选择性决策覆盖率。
 
 `final_upload_information_request.md` 用于收集正式上传前的 Author list、Corresponding author、Funding statement、Author contribution statement、Permissions statement、Artifact release URL or DOI 和 Live submission-system fields。该文件不作为正式投稿附件；作者确认这些外部输入后，再同步更新 `submission_metadata.yml`、投稿信和目标期刊系统字段。
 
