@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 67.
+Completed audit cycles: 68.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -633,6 +633,14 @@ Outcome: pass for evaluation-protocol table-density reduction; blocked for broad
 This gate checks whether the evaluation-protocol table is needed in the main manuscript. The main manuscript now states the evaluation boundary in prose: RQ1 tests whether IAD-Risk preserves same-work matching performance on gold identity pairs, RQ2 tests whether it reduces false merges on silver hard negatives with HNFMR, RQ3 examines whether the observed behavior is consistent with the proposed risk mechanism through FMR and HNFMR, and RQ4 tests whether results remain interpretable under gold, proxy, and silver label strata through split metrics. The supplementary material preserves the full evaluation-protocol table with question, evidence layer, metric, and interpretation columns.
 
 The reviewer-facing boundary is evaluation-protocol clarity without main-text table overload. The validator still requires the supplementary evaluation-protocol table and the explicit rule that gold, proxy, and silver evidence are not mixed into one undifferentiated score.
+
+## Audit Cycle 68: Training and Inference Trace Density Gate
+
+Outcome: pass for training-trace table-density reduction; blocked for implementation-equivalence claims until released prediction artifacts expose relation-head outputs, threshold values, cannot-link flags, metric denominators, and checksum-bound decision files for the same evaluated rows.
+
+This gate checks whether the training and inference trace table is needed in the main manuscript. The main manuscript now states the execution boundary in prose: schema loading preserves pair IDs and split fields, supervised fitting uses the masked objective, threshold fixation records threshold source, selection split, and selection metric, pair scoring writes relation scores and the derived risk score, decision emission records merge, block, or defer with cannot-link status, and metric export binds denominators and checksums to the same prediction artifact. The supplementary material preserves the full training and inference trace table with phase, required operation, and auditable output or invariant columns.
+
+The reviewer-facing boundary is training-trace clarity without main-text table overload. The validator still requires the supplementary training-inference trace table and the explicit rule that gold, proxy, and silver labels are not silently converted into unrelated supervision.
 
 ## Minimum Gate Before Final Upload
 

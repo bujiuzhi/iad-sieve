@@ -1618,26 +1618,29 @@ def check_method_pipeline_figure(manuscript_text: str) -> list[str]:
     return [f"method pipeline figure missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
 
 
-def check_scoring_merge_algorithm(manuscript_text: str) -> list[str]:
+def check_scoring_merge_algorithm(manuscript_text: str, supplementary_text: str = "") -> list[str]:
     """Check whether the method states executable scoring and merge order.
 
     参数:
         manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
 
     返回:
         list[str]: Error messages for missing scoring-algorithm markers.
     """
-    required_markers = [
+    required_main_markers = [
         r"\subsection{Scoring and Merge Algorithm}",
         r"\subsection{Training and Inference Trace}",
-        r"\label{tab:training-inference-trace}",
+        "full training and inference trace table is reported in the supplementary material",
         "threshold fixation, inference, and metric export",
-        "Schema loading",
-        "Supervised fitting",
-        "Threshold fixation",
-        "Pair scoring",
-        "Decision emission",
-        "Metric export",
+        "schema loading preserves pair IDs and split fields",
+        "supervised fitting uses the masked objective",
+        "threshold fixation records",
+        "selection split",
+        "selection metric",
+        "pair scoring writes",
+        "decision emission records merge, block, or defer",
+        "metric export binds denominators and checksums",
         r"\label{tab:scoring-merge-algorithm}",
         "fixed scoring and merge order",
         "identity, agenda, ANI, and audit fields",
@@ -1650,11 +1653,37 @@ def check_scoring_merge_algorithm(manuscript_text: str) -> list[str]:
         "merge, block, or defer",
         "same-work F1, FMR, HNFMR, coverage, and defer-rate audits",
     ]
-    return [
+    required_supplement_markers = [
+        r"\label{tab:training-inference-trace}",
+        "Training and inference trace for IAD-Risk",
+        "Phase",
+        "Required operation",
+        "Auditable output or invariant",
+        "Schema loading",
+        "Supervised fitting",
+        "Threshold fixation",
+        "Pair scoring",
+        "Decision emission",
+        "Metric export",
+        "Pair IDs and split fields remain unchanged",
+        "Gold, proxy, and silver labels are not silently converted",
+        "Threshold source, value, selection split, and selection metric",
+        "Prediction rows expose relation scores",
+        "cannot-link status",
+        "Metric summaries and checksums bind denominators",
+    ]
+    errors = [
         f"scoring and merge algorithm missing marker: {marker}"
-        for marker in required_markers
+        for marker in required_main_markers
         if marker not in manuscript_text
     ]
+    evidence_text = supplementary_text or manuscript_text
+    errors.extend(
+        f"training and inference trace missing supplementary marker: {marker}"
+        for marker in required_supplement_markers
+        if marker not in evidence_text
+    )
+    return errors
 
 
 def check_design_alternative_boundaries(manuscript_text: str, supplementary_text: str = "") -> list[str]:
@@ -3460,7 +3489,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 67",
+        "Completed audit cycles: 68",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3585,8 +3614,18 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 65: Failure-Control Rationale Density Gate",
         "Audit Cycle 66: Reproduction Levels Density Gate",
         "Audit Cycle 67: Evaluation Protocol Density Gate",
+        "Audit Cycle 68: Training and Inference Trace Density Gate",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
+        "training-trace table-density reduction",
+        "full training and inference trace table",
+        "schema loading preserves pair IDs and split fields",
+        "supervised fitting uses the masked objective",
+        "threshold fixation records",
+        "decision emission records merge, block, or defer",
+        "metric export binds denominators and checksums",
+        "training-trace clarity without main-text table overload",
+        "supplementary training-inference trace table",
         "evaluation-protocol table-density reduction",
         "full evaluation-protocol table",
         "RQ1 tests whether IAD-Risk preserves same-work matching performance",
@@ -5102,7 +5141,7 @@ def main() -> int:
     errors.extend(check_version_identifier_policy(manuscript_text))
     errors.extend(check_method_design_supplementary_boundaries(supplementary_text))
     errors.extend(check_method_pipeline_figure(manuscript_text))
-    errors.extend(check_scoring_merge_algorithm(manuscript_text))
+    errors.extend(check_scoring_merge_algorithm(manuscript_text, supplementary_text))
     errors.extend(check_design_alternative_boundaries(manuscript_text, supplementary_text))
     errors.extend(check_failure_control_rationale(manuscript_text, supplementary_text))
     errors.extend(check_related_work_positioning(manuscript_text, supplementary_text))

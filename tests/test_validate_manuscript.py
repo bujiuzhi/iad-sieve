@@ -2007,14 +2007,14 @@ def test_check_scoring_merge_algorithm_accepts_complete_contract() -> None:
     manuscript_text = "\n".join(
         [
             r"\subsection{Training and Inference Trace}",
-            r"\label{tab:training-inference-trace}",
             "The implementation keeps training, threshold fixation, inference, and metric export in one auditable trace.",
-            "Schema loading",
-            "Supervised fitting",
-            "Threshold fixation",
-            "Pair scoring",
-            "Decision emission",
-            "Metric export",
+            "The full training and inference trace table is reported in the supplementary material.",
+            "The schema loading preserves pair IDs and split fields.",
+            "The supervised fitting uses the masked objective.",
+            "The threshold fixation records threshold source, selection split, and selection metric.",
+            "The pair scoring writes scores.",
+            "The decision emission records merge, block, or defer.",
+            "The metric export binds denominators and checksums.",
             r"\subsection{Scoring and Merge Algorithm}",
             r"\label{tab:scoring-merge-algorithm}",
             "The executable method follows a fixed scoring and merge order.",
@@ -2026,8 +2026,29 @@ def test_check_scoring_merge_algorithm_accepts_complete_contract() -> None:
             "The artifact supports same-work F1, FMR, HNFMR, coverage, and defer-rate audits.",
         ]
     )
+    supplementary_text = "\n".join(
+        [
+            r"\label{tab:training-inference-trace}",
+            "Training and inference trace for IAD-Risk.",
+            "Phase",
+            "Required operation",
+            "Auditable output or invariant",
+            "Schema loading",
+            "Supervised fitting",
+            "Threshold fixation",
+            "Pair scoring",
+            "Decision emission",
+            "Metric export",
+            "Pair IDs and split fields remain unchanged.",
+            "Gold, proxy, and silver labels are not silently converted.",
+            "Threshold source, value, selection split, and selection metric.",
+            "Prediction rows expose relation scores.",
+            "cannot-link status",
+            "Metric summaries and checksums bind denominators.",
+        ]
+    )
 
-    errors = module.check_scoring_merge_algorithm(manuscript_text)
+    errors = module.check_scoring_merge_algorithm(manuscript_text, supplementary_text)
 
     assert errors == []
 
@@ -2041,6 +2062,7 @@ def test_check_scoring_merge_algorithm_rejects_missing_execution_order() -> None
     errors = module.check_scoring_merge_algorithm(manuscript_text)
 
     assert any("fixed scoring and merge order" in error for error in errors)
+    assert any("training-inference-trace" in error for error in errors)
     assert any("p_{\\mathrm{risk}}" in error for error in errors)
     assert any("merge, block, or defer" in error for error in errors)
 
@@ -5277,7 +5299,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 67.",
+            "Completed audit cycles: 68.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -5823,6 +5845,16 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "RQ4 tests whether results remain interpretable under gold, proxy, and silver label strata",
             "evaluation-protocol clarity without main-text table overload",
             "supplementary evaluation-protocol table",
+            "## Audit Cycle 68: Training and Inference Trace Density Gate",
+            "training-trace table-density reduction",
+            "full training and inference trace table",
+            "schema loading preserves pair IDs and split fields",
+            "supervised fitting uses the masked objective",
+            "threshold fixation records",
+            "decision emission records merge, block, or defer",
+            "metric export binds denominators and checksums",
+            "training-trace clarity without main-text table overload",
+            "supplementary training-inference trace table",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -5841,7 +5873,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 67",
+        "Completed audit cycles: 68",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -5852,7 +5884,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 67" in error for error in errors)
+    assert any("Completed audit cycles: 68" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

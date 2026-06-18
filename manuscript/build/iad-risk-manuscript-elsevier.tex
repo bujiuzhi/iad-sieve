@@ -278,27 +278,7 @@ where $\mathrm{CE}$ is binary cross-entropy and $\lambda_w,\lambda_a,\lambda_n$ 
 
 \subsection{Training and Inference Trace}
 
-The implementation keeps training, threshold fixation, inference, and metric export in one auditable trace. This trace is necessary because IAD-Risk is a selective decision system: the same row-level decisions that produce same-work F1 also determine FMR, HNFMR, automatic merge coverage, block rate, and defer rate. Table~\ref{tab:training-inference-trace} gives the execution contract that reviewers should use when checking whether a result artifact matches the method description.
-
-\begin{table}[H]
-\caption{Training and inference trace for IAD-Risk. Each phase states the required operation and the artifact or invariant that makes the phase auditable.}
-\label{tab:training-inference-trace}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{L{0.18\linewidth}L{0.42\linewidth}L{0.30\linewidth}}
-\toprule
-Phase & Required operation & Auditable output or invariant \\
-\midrule
-Schema loading & Load pair records with relation labels, label strength, provenance, split, and hard-negative fields. & Pair IDs and split fields remain unchanged from input to prediction output. \\
-Supervised fitting & Optimize the masked objective only where the relevant supervision mask is valid. & Gold, proxy, and silver labels are not silently converted into labels for unrelated heads. \\
-Threshold fixation & Select or record $\tau_w$, $\tau_a$, and $\tau_r$ before held-out reporting. & Threshold source, value, selection split, and selection metric are written to the threshold log. \\
-Pair scoring & Predict $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, and $p_{\mathrm{ani}}$, then derive $p_{\mathrm{risk}}$. & Prediction rows expose relation scores and the derived risk value for each pair. \\
-Decision emission & Apply cannot-link evidence and the risk-aware merge gate to emit merge, block, or defer. & Decision rows record threshold values, threshold source, and cannot-link status. \\
-Metric export & Count same-work F1, FMR, HNFMR, coverage, block rate, and defer rate from the same decision file. & Metric summaries and checksums bind denominators to the prediction artifact. \\
-\bottomrule
-\end{tabular}
-\end{table}
+The implementation keeps training, threshold fixation, inference, and metric export in one auditable trace. The full training and inference trace table is reported in the supplementary material. This trace is necessary because IAD-Risk is a selective decision system: the same row-level decisions that produce same-work F1 also determine FMR, HNFMR, automatic merge coverage, block rate, and defer rate. The main execution contract is that schema loading preserves pair IDs and split fields, supervised fitting uses the masked objective without converting gold, proxy, or silver labels into unrelated supervision, threshold fixation records $\tau_w$, $\tau_a$, $\tau_r$, threshold source, selection split, and selection metric before held-out reporting, pair scoring writes $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, $p_{\mathrm{ani}}$, and $p_{\mathrm{risk}}$, decision emission records merge, block, or defer with cannot-link status, and metric export binds denominators and checksums to the same prediction artifact.
 
 \subsection{Risk-Aware Merge Decision}
 
