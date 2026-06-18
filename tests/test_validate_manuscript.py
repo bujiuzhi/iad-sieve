@@ -4037,8 +4037,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 33.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
+            "Completed audit cycles: 35.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -4132,6 +4132,16 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "defer rate",
             "capacity-normalized review load",
             "validate_artifact_release.py",
+            "## Audit Cycle 34: Selective Decision Workload Boundary Gate",
+            "selective-decision workload wording",
+            "operational throughput or cost-saving claims",
+            "## Audit Cycle 35: Anonymous Cover-Letter Declaration Boundary Gate",
+            "anonymous preflight cover-letter boundary",
+            "author-provided metadata confirms originality",
+            "competing-interest status",
+            "author contribution",
+            "generative AI declarations",
+            "does not treat author declarations as finalized",
             "## Audit Cycle 10: Final Template Binding and System Metadata Gate",
             "target_journal_template_bound",
             "target_journal_template_applied",
@@ -4330,7 +4340,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 33",
+        "Completed audit cycles: 35",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -4341,7 +4351,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 33" in error for error in errors)
+    assert any("Completed audit cycles: 35" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -5185,17 +5195,17 @@ def test_check_reviewer_readiness_audit_rejects_missing_journal_fit_novelty_cycl
     assert any("target-journal scope fit" in error for error in errors)
 
 
-def test_check_cover_letter_accepts_required_submission_statements() -> None:
-    """验证 cover letter 含正式投稿声明时可通过检查。"""
+def test_check_cover_letter_accepts_preflight_declaration_boundary() -> None:
+    """验证匿名预投稿信包含正式声明待确认边界时可通过检查。"""
 
     module = _load_validate_manuscript_module()
     cover_letter_text = "\n".join(
         [
             "Dear Editor,",
             "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication.",
-            "The manuscript is not under consideration elsewhere.",
-            "All listed authors have approved the submitted version.",
-            "The authors declare no competing interests.",
+            "This anonymous preflight cover letter does not treat author declarations as finalized.",
+            "Before final upload, the author-provided metadata must confirm originality, author approval, "
+            "competing-interest status, funding, author contribution, permission, and generative AI declarations.",
             "The repository does not redistribute raw third-party data.",
             "full experimental outputs are not redistributed in Git.",
             "The repository includes artifact-release instructions.",
@@ -5209,15 +5219,44 @@ def test_check_cover_letter_accepts_required_submission_statements() -> None:
     assert errors == []
 
 
-def test_check_cover_letter_rejects_missing_submission_statements() -> None:
-    """验证 cover letter 缺少正式投稿声明时会被拒绝。"""
+def test_check_cover_letter_rejects_missing_preflight_declaration_boundary() -> None:
+    """验证匿名预投稿信缺少声明待确认边界时会被拒绝。"""
 
     module = _load_validate_manuscript_module()
     cover_letter_text = "Dear Editor,\nWe submit the manuscript."
 
     errors = module.check_cover_letter(cover_letter_text)
 
-    assert any("not under consideration elsewhere" in error for error in errors)
+    assert any("anonymous preflight cover letter" in error for error in errors)
+    assert any("author-provided metadata must confirm originality" in error for error in errors)
+    assert any("generative AI declarations" in error for error in errors)
+
+
+def test_check_cover_letter_rejects_premature_final_declarations() -> None:
+    """验证匿名预投稿信不得提前确认作者批准和利益冲突声明。"""
+
+    module = _load_validate_manuscript_module()
+    cover_letter_text = "\n".join(
+        [
+            "Dear Editor,",
+            "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication.",
+            "This anonymous preflight cover letter does not treat author declarations as finalized.",
+            "Before final upload, the author-provided metadata must confirm originality, author approval, "
+            "competing-interest status, funding, author contribution, permission, and generative AI declarations.",
+            "All listed authors have approved the submitted version.",
+            "The authors declare no competing interests.",
+            "The repository does not redistribute raw third-party data.",
+            "full experimental outputs are not redistributed in Git.",
+            "The repository includes artifact-release instructions.",
+            "Released artifacts should include manifests and checksums.",
+            "The manuscript does not claim cluster-level deployment quality without cluster artifacts.",
+        ]
+    )
+
+    errors = module.check_cover_letter(cover_letter_text)
+
+    assert any("premature final declaration" in error for error in errors)
+    assert any("All listed authors have approved" in error for error in errors)
     assert any("no competing interests" in error for error in errors)
 
 
@@ -5229,9 +5268,9 @@ def test_check_cover_letter_rejects_missing_artifact_release_boundary() -> None:
         [
             "Dear Editor,",
             "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication.",
-            "The manuscript is not under consideration elsewhere.",
-            "All listed authors have approved the submitted version.",
-            "The authors declare no competing interests.",
+            "This anonymous preflight cover letter does not treat author declarations as finalized.",
+            "Before final upload, the author-provided metadata must confirm originality, author approval, "
+            "competing-interest status, funding, author contribution, permission, and generative AI declarations.",
             "The repository does not redistribute raw third-party data.",
             "Released artifacts should include manifests and checksums.",
         ]
@@ -5251,9 +5290,9 @@ def test_check_cover_letter_rejects_missing_cluster_claim_boundary() -> None:
         [
             "Dear Editor,",
             "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication.",
-            "The manuscript is not under consideration elsewhere.",
-            "All listed authors have approved the submitted version.",
-            "The authors declare no competing interests.",
+            "This anonymous preflight cover letter does not treat author declarations as finalized.",
+            "Before final upload, the author-provided metadata must confirm originality, author approval, "
+            "competing-interest status, funding, author contribution, permission, and generative AI declarations.",
             "The repository does not redistribute raw third-party data.",
             "full experimental outputs are not redistributed in Git.",
             "The repository includes artifact-release instructions.",
@@ -5275,9 +5314,9 @@ def test_check_cover_letter_rejects_subjective_fit_language() -> None:
         [
             "Dear Editor,",
             "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication.",
-            "The manuscript is not under consideration elsewhere.",
-            "All listed authors have approved the submitted version.",
-            "The authors declare no competing interests.",
+            "This anonymous preflight cover letter does not treat author declarations as finalized.",
+            "Before final upload, the author-provided metadata must confirm originality, author approval, "
+            "competing-interest status, funding, author contribution, permission, and generative AI declarations.",
             "The repository does not redistribute raw third-party data.",
             "full experimental outputs are not redistributed in Git.",
             "The repository includes artifact-release instructions.",

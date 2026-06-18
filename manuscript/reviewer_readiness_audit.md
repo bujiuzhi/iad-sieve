@@ -10,9 +10,9 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 33.
+Completed audit cycles: 35.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.
 
@@ -369,6 +369,14 @@ Outcome: pass for selective-decision workload wording and validator coverage; bl
 This gate checks whether low false-merge rates can be overread as evidence that the method reduces human review. The manuscript now treats low FMR or HNFMR with high deferral as a conservative triage outcome rather than a productivity outcome. Operational benefit requires the released artifacts to bind false-merge metrics to automatic merge coverage, block rate, defer rate, a predeclared deferral budget, and manual-review capacity.
 
 The reviewer-facing boundary is workload attribution. The current manuscript can argue safety-oriented false-merge control under fixed operating points, but it should not claim throughput reduction, review-cost savings, or all-pair automatic resolution until the workload evidence is released and validated.
+
+## Audit Cycle 35: Anonymous Cover-Letter Declaration Boundary Gate
+
+Outcome: pass for anonymous preflight cover-letter boundary; blocked for final upload until author-provided metadata confirms originality, author approval, competing-interest status, funding, author contribution, permission, and generative AI declarations.
+
+This gate checks whether the anonymous cover letter prematurely asserts final author declarations. The preflight cover letter now keeps the scientific submission summary and evidence boundaries, but it states that it does not treat author declarations as finalized until the author-provided metadata and live submission-system fields are completed. This prevents the anonymous preflight package from representing unconfirmed author approval or competing-interest statements as final.
+
+The reviewer-facing boundary is compliance discipline. The current package can be used to review the manuscript story, scope, and reproducibility boundaries, but it should not be treated as final-upload-ready until the selected journal, author identities, corresponding author, declarations, artifact release, and live system fields are confirmed.
 
 ## Minimum Gate Before Final Upload
 

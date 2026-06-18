@@ -2708,7 +2708,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 33",
+        "Completed audit cycles: 35",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -2718,6 +2718,8 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "final-upload artifact-dir omission bypass",
         "zero-observed HNFMR overread",
         "L2 public-source rebuild chain-of-custody gap",
+        "selective-decision workload evidence",
+        "anonymous cover-letter declaration confirmation",
         "artifact release README completeness",
         "artifact release commit validity",
         "artifact README/manifest commit mismatch",
@@ -2900,6 +2902,16 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "defer rate",
         "capacity-normalized review load",
         "validate_artifact_release.py",
+        "Selective Decision Workload Boundary Gate",
+        "selective-decision workload wording",
+        "operational throughput or cost-saving claims",
+        "Anonymous Cover-Letter Declaration Boundary Gate",
+        "anonymous preflight cover-letter boundary",
+        "author-provided metadata confirms originality",
+        "competing-interest status",
+        "author contribution",
+        "generative AI declarations",
+        "does not treat author declarations as finalized",
         "target_journal_template_bound",
         "target_journal_template_applied",
         "source archive rebuilt after template conversion",
@@ -3287,9 +3299,15 @@ def check_cover_letter(cover_letter_text: str) -> list[str]:
     required_markers = [
         "Dear Editor",
         "IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication",
-        "not under consideration elsewhere",
-        "All listed authors have approved",
-        "no competing interests",
+        "anonymous preflight cover letter",
+        "does not treat author declarations as finalized",
+        "author-provided metadata must confirm originality",
+        "author approval",
+        "competing-interest status",
+        "funding",
+        "author contribution",
+        "permission",
+        "generative AI declarations",
         "raw third-party data",
         "full experimental outputs are not redistributed in Git",
         "artifact-release instructions",
@@ -3305,6 +3323,15 @@ def check_cover_letter(cover_letter_text: str) -> list[str]:
     errors.extend(
         f"cover letter contains subjective fit language: {marker}"
         for marker in subjective_fit_markers
+        if marker in cover_letter_text
+    )
+    premature_declaration_markers = [
+        "All listed authors have approved the submitted version.",
+        "The authors declare no competing interests.",
+    ]
+    errors.extend(
+        f"cover letter contains premature final declaration: {marker}"
+        for marker in premature_declaration_markers
         if marker in cover_letter_text
     )
     return errors
