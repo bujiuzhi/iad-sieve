@@ -26,6 +26,52 @@ def _load_validate_manuscript_module():
     return module
 
 
+def test_check_declaration_statements_accepts_complete_declarations() -> None:
+    """验证数据可用性、伦理和利益冲突声明内容完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\section*{Data and Code Availability}",
+            "The source code, benchmark construction scripts, schema contracts, fixture tests,",
+            "and artifact-release guidance are available for audit.",
+            "Raw third-party data are not redistributed in Git.",
+            "The release records data-processing commands, manifests, checksums, and commit identifiers.",
+            r"\section*{Ethics Statement}",
+            "This study uses public scholarly metadata and does not involve human participants,",
+            "clinical records, private user behavior, or sensitive personal information.",
+            r"\section*{Competing Interests}",
+            "The authors declare no competing interests.",
+        ]
+    )
+
+    errors = module.check_declaration_statements(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_declaration_statements_rejects_vague_declarations() -> None:
+    """验证空泛声明缺少数据边界、伦理范围或利益冲突表述时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\section*{Data and Code Availability}",
+            "Data are available on request.",
+            r"\section*{Ethics Statement}",
+            "No ethics approval was needed.",
+            r"\section*{Competing Interests}",
+            "None.",
+        ]
+    )
+
+    errors = module.check_declaration_statements(manuscript_text)
+
+    assert any("artifact-release" in error for error in errors)
+    assert any("human participants" in error for error in errors)
+    assert any("no competing interests" in error for error in errors)
+
+
 def test_check_highlights_accepts_five_concise_bullets() -> None:
     """验证 5 条简洁投稿 highlights 可通过检查。"""
 

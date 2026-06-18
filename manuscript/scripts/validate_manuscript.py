@@ -204,6 +204,71 @@ def check_sections(document_text: str, required_sections: list[str], document_na
     return [f"{document_name} missing required section marker: {section}" for section in required_sections if section not in document_text]
 
 
+def extract_latex_section_body(document_text: str, section_marker: str) -> str:
+    """Extract the body text after a LaTeX top-level section marker.
+
+    参数:
+        document_text: LaTeX document source.
+        section_marker: Exact top-level section marker to locate.
+
+    返回:
+        str: Section body text up to the next top-level section, or an empty string when missing.
+    """
+    section_start = document_text.find(section_marker)
+    if section_start < 0:
+        return ""
+    body_start = section_start + len(section_marker)
+    next_section = re.search(r"\n\\section\*?\{", document_text[body_start:])
+    if next_section is None:
+        return document_text[body_start:]
+    return document_text[body_start : body_start + next_section.start()]
+
+
+def check_declaration_statements(manuscript_text: str) -> list[str]:
+    """Check journal declaration statements for reviewer-auditable content.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for incomplete availability, ethics, or competing-interest statements.
+    """
+    required_markers_by_section = {
+        r"\section*{Data and Code Availability}": [
+            "source code",
+            "benchmark construction scripts",
+            "Raw third-party data are not redistributed",
+            "data-processing commands",
+            "schema contracts",
+            "fixture tests",
+            "artifact-release",
+            "manifests",
+            "checksums",
+            "commit identifiers",
+        ],
+        r"\section*{Ethics Statement}": [
+            "public scholarly metadata",
+            "does not involve human participants",
+            "clinical records",
+            "private user behavior",
+            "sensitive personal information",
+        ],
+        r"\section*{Competing Interests}": [
+            "no competing interests",
+        ],
+    }
+    errors: list[str] = []
+    for section_marker, required_markers in required_markers_by_section.items():
+        section_body = extract_latex_section_body(manuscript_text, section_marker)
+        if not section_body.strip():
+            errors.append(f"declaration statement missing section body: {section_marker}")
+            continue
+        for marker in required_markers:
+            if marker not in section_body:
+                errors.append(f"declaration statement {section_marker} missing marker: {marker}")
+    return errors
+
+
 def check_forbidden_claims(manuscript_text: str) -> list[str]:
     """Check forbidden unsupported claims in the manuscript.
 
@@ -1586,6 +1651,7 @@ def main() -> int:
     errors.extend(check_related_work_positioning(manuscript_text))
     errors.extend(check_error_taxonomy(manuscript_text))
     errors.extend(check_validity_threats(manuscript_text))
+    errors.extend(check_declaration_statements(manuscript_text))
     errors.extend(check_operating_point_disclosure(manuscript_text))
     errors.extend(check_threshold_sensitivity_status(manuscript_text))
     errors.extend(check_baseline_scope_alignment(manuscript_text))
