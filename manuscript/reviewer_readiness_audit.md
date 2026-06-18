@@ -29,7 +29,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 | Confidence intervals and statistical significance may be overread. | Medium | The manuscript reports point estimates and adds a statistical interpretation boundary that reserves bootstrap intervals, significance tests, and model-ranking claims for artifact-backed evidence. | Release bootstrap intervals, predefined tests, resampling logs, random seeds, and checksums before claiming interval-supported superiority. |
 | First-screen submission materials may drift in claim scope. | Medium | Title, abstract, conclusion, cover letter, highlights, and keywords are checked for editorial claim alignment around the same problem, method, evidence snapshot, and claim boundary. | Re-run the editorial alignment gate after template conversion or journal-specific cover-letter edits. |
 | Reproducibility depends on files outside Git. | Medium | Fixture rebuild, public-source commands, artifact manifest template, and checksums policy are documented. | Publish the L3 artifact release and link it in submission metadata. |
-| Final upload may mismatch journal system fields. | High | A submission-system checklist records file, metadata, PDF, and artifact checks. | Confirm target journal, author metadata, template, and live system fields. |
+| Final upload may mismatch journal system fields. | High | A submission-system checklist records file, metadata, PDF, and artifact checks. | Confirm target journal, author metadata, funding statement, author contribution statement, permissions statement, template, and live system fields. |
 
 ## Claim-Evidence Check
 
@@ -79,7 +79,7 @@ The manuscript avoids unsupported broad-superiority, human-gold, and threshold-s
 
 Outcome: blocked for final upload.
 
-The template-independent package is internally consistent, but final upload remains blocked until the target journal, journal template, author metadata, corresponding-author metadata, final template-specific PDFs, live submission-system fields, and artifact release link are completed.
+The template-independent package is internally consistent, but final upload remains blocked until the target journal, journal template, author metadata, corresponding-author metadata, funding statement, author contribution statement, third-party material permission statement, final template-specific PDFs, live submission-system fields, and artifact release link are completed.
 
 ## Audit Cycle 3: Q2/B Acceptance Gate
 
@@ -105,7 +105,7 @@ The editorial desk check compares the title, abstract, conclusion, cover letter,
 
 Outcome: pass for conservative response planning; blocked for stronger evidence claims.
 
-This cycle separates reviewer questions that can be answered from the current manuscript from questions that require additional artifact-backed evidence. The status labels are: `ready_to_answer` when the manuscript already contains direct evidence, `limited_answer` when the response must stay within the present Open-v2 evidence snapshot, and `do_not_answer_as_claim` when the answer would require new experiments, public artifact files, or target-journal confirmation before it can appear as a manuscript claim.
+This cycle separates reviewer questions that can be answered from the current manuscript from questions that require additional artifact-backed evidence. The status labels are: `ready_to_answer` when the manuscript already contains direct evidence, `limited_answer` when the response must stay within the present Open-v2 evidence snapshot, and `do_not_answer_as_claim` when the answer would require new experiments, public artifact files, author declarations, permission declarations, or target-journal confirmation before it can appear as a manuscript claim.
 
 | Reviewer challenge | Response status | safe response scope | must-not-claim boundary |
 | --- | --- | --- | --- |
@@ -114,7 +114,7 @@ This cycle separates reviewer questions that can be answered from the current ma
 | The table mixes pair scopes and may not support a ranking. | `limited_answer` | Treat Open-v2 as a scope-bounded evidence snapshot and cite operating-point and scope-compatibility disclosures. | Do not claim method ranking, SOTA performance, or interval-supported superiority without same-scope prediction artifacts and bootstrap logs. |
 | The mechanism may not be causal without ablations. | `do_not_answer_as_claim` | Use only the current mechanism-consistent wording. | Do not claim completed component causality before no-gate, no-ANI, single-space, and threshold-grid artifacts are released. |
 | The result cannot be fully reproduced from Git alone. | `limited_answer` | Distinguish fixture-level code reproduction from L2/L3 artifact reproduction. | Do not imply full numerical audit until the external artifact release URL or DOI, manifest, and checksums are available. |
-| The paper is ready for final upload. | `do_not_answer_as_claim` | State that the anonymous pre-submission package validates, but final upload is still gated. | Do not state final-upload readiness until target journal, author metadata, final PDFs, live system fields, and artifact release link are complete. |
+| The paper is ready for final upload. | `do_not_answer_as_claim` | State that the anonymous pre-submission package validates, but final upload is still gated. | Do not state final-upload readiness until target journal, author metadata, funding statement, author contribution statement, permissions statement, final PDFs, live system fields, and artifact release link are complete. |
 
 ## Audit Cycle 7: Journal Fit and Novelty Desk Check
 
@@ -132,7 +132,8 @@ The manuscript should not be uploaded to a journal system until all of the follo
 2. `main.tex` is converted to the selected journal template and rebuilt.
 3. `supplementary_material.tex` is rebuilt after any final source edits.
 4. The artifact release has a real URL or DOI and validates against its checksum file.
-5. `python manuscript/scripts/validate_manuscript.py --strict-latex` passes.
-6. `python manuscript/scripts/validate_submission_package.py --final-upload` passes.
-7. `submission_system_checklist.md` has been checked against the live journal system.
-8. The Q2/B acceptance gate is either fully ready or the manuscript title, abstract, cover letter, and conclusion avoid any Q2/B-complete or broad-superiority wording.
+5. The funding statement, author contribution statement, and permissions statement are complete and consistent with the live submission system.
+6. `python manuscript/scripts/validate_manuscript.py --strict-latex` passes.
+7. `python manuscript/scripts/validate_submission_package.py --final-upload` passes.
+8. `submission_system_checklist.md` has been checked against the live journal system.
+9. The Q2/B acceptance gate is either fully ready or the manuscript title, abstract, cover letter, and conclusion avoid any Q2/B-complete or broad-superiority wording.

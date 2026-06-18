@@ -1413,6 +1413,9 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "iad-risk-manuscript-elsevier.pdf",
             "Passing this check does not complete the final-upload gate.",
             "## Final Metadata Checks",
+            "The funding statement is completed and matches the manuscript and submission system.",
+            "The author contribution statement is completed before final upload.",
+            "The permissions statement records third-party material permission status.",
             "## File Hygiene Checks",
             "No `data/`, `outputs/`, cache, local connection, credential, or raw third-party file.",
             "Anonymous packages contain no author email addresses, ORCID values, personal account URLs, local absolute paths, or tool-generated process notes.",
@@ -1483,6 +1486,58 @@ def test_check_submission_system_checklist_rejects_missing_artifact_release_chec
 
     assert any("Artifact Release Package Checks" in error for error in errors)
     assert any("validate_artifact_release.py" in error for error in errors)
+
+
+def test_check_submission_system_checklist_rejects_missing_declaration_gate_fields() -> None:
+    """验证投稿系统清单缺少正式声明门禁字段时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    checklist_text = "\n".join(
+        [
+            "# Submission System Checklist",
+            "This is not a manuscript file for journal upload.",
+            "## Required Upload Files",
+            "Main manuscript source",
+            "Main manuscript PDF",
+            "DKE/Elsevier preflight source",
+            "DKE/Elsevier preflight PDF",
+            "Supplementary source",
+            "Supplementary PDF",
+            "Bibliography",
+            "Cover letter",
+            "Highlights",
+            "Keywords",
+            "Submission metadata",
+            "Artifact release manifest",
+            "## Artifact Release Package Checks",
+            "python manuscript/scripts/build_artifact_release_skeleton.py --output-dir /path/to/release --repository-commit",
+            "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
+            "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
+            "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
+            "## DKE/Elsevier Preflight Package Checks",
+            "python manuscript/scripts/build_submission_package.py --dke-preflight",
+            "python manuscript/scripts/validate_submission_package.py --dke-preflight",
+            "build/iad-risk-dke-preflight-package.zip",
+            "iad-risk-manuscript-elsevier.tex",
+            "iad-risk-manuscript-elsevier.pdf",
+            "Passing this check does not complete the final-upload gate.",
+            "## Final Metadata Checks",
+            "The author list, order, affiliations, ORCID values, and corresponding author match the title page.",
+            "The artifact release URL or DOI resolves publicly or according to the journal's access policy.",
+            "## File Hygiene Checks",
+            "No `data/`, `outputs/`, cache, local connection, credential, or raw third-party file.",
+            "Anonymous packages contain no author email addresses, ORCID values, personal account URLs, local absolute paths, or tool-generated process notes.",
+            "## Current Blocking Items",
+            "Target journal has not been author-confirmed.",
+            "Artifact release URL or DOI has not been created.",
+        ]
+    )
+
+    errors = module.check_submission_system_checklist(checklist_text)
+
+    assert any("funding statement" in error for error in errors)
+    assert any("author contribution statement" in error for error in errors)
+    assert any("permissions statement" in error for error in errors)
 
 
 def test_check_submission_system_checklist_rejects_missing_dke_preflight_package() -> None:
