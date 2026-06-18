@@ -3321,6 +3321,22 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "Highlights match `highlights.md` exactly unless the selected journal does not collect highlights.",
             "The live submission system preview shows the same title, abstract, keywords, and highlights.",
             "Mark `submission_system_files_verified` true only after these text fields and upload files are checked.",
+            "## First-Screen Claim Lockdown Checks",
+            "`cover_letter.md`, `highlights.md`, `keywords.md`, the abstract, and the conclusion describe the same problem, method, Open-v2 evidence snapshot, and claim boundary.",
+            "Any journal-specific edit keeps the Open-v2 numbers scope-bounded.",
+            "It preserves the distinction between full pair scope and held-out test scope.",
+            "No first-screen material claims broad method superiority.",
+            "No first-screen material claims SOTA ranking.",
+            "No first-screen material claims statistical superiority.",
+            "No first-screen material claims threshold stability.",
+            "No first-screen material claims human-gold validation.",
+            "No first-screen material claims Q2/B completion.",
+            "No first-screen material claims final-upload readiness.",
+            "No first-screen material claims cluster-level deployment quality.",
+            "Artifact URL or DOI insertion does not upgrade the scientific claim.",
+            "The optional evidence includes bootstrap intervals, threshold grids, ablations, manual-validation slice, or cluster artifacts.",
+            "After edits, rerun `python manuscript/scripts/validate_manuscript.py --strict-latex`.",
+            "Then rebuild the submission package before upload.",
             "## Final Metadata Checks",
             "The selected journal template matches the final manuscript source.",
             "The funding statement is completed and matches the manuscript and submission system.",
@@ -3388,6 +3404,30 @@ def test_check_submission_system_checklist_rejects_missing_live_text_checks() ->
     assert any("Title, abstract, keywords, and highlights are copied" in error for error in errors)
     assert any("Keywords match `keywords.md` exactly" in error for error in errors)
     assert any("Highlights match `highlights.md` exactly" in error for error in errors)
+
+
+def test_check_submission_system_checklist_rejects_missing_first_screen_lockdown() -> None:
+    """验证投稿系统清单必须覆盖首屏主张锁定。"""
+
+    module = _load_validate_manuscript_module()
+    checklist_text = Path("manuscript/submission_system_checklist.md").read_text(encoding="utf-8")
+    checklist_text = checklist_text.replace("## First-Screen Claim Lockdown Checks", "## Removed claim lockdown")
+    checklist_text = checklist_text.replace(
+        "`cover_letter.md`, `highlights.md`, `keywords.md`, the abstract, and the conclusion",
+        "submission text files",
+    )
+    checklist_text = checklist_text.replace("No first-screen material claims broad method superiority", "Claims are reviewed")
+    checklist_text = checklist_text.replace(
+        "Artifact URL or DOI insertion does not upgrade the scientific claim",
+        "Artifact link is inserted",
+    )
+
+    errors = module.check_submission_system_checklist(checklist_text)
+
+    assert any("First-Screen Claim Lockdown Checks" in error for error in errors)
+    assert any("cover_letter.md" in error for error in errors)
+    assert any("broad method superiority" in error for error in errors)
+    assert any("Artifact URL or DOI insertion" in error for error in errors)
 
 
 def test_check_submission_system_checklist_rejects_missing_publisher_declarations() -> None:
@@ -3763,7 +3803,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 22.",
+            "Completed audit cycles: 23.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release README completeness, artifact release commit validity, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -3965,6 +4005,13 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "decision emission",
             "metric export",
             "relation-head predictions",
+            "## Audit Cycle 23: First-Screen Claim Lockdown Gate",
+            "final-upload checklist coverage",
+            "first-screen upgrades",
+            "SOTA ranking",
+            "statistical superiority",
+            "human-gold validation",
+            "Q2/B completion",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload",
@@ -3983,7 +4030,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 22",
+        "Completed audit cycles: 23",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -3994,7 +4041,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 22" in error for error in errors)
+    assert any("Completed audit cycles: 23" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

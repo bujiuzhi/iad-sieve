@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 22.
+Completed audit cycles: 23.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release README completeness, artifact release commit validity, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
@@ -273,6 +273,14 @@ Outcome: pass for method-writing clarity; blocked for result-level audit until e
 This cycle checks whether the Method section gives reviewers a reproducible execution path rather than only a conceptual model description. The manuscript now states the training and inference trace from schema loading through masked supervision, threshold fixation, pair scoring, decision emission, and metric export. This closes a writing-clarity risk: reviewers can see how relation-head predictions, fixed thresholds, cannot-link evidence, merge/block/defer decisions, and metric denominators should align in a result artifact.
 
 The reviewer-facing boundary remains unchanged. A clear execution trace improves method reproducibility from the manuscript text, but it does not by itself prove the Open-v2 numbers. Result-level audit still requires populated prediction files, threshold logs, metric summaries, manifests, checksums, and the external artifact URL or DOI.
+
+## Audit Cycle 23: First-Screen Claim Lockdown Gate
+
+Outcome: pass for final-upload checklist coverage; blocked for final upload until target-journal wording edits, artifact links, and live system fields are checked against the same source package.
+
+This cycle checks the materials that editors and submission systems see before a reviewer reads the PDF. The submission checklist now requires `cover_letter.md`, `highlights.md`, `keywords.md`, the abstract, and the conclusion to describe the same problem, method, Open-v2 evidence snapshot, and claim boundary. It also blocks first-screen upgrades to broad method superiority, SOTA ranking, statistical superiority, threshold stability, human-gold validation, Q2/B completion, final-upload readiness, or cluster-level deployment quality.
+
+The reviewer-facing boundary is practical. A consistent first screen reduces desk-check and scope-drift risk, but it does not add empirical evidence. Artifact URL or DOI insertion must remain a traceability update unless the released artifact validates the optional evidence needed for stronger claims, such as bootstrap intervals, threshold grids, ablations, manual-validation slice, or cluster artifacts.
 
 ## Minimum Gate Before Final Upload
 

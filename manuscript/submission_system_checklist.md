@@ -124,6 +124,16 @@ Before upload, verify:
 5. The live submission system preview shows the same title, abstract, keywords, and highlights that appear in the source files.
 6. Mark `submission_system_files_verified` true only after these text fields and upload files are checked in the live submission system.
 
+## First-Screen Claim Lockdown Checks
+
+Before upload, verify:
+
+1. `cover_letter.md`, `highlights.md`, `keywords.md`, the abstract, and the conclusion describe the same problem, method, Open-v2 evidence snapshot, and claim boundary.
+2. Any journal-specific cover-letter or highlight edit keeps the Open-v2 numbers scope-bounded and preserves the distinction between full pair scope and held-out test scope.
+3. No first-screen material claims broad method superiority, SOTA ranking, statistical superiority, threshold stability, human-gold validation, Q2/B completion, final-upload readiness, or cluster-level deployment quality.
+4. Artifact URL or DOI insertion does not upgrade the scientific claim unless the released artifact validates the corresponding optional evidence, such as bootstrap intervals, threshold grids, ablations, manual-validation slice, or cluster artifacts.
+5. After any target-journal wording edit, rerun `python manuscript/scripts/validate_manuscript.py --strict-latex` and rebuild the submission package before upload.
+
 ## File Hygiene Checks
 
 Before upload, verify:
