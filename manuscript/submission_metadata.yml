@@ -58,6 +58,12 @@ permissions:
   permissions_statement: ""
   permission_files: []
 
+repository_reference:
+  repository_url: ""
+  repository_commit: ""
+  repository_branch: "main"
+  repository_commit_required_before_final_upload: true
+
 artifact_boundary:
   raw_third_party_data_included: false
   full_prediction_files_included: false

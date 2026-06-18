@@ -70,6 +70,8 @@ For each author, select the applicable CRediT roles and then draft the final aut
 
 - Repository URL:
 - Repository commit:
+- Repository branch:
+- Repository commit matches artifact release manifest:
 - Data boundary:
 - Artifact boundary:
 - Final statement for submission system:

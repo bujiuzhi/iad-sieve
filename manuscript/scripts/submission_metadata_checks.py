@@ -26,6 +26,14 @@ EMAIL_PATTERN = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 ORCID_PATTERN = re.compile(r"^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$")
 URL_PATTERN = re.compile(r"^https?://[^\s]+$", re.IGNORECASE)
 DOI_PATTERN = re.compile(r"^10\.[^\s/]+/[^\s]+$", re.IGNORECASE)
+COMMIT_PATTERN = re.compile(r"^[0-9a-f]{7,40}$", re.IGNORECASE)
+COMMIT_PLACEHOLDERS = {
+    "<commit>",
+    "commit",
+    "fill-with-release-commit",
+    "tbd",
+    "todo",
+}
 AUTHOR_VISIBLE_REVIEW_JOURNALS = {
     "data & knowledge engineering": "Data & Knowledge Engineering",
     "information systems": "Information Systems",
@@ -426,6 +434,35 @@ def check_artifact_release_link(metadata_text: str) -> list[str]:
     return errors
 
 
+def check_repository_reference(metadata_text: str) -> list[str]:
+    """Check final-upload repository URL, branch, and commit reference fields.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages for missing or invalid repository reference fields.
+    """
+    repository_row = parse_mapping_section(metadata_text, "repository_reference")
+    repository_url = repository_row.get("repository_url", "")
+    repository_commit = repository_row.get("repository_commit", "")
+    repository_branch = repository_row.get("repository_branch", "")
+    errors: list[str] = []
+    if not repository_url:
+        errors.append("repository URL is missing")
+    elif URL_PATTERN.fullmatch(repository_url) is None:
+        errors.append("repository URL is invalid")
+    if not repository_commit:
+        errors.append("repository commit is missing")
+    elif repository_commit.strip().lower() in COMMIT_PLACEHOLDERS:
+        errors.append("repository commit is still a placeholder")
+    elif COMMIT_PATTERN.fullmatch(repository_commit) is None:
+        errors.append("repository commit is invalid")
+    if not repository_branch:
+        errors.append("repository branch is missing")
+    return errors
+
+
 def doi_from_url(value: str) -> str:
     """Extract a DOI from a doi.org URL.
 
@@ -682,5 +719,6 @@ def check_final_upload_metadata_text(metadata_text: str) -> list[str]:
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_author_contribution_statement(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_permissions_statement(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_artifact_release_link(metadata_text))
+    errors.extend(f"final upload metadata unresolved: {message}" for message in check_repository_reference(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_final_upload_review_mode(metadata_text))
     return sorted(set(errors))

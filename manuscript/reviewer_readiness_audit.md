@@ -161,7 +161,7 @@ The manuscript should not be uploaded to a journal system until all of the follo
 1. `submission_metadata.yml` contains the selected target journal and completed author metadata.
 2. `main.tex` is converted to the selected journal template and rebuilt.
 3. `supplementary_material.tex` is rebuilt after any final source edits.
-4. The artifact release has a real URL or DOI and validates against its checksum file.
+4. The artifact release has a real URL or DOI, validates against its checksum file, and records the same repository commit used by the final manuscript package.
 5. The funding statement, author contribution statement, permissions statement, and journal-specific research data statement are complete and consistent with the live submission system, with the artifact URL or DOI embedded in the research data statement.
 6. `python manuscript/scripts/validate_manuscript.py --strict-latex` passes.
 7. `python manuscript/scripts/validate_submission_package.py --final-upload` passes.
