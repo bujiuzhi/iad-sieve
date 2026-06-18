@@ -79,6 +79,7 @@ REQUIRED_SECTIONS = [
     r"\subsection{Design Alternatives and Rejected Shortcuts}",
     r"\subsection{Implementation Details}",
     r"\subsection{Feature and Head Specification}",
+    r"\subsection{Scoring and Merge Algorithm}",
     r"\subsection{Implementation and Reproducibility}",
     r"\section{Experiments}",
     r"\subsection{Split and Leakage Controls}",
@@ -1206,6 +1207,36 @@ def check_method_pipeline_figure(manuscript_text: str) -> list[str]:
         r"\label{fig:iad-risk-pipeline}",
     ]
     return [f"method pipeline figure missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
+
+
+def check_scoring_merge_algorithm(manuscript_text: str) -> list[str]:
+    """Check whether the method states executable scoring and merge order.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing scoring-algorithm markers.
+    """
+    required_markers = [
+        r"\subsection{Scoring and Merge Algorithm}",
+        r"\label{tab:scoring-merge-algorithm}",
+        "fixed scoring and merge order",
+        "identity, agenda, ANI, and audit fields",
+        "without using audit metadata as predictors",
+        r"$p_{\mathrm{work}}$",
+        r"$p_{\mathrm{agenda}}$",
+        r"$p_{\mathrm{ani}}$",
+        r"$p_{\mathrm{risk}}=\max\{p_{\mathrm{ani}},p_{\mathrm{agenda}}(1-p_{\mathrm{work}})\}$",
+        "cannot-link flag",
+        "merge, block, or defer",
+        "same-work F1, FMR, HNFMR, coverage, and defer-rate audits",
+    ]
+    return [
+        f"scoring and merge algorithm missing marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
 
 
 def check_design_alternative_boundaries(manuscript_text: str) -> list[str]:
@@ -3406,6 +3437,7 @@ def main() -> int:
     errors.extend(check_operational_net_benefit_boundary(manuscript_text))
     errors.extend(check_version_identifier_policy(manuscript_text))
     errors.extend(check_method_pipeline_figure(manuscript_text))
+    errors.extend(check_scoring_merge_algorithm(manuscript_text))
     errors.extend(check_design_alternative_boundaries(manuscript_text))
     errors.extend(check_related_work_positioning(manuscript_text))
     errors.extend(check_error_taxonomy(manuscript_text))

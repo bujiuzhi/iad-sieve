@@ -1432,6 +1432,42 @@ def test_check_method_pipeline_figure_rejects_missing_visual_contract() -> None:
     assert any("Risk-aware" in error for error in errors)
 
 
+def test_check_scoring_merge_algorithm_accepts_complete_contract() -> None:
+    """验证 IAD-Risk 评分和合并算法契约完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Scoring and Merge Algorithm}",
+            r"\label{tab:scoring-merge-algorithm}",
+            "The executable method follows a fixed scoring and merge order.",
+            "IAD-Risk first builds identity, agenda, ANI, and audit fields.",
+            "It builds feature groups without using audit metadata as predictors.",
+            r"The heads output $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, and $p_{\mathrm{ani}}$.",
+            r"The derived risk score is $p_{\mathrm{risk}}=\max\{p_{\mathrm{ani}},p_{\mathrm{agenda}}(1-p_{\mathrm{work}})\}$.",
+            "The gate uses a cannot-link flag and emits merge, block, or defer.",
+            "The artifact supports same-work F1, FMR, HNFMR, coverage, and defer-rate audits.",
+        ]
+    )
+
+    errors = module.check_scoring_merge_algorithm(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_scoring_merge_algorithm_rejects_missing_execution_order() -> None:
+    """验证算法契约缺少风险分数或三态输出时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\subsection{Scoring and Merge Algorithm}"
+
+    errors = module.check_scoring_merge_algorithm(manuscript_text)
+
+    assert any("fixed scoring and merge order" in error for error in errors)
+    assert any("p_{\\mathrm{risk}}" in error for error in errors)
+    assert any("merge, block, or defer" in error for error in errors)
+
+
 def test_check_design_alternative_boundaries_accepts_complete_boundaries() -> None:
     """验证设计替代项和拒绝边界完整时可通过检查。"""
 
