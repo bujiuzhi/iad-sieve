@@ -782,6 +782,33 @@ def check_risk_score_design_rationale(manuscript_text: str) -> list[str]:
     ]
 
 
+def check_operational_net_benefit_boundary(manuscript_text: str) -> list[str]:
+    """Check whether the method states deployment cost and net-benefit boundaries.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing operational net-benefit markers.
+    """
+    required_markers = [
+        r"\subsection{Operational Complexity and Net Benefit}",
+        r"\label{tab:operational-net-benefit}",
+        "false merges are more costly than additional review",
+        "three relation heads and explicit threshold records",
+        "deferral budget and manual-review capacity",
+        "not tuned per pair",
+        "not a universal replacement",
+        "net benefit is strongest in high-stakes scholarly indexes",
+        "low-risk bulk cleanup",
+    ]
+    return [
+        f"operational net-benefit boundary missing marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
+
+
 def check_method_pipeline_figure(manuscript_text: str) -> list[str]:
     """Check whether the method section includes the IAD-Risk pipeline figure.
 
@@ -2308,6 +2335,7 @@ def main() -> int:
     errors.extend(check_iad_bench_pair_schema_contract(manuscript_text))
     errors.extend(check_method_feature_contract(manuscript_text))
     errors.extend(check_risk_score_design_rationale(manuscript_text))
+    errors.extend(check_operational_net_benefit_boundary(manuscript_text))
     errors.extend(check_method_pipeline_figure(manuscript_text))
     errors.extend(check_design_alternative_boundaries(manuscript_text))
     errors.extend(check_related_work_positioning(manuscript_text))

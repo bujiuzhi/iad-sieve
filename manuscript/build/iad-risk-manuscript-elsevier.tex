@@ -302,6 +302,28 @@ p_{\mathrm{risk}}<\tau_r,\quad
 \]
 This rule is deliberately selective. It can reject or defer high-risk pairs instead of forcing every semantically related pair into a binary match decision. The same decision interface also supports constrained union-find clustering, where cannot-link evidence prevents transitive false merges.
 
+\subsection{Operational Complexity and Net Benefit}
+
+IAD-Risk is appropriate when false merges are more costly than additional review. The additional cost comes from three relation heads and explicit threshold records, rather than from a new end-to-end clustering system. In an operational scholarly index, this cost is justified when a false merge can contaminate citation counts, literature-review evidence, or recommendation signals. In contrast, low-risk bulk cleanup tasks may prefer a simpler deduplication rule if occasional false merges have limited downstream effect.
+
+\begin{table}[H]
+\caption{Operational complexity and net-benefit boundary. The framework is intended for safety-sensitive scholarly identity decisions, not as a universal replacement for simple deduplication pipelines.}
+\label{tab:operational-net-benefit}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{L{0.23\linewidth}L{0.33\linewidth}L{0.34\linewidth}}
+\toprule
+Operational item & Required practice & Net-benefit boundary \\
+\midrule
+Model complexity & Train and audit same-work, same-agenda, and ANI heads under one pair schema. & The net benefit is strongest in high-stakes scholarly indexes where false merges are costly. \\
+Threshold governance & Select shared thresholds on validation evidence and record them in artifacts. & Thresholds are not tuned per pair or changed after test inspection. \\
+Deferral policy & Record the deferral budget and manual-review capacity before deployment. & A high defer rate is acceptable only when review capacity exists. \\
+Simple alternatives & Retain simple rules for low-risk bulk cleanup or identifier-only reconciliation. & IAD-Risk is not a universal replacement for simple deduplication pipelines. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Failure-Control Rationale}
 
 IAD-Risk is designed as a failure-control framework rather than as another similarity scorer. Table~\ref{tab:failure-controls} summarizes how each design choice addresses a specific false-merge pathway. The table also states the remaining boundary for each control, because a safety mechanism should make its unsupported cases explicit.

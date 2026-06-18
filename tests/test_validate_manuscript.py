@@ -639,6 +639,42 @@ def test_check_risk_score_design_rationale_rejects_missing_boundary() -> None:
     assert any("not a calibrated probability" in error for error in errors)
 
 
+def test_check_operational_net_benefit_boundary_accepts_complete_boundary() -> None:
+    """验证方法复杂度和净收益边界完整时可通过检查。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Operational Complexity and Net Benefit}",
+            r"\label{tab:operational-net-benefit}",
+            "IAD-Risk is appropriate when false merges are more costly than additional review.",
+            "The additional cost comes from three relation heads and explicit threshold records.",
+            "The deferral budget and manual-review capacity should be recorded before deployment.",
+            "Shared thresholds should be selected on validation evidence, not tuned per pair.",
+            "The framework is not a universal replacement for simple deduplication pipelines.",
+            "net benefit is strongest in high-stakes scholarly indexes",
+            "low-risk bulk cleanup",
+        ]
+    )
+
+    errors = module.check_operational_net_benefit_boundary(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_operational_net_benefit_boundary_rejects_missing_cost_boundary() -> None:
+    """验证方法复杂度说明缺少成本和适用边界时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = r"\subsection{Operational Complexity and Net Benefit}"
+
+    errors = module.check_operational_net_benefit_boundary(manuscript_text)
+
+    assert any("operational-net-benefit" in error for error in errors)
+    assert any("deferral budget" in error for error in errors)
+    assert any("not a universal replacement" in error for error in errors)
+
+
 def test_check_method_pipeline_figure_accepts_complete_figure() -> None:
     """验证 IAD-Risk 方法流程图完整时可通过检查。"""
 
