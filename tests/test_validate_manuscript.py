@@ -605,6 +605,12 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
             "Threshold logs expose threshold name.",
             "Threshold logs expose selection split.",
             "Threshold logs expose selection metric.",
+            "External artifacts require artifact-level and manuscript-package validation.",
+            r"\path{manuscript/scripts/validate_artifact_release.py}",
+            r"\path{manuscript/scripts/validate_submission_package.py}",
+            r"\texttt{--final-upload --artifact-dir /path/to/release}",
+            "The release and manuscript package refer to the same source commit.",
+            "The release should not be used to support the Open-v2 numerical table when validation fails.",
             "The evidence does not support a broad method-ranking claim.",
             r"\label{tab:openv2-results}",
         ]
@@ -780,6 +786,86 @@ def test_check_result_claim_boundary_rejects_missing_supplementary_row_schema() 
     assert any("scope label used in the main table" in error for error in errors)
     assert any("automatic merge coverage" in error for error in errors)
     assert any("defer rate" in error for error in errors)
+
+
+def test_check_result_claim_boundary_rejects_missing_manuscript_artifact_validation_binding() -> None:
+    """验证主稿必须说明 artifact release 与最终投稿包绑定校验。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\label{tab:openv2-results}",
+            r"\subsection{Claim-Evidence Boundary for Result Interpretation}",
+            r"\subsection{Result Audit Trail}",
+            r"\label{tab:result-artifact-crosswalk}",
+            r"\path{open_v2_main_results}",
+            r"\path{iad_bench_split_summary}",
+            r"\path{representation_baseline_scores}",
+            r"\path{supervised_baseline_predictions}",
+            r"\path{iad_risk_predictions}",
+            r"\path{threshold_selection_logs}",
+            r"\path{bootstrap_intervals}",
+            r"\path{ablation_suite}",
+            r"\path{manual_validation_slice}",
+            r"\path{threshold_sensitivity_grid}",
+            r"\label{tab:claim-evidence-boundary-main}",
+            "Each row uses a prediction or score file, metric summary, and checksum or manifest.",
+            "Each row records per-row denominator counts.",
+            "Each row records the per-row threshold source.",
+            "Each row records the scope label used in the main table.",
+            "Each row records automatic merge count.",
+            "Each row records block count.",
+            "Each row records defer count.",
+            "Each row records automatic merge coverage.",
+            "Each row records defer rate.",
+            "Prediction JSONL artifacts expose pair/document IDs.",
+            "Prediction JSONL artifacts expose score or probability fields.",
+            "Threshold logs expose threshold name.",
+            "Threshold logs expose selection split.",
+            "Threshold logs expose selection metric.",
+            "The evidence does not support a broad method-ranking claim.",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Artifact Package Requirements}",
+            r"\section{Claim-Evidence Matrix}",
+            "The released artifact package includes checksums.sha256.",
+            "Reviewers can run python manuscript/scripts/build_artifact_release_skeleton.py.",
+            "Reviewers can run python manuscript/scripts/populate_artifact_release.py.",
+            "Reviewers can run python manuscript/scripts/finalize_artifact_release.py.",
+            "Reviewers can run python manuscript/scripts/validate_artifact_release.py.",
+            "The validator checks required result identifiers.",
+            "The validator checks conditional claim artifacts.",
+            r"The package documents \path{open_v2_main_results}.",
+            "The artifact package records per-row denominator counts.",
+            "The artifact package records the per-row threshold source.",
+            "The artifact package records the scope label used in the main table.",
+            "The artifact package records automatic merge count.",
+            "The artifact package records block count.",
+            "The artifact package records defer count.",
+            "The artifact package records automatic merge coverage.",
+            "The artifact package records defer rate.",
+            "Prediction and threshold artifacts are row-auditable.",
+            "Prediction artifacts include pair_id.",
+            "Representation artifacts include normalized score.",
+            "Supervised artifacts include match_probability.",
+            "Threshold logs include selection_rule.",
+            r"The package documents \path{threshold_sensitivity_grid}.",
+            r"The package documents \path{cluster_metric_summary}.",
+            r"The package documents \path{cannot_link_audit}.",
+            "The package states that cluster-level quality claims require cluster assignments.",
+            "The package states that cluster-level quality claims require cannot-link coverage.",
+            "The package states that cluster-level quality claims require cluster contamination rate.",
+            "The validator checks exclusion of raw third-party data.",
+        ]
+    )
+
+    errors = module.check_result_claim_boundary(manuscript_text, supplementary_text)
+
+    assert any("artifact-level and manuscript-package validation" in error for error in errors)
+    assert any("validate_submission_package.py" in error for error in errors)
+    assert any("same source commit" in error for error in errors)
 
 
 def test_check_result_claim_boundary_rejects_missing_artifact_validator_command() -> None:
@@ -3842,8 +3928,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 29.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
+            "Completed audit cycles: 30.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, manuscript artifact-validation text drift, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -4085,6 +4171,14 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "omit `--artifact-dir`",
             "local checksum, manifest, row-schema, prediction-schema, and package-artifact commit checks",
             "cannot bypass the external release directory",
+            "## Audit Cycle 30: Main-Manuscript Artifact Validation Text Gate",
+            "manuscript-level reproducibility wording",
+            "Data and Code Availability section",
+            "validate_artifact_release.py --artifact-dir /path/to/release",
+            "validate_submission_package.py --final-upload --artifact-dir /path/to/release",
+            "source-control commit",
+            "main text tells reviewers",
+            "should not be used to support the Open-v2 numerical table",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -4103,7 +4197,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 29",
+        "Completed audit cycles: 30",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -4114,7 +4208,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 29" in error for error in errors)
+    assert any("Completed audit cycles: 30" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -4514,6 +4608,30 @@ def test_check_reviewer_readiness_audit_rejects_missing_artifact_dir_required_ga
     assert any("Final-Upload Artifact-Dir Required Gate" in error for error in errors)
     assert any("missing artifact-directory rejection" in error for error in errors)
     assert any("cannot bypass the external release directory" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_main_manuscript_artifact_validation_gate() -> None:
+    """验证审稿准备度审计必须覆盖主稿 artifact 校验文本门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Audit Cycle 30: Main-Manuscript Artifact Validation Text Gate",
+        "manuscript-level reproducibility wording",
+        "Data and Code Availability section",
+        "validate_artifact_release.py --artifact-dir /path/to/release",
+        "validate_submission_package.py --final-upload --artifact-dir /path/to/release",
+        "source-control commit",
+        "main text tells reviewers",
+        "should not be used to support the Open-v2 numerical table",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Main-Manuscript Artifact Validation Text Gate" in error for error in errors)
+    assert any("manuscript-level reproducibility wording" in error for error in errors)
+    assert any("should not be used to support the Open-v2 numerical table" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_final_upload_source_control_package_gate() -> None:

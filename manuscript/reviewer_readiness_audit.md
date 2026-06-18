@@ -10,9 +10,9 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 29.
+Completed audit cycles: 30.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, DKE author biography and photograph materials, external artifact release, artifact release validation bypass, final-upload artifact-dir omission bypass, manuscript artifact-validation text drift, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only fixture reproducibility, source-to-PDF package consistency, final-upload source-control package binding, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes and a real artifact URL or DOI is recorded.
 
@@ -329,6 +329,14 @@ Outcome: pass for missing artifact-directory rejection; blocked for final upload
 This cycle closes the last command-line bypass in the final-upload validator. In final-upload mode, `validate_submission_package.py` now rejects validation runs that omit `--artifact-dir`, even when the package metadata already contains an artifact URL or DOI and the final-upload checklist marks the release as linked. This prevents a package from passing final validation with only manuscript metadata while skipping local checksum, manifest, row-schema, prediction-schema, and package-artifact commit checks.
 
 The reviewer-facing boundary remains reproducibility discipline rather than new result evidence. The gate proves that the final validation workflow cannot bypass the external release directory; it still requires the real release to be populated, finalized, checksum-verified, publicly linked, and source-bound to the submitted manuscript commit before any final-upload readiness claim is allowed.
+
+## Audit Cycle 30: Main-Manuscript Artifact Validation Text Gate
+
+Outcome: pass for manuscript-level reproducibility wording; blocked for final upload until the real artifact URL or DOI and finalized release directory are available.
+
+This cycle moves the artifact validation requirement into the main manuscript's Data and Code Availability section. The text now states that an external result release supports the Open-v2 numerical table only after `validate_artifact_release.py --artifact-dir /path/to/release` passes and the final manuscript package also passes `validate_submission_package.py --final-upload --artifact-dir /path/to/release`. The paragraph names the release manifest, checksums, result identifiers, row-level schemas, prediction schemas, claim-boundary flags, raw-data exclusions, source-control commit, submission metadata, and artifact manifest as the binding checks.
+
+The reviewer-facing boundary is claim-evidence alignment. The manuscript no longer relies only on supplemental instructions or repository scripts to describe result-level auditability; the main text tells reviewers that a failed artifact or package-binding validation means the external release should not be used to support the Open-v2 numerical table or stronger claims.
 
 ## Minimum Gate Before Final Upload
 
