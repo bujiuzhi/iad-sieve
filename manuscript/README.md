@@ -100,7 +100,7 @@ python manuscript/scripts/validate_submission_package.py --dke-preflight
 
 稿件当前使用模板无关的 LaTeX 源文件。正式投稿前，应按目标期刊要求替换 `main.tex` 的文档类并设置作者信息。现有证据支持保守主张：IAD-Risk 在 gold/proxy/silver 分层评估下建模身份-议题混杂并降低误合并风险，不应主张全领域方法优越性或已完成完整人工金标。
 
-`target_journal_shortlist.md` 记录候选期刊、适配风险和模板前置要求。该文件用于投稿前决策，不作为最终期刊系统上传附件；正式上传前仍需由作者确认目标期刊和最新分区/分类信息，并在 `submission_metadata.yml` 中填写 `ranking_confirmation_completed`、`ranking_confirmation_source`、`ranking_confirmation_checked_date` 和 `selected_target_author_confirmed`。若选择 DKE/Elsevier 路线，还需在最终上传前准备作者 biography 和 passport-type photograph 等作者身份材料，并在 `author_identity_materials` 中记录 `biography_files`、`photograph_files` 和 `author_identity_materials_verified`。
+`target_journal_shortlist.md` 记录候选期刊、适配风险和模板前置要求。该文件用于投稿前决策，不作为最终期刊系统上传附件；正式上传前仍需由作者确认目标期刊、作者指南来源 URL 和最新分区/分类信息，并在 `submission_metadata.yml` 中填写 `ranking_confirmation_completed`、`ranking_confirmation_source`、`ranking_confirmation_source_url`、`ranking_confirmation_checked_date` 和 `selected_target_author_confirmed`。若选择 DKE/Elsevier 路线，还需在最终上传前准备作者 biography 和 passport-type photograph 等作者身份材料，并在 `author_identity_materials` 中记录 `biography_files`、`photograph_files` 和 `author_identity_materials_verified`。
 
 `build/iad-risk-manuscript-elsevier.tex` 和 `build/iad-risk-manuscript-elsevier.pdf` 是 Data & Knowledge Engineering 路线的匿名 `elsarticle` 预转换预览，由 `scripts/build_elsevier_draft.py` 从 `main.tex` 和 `keywords.md` 生成。该组文件用于模板适配检查和源文件上传准备，不等同于最终投稿文件；正式上传前仍需作者信息、artifact release 和投稿系统核对。
 

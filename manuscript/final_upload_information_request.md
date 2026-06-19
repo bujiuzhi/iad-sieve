@@ -32,11 +32,13 @@ All author-guide and ranking/category confirmation dates must use YYYY-MM-DD and
 - Review mode:
 - Journal template:
 - Selected author-guide source:
+- Selected author-guide source URL:
 - Selected author-guide rechecked date:
 - Selected template requirements confirmed:
 - Submission system URL:
 - Rechecked author-guide date:
 - Institutional ranking/category source checked:
+- Institutional ranking/category source URL:
 - Ranking/category checked date:
 - Ranking/category confirmation completed:
 - Selected target journal author-confirmed:

@@ -14,11 +14,13 @@ target_preparation:
   provisional_target_status: "dke_preflight_ready_pending_author_confirmation"
   dke_official_guide_rechecked: "2026-06-19"
   selected_author_guide_source: ""
+  selected_author_guide_source_url: ""
   selected_author_guide_rechecked_date: ""
   selected_template_requirements_confirmed: false
   ranking_confirmation_required_before_final_upload: true
   ranking_confirmation_completed: false
   ranking_confirmation_source: ""
+  ranking_confirmation_source_url: ""
   ranking_confirmation_checked_date: ""
   selected_target_requires_author_confirmation: true
   selected_target_author_confirmed: false

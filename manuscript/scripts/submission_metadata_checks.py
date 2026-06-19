@@ -10,6 +10,8 @@ from urllib.parse import unquote, urlparse
 FINAL_UPLOAD_BLOCKED_MARKERS = {
     'target_journal: ""': "target journal is empty",
     "target_journal_template_bound: false": "target journal template is not bound",
+    'selected_author_guide_source_url: ""': "selected author guide source URL is empty",
+    'ranking_confirmation_source_url: ""': "ranking/category confirmation source URL is empty",
     "authors: []": "author list is empty",
     'name: ""': "corresponding author name is empty",
     'affiliation: ""': "corresponding author affiliation is empty",
@@ -542,6 +544,11 @@ def check_target_preparation_confirmation(metadata_text: str) -> list[str]:
 
     if not row.get("selected_author_guide_source", "").strip():
         errors.append("selected author guide source is missing")
+    author_guide_source_url = row.get("selected_author_guide_source_url", "").strip()
+    if not author_guide_source_url:
+        errors.append("selected author guide source URL is missing")
+    elif URL_PATTERN.fullmatch(author_guide_source_url) is None:
+        errors.append("selected author guide source URL is invalid")
     author_guide_date = row.get("selected_author_guide_rechecked_date", "").strip()
     if not author_guide_date:
         errors.append("selected author guide rechecked date is missing")
@@ -557,6 +564,11 @@ def check_target_preparation_confirmation(metadata_text: str) -> list[str]:
         errors.append("ranking/category confirmation is incomplete")
     if not row.get("ranking_confirmation_source", "").strip():
         errors.append("ranking/category confirmation source is missing")
+    ranking_source_url = row.get("ranking_confirmation_source_url", "").strip()
+    if not ranking_source_url:
+        errors.append("ranking/category confirmation source URL is missing")
+    elif URL_PATTERN.fullmatch(ranking_source_url) is None:
+        errors.append("ranking/category confirmation source URL is invalid")
     checked_date = row.get("ranking_confirmation_checked_date", "").strip()
     if not checked_date:
         errors.append("ranking/category confirmation checked date is missing")
