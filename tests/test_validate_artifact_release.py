@@ -769,6 +769,7 @@ def _complete_readme_text() -> str:
             "Required files include README.md, manifest.json, and checksums.sha256.",
             "Run sha256sum -c checksums.sha256 before manuscript validation.",
             "Run python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release.",
+            "Run python -m iad_sieve.cli --help to verify installable CLI discovery.",
             "Repository commit: 0123456789abcdef0123456789abcdef01234567.",
             "## Claim Boundaries",
             "Full numerical audit requires external artifacts.",
@@ -843,6 +844,7 @@ def _write_complete_release(artifact_dir: Path, release_status: str = "release_c
             "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
             "sha256sum -c checksums.sha256",
             "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
+            "python -m iad_sieve.cli --help",
             "python manuscript/scripts/validate_manuscript.py --strict-latex",
             "python manuscript/scripts/verify_fixture_rebuild.py",
             "python scripts/check_public_release.py",
@@ -917,6 +919,27 @@ def test_validate_artifact_release_accepts_complete_release(tmp_path) -> None:
     assert errors == []
 
 
+def test_validate_artifact_release_rejects_manifest_without_cli_discovery_command(tmp_path) -> None:
+    """验证 release manifest 必须记录 CLI discovery 命令。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    manifest_path = artifact_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["minimum_validation_commands"] = [
+        command
+        for command in manifest["minimum_validation_commands"]
+        if command != "python -m iad_sieve.cli --help"
+    ]
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    _refresh_checksums(artifact_dir)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("python -m iad_sieve.cli --help" in error for error in errors)
+
+
 def test_validate_artifact_release_rejects_readme_without_reproducibility_markers(tmp_path) -> None:
     """验证 release README 缺少复现说明时会被拒绝。"""
 
@@ -931,6 +954,7 @@ def test_validate_artifact_release_rejects_readme_without_reproducibility_marker
     assert any("README.md missing required release instruction" in error for error in errors)
     assert any("manifest.json" in error for error in errors)
     assert any("validate_artifact_release.py" in error for error in errors)
+    assert any("python -m iad_sieve.cli --help" in error for error in errors)
     assert any("Repository commit" in error for error in errors)
 
 

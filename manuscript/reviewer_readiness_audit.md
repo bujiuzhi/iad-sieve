@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 82.
+Completed audit cycles: 83.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.
 
@@ -754,6 +754,14 @@ Outcome: pass for bootstrap-interval artifact release schema validation; blocked
 This gate checks whether an external artifact release can pass `confidence_intervals_claimed` merely by including a file named `bootstrap_intervals`. It cannot. The artifact validator now checks `reports/bootstrap_intervals.csv` for required `metric_name` rows covering same-work F1, FMR, and HNFMR; `scope_type`; prediction artifact and checksum binding; bootstrap method; resample unit; resample count; confidence level; alpha; random seed; point estimate; interval lower and upper bounds; metric denominator; threshold source; and command provenance.
 
 The reviewer-facing boundary is interval auditability, not a new statistical result. The validator rejects bootstrap artifacts with missing core metrics, invalid prediction checksums, too few resamples, missing denominators, invalid confidence or alpha values, point estimates outside [0,1], intervals outside [0,1], intervals that do not contain the point estimate, or missing command provenance. This preserves the current claim limit: Open-v2 values remain point estimates until the real bootstrap interval table, exact prediction files, resampling logs, random seeds, command logs, commit identifiers, manifests, and checksums are released.
+
+## Audit Cycle 83: Artifact Release CLI Discovery Command Consistency Gate
+
+Outcome: pass for artifact release CLI discovery command consistency; blocked for final artifact publication until a real release directory passes the updated release validator.
+
+This gate checks whether the artifact release README command block and manifest command list can drift on the executable Git-only entry point. They cannot. The release README template, release README validator, artifact release validator, manuscript validator, and tests now require `python -m iad_sieve.cli --help` in the release `minimum_validation_commands` path, so reviewers can verify installable CLI discovery before artifact validation, fixture rebuild, or full result-audit commands are run.
+
+The reviewer-facing boundary is command discoverability, not new empirical evidence. This gate only proves that Git-only reviewers can verify CLI discovery before artifact validation; it does not prove the Open-v2 numerical table, external prediction files, bootstrap intervals, or final artifact URL/DOI. Those remain gated by the populated external artifact release, checksums, command logs, publication metadata, and final-upload package validation.
 
 ## Minimum Gate Before Final Upload
 

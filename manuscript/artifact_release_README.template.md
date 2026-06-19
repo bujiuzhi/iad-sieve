@@ -36,6 +36,7 @@ cd /path/to/release
 sha256sum -c checksums.sha256
 cd /path/to/iad-sieve
 python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release
+python -m iad_sieve.cli --help
 python manuscript/scripts/validate_manuscript.py --strict-latex
 python manuscript/scripts/verify_fixture_rebuild.py
 python scripts/check_public_release.py
