@@ -3983,7 +3983,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 110",
+        "Completed audit cycles: 111",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -4003,6 +4003,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "highlights FMR/HNFMR first-screen conflation",
         "document/cluster split overread",
         "preflight package source freshness",
+        "strict validation package freshness bypass",
         "L2 public-source rebuild chain-of-custody gap",
         "selective-decision workload evidence",
         "selective workload denominator ambiguity",
@@ -4185,6 +4186,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 108: Highlights FMR-HNFMR First-Screen Gate",
         "Audit Cycle 109: Document-Cluster Split Overread Gate",
         "Audit Cycle 110: Current Package Source Freshness Gate",
+        "Audit Cycle 111: Strict Validation Package Freshness Gate",
         "current abstract is 209 words",
         "250-word DKE preflight limit",
         "abstract-length compliance",
@@ -4262,6 +4264,12 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "package file main.tex differs from current source main.tex",
         "preflight packages from passing validation when generated from an older checkout",
         "rebuild the submission package",
+        "strict-manuscript package freshness integration",
+        "check_generated_submission_packages",
+        "template-independent submission package",
+        "DKE/Elsevier preflight package",
+        "strict-manuscript validation failures",
+        "validation coverage",
         "Mechanism ablation acceptance protocol",
         "no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold",
         "`protocol_variant`",
@@ -5342,6 +5350,74 @@ def check_elsevier_draft_source(manuscript_text: str, keywords_text: str, genera
     return []
 
 
+def load_submission_package_validator():
+    """Load the submission-package validator used by manuscript validation.
+
+    参数:
+        无。
+
+    返回:
+        module: Loaded validate_submission_package module.
+
+    异常:
+        ImportError: Raised when the validator module cannot be loaded.
+    """
+    validator_path = ROOT / "scripts" / "validate_submission_package.py"
+    spec = importlib.util.spec_from_file_location("validate_submission_package", validator_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"cannot load submission package validator: {validator_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def check_generated_submission_packages(manuscript_root: Path = ROOT, validator_module=None) -> list[str]:
+    """Check generated submission packages when they exist.
+
+    参数:
+        manuscript_root: Manuscript source root.
+        validator_module: Optional preloaded submission-package validator module.
+
+    返回:
+        list[str]: Error messages for stale generated packages.
+    """
+    package_targets = [
+        (
+            "template-independent submission package",
+            manuscript_root / "build" / "submission_package",
+            manuscript_root / "build" / "iad-risk-submission-package.zip",
+            False,
+        ),
+        (
+            "DKE/Elsevier preflight package",
+            manuscript_root / "build" / "dke_preflight_package",
+            manuscript_root / "build" / "iad-risk-dke-preflight-package.zip",
+            True,
+        ),
+    ]
+    existing_targets = [
+        target
+        for target in package_targets
+        if target[1].exists() or target[2].exists()
+    ]
+    if not existing_targets:
+        return []
+    try:
+        validator = validator_module or load_submission_package_validator()
+    except Exception as exc:  # noqa: BLE001
+        return [f"submission package validator could not be loaded: {exc}"]
+    errors: list[str] = []
+    for label, package_dir, zip_path, dke_preflight in existing_targets:
+        validation_errors = validator.validate_submission_package(
+            package_dir,
+            zip_path,
+            dke_preflight=dke_preflight,
+            source_root=manuscript_root,
+        )
+        errors.extend(f"{label}: {error}" for error in validation_errors)
+    return errors
+
+
 def check_cover_letter(cover_letter_text: str) -> list[str]:
     """Check cover letter completeness for journal submission.
 
@@ -6083,6 +6159,7 @@ def main() -> int:
     errors.extend(check_highlights(highlights_text))
     errors.extend(check_keywords(keywords_text))
     errors.extend(check_elsevier_draft_source(manuscript_text, keywords_text, elsevier_draft_source_text))
+    errors.extend(check_generated_submission_packages(ROOT))
     errors.extend(check_cover_letter(cover_letter_text))
     errors.extend(check_submission_material_quantitative_summary(highlights_text, cover_letter_text))
     errors.extend(

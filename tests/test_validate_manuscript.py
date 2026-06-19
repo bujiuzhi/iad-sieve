@@ -27,6 +27,132 @@ def _load_validate_manuscript_module():
     return module
 
 
+def _load_named_script_module(module_name: str, relative_script_path: str):
+    """加载仓库内指定脚本模块。
+
+    参数:
+        module_name: 临时模块名。
+        relative_script_path: 相对仓库根目录的脚本路径。
+
+    返回:
+        module: 已加载的 Python 模块。
+    """
+
+    script_path = Path(__file__).resolve().parents[1] / relative_script_path
+    spec = importlib.util.spec_from_file_location(module_name, script_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"无法加载脚本: {script_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _write_text_file(path: Path, text: str) -> None:
+    """写入 UTF-8 测试文本文件。
+
+    参数:
+        path: 输出路径。
+        text: 文件内容。
+
+    返回:
+        无。
+    """
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+
+
+def _write_bytes_file(path: Path, content: bytes) -> None:
+    """写入测试二进制文件。
+
+    参数:
+        path: 输出路径。
+        content: 文件内容。
+
+    返回:
+        无。
+    """
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(content)
+
+
+def _write_minimal_submission_package_sources(manuscript_root: Path) -> None:
+    """写入投稿包生成器所需的最小测试源文件。
+
+    参数:
+        manuscript_root: 临时 manuscript 目录。
+
+    返回:
+        无。
+    """
+
+    for file_name in [
+        "main.tex",
+        "supplementary_material.tex",
+        "references.bib",
+        "cover_letter.md",
+        "highlights.md",
+        "keywords.md",
+        "submission_metadata.yml",
+    ]:
+        _write_text_file(manuscript_root / file_name, f"{file_name}\n")
+    _write_bytes_file(manuscript_root / "build" / "iad-risk-manuscript-latex.pdf", b"%PDF-1.5 main\n")
+    _write_bytes_file(manuscript_root / "build" / "iad-risk-supplementary-material.pdf", b"%PDF-1.5 supp\n")
+
+
+def test_check_generated_submission_packages_accepts_current_package(tmp_path) -> None:
+    """验证严格稿件检查可接受当前源文件生成的投稿包。"""
+
+    module = _load_validate_manuscript_module()
+    builder = _load_named_script_module(
+        "build_submission_package_for_validate_manuscript_test",
+        "manuscript/scripts/build_submission_package.py",
+    )
+    validator = _load_named_script_module(
+        "validate_submission_package_for_validate_manuscript_test",
+        "manuscript/scripts/validate_submission_package.py",
+    )
+    manuscript_root = tmp_path / "manuscript"
+    _write_minimal_submission_package_sources(manuscript_root)
+    builder.build_submission_package(
+        manuscript_root,
+        manuscript_root / "build" / "submission_package",
+        manuscript_root / "build" / "iad-risk-submission-package.zip",
+    )
+
+    errors = module.check_generated_submission_packages(manuscript_root, validator)
+
+    assert errors == []
+
+
+def test_check_generated_submission_packages_rejects_stale_source(tmp_path) -> None:
+    """验证严格稿件检查会拒绝旧源文件生成的投稿包。"""
+
+    module = _load_validate_manuscript_module()
+    builder = _load_named_script_module(
+        "build_submission_package_for_stale_validate_manuscript_test",
+        "manuscript/scripts/build_submission_package.py",
+    )
+    validator = _load_named_script_module(
+        "validate_submission_package_for_stale_validate_manuscript_test",
+        "manuscript/scripts/validate_submission_package.py",
+    )
+    manuscript_root = tmp_path / "manuscript"
+    _write_minimal_submission_package_sources(manuscript_root)
+    builder.build_submission_package(
+        manuscript_root,
+        manuscript_root / "build" / "submission_package",
+        manuscript_root / "build" / "iad-risk-submission-package.zip",
+    )
+    _write_text_file(manuscript_root / "main.tex", "updated main source\n")
+
+    errors = module.check_generated_submission_packages(manuscript_root, validator)
+
+    assert any("template-independent submission package" in error for error in errors)
+    assert any("package file main.tex differs from current source main.tex" in error for error in errors)
+
+
 def test_check_declaration_statements_accepts_complete_declarations() -> None:
     """验证数据可用性、伦理和利益冲突声明内容完整时可通过检查。"""
 
@@ -6000,8 +6126,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 110.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, and stronger evidence gates.",
+            "Completed audit cycles: 111.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -6896,6 +7022,13 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "package file main.tex differs from current source main.tex",
             "preflight packages from passing validation when generated from an older checkout",
             "rebuild the submission package",
+            "## Audit Cycle 111: Strict Validation Package Freshness Gate",
+            "strict-manuscript package freshness integration",
+            "check_generated_submission_packages",
+            "template-independent submission package",
+            "DKE/Elsevier preflight package",
+            "strict-manuscript validation failures",
+            "validation coverage",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -6914,7 +7047,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 110",
+        "Completed audit cycles: 111",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -6925,7 +7058,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 110" in error for error in errors)
+    assert any("Completed audit cycles: 111" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
