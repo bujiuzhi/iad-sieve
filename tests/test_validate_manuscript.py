@@ -4069,7 +4069,17 @@ def test_check_artifact_release_manifest_template_accepts_complete_template() ->
                         "start and finish timestamps, input manifest reference, output path, and exit status."
                     ),
                 },
-                {"artifact_id": "bootstrap_intervals"},
+                {
+                    "artifact_id": "bootstrap_intervals",
+                    "claim_support": (
+                        "Confidence intervals only if cited by the final manuscript. The CSV must include "
+                        "metric_name rows for same_work_f1, fmr, and hnfmr, with system, scope_type, "
+                        "prediction_artifact_id, prediction_file_sha256, bootstrap_method, resample_unit, "
+                        "resample_count, confidence_level, alpha, random_seed, point_estimate, interval_lower, "
+                        "interval_upper, metric_denominator, threshold_source, and command_line. Each row must "
+                        "bind to the exact prediction file checksum and satisfy interval_lower <= point_estimate <= interval_upper."
+                    ),
+                },
                 {
                     "artifact_id": "ablation_suite",
                     "claim_support": (
@@ -4446,6 +4456,22 @@ def test_check_artifact_release_readme_template_accepts_complete_template() -> N
             "environment summary",
             "random seed",
             "exit status",
+            "bootstrap_intervals",
+            "metric_name rows for same_work_f1, fmr, and hnfmr",
+            "scope_type",
+            "prediction_artifact_id",
+            "prediction_file_sha256",
+            "bootstrap_method",
+            "resample_unit",
+            "resample_count",
+            "confidence_level",
+            "alpha",
+            "point_estimate",
+            "interval_lower",
+            "interval_upper",
+            "metric_denominator",
+            "exact prediction file checksum",
+            "interval_lower <= point_estimate <= interval_upper",
             "ablation_suite",
             "protocol_variant",
             "no-risk-gate",
@@ -5552,7 +5578,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 81.",
+            "Completed audit cycles: 82.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -6214,6 +6240,19 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "mixed cluster runs or merge policies",
             "unparseable cannot-link booleans",
             "pair-level FMR and HNFMR support false-merge control",
+            "## Audit Cycle 82: Bootstrap Interval Artifact Release Schema Gate",
+            "bootstrap-interval artifact release schema validation",
+            "`confidence_intervals_claimed`",
+            "reports/bootstrap_intervals.csv",
+            "required `metric_name` rows covering same-work F1, FMR, and HNFMR",
+            "bootstrap method",
+            "resample unit",
+            "resample count",
+            "confidence level",
+            "interval lower and upper bounds",
+            "too few resamples",
+            "intervals that do not contain the point estimate",
+            "Open-v2 values remain point estimates",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -6232,7 +6271,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 81",
+        "Completed audit cycles: 82",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -6243,7 +6282,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 81" in error for error in errors)
+    assert any("Completed audit cycles: 82" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

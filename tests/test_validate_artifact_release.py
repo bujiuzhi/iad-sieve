@@ -477,6 +477,107 @@ def _add_threshold_sensitivity_grid_artifact(
     _refresh_checksums(artifact_dir)
 
 
+def _complete_bootstrap_intervals_csv(
+    missing_metric: str | None = None,
+    invalid_interval: bool = False,
+    low_resample_count: bool = False,
+) -> str:
+    """生成满足 bootstrap_intervals schema 的 CSV 内容。
+
+    参数:
+        missing_metric: 需要从测试样本中排除的指标名。
+        invalid_interval: 是否故意写入不包含 point_estimate 的区间。
+        low_resample_count: 是否故意写入过低 resample_count。
+
+    返回:
+        str: bootstrap_intervals CSV 内容。
+    """
+    header = [
+        "system",
+        "metric_name",
+        "scope_type",
+        "prediction_artifact_id",
+        "prediction_file_sha256",
+        "bootstrap_method",
+        "resample_unit",
+        "resample_count",
+        "confidence_level",
+        "alpha",
+        "random_seed",
+        "point_estimate",
+        "interval_lower",
+        "interval_upper",
+        "metric_denominator",
+        "threshold_source",
+        "command_line",
+    ]
+    metric_rows = {
+        "same_work_f1": ("0.80", "0.75", "0.85", "100"),
+        "fmr": ("0.05", "0.02", "0.08", "200"),
+        "hnfmr": ("0.10", "0.04", "0.16", "50"),
+    }
+    lines = [",".join(header)]
+    for metric_name, (point_estimate, interval_lower, interval_upper, denominator) in metric_rows.items():
+        if metric_name == missing_metric:
+            continue
+        if invalid_interval and metric_name == "fmr":
+            interval_lower, interval_upper = "0.06", "0.08"
+        row = [
+            "iad_risk_transformer",
+            metric_name,
+            "open_v2_test",
+            "iad_risk_predictions",
+            "5" * 64,
+            "stratified_pair_bootstrap",
+            "pair_id",
+            "50" if low_resample_count and metric_name == "hnfmr" else "1000",
+            "0.95",
+            "0.05",
+            "42",
+            point_estimate,
+            interval_lower,
+            interval_upper,
+            denominator,
+            "threshold_selection_logs",
+            "python -m iad_sieve.cli run-iad-evidence-bootstrap",
+        ]
+        lines.append(",".join(row))
+    return "\n".join(lines) + "\n"
+
+
+def _add_bootstrap_intervals_artifact(
+    artifact_dir: Path,
+    csv_content: str | None = None,
+    confidence_claimed: bool = True,
+) -> None:
+    """向测试 release 添加 bootstrap_intervals artifact。
+
+    参数:
+        artifact_dir: Release 目录。
+        csv_content: 可选 bootstrap_intervals CSV 内容。
+        confidence_claimed: 是否打开 confidence_intervals_claimed。
+
+    返回:
+        无。
+    """
+    bootstrap_path = artifact_dir / "reports" / "bootstrap_intervals.csv"
+    _write_file(bootstrap_path, csv_content or _complete_bootstrap_intervals_csv())
+    manifest_path = artifact_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["claim_boundaries"]["confidence_intervals_claimed"] = confidence_claimed
+    manifest["required_artifacts"].append(
+        {
+            "artifact_id": "bootstrap_intervals",
+            "required": confidence_claimed,
+            "expected_location": "reports/bootstrap_intervals.csv",
+            "sha256": _sha256_file(bootstrap_path),
+            "claim_support": "Bootstrap interval artifact with prediction checksum and resampling provenance.",
+        }
+    )
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    _refresh_checksums(artifact_dir)
+
+
 def _complete_cluster_metric_summary_csv(mixed_cluster_run: bool = False, invalid_ratio: bool = False) -> str:
     """生成满足 cluster_metric_summary schema 的 CSV 内容。
 
@@ -991,6 +1092,59 @@ def test_validate_artifact_release_rejects_claimed_confidence_without_bootstrap_
 
     assert any("confidence_intervals_claimed" in error for error in errors)
     assert any("bootstrap_intervals" in error for error in errors)
+
+
+def test_validate_artifact_release_accepts_claimed_confidence_with_protocol_bootstrap_intervals(tmp_path) -> None:
+    """验证 confidence interval claim 只有在 bootstrap 字段完整时通过。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    _add_bootstrap_intervals_artifact(artifact_dir)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert errors == []
+
+
+def test_validate_artifact_release_rejects_bootstrap_intervals_missing_core_metric(tmp_path) -> None:
+    """验证 bootstrap_intervals 缺少核心指标行时会被拒绝。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    _add_bootstrap_intervals_artifact(artifact_dir, _complete_bootstrap_intervals_csv(missing_metric="hnfmr"))
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("bootstrap_intervals CSV missing required metric_name rows" in error for error in errors)
+    assert any("hnfmr" in error for error in errors)
+
+
+def test_validate_artifact_release_rejects_bootstrap_intervals_invalid_interval(tmp_path) -> None:
+    """验证 bootstrap_intervals 的点估计必须落在区间内。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    _add_bootstrap_intervals_artifact(artifact_dir, _complete_bootstrap_intervals_csv(invalid_interval=True))
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("interval_lower <= point_estimate <= interval_upper" in error for error in errors)
+
+
+def test_validate_artifact_release_rejects_bootstrap_intervals_low_resample_count(tmp_path) -> None:
+    """验证 bootstrap_intervals 的重采样次数不能过低。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    _add_bootstrap_intervals_artifact(artifact_dir, _complete_bootstrap_intervals_csv(low_resample_count=True))
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("resample_count to an integer >= 100" in error for error in errors)
 
 
 def test_validate_artifact_release_rejects_claimed_cluster_quality_without_cluster_artifacts(tmp_path) -> None:

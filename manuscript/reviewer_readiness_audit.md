@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 81.
+Completed audit cycles: 82.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.
 
@@ -746,6 +746,14 @@ Outcome: pass for cluster-level artifact release schema validation; blocked for 
 This gate checks whether an external artifact release can pass `cluster_level_quality_claimed` merely by including files named `cluster_metric_summary` and `cannot_link_audit`. It cannot. The artifact validator now checks `reports/cluster_metric_summary.csv` for cluster-run and merge-policy identifiers, prediction artifact and checksum binding, threshold fields, cluster assignment and pair-to-cluster trace file references, cluster identifiers, cluster size, accepted-link counts, cannot-link conflict counts, unresolved-conflict counts, cluster contamination rate, singleton rate, merge coverage, `random_seed`, and `command_line`. It also checks `reports/cannot_link_audit.csv` for cannot-link rule IDs, conflict types, pair IDs, cannot-link flags, blocked-merge indicators, violation and unresolved-conflict fields, coverage rate, identifier-conflict rules, trace file references, threshold fields, prediction checksum binding, random seed, and command provenance.
 
 The reviewer-facing boundary is cluster-level auditability, not a new deployment result. The validator rejects cluster artifacts with missing pair-to-cluster trace references, mixed cluster runs or merge policies, mixed prediction checksums, invalid contamination or coverage rates, unparseable cannot-link booleans, missing conflict rules, or missing command provenance. This preserves the current claim limit: pair-level FMR and HNFMR support false-merge control, but they do not prove cluster-level contamination reduction until the real cluster assignments, cannot-link audit, pair-to-cluster trace, command logs, commit identifiers, manifests, and checksums are released.
+
+## Audit Cycle 82: Bootstrap Interval Artifact Release Schema Gate
+
+Outcome: pass for bootstrap-interval artifact release schema validation; blocked for confidence-interval claims until a real external artifact release passes the strengthened schema.
+
+This gate checks whether an external artifact release can pass `confidence_intervals_claimed` merely by including a file named `bootstrap_intervals`. It cannot. The artifact validator now checks `reports/bootstrap_intervals.csv` for required `metric_name` rows covering same-work F1, FMR, and HNFMR; `scope_type`; prediction artifact and checksum binding; bootstrap method; resample unit; resample count; confidence level; alpha; random seed; point estimate; interval lower and upper bounds; metric denominator; threshold source; and command provenance.
+
+The reviewer-facing boundary is interval auditability, not a new statistical result. The validator rejects bootstrap artifacts with missing core metrics, invalid prediction checksums, too few resamples, missing denominators, invalid confidence or alpha values, point estimates outside [0,1], intervals outside [0,1], intervals that do not contain the point estimate, or missing command provenance. This preserves the current claim limit: Open-v2 values remain point estimates until the real bootstrap interval table, exact prediction files, resampling logs, random seeds, command logs, commit identifiers, manifests, and checksums are released.
 
 ## Minimum Gate Before Final Upload
 

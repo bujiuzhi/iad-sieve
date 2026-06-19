@@ -91,6 +91,26 @@ REQUIRED_ABLATION_PROTOCOL_VARIANTS = {
     "no-cannot-link",
     "post-hoc-threshold",
 }
+BOOTSTRAP_INTERVALS_REQUIRED_COLUMNS = {
+    "system",
+    "metric_name",
+    "scope_type",
+    "prediction_artifact_id",
+    "prediction_file_sha256",
+    "bootstrap_method",
+    "resample_unit",
+    "resample_count",
+    "confidence_level",
+    "alpha",
+    "random_seed",
+    "point_estimate",
+    "interval_lower",
+    "interval_upper",
+    "metric_denominator",
+    "threshold_source",
+    "command_line",
+}
+BOOTSTRAP_INTERVALS_REQUIRED_METRICS = {"same_work_f1", "fmr", "hnfmr"}
 MANUAL_VALIDATION_SLICE_REQUIRED_COLUMNS = {
     "pair_id",
     "source_document_id",
@@ -1010,6 +1030,92 @@ def check_threshold_sensitivity_grid_schema(csv_path: Path) -> list[str]:
     return errors
 
 
+def check_bootstrap_intervals_schema(csv_path: Path) -> list[str]:
+    """Check bootstrap-interval artifact columns and interval consistency.
+
+    参数:
+        csv_path: Path to reports/bootstrap_intervals.csv.
+
+    返回:
+        list[str]: Error messages for missing interval evidence or invalid rows.
+    """
+    try:
+        with csv_path.open("r", encoding="utf-8", newline="") as file_handle:
+            reader = csv.DictReader(file_handle)
+            header = [column.strip() for column in (reader.fieldnames or []) if column and column.strip()]
+            rows = [{str(key).strip(): value for key, value in raw_row.items() if key is not None} for raw_row in reader]
+    except OSError as exc:
+        return [f"bootstrap_intervals CSV cannot be read: {exc}"]
+    if not header:
+        return ["bootstrap_intervals CSV is empty or missing a header row"]
+
+    errors: list[str] = []
+    actual_columns = set(header)
+    missing_columns = BOOTSTRAP_INTERVALS_REQUIRED_COLUMNS - actual_columns
+    for column in sorted(missing_columns):
+        errors.append(f"bootstrap_intervals CSV missing interval audit column: {column}")
+    if missing_columns:
+        return errors
+    if not rows:
+        return ["bootstrap_intervals CSV has no data rows"]
+
+    required_text_fields = [
+        "system",
+        "metric_name",
+        "scope_type",
+        "prediction_artifact_id",
+        "prediction_file_sha256",
+        "bootstrap_method",
+        "resample_unit",
+        "threshold_source",
+        "command_line",
+    ]
+    present_metrics: set[str] = set()
+    for line_number, row in enumerate(rows, start=2):
+        for field in required_text_fields:
+            if not str(row.get(field, "")).strip():
+                errors.append(f"bootstrap_intervals CSV line {line_number} missing required value: {field}")
+        metric_name = str(row.get("metric_name", "")).strip()
+        if metric_name:
+            present_metrics.add(metric_name)
+        prediction_checksum = str(row.get("prediction_file_sha256", "")).strip().lower()
+        if prediction_checksum and not SHA256_PATTERN.fullmatch(prediction_checksum):
+            errors.append(f"bootstrap_intervals CSV line {line_number} has invalid prediction_file_sha256")
+        resample_count = _parse_int(row.get("resample_count"))
+        if resample_count is None or resample_count < 100:
+            errors.append(f"bootstrap_intervals CSV line {line_number} must set resample_count to an integer >= 100")
+        metric_denominator = _parse_int(row.get("metric_denominator"))
+        if metric_denominator is None or metric_denominator <= 0:
+            errors.append(f"bootstrap_intervals CSV line {line_number} must set metric_denominator to a positive integer")
+        random_seed = _parse_int(row.get("random_seed"))
+        if random_seed is None:
+            errors.append(f"bootstrap_intervals CSV line {line_number} must set random_seed to an integer")
+        confidence_level = _parse_float(row.get("confidence_level"))
+        alpha = _parse_float(row.get("alpha"))
+        if confidence_level is None or not 0.0 < confidence_level < 1.0:
+            errors.append(f"bootstrap_intervals CSV line {line_number} must set confidence_level between 0 and 1")
+        if alpha is None or not 0.0 < alpha < 1.0:
+            errors.append(f"bootstrap_intervals CSV line {line_number} must set alpha between 0 and 1")
+        point_estimate = _parse_float(row.get("point_estimate"))
+        interval_lower = _parse_float(row.get("interval_lower"))
+        interval_upper = _parse_float(row.get("interval_upper"))
+        interval_values = [point_estimate, interval_lower, interval_upper]
+        if any(value is None or not 0.0 <= value <= 1.0 for value in interval_values):
+            errors.append(
+                f"bootstrap_intervals CSV line {line_number} must set point_estimate, interval_lower, and interval_upper between 0 and 1"
+            )
+        elif not interval_lower <= point_estimate <= interval_upper:
+            errors.append(f"bootstrap_intervals CSV line {line_number} must satisfy interval_lower <= point_estimate <= interval_upper")
+        if len(errors) >= 30:
+            errors.append("bootstrap_intervals CSV schema check stopped after 30 errors")
+            return errors
+
+    missing_metrics = BOOTSTRAP_INTERVALS_REQUIRED_METRICS - present_metrics
+    if missing_metrics:
+        errors.append(f"bootstrap_intervals CSV missing required metric_name rows: {sorted(missing_metrics)}")
+    return errors
+
+
 def _check_single_prediction_binding(rows: list[dict[str, Any]], artifact_id: str) -> list[str]:
     """Check that rows bind to exactly one prediction artifact and checksum.
 
@@ -1379,6 +1485,18 @@ def check_manifest_artifacts(
             and (artifact_dir / threshold_grid_location).is_file()
         ):
             errors.extend(check_threshold_sensitivity_grid_schema(artifact_dir / threshold_grid_location))
+
+    bootstrap_row = artifact_rows.get("bootstrap_intervals")
+    if isinstance(bootstrap_row, dict):
+        bootstrap_location = str(bootstrap_row.get("expected_location", "")).strip()
+        bootstrap_location_path = Path(bootstrap_location)
+        if (
+            bootstrap_location
+            and not bootstrap_location_path.is_absolute()
+            and ".." not in bootstrap_location_path.parts
+            and (artifact_dir / bootstrap_location).is_file()
+        ):
+            errors.extend(check_bootstrap_intervals_schema(artifact_dir / bootstrap_location))
 
     cluster_metric_row = artifact_rows.get("cluster_metric_summary")
     if isinstance(cluster_metric_row, dict):

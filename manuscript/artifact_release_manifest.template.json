@@ -92,7 +92,7 @@
       "artifact_id": "bootstrap_intervals",
       "required": false,
       "expected_location": "reports/bootstrap_intervals.csv",
-      "claim_support": "Confidence intervals only if cited by the final manuscript."
+      "claim_support": "Confidence intervals only if cited by the final manuscript. The CSV must include metric_name rows for same_work_f1, fmr, and hnfmr, with system, scope_type, prediction_artifact_id, prediction_file_sha256, bootstrap_method, resample_unit, resample_count, confidence_level, alpha, random_seed, point_estimate, interval_lower, interval_upper, metric_denominator, threshold_source, and command_line. Each row must bind to the exact prediction file checksum and satisfy interval_lower <= point_estimate <= interval_upper."
     },
     {
       "artifact_id": "threshold_sensitivity_grid",

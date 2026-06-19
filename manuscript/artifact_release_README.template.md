@@ -58,6 +58,8 @@ python scripts/check_public_release.py
   - configs/source_input_manifest.json must record source name, acquisition date or version, original provider, local file name, record count when known, license boundary, and SHA256 checksum for each public input file.
 - processing_run_log
   - logs/processing_run_log.jsonl must record command line, code commit, environment summary, random seed, start and finish timestamps, input manifest reference, output path, and exit status for each rebuild stage.
+- bootstrap_intervals
+  - reports/bootstrap_intervals.csv is required before confidence-interval claims. It must include metric_name rows for same_work_f1, fmr, and hnfmr, with system, scope_type, prediction_artifact_id, prediction_file_sha256, bootstrap_method, resample_unit, resample_count, confidence_level, alpha, random_seed, point_estimate, interval_lower, interval_upper, metric_denominator, threshold_source, and command_line. Each row must bind to the exact prediction file checksum and satisfy interval_lower <= point_estimate <= interval_upper.
 - ablation_suite
   - reports/iad_ablation_suite.csv is required before component-causality claims. It must include protocol_variant rows for no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold, with protocol_required, accepted_for_component_causality, threshold_source, protocol_scope_rule, requires_prediction_rows, denominators, and false-merge metrics. The post-hoc-threshold row must use threshold_source=post_hoc_labeled_sweep and must not be treated as standalone component-causality evidence.
 - manual_validation_slice
