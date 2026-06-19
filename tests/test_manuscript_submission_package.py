@@ -1161,9 +1161,50 @@ def test_validate_submission_package_accepts_generated_package(tmp_path) -> None
     _write_required_manuscript_files(manuscript_root)
 
     builder.build_submission_package(manuscript_root, output_dir, zip_path)
-    errors = validator.validate_submission_package(output_dir, zip_path)
+    errors = validator.validate_submission_package(output_dir, zip_path, source_root=manuscript_root)
 
     assert errors == []
+
+
+def test_validate_submission_package_rejects_stale_source_file(tmp_path) -> None:
+    """验证当前源文件变更后旧投稿包会被拒绝。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path)
+    _write_file(manuscript_root / "main.tex", "updated main source\n")
+    errors = validator.validate_submission_package(output_dir, zip_path, source_root=manuscript_root)
+
+    assert any("package file main.tex differs from current source main.tex" in error for error in errors)
+    assert any("zip archive package file main.tex differs from current source main.tex" in error for error in errors)
+
+
+def test_validate_submission_package_rejects_stale_source_control_metadata(tmp_path, monkeypatch) -> None:
+    """验证投稿包 manifest 的提交号必须匹配当前检出状态。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    monkeypatch.setattr(builder, "collect_source_control_state", lambda _: _clean_source_control_state("aaaaaaaaaaaaaaaa"))
+    monkeypatch.setattr(
+        validator,
+        "collect_current_source_control_state",
+        lambda _: _clean_source_control_state("bbbbbbbbbbbbbbbb"),
+    )
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path)
+    errors = validator.validate_submission_package(output_dir, zip_path, source_root=manuscript_root)
+
+    assert any("source_control repository_commit aaaaaaaaaaaaaaaa" in error for error in errors)
+    assert any("current repository_commit bbbbbbbbbbbbbbbb" in error for error in errors)
 
 
 def test_validate_submission_package_rejects_stale_main_pdf_against_references(tmp_path) -> None:

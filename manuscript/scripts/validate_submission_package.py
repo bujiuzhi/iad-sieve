@@ -12,6 +12,7 @@ import hashlib
 import json
 import logging
 import re
+import subprocess
 import sys
 import zipfile
 from pathlib import Path
@@ -167,8 +168,69 @@ def parse_arguments() -> argparse.Namespace:
         default=str(DEFAULT_ARTIFACT_MANIFEST_TEMPLATE_PATH),
         help="Artifact release manifest template used when --artifact-dir is provided.",
     )
+    parser.add_argument(
+        "--source-root",
+        default=str(MANUSCRIPT_ROOT),
+        help="Current manuscript source root used to reject stale generated packages.",
+    )
     parser.add_argument("--log-level", default="INFO", help="Logging level.")
     return parser.parse_args()
+
+
+def run_git_command(repository_root: Path, args: list[str]) -> str:
+    """Run a Git command and return stdout.
+
+    参数:
+        repository_root: Repository root directory.
+        args: Git command arguments after `git`.
+
+    返回:
+        str: Stripped stdout, or an empty string when Git is unavailable.
+    """
+    try:
+        completed = subprocess.run(
+            ["git", *args],
+            cwd=repository_root,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except OSError:
+        return ""
+    if completed.returncode != 0:
+        return ""
+    return completed.stdout.strip()
+
+
+def collect_current_source_control_state(source_root: Path) -> dict:
+    """Collect the current Git source-control state for package freshness checks.
+
+    参数:
+        source_root: Current manuscript source root.
+
+    返回:
+        dict: Current source-control metadata, or unavailable metadata outside Git.
+    """
+    repository_root = source_root.parent
+    repository_commit = run_git_command(repository_root, ["rev-parse", "HEAD"])
+    repository_branch = run_git_command(repository_root, ["rev-parse", "--abbrev-ref", "HEAD"]) if repository_commit else ""
+    porcelain_status = run_git_command(repository_root, ["status", "--porcelain"]) if repository_commit else ""
+    if not repository_commit:
+        return {
+            "available": False,
+            "repository_commit": "",
+            "repository_branch": "",
+            "worktree_dirty": None,
+            "tracked_state": "unavailable",
+        }
+    worktree_dirty = bool(porcelain_status)
+    return {
+        "available": True,
+        "repository_commit": repository_commit,
+        "repository_branch": repository_branch,
+        "worktree_dirty": worktree_dirty,
+        "tracked_state": "dirty" if worktree_dirty else "clean",
+    }
 
 
 def expected_files(dke_preflight: bool = False) -> set[str]:
@@ -386,6 +448,152 @@ def check_final_upload_source_control_binding(manifest_text: str, metadata_text:
         )
     if source_control.get("worktree_dirty") is True:
         errors.append(f"{location} final-upload source_control worktree_dirty must be false")
+    return errors
+
+
+def check_manifest_source_control_current(manifest_text: str, source_root: Path, location: str) -> list[str]:
+    """Check whether package source-control metadata matches the current checkout.
+
+    参数:
+        manifest_text: Submission manifest JSON text.
+        source_root: Current manuscript source root.
+        location: Human-readable package location.
+
+    返回:
+        list[str]: Error messages for stale source-control metadata.
+    """
+    try:
+        manifest = json.loads(manifest_text)
+    except json.JSONDecodeError:
+        return []
+    source_control = manifest.get("source_control")
+    if not isinstance(source_control, dict) or source_control.get("available") is not True:
+        return []
+    current_source_control = collect_current_source_control_state(source_root)
+    if current_source_control.get("available") is not True:
+        return []
+    errors: list[str] = []
+    manifest_commit = str(source_control.get("repository_commit", "")).strip()
+    current_commit = str(current_source_control.get("repository_commit", "")).strip()
+    manifest_branch = str(source_control.get("repository_branch", "")).strip()
+    current_branch = str(current_source_control.get("repository_branch", "")).strip()
+    if manifest_commit != current_commit:
+        errors.append(
+            f"{location} source_control repository_commit {manifest_commit} does not match "
+            f"current repository_commit {current_commit}; rebuild submission package"
+        )
+    if manifest_branch != current_branch:
+        errors.append(
+            f"{location} source_control repository_branch {manifest_branch} does not match "
+            f"current repository_branch {current_branch}; rebuild submission package"
+        )
+    if source_control.get("worktree_dirty") != current_source_control.get("worktree_dirty"):
+        errors.append(
+            f"{location} source_control worktree_dirty {source_control.get('worktree_dirty')} does not match "
+            f"current worktree_dirty {current_source_control.get('worktree_dirty')}; rebuild submission package"
+        )
+    return errors
+
+
+def check_package_files_match_sources(
+    manifest_text: str,
+    package_dir: Path,
+    source_root: Path,
+    final_upload: bool = False,
+) -> list[str]:
+    """Check whether packaged files match the current source files.
+
+    参数:
+        manifest_text: Submission manifest JSON text.
+        package_dir: Generated package directory.
+        source_root: Current manuscript source root.
+        final_upload: Whether final-upload metadata may be generated from source metadata.
+
+    返回:
+        list[str]: Error messages for stale or missing package-source files.
+    """
+    try:
+        manifest = json.loads(manifest_text)
+    except json.JSONDecodeError:
+        return []
+    file_rows = manifest.get("files")
+    if not isinstance(file_rows, list):
+        return []
+    errors: list[str] = []
+    for row in file_rows:
+        if not isinstance(row, dict):
+            continue
+        package_path_value = row.get("package_path")
+        source_path_value = row.get("source_path")
+        if not isinstance(package_path_value, str) or not isinstance(source_path_value, str):
+            continue
+        if final_upload and package_path_value == "submission_metadata.yml":
+            continue
+        package_path = package_dir / package_path_value
+        source_path = source_root / source_path_value
+        if not source_path.is_file():
+            errors.append(f"{package_dir} current source file is missing: {source_path_value}")
+            continue
+        if not package_path.is_file():
+            continue
+        if sha256_file(package_path) != sha256_file(source_path):
+            errors.append(
+                f"{package_dir} package file {package_path_value} differs from current source "
+                f"{source_path_value}; rebuild submission package"
+            )
+    return errors
+
+
+def check_zip_files_match_sources(
+    manifest_text: str,
+    archive: zipfile.ZipFile,
+    package_root_name: str,
+    source_root: Path,
+    final_upload: bool = False,
+) -> list[str]:
+    """Check whether zipped package files match the current source files.
+
+    参数:
+        manifest_text: Submission manifest JSON text from the zip archive.
+        archive: Open zip archive.
+        package_root_name: Expected root directory inside the zip archive.
+        source_root: Current manuscript source root.
+        final_upload: Whether final-upload metadata may be generated from source metadata.
+
+    返回:
+        list[str]: Error messages for stale or missing zip-source files.
+    """
+    try:
+        manifest = json.loads(manifest_text)
+    except json.JSONDecodeError:
+        return []
+    file_rows = manifest.get("files")
+    if not isinstance(file_rows, list):
+        return []
+    errors: list[str] = []
+    for row in file_rows:
+        if not isinstance(row, dict):
+            continue
+        package_path_value = row.get("package_path")
+        source_path_value = row.get("source_path")
+        if not isinstance(package_path_value, str) or not isinstance(source_path_value, str):
+            continue
+        if final_upload and package_path_value == "submission_metadata.yml":
+            continue
+        member_path = f"{package_root_name}/{package_path_value}"
+        source_path = source_root / source_path_value
+        if not source_path.is_file():
+            errors.append(f"zip archive current source file is missing: {source_path_value}")
+            continue
+        try:
+            member_content = archive.read(member_path)
+        except KeyError:
+            continue
+        if sha256_bytes(member_content) != sha256_file(source_path):
+            errors.append(
+                f"zip archive package file {package_path_value} differs from current source "
+                f"{source_path_value}; rebuild submission package"
+            )
     return errors
 
 
@@ -736,6 +944,7 @@ def validate_package_directory(
     final_upload: bool = False,
     dke_preflight: bool = False,
     artifact_manifest: dict | None = None,
+    source_root: Path | None = None,
 ) -> list[str]:
     """Validate the generated package directory.
 
@@ -744,6 +953,7 @@ def validate_package_directory(
         final_upload: Whether to require journal and author metadata for final upload.
         dke_preflight: Whether the package should include DKE/Elsevier files.
         artifact_manifest: Optional external artifact release manifest.
+        source_root: Optional current manuscript source root for stale-package checks.
 
     返回:
         list[str]: Error messages.
@@ -768,7 +978,11 @@ def validate_package_directory(
     metadata_path = package_dir / "submission_metadata.yml"
     cover_letter_path = package_dir / "cover_letter.md"
     if manifest_path.exists():
-        errors.extend(check_manifest_text(manifest_path.read_text(encoding="utf-8"), dke_preflight, final_upload))
+        manifest_text = manifest_path.read_text(encoding="utf-8")
+        errors.extend(check_manifest_text(manifest_text, dke_preflight, final_upload))
+        if source_root is not None:
+            errors.extend(check_manifest_source_control_current(manifest_text, source_root, str(package_dir)))
+            errors.extend(check_package_files_match_sources(manifest_text, package_dir, source_root, final_upload))
     if final_upload:
         if metadata_path.exists():
             metadata_text = metadata_path.read_text(encoding="utf-8")
@@ -832,6 +1046,7 @@ def validate_zip_archive(
     dke_preflight: bool = False,
     package_root_name: str = PACKAGE_ROOT_NAME,
     artifact_manifest: dict | None = None,
+    source_root: Path | None = None,
 ) -> list[str]:
     """Validate the generated package zip archive.
 
@@ -841,6 +1056,7 @@ def validate_zip_archive(
         dke_preflight: Whether the package should include DKE/Elsevier files.
         package_root_name: Expected root directory name inside the zip archive.
         artifact_manifest: Optional external artifact release manifest.
+        source_root: Optional current manuscript source root for stale-package checks.
 
     返回:
         list[str]: Error messages.
@@ -893,6 +1109,17 @@ def validate_zip_archive(
             except KeyError as exc:
                 return errors + [f"zip archive missing required metadata file: {exc}"]
             errors.extend(check_manifest_text(manifest_text, dke_preflight, final_upload))
+            if source_root is not None:
+                errors.extend(check_manifest_source_control_current(manifest_text, source_root, "zip archive"))
+                errors.extend(
+                    check_zip_files_match_sources(
+                        manifest_text,
+                        archive,
+                        package_root_name,
+                        source_root,
+                        final_upload,
+                    )
+                )
             if final_upload:
                 try:
                     metadata_text = archive.read(f"{package_root_name}/submission_metadata.yml").decode("utf-8")
@@ -976,6 +1203,7 @@ def validate_submission_package(
     dke_preflight: bool = False,
     artifact_dir: Path | None = None,
     artifact_manifest_template_path: Path = DEFAULT_ARTIFACT_MANIFEST_TEMPLATE_PATH,
+    source_root: Path | None = None,
 ) -> list[str]:
     """Validate the package directory and zip archive.
 
@@ -986,6 +1214,7 @@ def validate_submission_package(
         dke_preflight: Whether the package should include DKE/Elsevier files.
         artifact_dir: Optional external artifact release directory.
         artifact_manifest_template_path: Artifact manifest template used when artifact_dir is provided.
+        source_root: Optional current manuscript source root for stale-package checks.
 
     返回:
         list[str]: Error messages.
@@ -999,13 +1228,14 @@ def validate_submission_package(
         else (None, [])
     )
     errors.extend(artifact_errors)
-    errors.extend(validate_package_directory(package_dir, final_upload, dke_preflight, artifact_manifest))
+    errors.extend(validate_package_directory(package_dir, final_upload, dke_preflight, artifact_manifest, source_root))
     errors.extend(validate_zip_archive(
         zip_path,
         final_upload,
         dke_preflight,
         package_dir.name,
         artifact_manifest,
+        source_root,
     ))
     return unique_errors(errors)
 
@@ -1035,6 +1265,7 @@ def main() -> int:
             args.dke_preflight,
             Path(args.artifact_dir).resolve() if args.artifact_dir else None,
             Path(args.artifact_manifest_template).resolve(),
+            Path(args.source_root).resolve() if args.source_root else None,
         )
     except Exception as exc:  # noqa: BLE001
         LOGGER.error("submission package validation failed: %s", exc)
