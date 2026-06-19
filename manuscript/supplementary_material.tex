@@ -451,6 +451,7 @@ Threshold-stability claims & \path{threshold_sensitivity_grid}, \path{threshold_
 \section{Selective Decision Coverage Boundary}
 
 The main manuscript summarizes the selective-decision coverage boundary in prose. Table~\ref{tab:selective-decision-coverage} preserves the coverage and review-load quantities that must be released before false-merge control can be read as operational automation evidence.
+Let $N$ denote the evaluated pair count for one row of the result table, with $M$ automatic merges, $B$ blocked pairs, and $D$ deferred pairs under the same fixed operating point. The release artifact should satisfy $N=M+B+D$ for every row. Automatic merge coverage is $\mathrm{AMC}=M/N$, block rate is $\mathrm{BR}=B/N$, and defer rate is $\mathrm{DR}=D/N$. If $R$ is the number of blocked or deferred pairs that still require human review and $C$ is the predeclared review capacity for the batch, capacity-normalized review load is $\mathrm{CNRL}=R/C$. These quantities must be derived from the same prediction artifact, threshold configuration, row scope, and denominator record as FMR and HNFMR.
 
 \begin{table}[H]
 \caption{Selective decision coverage boundary. Coverage and review-load quantities must be computed from the same prediction files as the reported risk metrics before operational deployment claims are made.}

@@ -2339,6 +2339,12 @@ def test_check_selective_decision_coverage_boundary_accepts_supplementary_table(
             "capacity-normalized review load",
             "same prediction files",
             "A result with low FMR or HNFMR but high deferral is a conservative triage result.",
+            "N=M+B+D",
+            r"\mathrm{AMC}=\frac{M}{N}",
+            r"\mathrm{BR}=\frac{B}{N}",
+            r"\mathrm{DR}=\frac{D}{N}",
+            r"\mathrm{CNRL}=R/C",
+            "same prediction artifact, threshold configuration, row scope, and denominator record",
             "Results must be compared with a predeclared manual-review capacity and deferral budget.",
             "The current manuscript does not claim throughput reduction.",
             "It does not claim all-pair automatic resolution.",
@@ -2357,6 +2363,11 @@ def test_check_selective_decision_coverage_boundary_accepts_supplementary_table(
             "Defer rate",
             "Review load",
             "Capacity-normalized review load",
+            "N=M+B+D",
+            r"\mathrm{AMC}=M/N",
+            r"\mathrm{BR}=B/N",
+            r"\mathrm{DR}=D/N",
+            r"\mathrm{CNRL}=R/C",
         ]
     )
 
@@ -2382,6 +2393,12 @@ def test_check_selective_decision_coverage_boundary_rejects_missing_supplementar
             "capacity-normalized review load",
             "same prediction files",
             "A result with low FMR or HNFMR but high deferral is a conservative triage result.",
+            "N=M+B+D",
+            r"\mathrm{AMC}=\frac{M}{N}",
+            r"\mathrm{BR}=\frac{B}{N}",
+            r"\mathrm{DR}=\frac{D}{N}",
+            r"\mathrm{CNRL}=R/C",
+            "same prediction artifact, threshold configuration, row scope, and denominator record",
             "Results must be compared with a predeclared manual-review capacity and deferral budget.",
             "The current manuscript does not claim throughput reduction.",
             "It does not claim all-pair automatic resolution.",
@@ -5644,7 +5661,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 87.",
+            "Completed audit cycles: 88.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -6356,6 +6373,19 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             ".invalid",
             "must not use a placeholder URL",
             "source URL realism",
+            "## Audit Cycle 88: Selective Coverage Formula Gate",
+            "selective coverage formula disclosure",
+            "operational throughput claims",
+            "N=M+B+D",
+            "automatic merge coverage",
+            "block rate",
+            "defer rate",
+            "capacity-normalized review load",
+            "same prediction artifact, threshold configuration, row scope, and denominator record",
+            "workload interpretation",
+            "review-cost savings",
+            "manual-review capacity",
+            "deferral budget",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -6374,7 +6404,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 87",
+        "Completed audit cycles: 88",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -6385,7 +6415,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 87" in error for error in errors)
+    assert any("Completed audit cycles: 88" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

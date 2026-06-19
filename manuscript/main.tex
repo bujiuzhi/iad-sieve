@@ -372,6 +372,13 @@ The main result table reports fixed operating points rather than post-hoc best t
 \subsection{Selective Decision Coverage Boundary}
 
 IAD-Risk is a selective decision system, so false-merge metrics should be interpreted together with coverage and review-load evidence. A low FMR or HNFMR is not by itself a throughput claim if the operating point blocks or defers many pairs. A result with low FMR or HNFMR but high deferral is a conservative triage result rather than evidence of reduced review cost. The full selective-decision coverage boundary table is reported in the supplementary material. The main text keeps the operational boundary as a prose rule: automatic merge coverage, block rate, defer rate, review load, and capacity-normalized review load must be computed from the same prediction files and compared with a predeclared manual-review capacity and deferral budget before making operational automation claims. The current manuscript therefore reports false-merge control under fixed operating points, but does not claim throughput reduction and does not claim all-pair automatic resolution.
+Let $N$ be the number of evaluated pairs under a fixed operating point, and let $M$, $B$, and $D$ be the numbers of automatic merge, block, and defer decisions from the same prediction artifact, so $N=M+B+D$. The required coverage quantities are
+\[
+\mathrm{AMC}=\frac{M}{N},\quad
+\mathrm{BR}=\frac{B}{N},\quad
+\mathrm{DR}=\frac{D}{N}.
+\]
+If $R$ denotes the number of blocked or deferred pairs that require human review under the declared workflow, and $C$ denotes the predeclared manual-review capacity for the same batch, the capacity-normalized review load is $\mathrm{CNRL}=R/C$. These quantities must use the same prediction artifact, threshold configuration, row scope, and denominator record as FMR and HNFMR; otherwise low false-merge rates can be produced by shifting unresolved pairs to manual review. The current result table therefore supports fixed-threshold false-merge control, not an operational throughput or staffing claim.
 
 \subsection{Pair-to-Cluster Evidence Boundary}
 

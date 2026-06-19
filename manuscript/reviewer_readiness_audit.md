@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 87.
+Completed audit cycles: 88.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.
 
@@ -794,6 +794,14 @@ Outcome: pass for target source placeholder URL validation; blocked for final up
 This gate checks whether final-upload metadata can pass with syntactically valid placeholder domains such as example.org, localhost, .test, or .invalid. It cannot. The metadata validator now rejects target-confirmation source URLs that use reserved or local placeholder hosts and emits `must not use a placeholder URL`.
 
 The reviewer-facing boundary is source URL realism, not live-source verification. This gate prevents placeholder domains from being treated as inspectable journal or ranking evidence, but it does not verify the live content of the selected author guide, complete ranking/category confirmation, or replace author confirmation. Those external checks remain required before final upload.
+
+## Audit Cycle 88: Selective Coverage Formula Gate
+
+Outcome: pass for selective coverage formula disclosure; blocked for operational throughput claims until same-artifact workload evidence is released.
+
+This gate checks whether the manuscript defines the workload quantities needed to interpret a selective decision system. The manuscript states $N=M+B+D$, automatic merge coverage, block rate, defer rate, and capacity-normalized review load, and it requires these quantities to use the same prediction artifact, threshold configuration, row scope, and denominator record as FMR and HNFMR.
+
+The reviewer-facing boundary is workload interpretation, not deployment readiness. The formulas prevent low false-merge metrics from being read as review-cost savings when unresolved cases are shifted to block or defer decisions, but they do not supply the external workload evidence, manual-review capacity, or deferral budget needed for operational throughput claims.
 
 ## Minimum Gate Before Final Upload
 
