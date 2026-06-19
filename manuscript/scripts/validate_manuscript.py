@@ -853,6 +853,7 @@ def check_abstract_quantitative_evidence(manuscript_text: str) -> list[str]:
         "same-work F1=0.980",
         "zero observed HNFMR",
         "held-out test scope",
+        "ordinary FMR still reported separately as 0.001",
     ]
     return [f"abstract missing bounded quantitative evidence marker: {marker}" for marker in required_markers if marker not in abstract_text]
 
@@ -3967,7 +3968,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 106",
+        "Completed audit cycles: 107",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3983,6 +3984,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "artifact publication link mismatch",
         "zero-observed HNFMR overread",
         "FMR/HNFMR stratum conflation",
+        "abstract FMR/HNFMR first-screen conflation",
         "L2 public-source rebuild chain-of-custody gap",
         "selective-decision workload evidence",
         "selective workload denominator ambiguity",
@@ -4161,7 +4163,8 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 104: Method Shortcut Wording Gate",
         "Audit Cycle 105: Selective Workload Denominator Gate",
         "Audit Cycle 106: FMR-HNFMR Stratum Gate",
-        "current abstract is 210 words",
+        "Audit Cycle 107: Abstract FMR-HNFMR First-Screen Gate",
+        "current abstract is 209 words",
         "250-word DKE preflight limit",
         "abstract-length compliance",
         "not writing quality or scientific evidence",
@@ -4216,6 +4219,10 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "zero observed HNFMR means no observed false merge in the agenda-hard-negative stratum",
         "not absence of all non-identity false merges",
         "metric-stratum interpretation",
+        "abstract and cover-letter FMR/HNFMR first-screen separation",
+        "ordinary FMR still reported separately as 0.001",
+        "first-screen metric separation",
+        "same-scope comparative-ranking limits",
         "Mechanism ablation acceptance protocol",
         "no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold",
         "`protocol_variant`",
@@ -5367,6 +5374,7 @@ def check_submission_material_quantitative_summary(highlights_text: str, cover_l
     cover_letter_quantitative_markers = [
         "HNFMR 0.790--0.999",
         "zero observed HNFMR",
+        "ordinary FMR still reported separately as 0.001",
     ]
     for marker in cover_letter_quantitative_markers:
         if marker not in cover_letter_text:
@@ -5437,6 +5445,7 @@ def check_editorial_claim_alignment(
                 "same-scope comparative ranking",
                 "HNFMR 0.790--0.999",
                 "zero observed HNFMR",
+                "ordinary FMR still reported separately as 0.001",
                 "pair-level conclusion",
                 "cluster artifacts",
                 "broad method-ranking claims",
@@ -5464,6 +5473,7 @@ def check_editorial_claim_alignment(
                 "Open-v2 evidence snapshot",
                 "HNFMR 0.790--0.999",
                 "zero observed HNFMR",
+                "ordinary FMR still reported separately as 0.001",
                 "does not claim broad method superiority",
                 "raw third-party data and full experimental outputs are not redistributed in Git",
                 "DKE-style data and knowledge engineering editorial screen",

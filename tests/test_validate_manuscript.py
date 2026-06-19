@@ -5957,8 +5957,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 106.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, and stronger evidence gates.",
+            "Completed audit cycles: 107.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -6762,7 +6762,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "metadata fit",
             "not stronger evidence",
             "## Audit Cycle 96: DKE Abstract-Length Gate",
-            "current abstract is 210 words",
+            "current abstract is 209 words",
             "250-word DKE preflight limit",
             "abstract-length compliance",
             "not writing quality or scientific evidence",
@@ -6827,6 +6827,11 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "zero observed HNFMR means no observed false merge in the agenda-hard-negative stratum",
             "not absence of all non-identity false merges",
             "metric-stratum interpretation",
+            "## Audit Cycle 107: Abstract FMR-HNFMR First-Screen Gate",
+            "abstract and cover-letter FMR/HNFMR first-screen separation",
+            "ordinary FMR still reported separately as 0.001",
+            "first-screen metric separation",
+            "same-scope comparative-ranking limits",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -6845,7 +6850,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 106",
+        "Completed audit cycles: 107",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -6856,7 +6861,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 106" in error for error in errors)
+    assert any("Completed audit cycles: 107" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -7914,7 +7919,7 @@ def test_check_submission_material_quantitative_summary_accepts_scoped_highlight
             "The manuscript reports an Open-v2 evidence snapshot.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
             "Single-space scientific representation baselines show HNFMR 0.790--0.999 on the full pair scope.",
-            "IAD-Risk reports same-work F1=0.980 and zero observed HNFMR on the held-out test scope.",
+            "IAD-Risk reports same-work F1=0.980 and zero observed HNFMR on the held-out test scope, with ordinary FMR still reported separately as 0.001.",
         ]
     )
 
@@ -7933,7 +7938,7 @@ def test_check_submission_material_quantitative_summary_rejects_unscoped_highlig
             "The manuscript reports an Open-v2 evidence snapshot.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
             "Single-space scientific representation baselines show HNFMR 0.790--0.999 on the full pair scope.",
-            "IAD-Risk reports same-work F1=0.980 and zero observed HNFMR on the held-out test scope.",
+            "IAD-Risk reports same-work F1=0.980 and zero observed HNFMR on the held-out test scope, with ordinary FMR still reported separately as 0.001.",
         ]
     )
 
@@ -7982,7 +7987,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
             "This paper studies identity-agenda confusion and proposes IAD-Risk.",
             "It evaluates IAD-Bench under an Open-v2 evidence snapshot.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
-            "The results include HNFMR 0.790--0.999 and zero observed HNFMR.",
+            "The results include HNFMR 0.790--0.999 and zero observed HNFMR, with ordinary FMR still reported separately as 0.001.",
             "The results support a conservative pair-level conclusion.",
             "Cluster-level quality claims require cluster artifacts before broad method-ranking claims.",
             r"\end{abstract}",
@@ -7999,7 +8004,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
             title,
             "The paper studies identity-agenda confusion and proposes IAD-Risk.",
             "The manuscript contributes IAD-Bench and reports an Open-v2 evidence snapshot.",
-            "The result includes HNFMR 0.790--0.999 and zero observed HNFMR.",
+            "The result includes HNFMR 0.790--0.999 and zero observed HNFMR, with ordinary FMR still reported separately as 0.001.",
             "The manuscript does not claim broad method superiority.",
             "raw third-party data and full experimental outputs are not redistributed in Git.",
             "The cover letter supports a DKE-style data and knowledge engineering editorial screen.",
