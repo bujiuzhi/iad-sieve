@@ -4024,7 +4024,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 112",
+        "Completed audit cycles: 113",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -4046,6 +4046,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "preflight package source freshness",
         "strict validation package freshness bypass",
         "reproduction command-chain drift",
+        "strict PDF visual-quality validation bypass",
         "L2 public-source rebuild chain-of-custody gap",
         "selective-decision workload evidence",
         "selective workload denominator ambiguity",
@@ -4230,6 +4231,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 110: Current Package Source Freshness Gate",
         "Audit Cycle 111: Strict Validation Package Freshness Gate",
         "Audit Cycle 112: Reproduction Command Chain Gate",
+        "Audit Cycle 113: Strict PDF Visual-Quality Gate",
         "current abstract is 209 words",
         "250-word DKE preflight limit",
         "abstract-length compliance",
@@ -4321,6 +4323,14 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "artifact-level validation",
         "final-upload package binding",
         "full numerical reproduction requires public-source rebuilds or released artifacts",
+        "strict PDF visual-quality integration",
+        "check_latex_build_logs",
+        "check_rendered_pdf_outputs",
+        "LaTeX visual-quality gate",
+        "PDF rendering gate",
+        "severe overfull hbox",
+        "blank pages, dark pages, or rendering failures",
+        "first-screen PDF reliability",
         "Mechanism ablation acceptance protocol",
         "no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold",
         "`protocol_variant`",
@@ -5422,6 +5432,86 @@ def load_submission_package_validator():
     return module
 
 
+def load_latex_warning_checker():
+    """Load the LaTeX warning checker used by strict manuscript validation.
+
+    参数:
+        无。
+
+    返回:
+        module: Loaded check_latex_warnings module.
+
+    异常:
+        ImportError: Raised when the checker module cannot be loaded.
+    """
+    checker_path = ROOT / "scripts" / "check_latex_warnings.py"
+    spec = importlib.util.spec_from_file_location("check_latex_warnings", checker_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"cannot load LaTeX warning checker: {checker_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def check_latex_build_logs(checker_module=None) -> list[str]:
+    """Check generated LaTeX logs for submission-blocking warnings.
+
+    参数:
+        checker_module: Optional preloaded check_latex_warnings module.
+
+    返回:
+        list[str]: Error messages for missing logs or severe LaTeX warnings.
+    """
+    try:
+        checker = checker_module or load_latex_warning_checker()
+    except Exception as exc:  # noqa: BLE001
+        return [f"LaTeX warning checker could not be loaded: {exc}"]
+    try:
+        return [f"LaTeX visual-quality gate: {error}" for error in checker.check_log_files(checker.DEFAULT_LOGS)]
+    except Exception as exc:  # noqa: BLE001
+        return [f"LaTeX visual-quality gate failed: {exc}"]
+
+
+def load_pdf_rendering_checker():
+    """Load the PDF rendering checker used by strict manuscript validation.
+
+    参数:
+        无。
+
+    返回:
+        module: Loaded check_pdf_rendering module.
+
+    异常:
+        ImportError: Raised when the checker module cannot be loaded.
+    """
+    checker_path = ROOT / "scripts" / "check_pdf_rendering.py"
+    spec = importlib.util.spec_from_file_location("check_pdf_rendering", checker_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"cannot load PDF rendering checker: {checker_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def check_rendered_pdf_outputs(checker_module=None) -> list[str]:
+    """Check generated PDFs by rendering sampled pages.
+
+    参数:
+        checker_module: Optional preloaded check_pdf_rendering module.
+
+    返回:
+        list[str]: Error messages for missing render tools, blank pages, or failed rendering.
+    """
+    try:
+        checker = checker_module or load_pdf_rendering_checker()
+    except Exception as exc:  # noqa: BLE001
+        return [f"PDF rendering checker could not be loaded: {exc}"]
+    try:
+        return [f"PDF rendering gate: {error}" for error in checker.check_pdf_files(checker.DEFAULT_PDFS)]
+    except Exception as exc:  # noqa: BLE001
+        return [f"PDF rendering gate failed: {exc}"]
+
+
 def check_generated_submission_packages(manuscript_root: Path = ROOT, validator_module=None) -> list[str]:
     """Check generated submission packages when they exist.
 
@@ -6302,6 +6392,9 @@ def main() -> int:
     latex_warnings, latex_errors = check_latex_toolchain(args.strict_latex)
     warnings.extend(latex_warnings)
     errors.extend(latex_errors)
+    if args.strict_latex:
+        errors.extend(check_latex_build_logs())
+        errors.extend(check_rendered_pdf_outputs())
 
     for warning in warnings:
         LOGGER.warning(warning)
