@@ -74,6 +74,11 @@ AUTHOR_VISIBLE_REVIEW_JOURNALS = {
     "information systems": "Information Systems",
     "scientometrics": "Scientometrics",
 }
+AUTHOR_VISIBLE_FINAL_REVIEW_MODES = {
+    "single_anonymized_author_visible_final_upload",
+    "single_anonymized_with_final_author_identities",
+    "single_anonymized_review_with_final_author_identities",
+}
 ELSEVIER_TARGET_JOURNALS = {
     "data & knowledge engineering",
     "information systems",
@@ -718,10 +723,13 @@ def check_final_upload_review_mode(metadata_text: str) -> list[str]:
     target_journal = scalar_value(metadata_text, "target_journal")
     review_mode = scalar_value(metadata_text, "review_mode")
     normalized_target = target_journal.strip().lower()
-    if not review_mode and normalized_target in AUTHOR_VISIBLE_REVIEW_JOURNALS:
+    normalized_review_mode = review_mode.strip().lower()
+    if not normalized_review_mode and normalized_target in AUTHOR_VISIBLE_REVIEW_JOURNALS:
         journal_name = AUTHOR_VISIBLE_REVIEW_JOURNALS[normalized_target]
         return [f"review mode must be recorded for {journal_name}"]
-    if review_mode == "anonymous_review" and normalized_target in AUTHOR_VISIBLE_REVIEW_JOURNALS:
+    if normalized_target in AUTHOR_VISIBLE_REVIEW_JOURNALS and (
+        normalized_review_mode not in AUTHOR_VISIBLE_FINAL_REVIEW_MODES
+    ):
         journal_name = AUTHOR_VISIBLE_REVIEW_JOURNALS[normalized_target]
         return [f"review mode must include final author identities for {journal_name}"]
     return []

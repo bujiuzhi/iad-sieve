@@ -43,6 +43,9 @@ The DKE official-guide preflight source is already recorded in `submission_metad
 - Selected target journal:
 - Article type:
 - Review mode:
+- Review mode controlled value for single-anonymized author-visible final upload routes:
+- Use `single_anonymized_with_final_author_identities` or `single_anonymized_author_visible_final_upload` for DKE, Information Systems, or Scientometrics final upload:
+- Do not use `anonymous_review` or a generic `single_anonymized` value for final upload:
 - Journal template:
 - Selected author-guide source:
 - Selected author-guide source URL:
