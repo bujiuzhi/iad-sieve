@@ -48,10 +48,23 @@ This audit records the publisher-facing constraints that determine the next manu
 Official source snapshot date: 2026-06-19.
 
 - DKE guide verified: 2026-06-19.
+- DKE guide source URL: https://www.sciencedirect.com/journal/data-and-knowledge-engineering/publish/guide-for-authors.
 - Information Systems guide verified: 2026-06-19.
 - Scientometrics guide verified: 2026-06-19.
 
 All publisher-page facts in this shortlist were rechecked on 2026-06-19 from the official source links listed below. These checks support manuscript-preparation decisions only; JCR quartile, Chinese Academy of Sciences zone, CCF class, and local institutional category must still be rechecked in the authors' authorized ranking systems before final upload.
+
+### DKE Official Guide Evidence
+
+The DKE source check is an official-guide preflight record, not final target selection. It binds the current preflight package to the publisher's guide URL while leaving `selected_author_guide_source`, `selected_author_guide_source_url`, `selected_author_guide_rechecked_date`, and `selected_target_author_confirmed` incomplete until the authors confirm the final route.
+
+| Official DKE guide item | Verified source fact | Project consequence |
+| --- | --- | --- |
+| Scope and metrics | ScienceDirect lists DKE with 6.4 CiteScore and 2.6 Impact Factor and describes the journal as publishing data engineering, knowledge engineering, and interface work. | Keep DKE as the primary practical candidate, but treat publisher metrics as screening signals rather than JCR, CAS, CCF, or institutional ranking proof. |
+| Review and source files | The guide states single anonymized review and requests editable source material, with LaTeX supported. | Keep the current anonymous Elsevier preflight package separate from final upload, and bind the final source only after author confirmation. |
+| Front-matter limits | The guide lists a 250-word abstract limit, 1--7 keywords, and 3--5 highlights with an 85-character limit. | Continue validating abstract, keywords, and highlights before package creation and after any template conversion. |
+| Data and declarations | The guide requires research data handling or a data statement, CRediT author contribution reporting, and generative AI disclosure when AI tools were used in manuscript preparation. | Keep artifact URL/DOI, CRediT roles, and the target-specific generative AI declaration as final-upload blockers. |
+| Author identity materials | The guide requests a short biography for each author and a passport-type photograph as a separate editable figure. | Collect author-approved biographies and photographs only after author order is confirmed; keep them outside anonymous preflight packages. |
 
 | Candidate | Officially verified constraints | Project implication |
 | --- | --- | --- |

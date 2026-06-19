@@ -3962,6 +3962,13 @@ def test_check_target_journal_shortlist_accepts_complete_shortlist() -> None:
             "Official guide rechecked: 2026-06-19",
             "Official source snapshot date: 2026-06-19",
             "DKE guide verified: 2026-06-19",
+            "DKE guide source URL: https://www.sciencedirect.com/journal/data-and-knowledge-engineering/publish/guide-for-authors.",
+            "## DKE Official Guide Evidence",
+            "This is an official-guide preflight record.",
+            "`selected_author_guide_source` remains incomplete.",
+            "`selected_author_guide_source_url` remains incomplete.",
+            "`selected_author_guide_rechecked_date` remains incomplete.",
+            "`selected_target_author_confirmed` remains incomplete.",
             "Information Systems guide verified: 2026-06-19",
             "Scientometrics guide verified: 2026-06-19",
             "All publisher-page facts in this shortlist were rechecked on 2026-06-19.",
@@ -3978,6 +3985,10 @@ def test_check_target_journal_shortlist_accepts_complete_shortlist() -> None:
             "CRediT author contribution statement.",
             "generative AI declaration.",
             "author biographies and photographs.",
+            "passport-type photograph.",
+            "publisher metrics as screening signals.",
+            "final-upload blockers.",
+            "outside anonymous preflight packages.",
             "AI-tool use.",
             "AI tools as authors.",
             "large-language-model use should be documented.",
@@ -5718,8 +5729,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 91.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, default-threshold provenance gap, and stronger evidence gates.",
+            "Completed audit cycles: 92.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -6479,6 +6490,23 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "not evidence of validation-selected, optimized, or threshold-stable performance",
             "`threshold_selection_logs`",
             "`threshold_sensitivity_grid`",
+            "## Audit Cycle 92: DKE Official Guide Source Gate",
+            "DKE official-guide source traceability",
+            "final target selection",
+            "selected journal, ranking/category source, author-guide source, and live submission route",
+            "`dke_official_guide_source`",
+            "`dke_official_guide_source_url`",
+            "`dke_official_guide_rechecked`",
+            "`dke_official_guide_constraints_verified`",
+            "DKE official guide URL",
+            "DKE Official Guide Evidence",
+            "scope and metrics, review and source files, front-matter limits, data and declarations, and author identity materials",
+            "source traceability for preflight preparation",
+            "not final author confirmation",
+            "selected-author-guide fields",
+            "ranking/category confirmation",
+            "artifact URL or DOI",
+            "live submission-system verification",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -6497,7 +6525,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 91",
+        "Completed audit cycles: 92",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -6508,7 +6536,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 91" in error for error in errors)
+    assert any("Completed audit cycles: 92" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
