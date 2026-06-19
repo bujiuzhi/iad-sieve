@@ -192,6 +192,22 @@ def test_check_final_upload_information_request_rejects_missing_target_date_boun
     assert any("actual check date" in error for error in errors)
 
 
+def test_check_final_upload_information_request_rejects_missing_target_url_boundary() -> None:
+    """验证最终上传信息表必须说明目标确认来源 URL 不能使用占位域名。"""
+
+    module = _load_validate_manuscript_module()
+    request_text = Path("manuscript/final_upload_information_request.md").read_text(encoding="utf-8")
+    request_text = request_text.replace(
+        "Source URLs must be public HTTP/HTTPS URLs and must not use placeholder domains such as example.org, localhost, .test, or .invalid.",
+        "",
+    )
+
+    errors = module.check_final_upload_information_request(request_text)
+
+    assert any("Source URLs must be public HTTP/HTTPS URLs" in error for error in errors)
+    assert any("must not use placeholder domains" in error for error in errors)
+
+
 def test_check_final_upload_information_request_rejects_missing_metadata_mapping() -> None:
     """验证最终上传信息表必须说明外部输入如何同步到元数据文件。"""
 
@@ -5108,8 +5124,8 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "Then rebuild the submission package before upload.",
             "## Final Metadata Checks",
             "The selected journal template matches the final manuscript source.",
-            "`selected_author_guide_source`, `selected_author_guide_source_url`, `selected_author_guide_rechecked_date`, and `selected_template_requirements_confirmed` are complete before final upload.",
-            "`ranking_confirmation_completed`, `ranking_confirmation_source`, `ranking_confirmation_source_url`, `ranking_confirmation_checked_date`, and `selected_target_author_confirmed` are complete before final upload.",
+            "`selected_author_guide_source`, non-placeholder `selected_author_guide_source_url`, `selected_author_guide_rechecked_date`, and `selected_template_requirements_confirmed` are complete before final upload.",
+            "`ranking_confirmation_completed`, `ranking_confirmation_source`, non-placeholder `ranking_confirmation_source_url`, `ranking_confirmation_checked_date`, and `selected_target_author_confirmed` are complete before final upload.",
             "`live_submission_system_verified` and `final_upload_package_verified_against_system` are true.",
             "The funding statement is completed and matches the manuscript and submission system.",
             "The author contribution statement is completed before final upload.",
@@ -5628,7 +5644,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 86.",
+            "Completed audit cycles: 87.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -6331,6 +6347,15 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "`ranking_confirmation_source_url`",
             "HTTP or HTTPS URLs",
             "source auditability",
+            "## Audit Cycle 87: Target Source Placeholder URL Gate",
+            "target source placeholder URL validation",
+            "placeholder domains",
+            "example.org",
+            "localhost",
+            ".test",
+            ".invalid",
+            "must not use a placeholder URL",
+            "source URL realism",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -6349,7 +6374,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 86",
+        "Completed audit cycles: 87",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -6360,7 +6385,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 86" in error for error in errors)
+    assert any("Completed audit cycles: 87" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -7978,13 +8003,13 @@ def _build_filled_final_upload_metadata_text(
         "target_journal_template_bound: true",
         "target_preparation:",
         '  selected_author_guide_source: "official journal guide for authors"',
-        '  selected_author_guide_source_url: "https://example.org/author-guide"',
+        '  selected_author_guide_source_url: "https://journal-source.org/author-guide"',
         '  selected_author_guide_rechecked_date: "2026-06-19"',
         "  selected_template_requirements_confirmed: true",
         "  ranking_confirmation_required_before_final_upload: true",
         "  ranking_confirmation_completed: true",
         '  ranking_confirmation_source: "institutional ranking system"',
-        '  ranking_confirmation_source_url: "https://example.org/ranking"',
+        '  ranking_confirmation_source_url: "https://ranking-source.org/journal-category"',
         '  ranking_confirmation_checked_date: "2026-06-19"',
         "  selected_target_requires_author_confirmation: true",
         "  selected_target_author_confirmed: true",
@@ -8110,13 +8135,13 @@ def test_check_final_upload_metadata_accepts_filled_metadata() -> None:
             "target_journal_template_bound: true",
             "target_preparation:",
             '  selected_author_guide_source: "official journal guide for authors"',
-            '  selected_author_guide_source_url: "https://example.org/author-guide"',
+            '  selected_author_guide_source_url: "https://journal-source.org/author-guide"',
             '  selected_author_guide_rechecked_date: "2026-06-19"',
             "  selected_template_requirements_confirmed: true",
             "  ranking_confirmation_required_before_final_upload: true",
             "  ranking_confirmation_completed: true",
             '  ranking_confirmation_source: "institutional ranking system"',
-            '  ranking_confirmation_source_url: "https://example.org/ranking"',
+            '  ranking_confirmation_source_url: "https://ranking-source.org/journal-category"',
             '  ranking_confirmation_checked_date: "2026-06-19"',
             "  selected_target_requires_author_confirmation: true",
             "  selected_target_author_confirmed: true",
@@ -8230,11 +8255,11 @@ def test_check_final_upload_metadata_rejects_missing_target_source_urls() -> Non
     module = _load_validate_manuscript_module()
     metadata_text = _build_filled_final_upload_metadata_text()
     metadata_text = metadata_text.replace(
-        '  selected_author_guide_source_url: "https://example.org/author-guide"',
+        '  selected_author_guide_source_url: "https://journal-source.org/author-guide"',
         '  selected_author_guide_source_url: ""',
     )
     metadata_text = metadata_text.replace(
-        '  ranking_confirmation_source_url: "https://example.org/ranking"',
+        '  ranking_confirmation_source_url: "https://ranking-source.org/journal-category"',
         '  ranking_confirmation_source_url: ""',
     )
 
@@ -8250,11 +8275,11 @@ def test_check_final_upload_metadata_rejects_invalid_target_source_urls() -> Non
     module = _load_validate_manuscript_module()
     metadata_text = _build_filled_final_upload_metadata_text()
     metadata_text = metadata_text.replace(
-        '  selected_author_guide_source_url: "https://example.org/author-guide"',
+        '  selected_author_guide_source_url: "https://journal-source.org/author-guide"',
         '  selected_author_guide_source_url: "official guide"',
     )
     metadata_text = metadata_text.replace(
-        '  ranking_confirmation_source_url: "https://example.org/ranking"',
+        '  ranking_confirmation_source_url: "https://ranking-source.org/journal-category"',
         '  ranking_confirmation_source_url: "institutional ranking"',
     )
 
@@ -8262,6 +8287,26 @@ def test_check_final_upload_metadata_rejects_invalid_target_source_urls() -> Non
 
     assert any("selected author guide source URL is invalid" in error for error in errors)
     assert any("ranking/category confirmation source URL is invalid" in error for error in errors)
+
+
+def test_check_final_upload_metadata_rejects_placeholder_target_source_urls() -> None:
+    """验证 final-upload 门禁拒绝目标确认来源的占位 URL。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = _build_filled_final_upload_metadata_text()
+    metadata_text = metadata_text.replace(
+        '  selected_author_guide_source_url: "https://journal-source.org/author-guide"',
+        '  selected_author_guide_source_url: "https://www.example.org/author-guide"',
+    )
+    metadata_text = metadata_text.replace(
+        '  ranking_confirmation_source_url: "https://ranking-source.org/journal-category"',
+        '  ranking_confirmation_source_url: "http://localhost/ranking"',
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any("selected author guide source URL must not use a placeholder URL" in error for error in errors)
+    assert any("ranking/category confirmation source URL must not use a placeholder URL" in error for error in errors)
 
 
 def test_check_final_upload_metadata_rejects_future_target_confirmation_dates() -> None:
@@ -8868,13 +8913,13 @@ def test_check_final_upload_metadata_rejects_missing_research_data_statement_for
             "target_journal_template_bound: true",
             "target_preparation:",
             '  selected_author_guide_source: "official journal guide for authors"',
-            '  selected_author_guide_source_url: "https://example.org/author-guide"',
+            '  selected_author_guide_source_url: "https://journal-source.org/author-guide"',
             '  selected_author_guide_rechecked_date: "2026-06-19"',
             "  selected_template_requirements_confirmed: true",
             "  ranking_confirmation_required_before_final_upload: true",
             "  ranking_confirmation_completed: true",
             '  ranking_confirmation_source: "institutional ranking system"',
-            '  ranking_confirmation_source_url: "https://example.org/ranking"',
+            '  ranking_confirmation_source_url: "https://ranking-source.org/journal-category"',
             '  ranking_confirmation_checked_date: "2026-06-19"',
             "  selected_target_requires_author_confirmation: true",
             "  selected_target_author_confirmed: true",
@@ -9035,13 +9080,13 @@ def test_check_final_upload_metadata_accepts_dke_research_data_statement_with_ar
             "target_journal_template_bound: true",
             "target_preparation:",
             '  selected_author_guide_source: "official journal guide for authors"',
-            '  selected_author_guide_source_url: "https://example.org/author-guide"',
+            '  selected_author_guide_source_url: "https://journal-source.org/author-guide"',
             '  selected_author_guide_rechecked_date: "2026-06-19"',
             "  selected_template_requirements_confirmed: true",
             "  ranking_confirmation_required_before_final_upload: true",
             "  ranking_confirmation_completed: true",
             '  ranking_confirmation_source: "institutional ranking system"',
-            '  ranking_confirmation_source_url: "https://example.org/ranking"',
+            '  ranking_confirmation_source_url: "https://ranking-source.org/journal-category"',
             '  ranking_confirmation_checked_date: "2026-06-19"',
             "  selected_target_requires_author_confirmation: true",
             "  selected_target_author_confirmed: true",

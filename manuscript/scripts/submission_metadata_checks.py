@@ -39,6 +39,29 @@ URL_PATTERN = re.compile(r"^https?://[^\s]+$", re.IGNORECASE)
 DOI_PATTERN = re.compile(r"^10\.[^\s/]+/[^\s]+$", re.IGNORECASE)
 COMMIT_PATTERN = re.compile(r"^[0-9a-f]{7,40}$", re.IGNORECASE)
 DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+PLACEHOLDER_URL_HOSTS = {
+    "example",
+    "example.com",
+    "example.net",
+    "example.org",
+    "example.edu",
+    "invalid",
+    "localhost",
+    "test",
+    "127.0.0.1",
+    "0.0.0.0",
+    "::1",
+}
+PLACEHOLDER_URL_SUFFIXES = (
+    ".example",
+    ".example.com",
+    ".example.edu",
+    ".example.net",
+    ".example.org",
+    ".invalid",
+    ".localhost",
+    ".test",
+)
 COMMIT_PLACEHOLDERS = {
     "<commit>",
     "commit",
@@ -231,6 +254,27 @@ def section_key_has_value(metadata_text: str, section_name: str, key_name: str) 
                     return True
         return False
     return False
+
+
+def check_non_placeholder_url(value: str, field_label: str) -> list[str]:
+    """Validate a public-looking HTTP/HTTPS URL and reject placeholder hosts.
+
+    参数:
+        value: URL string supplied for a final-upload source field.
+        field_label: Human-readable field label for error messages.
+
+    返回:
+        list[str]: Error messages for invalid or placeholder URLs.
+    """
+    if URL_PATTERN.fullmatch(value) is None:
+        return [f"{field_label} is invalid"]
+    parsed_url = urlparse(value)
+    if parsed_url.scheme.lower() not in {"http", "https"} or not parsed_url.hostname:
+        return [f"{field_label} is invalid"]
+    host = parsed_url.hostname.lower().rstrip(".")
+    if host in PLACEHOLDER_URL_HOSTS or host.endswith(PLACEHOLDER_URL_SUFFIXES):
+        return [f"{field_label} must not use a placeholder URL"]
+    return []
 
 
 def check_non_future_date(value: str, field_label: str) -> list[str]:
@@ -547,8 +591,13 @@ def check_target_preparation_confirmation(metadata_text: str) -> list[str]:
     author_guide_source_url = row.get("selected_author_guide_source_url", "").strip()
     if not author_guide_source_url:
         errors.append("selected author guide source URL is missing")
-    elif URL_PATTERN.fullmatch(author_guide_source_url) is None:
-        errors.append("selected author guide source URL is invalid")
+    else:
+        errors.extend(
+            check_non_placeholder_url(
+                author_guide_source_url,
+                "selected author guide source URL",
+            )
+        )
     author_guide_date = row.get("selected_author_guide_rechecked_date", "").strip()
     if not author_guide_date:
         errors.append("selected author guide rechecked date is missing")
@@ -567,8 +616,13 @@ def check_target_preparation_confirmation(metadata_text: str) -> list[str]:
     ranking_source_url = row.get("ranking_confirmation_source_url", "").strip()
     if not ranking_source_url:
         errors.append("ranking/category confirmation source URL is missing")
-    elif URL_PATTERN.fullmatch(ranking_source_url) is None:
-        errors.append("ranking/category confirmation source URL is invalid")
+    else:
+        errors.extend(
+            check_non_placeholder_url(
+                ranking_source_url,
+                "ranking/category confirmation source URL",
+            )
+        )
     checked_date = row.get("ranking_confirmation_checked_date", "").strip()
     if not checked_date:
         errors.append("ranking/category confirmation checked date is missing")

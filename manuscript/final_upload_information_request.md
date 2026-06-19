@@ -26,6 +26,7 @@ Repository URL and commit binding: keep the source `repository_reference` fields
 ## Target journal
 
 All author-guide and ranking/category confirmation dates must use YYYY-MM-DD and must not be later than the actual check date.
+Source URLs must be public HTTP/HTTPS URLs and must not use placeholder domains such as example.org, localhost, .test, or .invalid.
 
 - Selected target journal:
 - Article type:

@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 86.
+Completed audit cycles: 87.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.
 
@@ -786,6 +786,14 @@ Outcome: pass for target-confirmation source URL validation; blocked for final u
 This gate checks whether final-upload metadata can treat generic source labels as sufficient target-confirmation evidence. It cannot. The metadata schema and validator now require `selected_author_guide_source_url` and `ranking_confirmation_source_url` in addition to the human-readable source labels, and both URL fields must parse as HTTP or HTTPS URLs before final-upload validation can pass.
 
 The reviewer-facing boundary is source auditability, not target-journal completion. This gate ensures that the author-guide and ranking/category confirmations point to inspectable source records, but it does not verify the live content of those sources, complete the selected-journal decision, or replace author confirmation. Those external checks remain required before final upload.
+
+## Audit Cycle 87: Target Source Placeholder URL Gate
+
+Outcome: pass for target source placeholder URL validation; blocked for final upload until real source URLs are supplied.
+
+This gate checks whether final-upload metadata can pass with syntactically valid placeholder domains such as example.org, localhost, .test, or .invalid. It cannot. The metadata validator now rejects target-confirmation source URLs that use reserved or local placeholder hosts and emits `must not use a placeholder URL`.
+
+The reviewer-facing boundary is source URL realism, not live-source verification. This gate prevents placeholder domains from being treated as inspectable journal or ranking evidence, but it does not verify the live content of the selected author guide, complete ranking/category confirmation, or replace author confirmation. Those external checks remain required before final upload.
 
 ## Minimum Gate Before Final Upload
 

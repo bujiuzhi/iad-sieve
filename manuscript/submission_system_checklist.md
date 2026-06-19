@@ -106,8 +106,8 @@ Before upload, verify:
 
 1. The selected target journal and article type match the submission system.
 2. `target_journal_template_bound` is true and the selected journal template matches the final manuscript source.
-3. `selected_author_guide_source`, `selected_author_guide_source_url`, `selected_author_guide_rechecked_date`, and `selected_template_requirements_confirmed` are complete before final upload.
-4. `ranking_confirmation_completed`, `ranking_confirmation_source`, `ranking_confirmation_source_url`, `ranking_confirmation_checked_date`, and `selected_target_author_confirmed` are complete before final upload.
+3. `selected_author_guide_source`, non-placeholder `selected_author_guide_source_url`, `selected_author_guide_rechecked_date`, and `selected_template_requirements_confirmed` are complete before final upload.
+4. `ranking_confirmation_completed`, `ranking_confirmation_source`, non-placeholder `ranking_confirmation_source_url`, `ranking_confirmation_checked_date`, and `selected_target_author_confirmed` are complete before final upload.
 5. For single-anonymized routes such as DKE and Information Systems, the final title page and submission-system fields include author identities; the anonymous package is only a preflight package.
 6. The author list, order, affiliations, ORCID values, and corresponding author match the title page.
 7. The funding statement text is completed and matches the manuscript and submission system.
