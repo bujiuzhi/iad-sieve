@@ -3925,7 +3925,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 93",
+        "Completed audit cycles: 94",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3961,6 +3961,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "final-upload artifact publication binding",
         "default-threshold provenance gap",
         "DKE official-guide source traceability",
+        "DKE first-screen scope-fit drift",
         "final-upload information request specificity",
         "stronger evidence gates",
         "Current stopping rule",
@@ -4093,6 +4094,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 91: Default-Threshold Provenance Gate",
         "Audit Cycle 92: DKE Official Guide Source Gate",
         "Audit Cycle 93: Final-Upload Information Request Specificity Gate",
+        "Audit Cycle 94: DKE First-Screen Scope-Fit Gate",
         "Mechanism ablation acceptance protocol",
         "no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold",
         "`protocol_variant`",
@@ -5194,6 +5196,11 @@ def check_cover_letter(cover_letter_text: str) -> list[str]:
         "artifact-release instructions",
         "manifests and checksums",
         "does not claim cluster-level deployment quality without cluster artifacts",
+        "DKE-style data and knowledge engineering editorial screen",
+        "database-oriented scholarly data integration",
+        "knowledge engineering for scholarly records",
+        "reproducible data-processing contracts",
+        "does not finalize the target journal",
     ]
     errors = [f"cover letter missing required statement: {marker}" for marker in required_markers if marker not in cover_letter_text]
     subjective_fit_markers = [
@@ -5338,12 +5345,15 @@ def check_editorial_claim_alignment(
                 "zero observed HNFMR",
                 "does not claim broad method superiority",
                 "raw third-party data and full experimental outputs are not redistributed in Git",
+                "DKE-style data and knowledge engineering editorial screen",
+                "does not finalize the target journal",
             ],
         ),
         "highlights": (
             highlights_text,
             [
                 "Identity-agenda confusion",
+                "data/knowledge-engineering",
                 "IAD-Risk",
                 "IAD-Bench",
                 "Open-v2 scope-bounded evidence",
