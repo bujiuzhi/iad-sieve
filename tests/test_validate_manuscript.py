@@ -2947,6 +2947,14 @@ def test_check_statistical_interpretation_boundary_accepts_bounded_point_estimat
             "The stronger claim needs exact prediction files, resampling logs, random seeds, and checksums.",
             "An HNFMR value states no hard-negative false merge was observed.",
             "It should not be read as proof of zero risk.",
+            "Zero-observed HNFMR rows require numerator-denominator disclosure.",
+            "The artifact row records hard-negative false-merge numerator $=0$.",
+            "The artifact row records HNFMR denominator.",
+            "The artifact row records hard-negative label stratum.",
+            "The artifact row records evaluated split.",
+            "The artifact row records threshold source.",
+            "The artifact row records prediction-file checksum.",
+            "A rounded value of 0.000 without those fields is treated only as a manuscript summary.",
             r"\path{bootstrap_intervals}",
             "Predefined tests, multiplicity handling, input artifacts, and reproducible analysis logs are required.",
             "Same-scope predictions, interval estimates, ablations, and manual-validation slice are required.",
@@ -2969,6 +2977,8 @@ def test_check_statistical_interpretation_boundary_rejects_missing_significance_
     assert any("statistical superiority estimates" in error for error in errors)
     assert any("bootstrap_intervals" in error for error in errors)
     assert any("zero risk" in error for error in errors)
+    assert any("numerator-denominator disclosure" in error for error in errors)
+    assert any("prediction-file checksum" in error for error in errors)
 
 
 def test_check_ablation_acceptance_boundary_accepts_protocol() -> None:
@@ -3043,6 +3053,12 @@ def test_check_experiment_reporting_supplementary_boundaries_accepts_complete_ta
             "Confidence intervals.",
             "Statistical significance.",
             "Zero HNFMR rows.",
+            "Hard-negative false-merge numerator $=0$.",
+            "HNFMR denominator.",
+            "hard-negative label stratum.",
+            "evaluated split.",
+            "threshold source.",
+            "prediction-file checksum.",
             "Model ranking.",
             r"\path{bootstrap_intervals}",
             "Predefined tests, multiplicity handling, input artifacts, and reproducible analysis logs.",
@@ -5677,7 +5693,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 89.",
+            "Completed audit cycles: 90.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -6412,6 +6428,19 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "source-generalization readiness",
             "coverage gap or exploratory diagnostic",
             "readiness protocol rather than evidence of broad source generalization",
+            "## Audit Cycle 90: Zero-HNFMR Numerator-Denominator Gate",
+            "zero-HNFMR numerator-denominator wording",
+            "zero-risk or interval-supported claims",
+            "rounded HNFMR value of 0.000",
+            "hard-negative false-merge numerator $=0$",
+            "HNFMR denominator",
+            "hard-negative label stratum",
+            "evaluated split",
+            "threshold source",
+            "prediction-file checksum",
+            "zero-observed auditability",
+            "not zero-risk proof",
+            "broader zero-risk, threshold-stability, or interval-supported superiority wording",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -6430,7 +6459,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 89",
+        "Completed audit cycles: 90",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -6441,7 +6470,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 89" in error for error in errors)
+    assert any("Completed audit cycles: 90" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 89.
+Completed audit cycles: 90.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.
 
@@ -810,6 +810,14 @@ Outcome: pass for source-heldout readiness wording; blocked for source-generaliz
 This gate checks whether the manuscript implies completed source-heldout evidence. It does not. The extended protocol now requires declared train, validation, and held-out source partitions, source identifiers excluded from predictive features, per-source denominators for same-work F1, FMR, and HNFMR, command logs, split summaries, prediction checksums, and threshold records before source-heldout conclusions can be used as evidence.
 
 The reviewer-facing boundary is source-generalization readiness, not current cross-source proof. Missing gold, proxy, or silver label strata in a held-out source partition must be reported as a coverage gap or exploratory diagnostic. The current package therefore treats source-heldout as a readiness protocol rather than evidence of broad source generalization.
+
+## Audit Cycle 90: Zero-HNFMR Numerator-Denominator Gate
+
+Outcome: pass for zero-HNFMR numerator-denominator wording; blocked for zero-risk or interval-supported claims until the external artifact rows are released.
+
+This gate checks whether a rounded HNFMR value of 0.000 can be treated as independently auditable evidence without numerator and denominator fields. It cannot. The statistical interpretation boundary now requires hard-negative false-merge numerator $=0$, HNFMR denominator, hard-negative label stratum, evaluated split, threshold source, and prediction-file checksum before zero-observed HNFMR rows can support numerical audit.
+
+The reviewer-facing boundary is zero-observed auditability, not zero-risk proof. A rounded 0.000 value without those fields remains a manuscript summary; broader zero-risk, threshold-stability, or interval-supported superiority wording still requires released source-heldout evidence, manual validation, bootstrap intervals, and same-scope prediction files.
 
 ## Minimum Gate Before Final Upload
 
