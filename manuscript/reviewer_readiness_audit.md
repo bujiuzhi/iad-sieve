@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 83.
+Completed audit cycles: 84.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.
 
@@ -762,6 +762,14 @@ Outcome: pass for artifact release CLI discovery command consistency; blocked fo
 This gate checks whether the artifact release README command block and manifest command list can drift on the executable Git-only entry point. They cannot. The release README template, release README validator, artifact release validator, manuscript validator, and tests now require `python -m iad_sieve.cli --help` in the release `minimum_validation_commands` path, so reviewers can verify installable CLI discovery before artifact validation, fixture rebuild, or full result-audit commands are run.
 
 The reviewer-facing boundary is command discoverability, not new empirical evidence. This gate only proves that Git-only reviewers can verify CLI discovery before artifact validation; it does not prove the Open-v2 numerical table, external prediction files, bootstrap intervals, or final artifact URL/DOI. Those remain gated by the populated external artifact release, checksums, command logs, publication metadata, and final-upload package validation.
+
+## Audit Cycle 84: Submission Checklist Artifact CLI Discovery Gate
+
+Outcome: pass for submission-system checklist alignment; blocked for final upload until the live journal system and real artifact release are verified.
+
+This gate checks whether the final-upload checklist can omit the CLI discovery command while the artifact release README and manifest require it. It cannot. The submission-system checklist now requires `python -m iad_sieve.cli --help` from the same repository checkout named by the release manifest, immediately after artifact release validation and before final upload checks that depend on executable repository entry points.
+
+The reviewer-facing boundary is final-upload procedure consistency, not new evidence. The checklist alignment helps prevent a manual submission workflow from skipping installable CLI discovery, but it does not validate the external artifact URL or DOI, author metadata, selected journal template, or live submission-system preview. Those remain required before upload.
 
 ## Minimum Gate Before Final Upload
 
