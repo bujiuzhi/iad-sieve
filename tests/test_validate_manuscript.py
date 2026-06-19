@@ -707,7 +707,7 @@ def test_check_keywords_accepts_semicolon_separated_terms() -> None:
         "# Keywords\n\n"
         "scholarly entity matching; work deduplication; identity-agenda disentanglement; "
         "hard-negative false-merge rate; false-merge risk; provenance-aware evaluation; "
-        "scientific document representation"
+        "scholarly data integration"
     )
 
     errors = module.check_keywords(keywords_text)
@@ -5758,8 +5758,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 94.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, DKE first-screen scope-fit drift, final-upload information request specificity, and stronger evidence gates.",
+            "Completed audit cycles: 95.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, final-upload information request specificity, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -6555,6 +6555,13 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "data/knowledge-engineering merge-safety problem",
             "scope-fit precision",
             "not final journal selection",
+            "## Audit Cycle 95: Keyword Scope-Fit Gate",
+            "keyword-level DKE scope fit",
+            "`scholarly data integration`",
+            "first-screen metadata",
+            "data-integration and knowledge-engineering editors",
+            "metadata fit",
+            "not stronger evidence",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -6573,7 +6580,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 94",
+        "Completed audit cycles: 95",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -6584,7 +6591,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 94" in error for error in errors)
+    assert any("Completed audit cycles: 95" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -7745,7 +7752,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
     )
     keywords_text = (
         "scholarly entity matching; work deduplication; identity-agenda disentanglement; "
-        "false-merge risk; provenance-aware evaluation"
+        "false-merge risk; provenance-aware evaluation; scholarly data integration"
     )
     metadata_text = "\n".join(
         [
@@ -7866,7 +7873,7 @@ def test_check_editorial_claim_alignment_rejects_abstract_without_pair_cluster_b
     )
     keywords_text = (
         "scholarly entity matching; work deduplication; identity-agenda disentanglement; "
-        "false-merge risk; provenance-aware evaluation"
+        "false-merge risk; provenance-aware evaluation; scholarly data integration"
     )
     metadata_text = "\n".join(
         [

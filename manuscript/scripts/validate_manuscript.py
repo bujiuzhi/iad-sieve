@@ -3925,7 +3925,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 94",
+        "Completed audit cycles: 95",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3962,6 +3962,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "default-threshold provenance gap",
         "DKE official-guide source traceability",
         "DKE first-screen scope-fit drift",
+        "keyword DKE scope-fit drift",
         "final-upload information request specificity",
         "stronger evidence gates",
         "Current stopping rule",
@@ -4095,6 +4096,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 92: DKE Official Guide Source Gate",
         "Audit Cycle 93: Final-Upload Information Request Specificity Gate",
         "Audit Cycle 94: DKE First-Screen Scope-Fit Gate",
+        "Audit Cycle 95: Keyword Scope-Fit Gate",
         "Mechanism ablation acceptance protocol",
         "no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold",
         "`protocol_variant`",
@@ -5102,7 +5104,7 @@ def check_keywords(keywords_text: str) -> list[str]:
     errors: list[str] = []
     if not 1 <= len(keywords) <= 7:
         errors.append(f"keywords has {len(keywords)} entries; expected 1 to 7")
-    required_keywords = ["hard-negative false-merge rate"]
+    required_keywords = ["hard-negative false-merge rate", "scholarly data integration"]
     for required_keyword in required_keywords:
         if required_keyword not in keywords:
             errors.append(f"keywords missing required term: {required_keyword}")
@@ -5369,6 +5371,7 @@ def check_editorial_claim_alignment(
                 "identity-agenda disentanglement",
                 "false-merge risk",
                 "provenance-aware evaluation",
+                "scholarly data integration",
             ],
         ),
         "submission metadata": (
