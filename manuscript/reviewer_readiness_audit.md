@@ -10,9 +10,9 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 90.
+Completed audit cycles: 91.
 
-Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.
+Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, default-threshold provenance gap, and stronger evidence gates.
 
 Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.
 
@@ -818,6 +818,14 @@ Outcome: pass for zero-HNFMR numerator-denominator wording; blocked for zero-ris
 This gate checks whether a rounded HNFMR value of 0.000 can be treated as independently auditable evidence without numerator and denominator fields. It cannot. The statistical interpretation boundary now requires hard-negative false-merge numerator $=0$, HNFMR denominator, hard-negative label stratum, evaluated split, threshold source, and prediction-file checksum before zero-observed HNFMR rows can support numerical audit.
 
 The reviewer-facing boundary is zero-observed auditability, not zero-risk proof. A rounded 0.000 value without those fields remains a manuscript summary; broader zero-risk, threshold-stability, or interval-supported superiority wording still requires released source-heldout evidence, manual validation, bootstrap intervals, and same-scope prediction files.
+
+## Audit Cycle 91: Default-Threshold Provenance Gate
+
+Outcome: pass for default-threshold provenance wording; blocked for threshold-optimization claims until threshold-selection and sensitivity artifacts are released.
+
+This gate checks whether the default IAD-Risk operating point can be treated as validation-selected or optimized. It cannot. The operating-point boundary now requires default-threshold rows to record `threshold_source=predeclared_default`, a pre-run configuration checksum, a configuration timestamp or run identifier, and evidence that the threshold values were fixed before held-out scoring.
+
+The reviewer-facing boundary is default-rule auditability, not threshold optimality. Default-threshold rows are fixed-rule evidence, not evidence of validation-selected, optimized, or threshold-stable performance without `threshold_selection_logs` and `threshold_sensitivity_grid` from the same prediction file.
 
 ## Minimum Gate Before Final Upload
 

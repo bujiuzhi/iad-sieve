@@ -2273,6 +2273,14 @@ def test_check_operating_point_disclosure_accepts_supplementary_table() -> None:
             "A score file, metric summary, and threshold entry are required.",
             "A prediction file, metric summary, and model log are required.",
             "A prediction file, model JSON, thresholds, and checksums are required.",
+            "Default-threshold rows have a narrower interpretation.",
+            r"The artifact row exposes \texttt{threshold\_source=predeclared\_default}.",
+            "The artifact row includes a pre-run configuration checksum.",
+            "The artifact row includes a configuration timestamp or run identifier.",
+            "The thresholds were fixed before held-out scoring.",
+            "Rows cannot be described as validation-selected, optimized, or threshold-stable.",
+            r"\path{threshold_selection_logs}",
+            r"\path{threshold_sensitivity_grid}",
         ]
     )
     supplementary_text = "\n".join(
@@ -2289,6 +2297,14 @@ def test_check_operating_point_disclosure_accepts_supplementary_table() -> None:
             "IAD-Risk transformer variants",
             "Score file, metric summary, and threshold entry",
             "Prediction file, model JSON, thresholds, and checksums",
+            "Default-threshold audit rule",
+            r"\texttt{threshold\_source=predeclared\_default}",
+            "pre-run configuration checksum",
+            "configuration timestamp or run identifier",
+            "fixed before held-out scoring",
+            "not evidence of validation-selected, optimized, or threshold-stable performance",
+            r"\path{threshold_selection_logs}",
+            r"\path{threshold_sensitivity_grid}",
         ]
     )
 
@@ -2313,6 +2329,14 @@ def test_check_operating_point_disclosure_rejects_missing_supplementary_table() 
             "A score file, metric summary, and threshold entry are required.",
             "A prediction file, metric summary, and model log are required.",
             "A prediction file, model JSON, thresholds, and checksums are required.",
+            "Default-threshold rows have a narrower interpretation.",
+            r"The artifact row exposes \texttt{threshold\_source=predeclared\_default}.",
+            "The artifact row includes a pre-run configuration checksum.",
+            "The artifact row includes a configuration timestamp or run identifier.",
+            "The thresholds were fixed before held-out scoring.",
+            "Rows cannot be described as validation-selected, optimized, or threshold-stable.",
+            r"\path{threshold_selection_logs}",
+            r"\path{threshold_sensitivity_grid}",
         ]
     )
 
@@ -2320,6 +2344,7 @@ def test_check_operating_point_disclosure_rejects_missing_supplementary_table() 
 
     assert any("operating-point-disclosure" in error for error in errors)
     assert any("Operating Point Disclosure" in error for error in errors)
+    assert any("Default-threshold audit rule" in error for error in errors)
 
 
 def test_check_selective_decision_coverage_boundary_accepts_supplementary_table() -> None:
@@ -5693,8 +5718,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 90.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.",
+            "Completed audit cycles: 91.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, default-threshold provenance gap, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -6441,6 +6466,19 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "zero-observed auditability",
             "not zero-risk proof",
             "broader zero-risk, threshold-stability, or interval-supported superiority wording",
+            "## Audit Cycle 91: Default-Threshold Provenance Gate",
+            "default-threshold provenance wording",
+            "threshold-optimization claims",
+            "default IAD-Risk operating point",
+            "`threshold_source=predeclared_default`",
+            "pre-run configuration checksum",
+            "configuration timestamp or run identifier",
+            "fixed before held-out scoring",
+            "default-rule auditability",
+            "not threshold optimality",
+            "not evidence of validation-selected, optimized, or threshold-stable performance",
+            "`threshold_selection_logs`",
+            "`threshold_sensitivity_grid`",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -6459,7 +6497,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 90",
+        "Completed audit cycles: 91",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -6470,7 +6508,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 90" in error for error in errors)
+    assert any("Completed audit cycles: 91" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

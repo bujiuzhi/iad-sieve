@@ -807,6 +807,8 @@ IAD-Risk transformer variants & $p_{\mathrm{work}}$, $p_{\mathrm{ani}}$, and $p_
 \end{tabular}
 \end{table}
 
+Default-threshold audit rule. A default IAD-Risk operating point is auditable only when the artifact row records \texttt{threshold\_source=predeclared\_default}, a pre-run configuration checksum, a configuration timestamp or run identifier, and evidence that threshold values were fixed before held-out scoring. The default threshold is a fixed rule, not evidence of validation-selected, optimized, or threshold-stable performance without \path{threshold_selection_logs} and \path{threshold_sensitivity_grid} from the same prediction file.
+
 \section{Threshold Sensitivity Evidence Status}
 
 The main manuscript summarizes the threshold-sensitivity evidence status in prose. Table~\ref{tab:threshold-sensitivity-status} preserves the audit items required before fixed-threshold results can be upgraded to threshold-stability claims.
