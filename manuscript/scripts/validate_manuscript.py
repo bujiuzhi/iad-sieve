@@ -3968,7 +3968,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 107",
+        "Completed audit cycles: 108",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -3985,6 +3985,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "zero-observed HNFMR overread",
         "FMR/HNFMR stratum conflation",
         "abstract FMR/HNFMR first-screen conflation",
+        "highlights FMR/HNFMR first-screen conflation",
         "L2 public-source rebuild chain-of-custody gap",
         "selective-decision workload evidence",
         "selective workload denominator ambiguity",
@@ -4164,6 +4165,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 105: Selective Workload Denominator Gate",
         "Audit Cycle 106: FMR-HNFMR Stratum Gate",
         "Audit Cycle 107: Abstract FMR-HNFMR First-Screen Gate",
+        "Audit Cycle 108: Highlights FMR-HNFMR First-Screen Gate",
         "current abstract is 209 words",
         "250-word DKE preflight limit",
         "abstract-length compliance",
@@ -4223,6 +4225,9 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "ordinary FMR still reported separately as 0.001",
         "first-screen metric separation",
         "same-scope comparative-ranking limits",
+        "highlights FMR/HNFMR first-screen separation",
+        "Open-v2 scope-bounded evidence: zero observed IAD-Risk HNFMR; FMR=0.001",
+        "highlight-level metric separation",
         "Mechanism ablation acceptance protocol",
         "no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold",
         "`protocol_variant`",
@@ -5212,6 +5217,11 @@ def check_highlights(highlights_text: str) -> list[str]:
                     "HNFMR highlight must mention Open-v2 and scope boundary when reporting numbers: "
                     f"{line}"
                 )
+        if "zero observed" in highlight and "HNFMR" in highlight and "FMR=0.001" not in highlight:
+            errors.append(
+                "zero-observed HNFMR highlight must include ordinary FMR=0.001 boundary: "
+                f"{line}"
+            )
     return errors
 
 
@@ -5366,6 +5376,7 @@ def check_submission_material_quantitative_summary(highlights_text: str, cover_l
     highlight_required_markers = [
         "Open-v2 scope-bounded evidence",
         "zero observed IAD-Risk HNFMR",
+        "FMR=0.001",
     ]
     errors: list[str] = []
     for marker in highlight_required_markers:
@@ -5489,6 +5500,7 @@ def check_editorial_claim_alignment(
                 "IAD-Bench",
                 "Open-v2 scope-bounded evidence",
                 "zero observed IAD-Risk HNFMR",
+                "FMR=0.001",
                 "artifact-backed audits",
             ],
         ),
