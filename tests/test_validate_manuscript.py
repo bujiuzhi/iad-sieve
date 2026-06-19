@@ -93,6 +93,7 @@ def test_check_final_upload_information_request_rejects_missing_required_fields(
     assert any("Live submission-system fields" in error for error in errors)
     assert any("Submission text consistency" in error for error in errors)
     assert any("Submission metadata mapping" in error for error in errors)
+    assert any("DKE preflight source status" in error for error in errors)
 
 
 def test_check_final_upload_information_request_rejects_missing_credit_roles() -> None:
@@ -206,6 +207,34 @@ def test_check_final_upload_information_request_rejects_missing_target_url_bound
 
     assert any("Source URLs must be public HTTP/HTTPS URLs" in error for error in errors)
     assert any("must not use placeholder domains" in error for error in errors)
+
+
+def test_check_final_upload_information_request_rejects_missing_dke_preflight_status() -> None:
+    """验证最终上传信息表必须区分 DKE 预检来源和最终作者确认。"""
+
+    module = _load_validate_manuscript_module()
+    request_text = Path("manuscript/final_upload_information_request.md").read_text(encoding="utf-8")
+    request_text = request_text.replace("### DKE preflight source status", "")
+    request_text = request_text.replace(
+        "The DKE official-guide preflight source is already recorded in `submission_metadata.yml` as "
+        "`dke_official_guide_source`, `dke_official_guide_source_url`, `dke_official_guide_rechecked`, "
+        "and `dke_official_guide_constraints_verified`. These fields support preflight preparation only. "
+        "They do not replace the final selected-author-guide fields or the author-confirmed target-journal decision.",
+        "",
+    )
+    for marker in [
+        "DKE official guide source recorded",
+        "Final selected-author-guide fields still require author confirmation",
+        "Final target journal decision still requires author confirmation",
+        "Final ranking/category confirmation still requires institutional source confirmation",
+    ]:
+        request_text = request_text.replace(f"- {marker}:", "")
+
+    errors = module.check_final_upload_information_request(request_text)
+
+    assert any("DKE preflight source status" in error for error in errors)
+    assert any("preflight preparation only" in error for error in errors)
+    assert any("Final target journal decision still requires author confirmation" in error for error in errors)
 
 
 def test_check_final_upload_information_request_rejects_missing_metadata_mapping() -> None:
@@ -5729,8 +5758,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 92.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, and stronger evidence gates.",
+            "Completed audit cycles: 93.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, final-upload information request specificity, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -6507,6 +6536,17 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "ranking/category confirmation",
             "artifact URL or DOI",
             "live submission-system verification",
+            "## Audit Cycle 93: Final-Upload Information Request Specificity Gate",
+            "DKE final-upload information-request specificity",
+            "requested external values are supplied and synchronized into metadata, cover letter, source package, and live submission system",
+            "recorded DKE official-guide preflight source",
+            "DKE preflight source status section",
+            "final selected-author-guide fields",
+            "final target-journal author confirmation",
+            "final ranking/category confirmation",
+            "request specificity",
+            "not completed metadata",
+            "`submission_metadata.yml`, `cover_letter.md`, the selected journal source package, the artifact release, and the live submission system",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -6525,7 +6565,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 92",
+        "Completed audit cycles: 93",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -6536,7 +6576,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 92" in error for error in errors)
+    assert any("Completed audit cycles: 93" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

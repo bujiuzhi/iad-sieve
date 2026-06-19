@@ -28,6 +28,18 @@ Repository URL and commit binding: keep the source `repository_reference` fields
 All author-guide and ranking/category confirmation dates must use YYYY-MM-DD and must not be later than the actual check date.
 Source URLs must be public HTTP/HTTPS URLs and must not use placeholder domains such as example.org, localhost, .test, or .invalid.
 
+### DKE preflight source status
+
+The DKE official-guide preflight source is already recorded in `submission_metadata.yml` as `dke_official_guide_source`, `dke_official_guide_source_url`, `dke_official_guide_rechecked`, and `dke_official_guide_constraints_verified`. These fields support preflight preparation only. They do not replace the final selected-author-guide fields or the author-confirmed target-journal decision.
+
+- DKE official guide source recorded:
+- DKE official guide source URL:
+- DKE official guide rechecked date:
+- DKE official guide constraints verified:
+- Final selected-author-guide fields still require author confirmation:
+- Final target journal decision still requires author confirmation:
+- Final ranking/category confirmation still requires institutional source confirmation:
+
 - Selected target journal:
 - Article type:
 - Review mode:
