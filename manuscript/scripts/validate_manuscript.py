@@ -547,7 +547,7 @@ def check_data_code_availability_boundary(manuscript_text: str, supplementary_te
         "L0/L1 code-level reproduction",
         "L2/L3 result-level audit",
         "raw data or full experiment outputs",
-        "full numerical reproduction requires public-source rebuilds or released artifacts",
+        "Full numerical reproduction requires public-source rebuilds or released artifacts",
     ]
     required_supplement_markers = [
         r"\section{Data and Code Availability Boundary}",
@@ -579,6 +579,47 @@ def check_data_code_availability_boundary(manuscript_text: str, supplementary_te
         if marker.lower() not in evidence_text
     )
     return errors
+
+
+def check_reproduction_command_chain(manuscript_text: str) -> list[str]:
+    """Check whether the manuscript preserves the executable reproduction command chain.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing command-chain markers.
+    """
+    required_markers = [
+        r"\section*{Data and Code Availability}",
+        r"\texttt{python -m iad\_sieve.cli --help}",
+        "fixture rebuild validation",
+        r"\path{manuscript/scripts/verify_fixture_rebuild.py}",
+        "public-release audit",
+        r"\path{scripts/check_public_release.py}",
+        r"\path{manuscript/scripts/populate_artifact_release.py}",
+        r"\texttt{--artifact-dir}",
+        r"\path{/path/to/release}",
+        r"\texttt{--source-dir}",
+        r"\path{/path/to/source-artifacts}",
+        r"\texttt{--preflight-only}",
+        "it is not itself result evidence",
+        r"\path{source_input_manifest}",
+        r"\path{processing_run_log}",
+        r"\path{manuscript/scripts/validate_artifact_release.py}",
+        r"\texttt{--artifact-dir /path/to/release}",
+        r"\path{manuscript/scripts/validate_submission_package.py}",
+        r"\texttt{--final-upload --artifact-dir /path/to/release}",
+        "source-control commit",
+        "same source commit",
+        "do not reproduce the Open-v2 numerical table",
+        "Full numerical reproduction requires public-source rebuilds or released artifacts",
+    ]
+    return [
+        f"reproduction command chain missing manuscript marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
 
 
 def check_reproduction_levels_boundary(manuscript_text: str, supplementary_text: str = "") -> list[str]:
@@ -3983,7 +4024,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 111",
+        "Completed audit cycles: 112",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -4004,6 +4045,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "document/cluster split overread",
         "preflight package source freshness",
         "strict validation package freshness bypass",
+        "reproduction command-chain drift",
         "L2 public-source rebuild chain-of-custody gap",
         "selective-decision workload evidence",
         "selective workload denominator ambiguity",
@@ -4187,6 +4229,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 109: Document-Cluster Split Overread Gate",
         "Audit Cycle 110: Current Package Source Freshness Gate",
         "Audit Cycle 111: Strict Validation Package Freshness Gate",
+        "Audit Cycle 112: Reproduction Command Chain Gate",
         "current abstract is 209 words",
         "250-word DKE preflight limit",
         "abstract-length compliance",
@@ -4270,6 +4313,14 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "DKE/Elsevier preflight package",
         "strict-manuscript validation failures",
         "validation coverage",
+        "Git-only command chain",
+        "check_reproduction_command_chain",
+        "fixture rebuild validation",
+        "public-release audit",
+        "artifact source preflight",
+        "artifact-level validation",
+        "final-upload package binding",
+        "full numerical reproduction requires public-source rebuilds or released artifacts",
         "Mechanism ablation acceptance protocol",
         "no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold",
         "`protocol_variant`",
@@ -6112,6 +6163,7 @@ def main() -> int:
     errors.extend(check_claim_interpretation_boundary(manuscript_text, supplementary_text))
     errors.extend(check_declaration_statements(manuscript_text))
     errors.extend(check_data_code_availability_boundary(manuscript_text, supplementary_text))
+    errors.extend(check_reproduction_command_chain(manuscript_text))
     errors.extend(check_reproduction_levels_boundary(manuscript_text, supplementary_text))
     errors.extend(check_evaluation_protocol_boundary(manuscript_text, supplementary_text))
     errors.extend(check_cli_entrypoint_contract(pyproject_text, cli_entrypoint_text))
