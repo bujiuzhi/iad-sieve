@@ -380,7 +380,11 @@ Let $N$ be the number of evaluated pairs under a fixed operating point, and let 
 \mathrm{BR}=\frac{B}{N},\quad
 \mathrm{DR}=\frac{D}{N}.
 \]
-If $R$ denotes the number of blocked or deferred pairs that require human review under the declared workflow, and $C$ denotes the predeclared manual-review capacity for the same batch, the capacity-normalized review load is $\mathrm{CNRL}=R/C$. These quantities must use the same prediction artifact, threshold configuration, row scope, and denominator record as FMR and HNFMR; otherwise low false-merge rates can be produced by shifting unresolved pairs to manual review. The current result table therefore supports fixed-threshold false-merge control, not an operational throughput or staffing claim.
+Let $B_{\mathrm{review}}\leq B$ and $D_{\mathrm{review}}\leq D$ denote the blocked and deferred pairs that the declared workflow sends to human review. Terminal cannot-link blocks that need no further adjudication remain counted in $B$ but are not counted in $R$. If $R=B_{\mathrm{review}}+D_{\mathrm{review}}$ and $C$ denotes the predeclared manual-review capacity for the same batch, the capacity-normalized review load is
+\[
+\mathrm{CNRL}=\frac{R}{C}.
+\]
+These quantities must use the same prediction artifact, threshold configuration, row scope, and denominator record as FMR and HNFMR; otherwise low false-merge rates can be produced by shifting unresolved pairs to manual review. The current result table therefore supports fixed-threshold false-merge control, not an operational throughput or staffing claim.
 
 \subsection{Pair-to-Cluster Evidence Boundary}
 

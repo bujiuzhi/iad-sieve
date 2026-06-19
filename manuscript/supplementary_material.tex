@@ -451,7 +451,7 @@ Threshold-stability claims & \path{threshold_sensitivity_grid}, \path{threshold_
 \section{Selective Decision Coverage Boundary}
 
 The main manuscript summarizes the selective-decision coverage boundary in prose. Table~\ref{tab:selective-decision-coverage} preserves the coverage and review-load quantities that must be released before false-merge control can be read as operational automation evidence.
-Let $N$ denote the evaluated pair count for one row of the result table, with $M$ automatic merges, $B$ blocked pairs, and $D$ deferred pairs under the same fixed operating point. The release artifact should satisfy $N=M+B+D$ for every row. Automatic merge coverage is $\mathrm{AMC}=M/N$, block rate is $\mathrm{BR}=B/N$, and defer rate is $\mathrm{DR}=D/N$. If $R$ is the number of blocked or deferred pairs that still require human review and $C$ is the predeclared review capacity for the batch, capacity-normalized review load is $\mathrm{CNRL}=R/C$. These quantities must be derived from the same prediction artifact, threshold configuration, row scope, and denominator record as FMR and HNFMR.
+Let $N$ denote the evaluated pair count for one row of the result table, with $M$ automatic merges, $B$ blocked pairs, and $D$ deferred pairs under the same fixed operating point. The release artifact should satisfy $N=M+B+D$ for every row. Automatic merge coverage is $\mathrm{AMC}=M/N$, block rate is $\mathrm{BR}=B/N$, and defer rate is $\mathrm{DR}=D/N$. Let $B_{\mathrm{review}}\leq B$ and $D_{\mathrm{review}}\leq D$ denote the blocked and deferred pairs that the declared workflow sends to human review; terminal cannot-link blocks that need no further adjudication remain counted in $B$ but are not counted in $R$. If $R=B_{\mathrm{review}}+D_{\mathrm{review}}$ and $C$ is the predeclared review capacity for the batch, capacity-normalized review load is $\mathrm{CNRL}=R/C$. These quantities must be derived from the same prediction artifact, threshold configuration, row scope, and denominator record as FMR and HNFMR.
 
 \begin{table}[H]
 \caption{Selective decision coverage boundary. Coverage and review-load quantities must be computed from the same prediction files as the reported risk metrics before operational deployment claims are made.}
@@ -466,8 +466,8 @@ Quantity & Required artifact source & Interpretation boundary \\
 Automatic merge coverage & Merge decisions from the same prediction files and thresholds. & Needed before claiming that the system resolves a large fraction of pairs automatically. \\
 Block rate & Blocked decisions under the reported risk gate. & Separates safety-driven blocking from improved identity recognition. \\
 Defer rate & Deferred decisions under the fixed operating point. & High defer rate shifts work to manual review and must be reported with FMR/HNFMR. \\
-Review load & Counts by label stratum, source, and hard-negative level. & Needed before claiming operational throughput reduction or review-cost savings. \\
-Capacity-normalized review load & Review workload after subtracting automatic merges and adding blocked or deferred pairs requiring review. & Required before interpreting low false-merge rates as operational cost savings. \\
+Review load & Counts of review-required blocked and deferred pairs by label stratum, source, and hard-negative level. & Terminal safety blocks must be separated from pairs that require human handling before claiming operational throughput reduction or review-cost savings. \\
+Capacity-normalized review load & Review workload after subtracting automatic merges and counting only blocked or deferred pairs requiring review. & Required before interpreting low false-merge rates as operational cost savings. \\
 \bottomrule
 \end{tabular}
 \end{table}
