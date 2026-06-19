@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import datetime as dt
 import re
 from urllib.parse import unquote, urlparse
 
@@ -228,6 +229,27 @@ def section_key_has_value(metadata_text: str, section_name: str, key_name: str) 
                     return True
         return False
     return False
+
+
+def check_non_future_date(value: str, field_label: str) -> list[str]:
+    """Validate an ISO date and reject dates later than today.
+
+    参数:
+        value: Date string in YYYY-MM-DD format.
+        field_label: Human-readable field label used in error messages.
+
+    返回:
+        list[str]: Error messages for invalid or future dates.
+    """
+    if DATE_PATTERN.fullmatch(value) is None:
+        return [f"{field_label} is invalid"]
+    try:
+        parsed_date = dt.date.fromisoformat(value)
+    except ValueError:
+        return [f"{field_label} is invalid"]
+    if parsed_date > dt.date.today():
+        return [f"{field_label} must not be in the future"]
+    return []
 
 
 def parse_author_rows(metadata_text: str) -> list[dict[str, str]]:
@@ -523,8 +545,8 @@ def check_target_preparation_confirmation(metadata_text: str) -> list[str]:
     author_guide_date = row.get("selected_author_guide_rechecked_date", "").strip()
     if not author_guide_date:
         errors.append("selected author guide rechecked date is missing")
-    elif DATE_PATTERN.fullmatch(author_guide_date) is None:
-        errors.append("selected author guide rechecked date is invalid")
+    else:
+        errors.extend(check_non_future_date(author_guide_date, "selected author guide rechecked date"))
     if row.get("selected_template_requirements_confirmed", "").lower() != "true":
         errors.append("selected template requirements confirmation is incomplete")
 
@@ -538,8 +560,8 @@ def check_target_preparation_confirmation(metadata_text: str) -> list[str]:
     checked_date = row.get("ranking_confirmation_checked_date", "").strip()
     if not checked_date:
         errors.append("ranking/category confirmation checked date is missing")
-    elif DATE_PATTERN.fullmatch(checked_date) is None:
-        errors.append("ranking/category confirmation checked date is invalid")
+    else:
+        errors.extend(check_non_future_date(checked_date, "ranking/category confirmation checked date"))
 
     selected_target_required = row.get("selected_target_requires_author_confirmation", "").lower()
     if selected_target_required != "true":

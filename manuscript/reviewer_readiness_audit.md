@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 84.
+Completed audit cycles: 85.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.
 
@@ -770,6 +770,14 @@ Outcome: pass for submission-system checklist alignment; blocked for final uploa
 This gate checks whether the final-upload checklist can omit the CLI discovery command while the artifact release README and manifest require it. It cannot. The submission-system checklist now requires `python -m iad_sieve.cli --help` from the same repository checkout named by the release manifest, immediately after artifact release validation and before final upload checks that depend on executable repository entry points.
 
 The reviewer-facing boundary is final-upload procedure consistency, not new evidence. The checklist alignment helps prevent a manual submission workflow from skipping installable CLI discovery, but it does not validate the external artifact URL or DOI, author metadata, selected journal template, or live submission-system preview. Those remain required before upload.
+
+## Audit Cycle 85: Target Confirmation Date Validity Gate
+
+Outcome: pass for target-confirmation date validation; blocked for final upload until real author-guide and ranking/category sources are supplied.
+
+This gate checks whether a final-upload package can use syntactically valid but future-dated target-confirmation records. It cannot. The metadata validator now parses `selected_author_guide_rechecked_date` and `ranking_confirmation_checked_date` as real ISO dates and rejects dates later than the current validation date. The final-upload information request also states that author-guide and ranking/category confirmation dates must use YYYY-MM-DD and must not be later than the actual check date.
+
+The reviewer-facing boundary is source traceability, not target-journal completion. This gate prevents impossible or placeholder confirmation dates from passing final-upload validation, but it does not supply the selected journal, official author-guide source, institutional ranking/category source, or author confirmation. Those still require external author-provided evidence before final upload.
 
 ## Minimum Gate Before Final Upload
 

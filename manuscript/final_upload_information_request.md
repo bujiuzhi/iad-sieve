@@ -25,6 +25,8 @@ Repository URL and commit binding: keep the source `repository_reference` fields
 
 ## Target journal
 
+All author-guide and ranking/category confirmation dates must use YYYY-MM-DD and must not be later than the actual check date.
+
 - Selected target journal:
 - Article type:
 - Review mode:

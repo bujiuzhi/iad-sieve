@@ -176,6 +176,22 @@ def test_check_final_upload_information_request_accepts_complete_request() -> No
     assert errors == []
 
 
+def test_check_final_upload_information_request_rejects_missing_target_date_boundary() -> None:
+    """验证最终上传信息表必须说明目标确认日期不能是未来日期。"""
+
+    module = _load_validate_manuscript_module()
+    request_text = Path("manuscript/final_upload_information_request.md").read_text(encoding="utf-8")
+    request_text = request_text.replace(
+        "All author-guide and ranking/category confirmation dates must use YYYY-MM-DD and must not be later than the actual check date.",
+        "",
+    )
+
+    errors = module.check_final_upload_information_request(request_text)
+
+    assert any("author-guide and ranking/category confirmation dates" in error for error in errors)
+    assert any("actual check date" in error for error in errors)
+
+
 def test_check_final_upload_information_request_rejects_missing_metadata_mapping() -> None:
     """验证最终上传信息表必须说明外部输入如何同步到元数据文件。"""
 
@@ -5612,7 +5628,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 84.",
+            "Completed audit cycles: 85.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -6302,6 +6318,13 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "manual submission workflow",
             "installable CLI discovery",
             "final-upload procedure consistency",
+            "## Audit Cycle 85: Target Confirmation Date Validity Gate",
+            "target-confirmation date validation",
+            "`selected_author_guide_rechecked_date`",
+            "`ranking_confirmation_checked_date`",
+            "rejects dates later than the current validation date",
+            "must not be later than the actual check date",
+            "source traceability",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -6320,7 +6343,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 84",
+        "Completed audit cycles: 85",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -6331,7 +6354,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 84" in error for error in errors)
+    assert any("Completed audit cycles: 85" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -8189,6 +8212,26 @@ def test_check_final_upload_metadata_rejects_missing_author_guide_confirmation()
     assert any("selected author guide source is missing" in error for error in errors)
     assert any("selected author guide rechecked date is missing" in error for error in errors)
     assert any("selected template requirements confirmation is incomplete" in error for error in errors)
+
+
+def test_check_final_upload_metadata_rejects_future_target_confirmation_dates() -> None:
+    """验证 final-upload 门禁拒绝未来日期的目标确认记录。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = _build_filled_final_upload_metadata_text()
+    metadata_text = metadata_text.replace(
+        '  selected_author_guide_rechecked_date: "2026-06-19"',
+        '  selected_author_guide_rechecked_date: "2099-01-01"',
+    )
+    metadata_text = metadata_text.replace(
+        '  ranking_confirmation_checked_date: "2026-06-19"',
+        '  ranking_confirmation_checked_date: "2099-01-01"',
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any("selected author guide rechecked date must not be in the future" in error for error in errors)
+    assert any("ranking/category confirmation checked date must not be in the future" in error for error in errors)
 
 
 def test_check_final_upload_metadata_rejects_missing_target_ranking_confirmation() -> None:
