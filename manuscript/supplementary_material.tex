@@ -151,10 +151,10 @@ Threshold gate & Converts the risk proxy into a merge, block, or defer decision.
 \toprule
 Alternative & Why it is insufficient for this failure mode & IAD-Risk design response & Evidence boundary \\
 \midrule
-Tune a representation-similarity threshold. & High scientific relatedness can still connect different works in the same task, benchmark, or citation community. & Use representation similarity as candidate and agenda evidence, not direct merge evidence. & Supports false-merge-risk motivation, not a full retrieval benchmark. \\
-Use one supervised pair classifier. & A strong classifier can reduce false merges but does not expose whether a positive score comes from identity or agenda evidence. & Predict same-work, same-agenda, and agenda-non-identity signals separately before gating. & RoBERTa remains a strong baseline; broad superiority is not claimed. \\
+Tune only a representation-similarity threshold. & High scientific relatedness can still connect different works in the same task, benchmark, or citation community. & Use representation similarity as candidate and agenda evidence, not direct merge evidence. & Supports false-merge-risk motivation, not a full retrieval benchmark. \\
+Rely on one supervised pair classifier. & A strong classifier can reduce false merges but does not expose whether a positive score comes from identity or agenda evidence. & Predict same-work, same-agenda, and agenda-non-identity signals separately before gating. & RoBERTa remains a strong baseline; broad superiority is not claimed. \\
 Use provenance as a model feature. & Source or split identifiers can create leakage and make held-out interpretation fragile. & Keep provenance as audit metadata and apply provenance-aware supervision masking. & Source-heldout claims require stronger source coverage. \\
-Always force a binary merge decision. & Some pairs have related evidence but insufficient identity evidence, making automatic merging risky. & Emit merge, block, or defer through the risk-aware gate. & Defer behavior needs deployment-specific review policies. \\
+Force every candidate into a binary merge decision. & Some pairs have related evidence but insufficient identity evidence, making automatic merging risky. & Emit merge, block, or defer through the risk-aware gate. & Defer behavior needs deployment-specific review policies. \\
 Select thresholds after test results. & Post-hoc threshold choice can hide false-merge risk and inflate held-out conclusions. & Fix operating points before final reporting and require threshold artifacts for stronger claims. & Threshold stability needs a released grid and checksums. \\
 \bottomrule
 \end{tabular}
