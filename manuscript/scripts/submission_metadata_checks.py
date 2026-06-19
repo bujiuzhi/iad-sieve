@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import datetime as dt
 import re
 from urllib.parse import unquote, urlparse
@@ -131,6 +132,7 @@ ARTICLE_TYPE_COVER_LETTER_MARKERS = {
     "research_article": "research article",
 }
 FINAL_UPLOAD_ARTICLE_TYPES = set(ARTICLE_TYPE_COVER_LETTER_MARKERS)
+DKE_EDITABLE_BIOGRAPHY_EXTENSIONS = {".doc", ".docx", ".rtf", ".txt", ".md", ".tex"}
 
 
 def strip_yaml_value(value: str) -> str:
@@ -261,6 +263,50 @@ def section_key_has_value(metadata_text: str, section_name: str, key_name: str) 
                     return True
         return False
     return False
+
+
+def parse_section_sequence_values(metadata_text: str, section_name: str, key_name: str) -> list[str]:
+    """Parse simple inline or block sequence values from a metadata section.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+        section_name: Top-level section name.
+        key_name: Sequence key to parse inside the section.
+
+    返回:
+        list[str]: Parsed non-empty sequence item values.
+    """
+    lines = section_lines(metadata_text, section_name)
+    for index, line in enumerate(lines):
+        stripped_line = line.strip()
+        if not stripped_line.startswith(f"{key_name}:"):
+            continue
+        inline_value = stripped_line.split(":", 1)[1].strip()
+        if inline_value and inline_value != "[]":
+            try:
+                parsed_value = ast.literal_eval(inline_value)
+            except (SyntaxError, ValueError):
+                parsed_value = strip_yaml_value(inline_value)
+            if isinstance(parsed_value, list):
+                return [str(item).strip() for item in parsed_value if str(item).strip()]
+            parsed_scalar = str(parsed_value).strip()
+            return [parsed_scalar] if parsed_scalar else []
+
+        values: list[str] = []
+        key_indent = len(line) - len(line.lstrip(" \t"))
+        for following_line in lines[index + 1 :]:
+            following_stripped = following_line.strip()
+            if not following_stripped:
+                continue
+            following_indent = len(following_line) - len(following_line.lstrip(" \t"))
+            if following_indent <= key_indent and ":" in following_stripped:
+                break
+            if following_stripped.startswith("- "):
+                item_value = strip_yaml_value(following_stripped[2:])
+                if item_value:
+                    values.append(item_value)
+        return values
+    return []
 
 
 def check_non_placeholder_url(value: str, field_label: str) -> list[str]:
@@ -771,6 +817,34 @@ def target_journal_requires_elsevier_files(metadata_text: str) -> bool:
     return target_journal.strip().lower() in ELSEVIER_TARGET_JOURNALS
 
 
+def check_editable_biography_file_paths(metadata_text: str) -> list[str]:
+    """Check whether DKE author biography paths use editable non-PDF formats.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages for missing or non-editable biography file paths.
+    """
+    biography_files = parse_section_sequence_values(metadata_text, "author_identity_materials", "biography_files")
+    errors: list[str] = []
+    for biography_file in biography_files:
+        normalized_path = unquote(biography_file).strip()
+        suffix_match = re.search(r"(\.[A-Za-z0-9]+)(?:[?#].*)?$", normalized_path)
+        suffix = suffix_match.group(1).lower() if suffix_match else ""
+        if not suffix:
+            errors.append(f"author biography file must include an editable file extension: {biography_file}")
+            continue
+        if suffix == ".pdf":
+            errors.append("author biography file must be editable and must not be PDF")
+        elif suffix not in DKE_EDITABLE_BIOGRAPHY_EXTENSIONS:
+            errors.append(
+                "author biography file must use an editable format "
+                f"({', '.join(sorted(DKE_EDITABLE_BIOGRAPHY_EXTENSIONS))}): {biography_file}"
+            )
+    return errors
+
+
 def check_author_identity_materials(metadata_text: str) -> list[str]:
     """Check DKE/Elsevier author biography and photograph material records.
 
@@ -796,6 +870,8 @@ def check_author_identity_materials(metadata_text: str) -> list[str]:
         errors.append("author identity materials verification is incomplete")
     if not section_key_has_value(metadata_text, "author_identity_materials", "biography_files"):
         errors.append("author biography file list is missing")
+    else:
+        errors.extend(check_editable_biography_file_paths(metadata_text))
     if not section_key_has_value(metadata_text, "author_identity_materials", "photograph_files"):
         errors.append("author photograph file list is missing")
     return errors

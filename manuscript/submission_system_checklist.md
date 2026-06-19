@@ -23,7 +23,7 @@ The checklist intentionally remains incomplete until the authors confirm the tar
 | Highlights | `highlights.md` | Keep 3--5 bullets, each at most 85 characters, if the selected journal uses Elsevier-style highlights. |
 | Keywords | `keywords.md` | Keep 1--7 keywords for the current Elsevier candidate route unless the selected journal specifies otherwise. |
 | Submission metadata | `submission_metadata.yml` | Fill target journal, `target_journal_template_bound`, target ranking/category confirmation fields, authors, corresponding author, funding statement text, author contribution statement, permissions statement, third-party material permission status, artifact URL, and final-upload checklist fields. |
-| Author biographies and photographs | External author-provided files | For the DKE route, prepare short author biographies and passport-type photographs as final-upload materials after author identities are confirmed; record the external file list under `author_identity_materials`. |
+| Author biographies and photographs | External author-provided files | For the DKE route, prepare short author biographies with a maximum 100 words, editable non-PDF biography files, and passport-type photographs as final-upload materials after author identities are confirmed; record the external file list under `author_identity_materials`. |
 | Artifact release manifest | `artifact_release_manifest.template.json` | Replace with the real release manifest, DOI or URL, and SHA256 checksum file. |
 
 ## Artifact Release Package Checks
@@ -66,7 +66,7 @@ Before upload, verify:
 4. Permission files are listed when third-party permission is required.
 5. The data availability statement matches artifact release status, including whether the release has a real URL or DOI.
 6. The generative AI declaration records AI tool use status, author review and responsibility, AI authorship exclusion, and whether any machine-generated figures, images, or artwork are included.
-7. DKE-specific author biographies and passport-type photographs are prepared only after author identities are confirmed and are excluded from anonymous preflight packages.
+7. DKE-specific author biographies with a maximum 100 words, editable biography files that must not be PDF, and passport-type photographs are prepared only after author identities are confirmed and are excluded from anonymous preflight packages.
 8. `author_identity_materials`, `biography_files`, `photograph_files`, and `author_identity_materials_verified` are completed before `author_biographies_and_photos_ready` is marked true.
 
 ## Cover Letter Customization Checks
@@ -114,7 +114,7 @@ Before upload, verify:
 8. The author contribution statement is completed and matches the final author list.
 9. The permissions statement records whether third-party material permission is not required or lists the permission files needed by the journal.
 10. The generative AI declaration statement is complete and matches the selected journal's live submission field.
-11. Author biographies and photographs are ready when the selected DKE/Elsevier route requests them, and `author_identity_materials.biography_files`, `author_identity_materials.photograph_files`, and `author_identity_materials.author_identity_materials_verified` record the external materials.
+11. Author biographies and photographs are ready when the selected DKE/Elsevier route requests them, each biography has a maximum 100 words, each biography file uses an editable format and must not be PDF, and `author_identity_materials.biography_files`, `author_identity_materials.photograph_files`, and `author_identity_materials.author_identity_materials_verified` record the external materials.
 12. The competing-interest statement, data/code availability statement, and ethics statement are consistent across the manuscript and system fields.
 13. The artifact release URL or DOI resolves publicly or according to the journal's access policy, the artifact release URL is a public non-placeholder HTTP/HTTPS URL when a URL is used, and the artifact manifest `publication.public_access_status` records that public access state.
 14. `live_submission_system_verified` and `final_upload_package_verified_against_system` are true only after the live submission system preview and final package contents match the current source package.

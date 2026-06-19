@@ -1062,6 +1062,31 @@ def test_build_submission_package_rejects_dke_final_upload_without_author_identi
     assert "author identity materials verification is incomplete" in message
 
 
+def test_build_submission_package_rejects_dke_final_upload_with_pdf_author_biography_file(tmp_path) -> None:
+    """验证 DKE 正式上传包拒绝 PDF 作者传记文件。"""
+
+    module = _load_submission_package_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_dke_preflight_files(manuscript_root)
+    _write_dke_final_upload_metadata(manuscript_root)
+    _write_dke_final_upload_cover_letter(manuscript_root)
+    metadata_path = manuscript_root / "submission_metadata.yml"
+    metadata_text = metadata_path.read_text(encoding="utf-8")
+    metadata_text = metadata_text.replace(
+        '  biography_files: ["author-materials/example-author-biography.md"]',
+        '  biography_files: ["author-materials/example-author-biography.pdf"]',
+    )
+    metadata_path.write_text(metadata_text, encoding="utf-8")
+
+    with pytest.raises(ValueError) as exc_info:
+        module.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True, dke_preflight=True)
+
+    assert "author biography file must be editable and must not be PDF" in str(exc_info.value)
+
+
 def test_build_submission_package_rejects_dke_final_upload_with_unsupported_review_mode(tmp_path) -> None:
     """验证 DKE 正式上传包拒绝不含最终作者身份语义的 review_mode。"""
 
