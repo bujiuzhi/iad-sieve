@@ -2608,6 +2608,11 @@ def test_check_validity_threats_accepts_supplementary_matrix() -> None:
         [
             r"\section{Limitations}",
             "This study has five limitations.",
+            "The source-heldout generalization is not established by the current package.",
+            "The stronger claim requires declared source partitions.",
+            "It also requires per-source denominators.",
+            "It also requires prediction checksums.",
+            "It also requires source-level split summaries.",
             "pair-level metrics do not by themselves establish cluster-level deployment quality.",
             "The stronger claim requires cluster assignments.",
             "It also requires cannot-link coverage.",
@@ -3247,6 +3252,9 @@ def test_check_split_leakage_controls_accepts_supplementary_table() -> None:
             "Unordered pair leakage guard",
             "Label-stratum coverage audit",
             "Source-heldout readiness audit",
+            "train, validation, and held-out source partitions",
+            "per-source denominators",
+            "prediction checksums",
             "Topic-heldout readiness audit",
             "Cross-topic stability should not be claimed when topic coverage is insufficient.",
         ]
@@ -3610,6 +3618,12 @@ def test_check_extended_protocol_boundary_accepts_follow_up_protocol_scope() -> 
             "The manuscript treats Open-v2 as the core mechanism demonstration.",
             "It reserves Open-v3/source-heldout conclusions for a released artifact package.",
             "That package needs matched prediction scopes, threshold logs, checksums, and manual-validation evidence.",
+            "A source-heldout claim to become admissible requires train, validation, and held-out source partitions.",
+            "The protocol must keep source identifiers out of predictive features.",
+            "It must report per-source denominators for same-work F1, FMR, and HNFMR.",
+            "It must release command logs, split summaries, prediction checksums, and threshold records.",
+            "Missing label strata are treated as a coverage gap or exploratory diagnostic.",
+            "The source-heldout is therefore a readiness protocol rather than current evidence of source generalization.",
         ]
     )
 
@@ -3627,6 +3641,7 @@ def test_check_extended_protocol_boundary_rejects_unreported_extended_results() 
             r"\subsection{Extended Evidence and Boundaries}",
             "Open-v3 and source-heldout experiments provide additional stress tests.",
             "The manuscript therefore treats Open-v3 as extended validation.",
+            "The source-heldout generalization remains mixed across model variants.",
         ]
     )
 
@@ -3634,6 +3649,7 @@ def test_check_extended_protocol_boundary_rejects_unreported_extended_results() 
 
     assert any("additional stress tests" in error for error in errors)
     assert any("extended validation" in error for error in errors)
+    assert any("source-heldout generalization remains mixed" in error for error in errors)
 
 
 def test_check_claim_interpretation_boundary_accepts_complete_boundary() -> None:
@@ -5661,7 +5677,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 88.",
+            "Completed audit cycles: 89.",
             "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
@@ -6386,6 +6402,16 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "review-cost savings",
             "manual-review capacity",
             "deferral budget",
+            "## Audit Cycle 89: Source-Heldout Readiness Gate",
+            "source-heldout readiness wording",
+            "source-generalization claims",
+            "declared train, validation, and held-out source partitions",
+            "source identifiers excluded from predictive features",
+            "per-source denominators for same-work F1, FMR, and HNFMR",
+            "command logs, split summaries, prediction checksums, and threshold records",
+            "source-generalization readiness",
+            "coverage gap or exploratory diagnostic",
+            "readiness protocol rather than evidence of broad source generalization",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -6404,7 +6430,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 88",
+        "Completed audit cycles: 89",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -6415,7 +6441,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 88" in error for error in errors)
+    assert any("Completed audit cycles: 89" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 

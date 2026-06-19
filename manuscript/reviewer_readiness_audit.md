@@ -10,7 +10,7 @@ Current decision: conditionally ready for target-journal selection; not ready fo
 
 ## Audit Iteration Summary
 
-Completed audit cycles: 88.
+Completed audit cycles: 89.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, and stronger evidence gates.
 
@@ -802,6 +802,14 @@ Outcome: pass for selective coverage formula disclosure; blocked for operational
 This gate checks whether the manuscript defines the workload quantities needed to interpret a selective decision system. The manuscript states $N=M+B+D$, automatic merge coverage, block rate, defer rate, and capacity-normalized review load, and it requires these quantities to use the same prediction artifact, threshold configuration, row scope, and denominator record as FMR and HNFMR.
 
 The reviewer-facing boundary is workload interpretation, not deployment readiness. The formulas prevent low false-merge metrics from being read as review-cost savings when unresolved cases are shifted to block or defer decisions, but they do not supply the external workload evidence, manual-review capacity, or deferral budget needed for operational throughput claims.
+
+## Audit Cycle 89: Source-Heldout Readiness Gate
+
+Outcome: pass for source-heldout readiness wording; blocked for source-generalization claims until source-heldout artifacts are released.
+
+This gate checks whether the manuscript implies completed source-heldout evidence. It does not. The extended protocol now requires declared train, validation, and held-out source partitions, source identifiers excluded from predictive features, per-source denominators for same-work F1, FMR, and HNFMR, command logs, split summaries, prediction checksums, and threshold records before source-heldout conclusions can be used as evidence.
+
+The reviewer-facing boundary is source-generalization readiness, not current cross-source proof. Missing gold, proxy, or silver label strata in a held-out source partition must be reported as a coverage gap or exploratory diagnostic. The current package therefore treats source-heldout as a readiness protocol rather than evidence of broad source generalization.
 
 ## Minimum Gate Before Final Upload
 

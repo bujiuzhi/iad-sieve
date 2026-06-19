@@ -2614,6 +2614,9 @@ def check_split_leakage_controls(manuscript_text: str, supplementary_text: str =
         "Unordered pair leakage guard",
         "Label-stratum coverage audit",
         "Source-heldout readiness audit",
+        "train, validation, and held-out source partitions",
+        "per-source denominators",
+        "prediction checksums",
         "Topic-heldout readiness audit",
         "Cross-topic stability should not be claimed when topic coverage is insufficient",
     ]
@@ -2694,11 +2697,19 @@ def check_extended_protocol_boundary(manuscript_text: str) -> list[str]:
         "Open-v2 as the core mechanism demonstration",
         "reserves Open-v3/source-heldout conclusions for a released artifact package",
         "matched prediction scopes, threshold logs, checksums, and manual-validation evidence",
+        "source-heldout claim to become admissible",
+        "train, validation, and held-out source partitions",
+        "keep source identifiers out of predictive features",
+        "per-source denominators for same-work F1, FMR, and HNFMR",
+        "command logs, split summaries, prediction checksums, and threshold records",
+        "coverage gap or exploratory diagnostic",
+        "source-heldout is therefore a readiness protocol rather than current evidence of source generalization",
     ]
     errors = [f"extended protocol boundary missing marker: {marker}" for marker in required_markers if marker not in manuscript_text]
     unsupported_phrases = [
         "Open-v3 and source-heldout experiments provide additional stress tests",
         "Open-v3 as extended validation",
+        "source-heldout generalization remains mixed",
     ]
     errors.extend(
         f"extended protocol boundary overstates unreported evidence: {phrase}"
@@ -3859,7 +3870,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Audit Iteration Summary",
-        "Completed audit cycles: 88",
+        "Completed audit cycles: 89",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -4019,6 +4030,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Audit Cycle 86: Target Confirmation Source URL Gate",
         "Audit Cycle 87: Target Source Placeholder URL Gate",
         "Audit Cycle 88: Selective Coverage Formula Gate",
+        "Audit Cycle 89: Source-Heldout Readiness Gate",
         "Mechanism ablation acceptance protocol",
         "no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold",
         "`protocol_variant`",
@@ -4119,6 +4131,15 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "review-cost savings",
         "manual-review capacity",
         "deferral budget",
+        "source-heldout readiness wording",
+        "source-generalization claims",
+        "declared train, validation, and held-out source partitions",
+        "source identifiers excluded from predictive features",
+        "per-source denominators for same-work F1, FMR, and HNFMR",
+        "command logs, split summaries, prediction checksums, and threshold records",
+        "source-generalization readiness",
+        "coverage gap or exploratory diagnostic",
+        "readiness protocol rather than evidence of broad source generalization",
         "Audit Cycle 39: Installable CLI Entry-Point Traceability Gate",
         "Audit Cycle 40: Artifact Source Preflight Gate",
         "scoring-algorithm table-density reduction",
@@ -4816,6 +4837,11 @@ def check_validity_threats(manuscript_text: str, supplementary_text: str = "") -
     ]
     required_limitation_markers = [
         "This study has five limitations",
+        "source-heldout generalization is not established by the current package",
+        "declared source partitions",
+        "per-source denominators",
+        "prediction checksums",
+        "source-level split summaries",
         "pair-level metrics do not by themselves establish cluster-level deployment quality",
         "cluster assignments",
         "cannot-link coverage",
