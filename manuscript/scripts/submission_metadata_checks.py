@@ -658,8 +658,8 @@ def check_artifact_release_link(metadata_text: str) -> list[str]:
     if not artifact_url and not artifact_doi:
         return ["artifact release URL or DOI is required"]
     errors: list[str] = []
-    if artifact_url and URL_PATTERN.fullmatch(artifact_url) is None:
-        errors.append("artifact release URL is invalid")
+    if artifact_url:
+        errors.extend(check_non_placeholder_url(artifact_url, "artifact release URL"))
     if artifact_doi and DOI_PATTERN.fullmatch(artifact_doi) is None:
         errors.append("artifact release DOI is invalid")
     doi_url_value = doi_from_url(artifact_url) if artifact_url else ""
@@ -684,8 +684,8 @@ def check_repository_reference(metadata_text: str) -> list[str]:
     errors: list[str] = []
     if not repository_url:
         errors.append("repository URL is missing")
-    elif URL_PATTERN.fullmatch(repository_url) is None:
-        errors.append("repository URL is invalid")
+    else:
+        errors.extend(check_non_placeholder_url(repository_url, "repository URL"))
     if not repository_commit:
         errors.append("repository commit is missing")
     elif repository_commit.strip().lower() in COMMIT_PLACEHOLDERS:

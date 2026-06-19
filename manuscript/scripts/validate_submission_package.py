@@ -26,9 +26,9 @@ from submission_metadata_checks import (
     COMMIT_PATTERN,
     DKE_ELSEVIER_FILE_REQUIREMENT_ERROR,
     DOI_PATTERN,
-    URL_PATTERN,
     check_final_upload_cover_letter_text as check_structured_final_upload_cover_letter_text,
     check_final_upload_metadata_text as check_structured_final_upload_metadata_text,
+    check_non_placeholder_url,
     doi_from_url,
     scalar_value,
     target_journal_requires_elsevier_files,
@@ -512,8 +512,11 @@ def check_final_upload_artifact_publication_binding(
 
     if not artifact_url and not artifact_doi:
         errors.append(f"{location} artifact manifest publication must record artifact_release_url or artifact_release_doi")
-    if artifact_url and URL_PATTERN.fullmatch(artifact_url) is None:
-        errors.append(f"{location} artifact manifest publication.artifact_release_url is invalid")
+    if artifact_url:
+        errors.extend(
+            f"{location} artifact manifest publication.{message}"
+            for message in check_non_placeholder_url(artifact_url, "artifact_release_url")
+        )
     if artifact_doi and DOI_PATTERN.fullmatch(artifact_doi) is None:
         errors.append(f"{location} artifact manifest publication.artifact_release_doi is invalid")
 

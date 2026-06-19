@@ -149,6 +149,7 @@ For each author, select the applicable CRediT roles and then draft the final aut
 ### Data and code availability statement
 
 - Repository URL:
+- Repository URL must be a public non-placeholder HTTP/HTTPS URL:
 - Repository commit:
 - Repository branch:
 - Repository URL and commit will be injected into the final-upload package copy from `git remote origin` and `git rev-parse HEAD`:
@@ -163,6 +164,7 @@ For each author, select the applicable CRediT roles and then draft the final aut
 ## Artifact release
 
 - Artifact release URL or DOI:
+- Artifact release URL must be a public non-placeholder HTTP/HTTPS URL when a URL is used:
 - Artifact manifest `publication.artifact_release_url` matches this URL:
 - Artifact manifest `publication.artifact_release_doi` matches this DOI:
 - Artifact manifest `publication.public_access_status` is public, published, publicly accessible, or archived:

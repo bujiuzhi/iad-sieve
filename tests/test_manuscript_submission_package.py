@@ -245,7 +245,7 @@ def _write_final_upload_metadata(manuscript_root: Path) -> None:
                 '  author_approval: "All listed authors have approved the submitted version."',
                 '  competing_interests: "The authors declare no competing interests."',
                 '  ethics: "This study uses public scholarly metadata and does not involve human participants."',
-                '  data_code_availability: "Source code and fixtures are available at https://example.org/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
+                '  data_code_availability: "Source code and fixtures are available at https://github.com/bujiuzhi/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
                 "",
                 "author_contributions:",
                 "  credit_taxonomy_required_before_final_upload: true",
@@ -269,7 +269,7 @@ def _write_final_upload_metadata(manuscript_root: Path) -> None:
                 "  ai_generated_images_or_artwork_included: false",
                 "",
                 "repository_reference:",
-                '  repository_url: "https://example.org/iad-sieve.git"',
+                '  repository_url: "https://github.com/bujiuzhi/iad-sieve.git"',
                 '  repository_commit: "abcdef1234567890"',
                 '  repository_branch: "main"',
                 "",
@@ -319,11 +319,11 @@ def _blank_final_upload_repository_reference(manuscript_root: Path) -> None:
     """
     metadata_path = manuscript_root / "submission_metadata.yml"
     metadata_text = metadata_path.read_text(encoding="utf-8")
-    metadata_text = metadata_text.replace('  repository_url: "https://example.org/iad-sieve.git"', '  repository_url: ""')
+    metadata_text = metadata_text.replace('  repository_url: "https://github.com/bujiuzhi/iad-sieve.git"', '  repository_url: ""')
     metadata_text = metadata_text.replace('  repository_commit: "abcdef1234567890"', '  repository_commit: ""')
     metadata_text = metadata_text.replace('  repository_branch: "main"', '  repository_branch: ""')
     metadata_text = metadata_text.replace(
-        '  data_code_availability: "Source code and fixtures are available at https://example.org/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
+        '  data_code_availability: "Source code and fixtures are available at https://github.com/bujiuzhi/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
         '  data_code_availability: "The repository provides source code, small public fixtures, schema contracts, build scripts, and artifact-release instructions. Raw third-party data and full experimental outputs are not redistributed in Git."',
     )
     metadata_path.write_text(metadata_text, encoding="utf-8")
@@ -425,7 +425,7 @@ def _write_dke_final_upload_metadata(manuscript_root: Path) -> None:
                 '  author_approval: "All listed authors have approved the submitted version."',
                 '  competing_interests: "The authors declare no competing interests."',
                 '  ethics: "This study uses public scholarly metadata and does not involve human participants."',
-                '  data_code_availability: "Source code and fixtures are available at https://example.org/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
+                '  data_code_availability: "Source code and fixtures are available at https://github.com/bujiuzhi/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
                 '  research_data_statement: "Source code and small fixtures are available in the repository; the full result artifact is available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
                 "",
                 "author_contributions:",
@@ -450,7 +450,7 @@ def _write_dke_final_upload_metadata(manuscript_root: Path) -> None:
                 "  ai_generated_images_or_artwork_included: false",
                 "",
                 "repository_reference:",
-                '  repository_url: "https://example.org/iad-sieve.git"',
+                '  repository_url: "https://github.com/bujiuzhi/iad-sieve.git"',
                 '  repository_commit: "abcdef1234567890"',
                 '  repository_branch: "main"',
                 "",
@@ -774,7 +774,7 @@ def _write_artifact_release_manifest(artifact_dir: Path, repository_commit: str 
         "release_status": "release_candidate",
         "manuscript_title": "IAD-Risk: Risk-Aware Identity-Agenda Disentanglement",
         "repository": {
-            "url": "https://example.org/iad-sieve.git",
+            "url": "https://github.com/bujiuzhi/iad-sieve.git",
             "commit": repository_commit,
             "branch": "main",
             "source_tree_clean": True,
@@ -940,7 +940,7 @@ def test_build_submission_package_autofills_final_upload_repository_reference(tm
     _write_final_upload_cover_letter(manuscript_root)
     _write_artifact_release_manifest(artifact_dir)
     monkeypatch.setattr(module, "collect_source_control_state", lambda _: _clean_source_control_state())
-    monkeypatch.setattr(module, "collect_repository_url", lambda _: "https://example.org/iad-sieve.git")
+    monkeypatch.setattr(module, "collect_repository_url", lambda _: "https://github.com/bujiuzhi/iad-sieve.git")
 
     module.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
 
@@ -948,10 +948,10 @@ def test_build_submission_package_autofills_final_upload_repository_reference(tm
     package_metadata_text = (output_dir / "submission_metadata.yml").read_text(encoding="utf-8")
     assert 'repository_url: ""' in source_metadata_text
     assert 'repository_commit: ""' in source_metadata_text
-    assert 'repository_url: "https://example.org/iad-sieve.git"' in package_metadata_text
+    assert 'repository_url: "https://github.com/bujiuzhi/iad-sieve.git"' in package_metadata_text
     assert 'repository_commit: "abcdef1234567890"' in package_metadata_text
     assert 'repository_branch: "main"' in package_metadata_text
-    assert "https://example.org/iad-sieve.git commit abcdef1234567890" in package_metadata_text
+    assert "https://github.com/bujiuzhi/iad-sieve.git commit abcdef1234567890" in package_metadata_text
     assert validator.validate_submission_package(output_dir, zip_path, final_upload=True, artifact_dir=artifact_dir) == []
 
 
@@ -1669,6 +1669,31 @@ def test_validate_submission_package_rejects_artifact_publication_link_mismatch(
 
     assert any("artifact_release_url" in error and "publication.artifact_release_url" in error for error in errors)
     assert any("artifact_release_doi" in error and "publication.artifact_release_doi" in error for error in errors)
+
+
+def test_validate_submission_package_rejects_placeholder_artifact_publication_url(tmp_path) -> None:
+    """验证正式上传包拒绝 artifact manifest 中的占位 publication URL。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    artifact_dir = tmp_path / "artifact_release"
+    _write_required_manuscript_files(manuscript_root)
+    _write_final_upload_metadata(manuscript_root)
+    _write_final_upload_cover_letter(manuscript_root)
+    _write_artifact_release_manifest(artifact_dir)
+    manifest_path = artifact_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["publication"]["artifact_release_url"] = "https://example.org/iad-risk-artifact"
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    _refresh_artifact_release_checksums(artifact_dir)
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
+    errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True, artifact_dir=artifact_dir)
+
+    assert any("publication.artifact_release_url must not use a placeholder URL" in error for error in errors)
 
 
 def test_validate_submission_package_rejects_invalid_final_upload_artifact_release(tmp_path) -> None:

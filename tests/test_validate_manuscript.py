@@ -252,6 +252,26 @@ def test_check_final_upload_information_request_rejects_missing_target_url_bound
     assert any("must not use placeholder domains" in error for error in errors)
 
 
+def test_check_final_upload_information_request_rejects_missing_public_link_policy() -> None:
+    """验证最终上传信息表必须说明仓库和 artifact 链接不能使用占位域名。"""
+
+    module = _load_validate_manuscript_module()
+    request_text = Path("manuscript/final_upload_information_request.md").read_text(encoding="utf-8")
+    request_text = request_text.replace(
+        "- Repository URL must be a public non-placeholder HTTP/HTTPS URL:\n",
+        "",
+    )
+    request_text = request_text.replace(
+        "- Artifact release URL must be a public non-placeholder HTTP/HTTPS URL when a URL is used:\n",
+        "",
+    )
+
+    errors = module.check_final_upload_information_request(request_text)
+
+    assert any("Repository URL must be a public non-placeholder" in error for error in errors)
+    assert any("Artifact release URL must be a public non-placeholder" in error for error in errors)
+
+
 def test_check_final_upload_information_request_rejects_missing_dke_preflight_status() -> None:
     """验证最终上传信息表必须区分 DKE 预检来源和最终作者确认。"""
 
@@ -5238,6 +5258,7 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "The corresponding author name appears in the cover letter.",
             "The artifact URL or DOI appears in the cover letter when available.",
             "The artifact manifest publication object records the same public artifact URL or DOI as `submission_metadata.yml`.",
+            "The artifact release URL is a public non-placeholder HTTP/HTTPS URL.",
             "The artifact manifest `publication.public_access_status` records the public access state.",
             "The cover letter no longer uses the generic Dear Editor greeting.",
             "The cover letter no longer uses an anonymous author signature.",
@@ -5253,6 +5274,7 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "The builder writes `repository_url`, `repository_commit`, and `repository_branch` into the package copy of `submission_metadata.yml`.",
             "The package copy of `submission_metadata.yml` is bound to git remote origin.",
             "The package copy is bound to git rev-parse HEAD.",
+            "`repository_url` must be a public non-placeholder HTTP/HTTPS URL.",
             "`submission_manifest.json` records the same `repository_commit` as the package copy.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
             "The external artifact release is finalized before final-upload package validation.",
@@ -5325,6 +5347,26 @@ def test_check_submission_system_checklist_rejects_missing_article_type_controll
     assert any("article_type" in error and "research_article" in error for error in errors)
     assert any("review_article" in error for error in errors)
     assert any("case_report" in error for error in errors)
+
+
+def test_check_submission_system_checklist_rejects_missing_public_link_policy() -> None:
+    """验证投稿系统清单必须核对仓库和 artifact 公共链接非占位。"""
+
+    module = _load_validate_manuscript_module()
+    checklist_text = Path("manuscript/submission_system_checklist.md").read_text(encoding="utf-8")
+    checklist_text = checklist_text.replace(
+        "`repository_url` must be a public non-placeholder HTTP/HTTPS URL",
+        "`repository_url` is recorded",
+    )
+    checklist_text = checklist_text.replace(
+        "the artifact release URL is a public non-placeholder HTTP/HTTPS URL",
+        "the artifact release URL is recorded",
+    )
+
+    errors = module.check_submission_system_checklist(checklist_text)
+
+    assert any("repository_url" in error and "non-placeholder" in error for error in errors)
+    assert any("artifact release URL" in error and "non-placeholder" in error for error in errors)
 
 
 def test_check_submission_system_checklist_rejects_missing_review_mode_controlled_values() -> None:
@@ -5846,8 +5888,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 100.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final review-mode vocabulary gap, final-upload information request specificity, and stronger evidence gates.",
+            "Completed audit cycles: 101.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final review-mode vocabulary gap, final-upload information request specificity, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -6679,6 +6721,14 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "`review_article`",
             "`case_report`",
             "final article type",
+            "## Audit Cycle 101: Final Public-Link Placeholder Gate",
+            "public-link placeholder rejection coverage",
+            "repository URL",
+            "artifact release URL",
+            "publication.artifact_release_url",
+            "must not use a placeholder URL",
+            "`example.org`",
+            "`localhost`",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -6697,7 +6747,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 100",
+        "Completed audit cycles: 101",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -6708,7 +6758,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 100" in error for error in errors)
+    assert any("Completed audit cycles: 101" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -8370,7 +8420,7 @@ def _build_filled_final_upload_metadata_text(
         '  author_approval: "All listed authors have approved the submitted version."',
         '  competing_interests: "The authors declare no competing interests."',
         '  ethics: "This study uses public scholarly metadata and does not involve human participants."',
-        '  data_code_availability: "Source code and fixtures are available at https://example.org/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
+        '  data_code_availability: "Source code and fixtures are available at https://github.com/bujiuzhi/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
         "author_contributions:",
         "  credit_taxonomy_required_before_final_upload: true",
         '  contribution_statement: "Example Author: conceptualization, methodology, software, validation, and writing - original draft."',
@@ -8384,7 +8434,7 @@ def _build_filled_final_upload_metadata_text(
         "  permission_files: []",
         *generative_ai_lines,
         "repository_reference:",
-        '  repository_url: "https://example.org/iad-sieve.git"',
+        '  repository_url: "https://github.com/bujiuzhi/iad-sieve.git"',
         '  repository_commit: "abcdef1234567890"',
         '  repository_branch: "main"',
         "artifact_boundary:",
@@ -8503,7 +8553,7 @@ def test_check_final_upload_metadata_accepts_filled_metadata() -> None:
             '  author_approval: "All listed authors have approved the submitted version."',
             '  competing_interests: "The authors declare no competing interests."',
             '  ethics: "This study uses public scholarly metadata and does not involve human participants."',
-            '  data_code_availability: "Source code and fixtures are available at https://example.org/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
+            '  data_code_availability: "Source code and fixtures are available at https://github.com/bujiuzhi/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
             "author_contributions:",
             "  credit_taxonomy_required_before_final_upload: true",
             '  contribution_statement: "Example Author: conceptualization, methodology, software, validation, and writing - original draft."',
@@ -8523,7 +8573,7 @@ def test_check_final_upload_metadata_accepts_filled_metadata() -> None:
             "  ai_not_listed_as_author_confirmed: true",
             "  ai_generated_images_or_artwork_included: false",
             "repository_reference:",
-            '  repository_url: "https://example.org/iad-sieve.git"',
+            '  repository_url: "https://github.com/bujiuzhi/iad-sieve.git"',
             '  repository_commit: "abcdef1234567890"',
             '  repository_branch: "main"',
             "artifact_boundary:",
@@ -8582,6 +8632,26 @@ def test_check_final_upload_metadata_rejects_unsupported_article_type_value() ->
     errors = module.check_final_upload_metadata(metadata_text)
 
     assert any("article type is unsupported: review_article" in error for error in errors)
+
+
+def test_check_final_upload_metadata_rejects_placeholder_repository_and_artifact_urls() -> None:
+    """验证 final-upload 门禁拒绝仓库和 artifact 的占位 URL。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = _build_filled_final_upload_metadata_text()
+    metadata_text = metadata_text.replace(
+        'repository_url: "https://github.com/bujiuzhi/iad-sieve.git"',
+        'repository_url: "https://example.org/iad-sieve.git"',
+    )
+    metadata_text = metadata_text.replace(
+        'artifact_release_url: "https://doi.org/10.0000/example"',
+        'artifact_release_url: "https://localhost/artifact"',
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any("repository URL must not use a placeholder URL" in error for error in errors)
+    assert any("artifact release URL must not use a placeholder URL" in error for error in errors)
 
 
 def test_check_final_upload_metadata_rejects_missing_author_guide_confirmation() -> None:
@@ -8837,7 +8907,7 @@ def test_check_final_upload_metadata_rejects_missing_repository_reference() -> N
             '  author_approval: "All listed authors have approved the submitted version."',
             '  competing_interests: "The authors declare no competing interests."',
             '  ethics: "This study uses public scholarly metadata and does not involve human participants."',
-            '  data_code_availability: "Source code and fixtures are available at https://example.org/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
+            '  data_code_availability: "Source code and fixtures are available at https://github.com/bujiuzhi/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
             "author_contributions:",
             "  credit_taxonomy_required_before_final_upload: true",
             '  contribution_statement: "Example Author: conceptualization, methodology, software, validation, and writing - original draft."',
@@ -8936,7 +9006,7 @@ def test_check_final_upload_metadata_rejects_data_code_statement_without_release
             "  ai_not_listed_as_author_confirmed: true",
             "  ai_generated_images_or_artwork_included: false",
             "repository_reference:",
-            '  repository_url: "https://example.org/iad-sieve.git"',
+            '  repository_url: "https://github.com/bujiuzhi/iad-sieve.git"',
             '  repository_commit: "abcdef1234567890"',
             '  repository_branch: "main"',
             "artifact_boundary:",
@@ -9088,7 +9158,7 @@ def test_check_final_upload_metadata_rejects_no_external_funding_without_stateme
             '  author_approval: "All listed authors have approved the submitted version."',
             '  competing_interests: "The authors declare no competing interests."',
             '  ethics: "This study uses public scholarly metadata and does not involve human participants."',
-            '  data_code_availability: "Source code and fixtures are available at https://example.org/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
+            '  data_code_availability: "Source code and fixtures are available at https://github.com/bujiuzhi/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
             "author_contributions:",
             "  credit_taxonomy_required_before_final_upload: true",
             '  contribution_statement: "Example Author: conceptualization, methodology, software, validation, and writing - original draft."',
@@ -9108,7 +9178,7 @@ def test_check_final_upload_metadata_rejects_no_external_funding_without_stateme
             "  ai_not_listed_as_author_confirmed: true",
             "  ai_generated_images_or_artwork_included: false",
             "repository_reference:",
-            '  repository_url: "https://example.org/iad-sieve.git"',
+            '  repository_url: "https://github.com/bujiuzhi/iad-sieve.git"',
             '  repository_commit: "abcdef1234567890"',
             '  repository_branch: "main"',
             "artifact_boundary:",
@@ -9236,7 +9306,7 @@ def test_check_final_upload_metadata_rejects_missing_research_data_statement_for
             "  ai_not_listed_as_author_confirmed: true",
             "  ai_generated_images_or_artwork_included: false",
             "repository_reference:",
-            '  repository_url: "https://example.org/iad-sieve.git"',
+            '  repository_url: "https://github.com/bujiuzhi/iad-sieve.git"',
             '  repository_commit: "abcdef1234567890"',
             '  repository_branch: "main"',
             "artifact_boundary:",
@@ -9474,7 +9544,7 @@ def test_check_final_upload_metadata_accepts_dke_research_data_statement_with_ar
             '  author_approval: "All listed authors have approved the submitted version."',
             '  competing_interests: "The authors declare no competing interests."',
             '  ethics: "This study uses public scholarly metadata and does not involve human participants."',
-            '  data_code_availability: "Source code and fixtures are available at https://example.org/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
+            '  data_code_availability: "Source code and fixtures are available at https://github.com/bujiuzhi/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
             '  research_data_statement: "Source code and small fixtures are available in the repository; the full result artifact is available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
             "author_identity_materials:",
             "  author_biography_and_photo_required_before_upload: true",
@@ -9500,7 +9570,7 @@ def test_check_final_upload_metadata_accepts_dke_research_data_statement_with_ar
             "  ai_not_listed_as_author_confirmed: true",
             "  ai_generated_images_or_artwork_included: false",
             "repository_reference:",
-            '  repository_url: "https://example.org/iad-sieve.git"',
+            '  repository_url: "https://github.com/bujiuzhi/iad-sieve.git"',
             '  repository_commit: "abcdef1234567890"',
             '  repository_branch: "main"',
             "artifact_boundary:",
@@ -9685,7 +9755,7 @@ def test_check_final_upload_metadata_rejects_empty_credit_roles_by_default() -> 
             '  author_approval: "All listed authors have approved the submitted version."',
             '  competing_interests: "The authors declare no competing interests."',
             '  ethics: "This study uses public scholarly metadata and does not involve human participants."',
-            '  data_code_availability: "Source code and fixtures are available at https://example.org/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
+            '  data_code_availability: "Source code and fixtures are available at https://github.com/bujiuzhi/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
             "author_contributions:",
             '  contribution_statement: "Example Author: conceptualization, methodology, software, validation, and writing - original draft."',
             "  roles: []",
@@ -9702,7 +9772,7 @@ def test_check_final_upload_metadata_rejects_empty_credit_roles_by_default() -> 
             "  ai_not_listed_as_author_confirmed: true",
             "  ai_generated_images_or_artwork_included: false",
             "repository_reference:",
-            '  repository_url: "https://example.org/iad-sieve.git"',
+            '  repository_url: "https://github.com/bujiuzhi/iad-sieve.git"',
             '  repository_commit: "abcdef1234567890"',
             '  repository_branch: "main"',
             "artifact_boundary:",
@@ -9766,7 +9836,7 @@ def test_check_final_upload_metadata_rejects_missing_credit_roles_for_each_autho
             '  author_approval: "All listed authors have approved the submitted version."',
             '  competing_interests: "The authors declare no competing interests."',
             '  ethics: "This study uses public scholarly metadata and does not involve human participants."',
-            '  data_code_availability: "Source code and fixtures are available at https://example.org/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
+            '  data_code_availability: "Source code and fixtures are available at https://github.com/bujiuzhi/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
             '  research_data_statement: "The full result artifact is available at https://doi.org/10.0000/example."',
             "author_contributions:",
             "  credit_taxonomy_required_before_final_upload: true",
@@ -9787,7 +9857,7 @@ def test_check_final_upload_metadata_rejects_missing_credit_roles_for_each_autho
             "  ai_not_listed_as_author_confirmed: true",
             "  ai_generated_images_or_artwork_included: false",
             "repository_reference:",
-            '  repository_url: "https://example.org/iad-sieve.git"',
+            '  repository_url: "https://github.com/bujiuzhi/iad-sieve.git"',
             '  repository_commit: "abcdef1234567890"',
             '  repository_branch: "main"',
             "artifact_boundary:",
@@ -9901,7 +9971,7 @@ def test_check_final_upload_metadata_rejects_no_permission_without_statement_tex
             '  author_approval: "All listed authors have approved the submitted version."',
             '  competing_interests: "The authors declare no competing interests."',
             '  ethics: "This study uses public scholarly metadata and does not involve human participants."',
-            '  data_code_availability: "Source code and fixtures are available at https://example.org/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
+            '  data_code_availability: "Source code and fixtures are available at https://github.com/bujiuzhi/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
             "author_contributions:",
             "  credit_taxonomy_required_before_final_upload: true",
             '  contribution_statement: "Example Author: conceptualization, methodology, software, validation, and writing - original draft."',
@@ -9921,7 +9991,7 @@ def test_check_final_upload_metadata_rejects_no_permission_without_statement_tex
             "  ai_not_listed_as_author_confirmed: true",
             "  ai_generated_images_or_artwork_included: false",
             "repository_reference:",
-            '  repository_url: "https://example.org/iad-sieve.git"',
+            '  repository_url: "https://github.com/bujiuzhi/iad-sieve.git"',
             '  repository_commit: "abcdef1234567890"',
             '  repository_branch: "main"',
             "artifact_boundary:",
@@ -10242,8 +10312,8 @@ def test_check_final_upload_metadata_rejects_unsupported_review_mode_for_dke() -
         '  photograph_files: ["author-materials/example-author-photo.jpg"]',
     )
     metadata_text = metadata_text.replace(
-        '  data_code_availability: "Source code and fixtures are available at https://example.org/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
-        '  data_code_availability: "Source code and fixtures are available at https://example.org/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."\n'
+        '  data_code_availability: "Source code and fixtures are available at https://github.com/bujiuzhi/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
+        '  data_code_availability: "Source code and fixtures are available at https://github.com/bujiuzhi/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."\n'
         '  research_data_statement: "The full result artifact is available at https://doi.org/10.0000/example."',
     )
 

@@ -96,7 +96,7 @@ Before upload, verify:
 
 1. The tracked source `submission_metadata.yml` can keep `repository_reference` blank before final upload.
 2. `python manuscript/scripts/build_submission_package.py --final-upload` writes `repository_url`, `repository_commit`, and `repository_branch` into the package copy of `submission_metadata.yml`.
-3. The package copy is bound to `git remote origin`, `git rev-parse HEAD`, and the current branch.
+3. The package copy is bound to `git remote origin`, `git rev-parse HEAD`, and the current branch; `repository_url` must be a public non-placeholder HTTP/HTTPS URL.
 4. `submission_manifest.json` records the same `repository_commit` as the package copy of `submission_metadata.yml`.
 5. `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes after the package is built, the external artifact release is finalized, and the artifact manifest publication object records the same public artifact URL or DOI as `submission_metadata.yml`.
 
@@ -116,7 +116,7 @@ Before upload, verify:
 10. The generative AI declaration statement is complete and matches the selected journal's live submission field.
 11. Author biographies and photographs are ready when the selected DKE/Elsevier route requests them, and `author_identity_materials.biography_files`, `author_identity_materials.photograph_files`, and `author_identity_materials.author_identity_materials_verified` record the external materials.
 12. The competing-interest statement, data/code availability statement, and ethics statement are consistent across the manuscript and system fields.
-13. The artifact release URL or DOI resolves publicly or according to the journal's access policy, and the artifact manifest `publication.public_access_status` records that public access state.
+13. The artifact release URL or DOI resolves publicly or according to the journal's access policy, the artifact release URL is a public non-placeholder HTTP/HTTPS URL when a URL is used, and the artifact manifest `publication.public_access_status` records that public access state.
 14. `live_submission_system_verified` and `final_upload_package_verified_against_system` are true only after the live submission system preview and final package contents match the current source package.
 15. The manuscript does not claim human gold labels, broad method superiority, or threshold stability unless the corresponding artifact evidence exists.
 
