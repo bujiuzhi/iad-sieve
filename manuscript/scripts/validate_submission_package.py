@@ -26,6 +26,7 @@ from submission_metadata_checks import (
     COMMIT_PATTERN,
     DKE_ELSEVIER_FILE_REQUIREMENT_ERROR,
     DOI_PATTERN,
+    FINAL_UPLOAD_REPOSITORY_BRANCH,
     check_final_upload_cover_letter_text as check_structured_final_upload_cover_letter_text,
     check_final_upload_metadata_text as check_structured_final_upload_metadata_text,
     check_non_placeholder_url,
@@ -367,10 +368,21 @@ def check_final_upload_source_control_binding(manifest_text: str, metadata_text:
     errors: list[str] = []
     manifest_commit = str(source_control.get("repository_commit", ""))
     metadata_commit = scalar_value(metadata_text, "repository_commit")
+    manifest_branch = str(source_control.get("repository_branch", ""))
+    metadata_branch = scalar_value(metadata_text, "repository_branch")
     if metadata_commit and manifest_commit and metadata_commit != manifest_commit:
         errors.append(
             f"{location} final-upload source_control commit {manifest_commit} "
             f"does not match submission_metadata.yml repository_commit {metadata_commit}"
+        )
+    if metadata_branch and manifest_branch and metadata_branch != manifest_branch:
+        errors.append(
+            f"{location} final-upload source_control branch {manifest_branch} "
+            f"does not match submission_metadata.yml repository_branch {metadata_branch}"
+        )
+    if manifest_branch and manifest_branch != FINAL_UPLOAD_REPOSITORY_BRANCH:
+        errors.append(
+            f"{location} final-upload source_control repository_branch must be {FINAL_UPLOAD_REPOSITORY_BRANCH}"
         )
     if source_control.get("worktree_dirty") is True:
         errors.append(f"{location} final-upload source_control worktree_dirty must be false")

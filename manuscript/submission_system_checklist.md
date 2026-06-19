@@ -96,8 +96,8 @@ Before upload, verify:
 
 1. The tracked source `submission_metadata.yml` can keep `repository_reference` blank before final upload.
 2. `python manuscript/scripts/build_submission_package.py --final-upload` writes `repository_url`, `repository_commit`, and `repository_branch` into the package copy of `submission_metadata.yml`.
-3. The package copy is bound to `git remote origin`, `git rev-parse HEAD`, and the current branch; `repository_url` must be a public non-placeholder HTTP/HTTPS URL.
-4. `submission_manifest.json` records the same `repository_commit` as the package copy of `submission_metadata.yml`.
+3. The package copy is bound to `git remote origin`, `git rev-parse HEAD`, and the current branch; `repository_url` must be a public non-placeholder HTTP/HTTPS URL and `repository_branch` must be `main`.
+4. `submission_manifest.json` records the same `repository_commit` and `repository_branch` as the package copy of `submission_metadata.yml`.
 5. `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes after the package is built, the external artifact release is finalized, and the artifact manifest publication object records the same public artifact URL or DOI as `submission_metadata.yml`.
 
 ## Final Metadata Checks

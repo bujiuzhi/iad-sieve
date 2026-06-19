@@ -117,11 +117,12 @@ def _write_dke_preflight_files(manuscript_root: Path) -> None:
     _write_file(manuscript_root / "build" / "iad-risk-manuscript-elsevier.pdf", b"%PDF-1.5 dke\n")
 
 
-def _clean_source_control_state(commit: str = "abcdef1234567890") -> dict:
+def _clean_source_control_state(commit: str = "abcdef1234567890", branch: str = "main") -> dict:
     """构造测试用 Git 源状态。
 
     参数:
         commit: 仓库提交号。
+        branch: 仓库分支名。
 
     返回:
         dict: 投稿包 manifest 使用的 source_control 字段。
@@ -129,7 +130,7 @@ def _clean_source_control_state(commit: str = "abcdef1234567890") -> dict:
     return {
         "available": True,
         "repository_commit": commit,
-        "repository_branch": "main",
+        "repository_branch": branch,
         "worktree_dirty": False,
         "tracked_state": "clean",
     }
@@ -955,6 +956,30 @@ def test_build_submission_package_autofills_final_upload_repository_reference(tm
     assert validator.validate_submission_package(output_dir, zip_path, final_upload=True, artifact_dir=artifact_dir) == []
 
 
+def test_build_submission_package_rejects_final_upload_from_non_main_branch(tmp_path, monkeypatch) -> None:
+    """验证正式上传包必须从 main 分支生成。"""
+
+    module = _load_submission_package_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_final_upload_metadata(manuscript_root)
+    _blank_final_upload_repository_reference(manuscript_root)
+    _write_final_upload_cover_letter(manuscript_root)
+    monkeypatch.setattr(
+        module,
+        "collect_source_control_state",
+        lambda _: _clean_source_control_state(branch="feature/final-upload"),
+    )
+    monkeypatch.setattr(module, "collect_repository_url", lambda _: "https://github.com/bujiuzhi/iad-sieve.git")
+
+    with pytest.raises(ValueError) as exc_info:
+        module.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
+
+    assert "repository branch must be main" in str(exc_info.value)
+
+
 def test_normalize_repository_url_converts_github_ssh_remote() -> None:
     """验证 GitHub SSH remote 会转成投稿元数据可用的 HTTPS URL。"""
 
@@ -1596,6 +1621,33 @@ def test_validate_submission_package_rejects_final_upload_commit_mismatch(tmp_pa
 
     assert any("source_control commit bbbbbbbbbbbbbbbb" in error for error in errors)
     assert any("repository_commit abcdef1234567890" in error for error in errors)
+
+
+def test_validate_submission_package_rejects_final_upload_branch_mismatch(tmp_path, monkeypatch) -> None:
+    """验证正式上传包的 Git 分支必须为 main 且匹配投稿元数据。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_final_upload_metadata(manuscript_root)
+    _write_final_upload_cover_letter(manuscript_root)
+    monkeypatch.setattr(builder, "collect_source_control_state", lambda _: _clean_source_control_state())
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
+    manifest_path = output_dir / "submission_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["source_control"]["repository_branch"] = "feature/final-upload"
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    builder.write_checksums(output_dir)
+    builder.create_zip_archive(output_dir, zip_path)
+
+    errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True)
+
+    assert any("source_control branch feature/final-upload" in error for error in errors)
+    assert any("repository_branch must be main" in error for error in errors)
 
 
 def test_validate_submission_package_rejects_final_upload_artifact_commit_mismatch(tmp_path) -> None:

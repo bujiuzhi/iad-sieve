@@ -105,6 +105,7 @@ RESEARCH_DATA_STATEMENT_REQUIRED_TARGETS = {
     "information systems": "Information Systems",
 }
 DKE_ELSEVIER_FILE_REQUIREMENT_ERROR = "DKE/Elsevier final upload requires DKE/Elsevier source and PDF files"
+FINAL_UPLOAD_REPOSITORY_BRANCH = "main"
 FINAL_UPLOAD_TRUE_FIELDS = {
     "target_journal_template_bound": "target journal template is not bound",
     "target_journal_selected": "target journal checklist item is incomplete",
@@ -694,6 +695,8 @@ def check_repository_reference(metadata_text: str) -> list[str]:
         errors.append("repository commit is invalid")
     if not repository_branch:
         errors.append("repository branch is missing")
+    elif repository_branch != FINAL_UPLOAD_REPOSITORY_BRANCH:
+        errors.append(f"repository branch must be {FINAL_UPLOAD_REPOSITORY_BRANCH}")
     return errors
 
 

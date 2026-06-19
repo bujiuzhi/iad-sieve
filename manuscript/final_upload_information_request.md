@@ -153,6 +153,7 @@ For each author, select the applicable CRediT roles and then draft the final aut
 - Repository URL must be a public non-placeholder HTTP/HTTPS URL:
 - Repository commit:
 - Repository branch:
+- Repository branch must be `main` for the final upload:
 - Repository URL and commit will be injected into the final-upload package copy from `git remote origin` and `git rev-parse HEAD`:
 - Repository commit matches artifact release manifest:
 - Data boundary:

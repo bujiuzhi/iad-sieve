@@ -288,6 +288,18 @@ def test_check_final_upload_information_request_rejects_missing_public_link_poli
     assert any("Artifact release URL must be a public non-placeholder" in error for error in errors)
 
 
+def test_check_final_upload_information_request_rejects_missing_main_branch_policy() -> None:
+    """验证最终上传信息表必须说明仓库分支为 main。"""
+
+    module = _load_validate_manuscript_module()
+    request_text = Path("manuscript/final_upload_information_request.md").read_text(encoding="utf-8")
+    request_text = request_text.replace("- Repository branch must be `main` for the final upload:\n", "")
+
+    errors = module.check_final_upload_information_request(request_text)
+
+    assert any("Repository branch must be `main`" in error for error in errors)
+
+
 def test_check_final_upload_information_request_rejects_missing_dke_preflight_status() -> None:
     """验证最终上传信息表必须区分 DKE 预检来源和最终作者确认。"""
 
@@ -5291,7 +5303,8 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "The package copy of `submission_metadata.yml` is bound to git remote origin.",
             "The package copy is bound to git rev-parse HEAD.",
             "`repository_url` must be a public non-placeholder HTTP/HTTPS URL.",
-            "`submission_manifest.json` records the same `repository_commit` as the package copy.",
+            "`repository_branch` must be `main`.",
+            "`submission_manifest.json` records the same `repository_commit` and `repository_branch` as the package copy.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
             "The external artifact release is finalized before final-upload package validation.",
             "## Live Submission Text Checks",
@@ -5384,6 +5397,23 @@ def test_check_submission_system_checklist_rejects_missing_public_link_policy() 
 
     assert any("repository_url" in error and "non-placeholder" in error for error in errors)
     assert any("artifact release URL" in error and "non-placeholder" in error for error in errors)
+
+
+def test_check_submission_system_checklist_rejects_missing_main_branch_policy() -> None:
+    """验证投稿系统清单必须核对 main 分支和 manifest 分支一致性。"""
+
+    module = _load_validate_manuscript_module()
+    checklist_text = Path("manuscript/submission_system_checklist.md").read_text(encoding="utf-8")
+    checklist_text = checklist_text.replace("`repository_branch` must be `main`", "`repository_branch` is recorded")
+    checklist_text = checklist_text.replace(
+        "records the same `repository_commit` and `repository_branch`",
+        "records the same `repository_commit`",
+    )
+
+    errors = module.check_submission_system_checklist(checklist_text)
+
+    assert any("repository_branch" in error and "main" in error for error in errors)
+    assert any("repository_commit" in error and "repository_branch" in error for error in errors)
 
 
 def test_check_submission_system_checklist_rejects_missing_review_mode_controlled_values() -> None:
@@ -5907,8 +5937,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 102.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final review-mode vocabulary gap, final-upload information request specificity, and stronger evidence gates.",
+            "Completed audit cycles: 103.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final review-mode vocabulary gap, final-upload information request specificity, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -6753,6 +6783,11 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "review mode must be recorded for final upload",
             "`review_mode` values",
             "metadata completeness",
+            "## Audit Cycle 103: Final Source-Control Branch Gate",
+            "final source-control branch rejection coverage",
+            'repository_branch: "main"',
+            "source-control branch differs from the package metadata",
+            "pushed `main` branch",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -6771,7 +6806,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 102",
+        "Completed audit cycles: 103",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -6782,7 +6817,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 102" in error for error in errors)
+    assert any("Completed audit cycles: 103" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -8994,6 +9029,21 @@ def test_check_final_upload_metadata_rejects_missing_repository_reference() -> N
 
     assert any("repository URL is missing" in error for error in errors)
     assert any("repository commit is missing" in error for error in errors)
+
+
+def test_check_final_upload_metadata_rejects_non_main_repository_branch() -> None:
+    """验证 final-upload 门禁拒绝非 main 仓库分支。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = _build_filled_final_upload_metadata_text()
+    metadata_text = metadata_text.replace(
+        'repository_branch: "main"',
+        'repository_branch: "feature/final-upload"',
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any("repository branch must be main" in error for error in errors)
 
 
 def test_check_final_upload_metadata_rejects_data_code_statement_without_release_references() -> None:
