@@ -200,6 +200,22 @@ def test_check_final_upload_information_request_rejects_missing_review_mode_cont
     assert any("generic `single_anonymized` value" in error for error in errors)
 
 
+def test_check_final_upload_information_request_rejects_missing_review_mode_presence_policy() -> None:
+    """验证最终上传信息表必须要求记录实际 review_mode 值。"""
+
+    module = _load_validate_manuscript_module()
+    request_text = Path("manuscript/final_upload_information_request.md").read_text(encoding="utf-8")
+    request_text = request_text.replace(
+        "- Review mode value must be recorded whenever `review_mode_confirmed` is true:\n",
+        "",
+    )
+
+    errors = module.check_final_upload_information_request(request_text)
+
+    assert any("Review mode value must be recorded" in error for error in errors)
+    assert any("review_mode_confirmed" in error for error in errors)
+
+
 def test_check_final_upload_information_request_rejects_missing_article_type_controlled_values() -> None:
     """验证最终上传信息收集表必须提示 article_type 受控取值。"""
 
@@ -5307,6 +5323,7 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "It does not use `review_article`, `case_report`, or another article-type value.",
             "`selected_author_guide_source`, non-placeholder `selected_author_guide_source_url`, `selected_author_guide_rechecked_date`, and `selected_template_requirements_confirmed` are complete before final upload.",
             "`ranking_confirmation_completed`, `ranking_confirmation_source`, non-placeholder `ranking_confirmation_source_url`, `ranking_confirmation_checked_date`, and `selected_target_author_confirmed` are complete before final upload.",
+            "`review_mode` records the live submission-system review setting.",
             "`review_mode` uses an author-visible final-upload value.",
             "single_anonymized_with_final_author_identities",
             "single_anonymized_author_visible_final_upload",
@@ -5374,6 +5391,7 @@ def test_check_submission_system_checklist_rejects_missing_review_mode_controlle
 
     module = _load_validate_manuscript_module()
     checklist_text = Path("manuscript/submission_system_checklist.md").read_text(encoding="utf-8")
+    checklist_text = checklist_text.replace("`review_mode` records the live submission-system review setting", "review mode is recorded")
     checklist_text = checklist_text.replace("`review_mode` uses an author-visible final-upload value", "review mode is checked")
     checklist_text = checklist_text.replace("`single_anonymized_with_final_author_identities`", "single anonymized")
     checklist_text = checklist_text.replace("`single_anonymized_author_visible_final_upload`", "single anonymized")
@@ -5382,6 +5400,7 @@ def test_check_submission_system_checklist_rejects_missing_review_mode_controlle
 
     errors = module.check_submission_system_checklist(checklist_text)
 
+    assert any("review_mode" in error and "live submission-system review setting" in error for error in errors)
     assert any("review_mode" in error and "author-visible final-upload value" in error for error in errors)
     assert any("single_anonymized_with_final_author_identities" in error for error in errors)
     assert any("single_anonymized_author_visible_final_upload" in error for error in errors)
@@ -5888,8 +5907,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 101.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final review-mode vocabulary gap, final-upload information request specificity, and stronger evidence gates.",
+            "Completed audit cycles: 102.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final review-mode vocabulary gap, final-upload information request specificity, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -6729,6 +6748,11 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "must not use a placeholder URL",
             "`example.org`",
             "`localhost`",
+            "## Audit Cycle 102: Final Review-Mode Presence Gate",
+            "review-mode presence rejection coverage",
+            "review mode must be recorded for final upload",
+            "`review_mode` values",
+            "metadata completeness",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -6747,7 +6771,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 101",
+        "Completed audit cycles: 102",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -6758,7 +6782,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 101" in error for error in errors)
+    assert any("Completed audit cycles: 102" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -8382,6 +8406,7 @@ def _build_filled_final_upload_metadata_text(
     metadata_lines = [
         'target_journal: "Journal of Scholarly Data"',
         'article_type: "research_article"',
+        'review_mode: "journal_system_confirmed"',
         "target_journal_template_bound: true",
         "target_preparation:",
         '  selected_author_guide_source: "official journal guide for authors"',
@@ -8515,6 +8540,7 @@ def test_check_final_upload_metadata_accepts_filled_metadata() -> None:
         [
             'target_journal: "Journal of Scholarly Data"',
             'article_type: "research_article"',
+            'review_mode: "journal_system_confirmed"',
             "target_journal_template_bound: true",
             "target_preparation:",
             '  selected_author_guide_source: "official journal guide for authors"',
@@ -8652,6 +8678,18 @@ def test_check_final_upload_metadata_rejects_placeholder_repository_and_artifact
 
     assert any("repository URL must not use a placeholder URL" in error for error in errors)
     assert any("artifact release URL must not use a placeholder URL" in error for error in errors)
+
+
+def test_check_final_upload_metadata_rejects_missing_review_mode_for_generic_target() -> None:
+    """验证 final-upload 门禁拒绝缺失的通用 review_mode 值。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = _build_filled_final_upload_metadata_text()
+    metadata_text = metadata_text.replace('review_mode: "journal_system_confirmed"\n', "")
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any("review mode must be recorded for final upload" in error for error in errors)
 
 
 def test_check_final_upload_metadata_rejects_missing_author_guide_confirmation() -> None:

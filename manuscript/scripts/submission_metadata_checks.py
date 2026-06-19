@@ -742,9 +742,11 @@ def check_final_upload_review_mode(metadata_text: str) -> list[str]:
     review_mode = scalar_value(metadata_text, "review_mode")
     normalized_target = target_journal.strip().lower()
     normalized_review_mode = review_mode.strip().lower()
-    if not normalized_review_mode and normalized_target in AUTHOR_VISIBLE_REVIEW_JOURNALS:
-        journal_name = AUTHOR_VISIBLE_REVIEW_JOURNALS[normalized_target]
-        return [f"review mode must be recorded for {journal_name}"]
+    if not normalized_review_mode:
+        if normalized_target in AUTHOR_VISIBLE_REVIEW_JOURNALS:
+            journal_name = AUTHOR_VISIBLE_REVIEW_JOURNALS[normalized_target]
+            return [f"review mode must be recorded for {journal_name}"]
+        return ["review mode must be recorded for final upload"]
     if normalized_target in AUTHOR_VISIBLE_REVIEW_JOURNALS and (
         normalized_review_mode not in AUTHOR_VISIBLE_FINAL_REVIEW_MODES
     ):
