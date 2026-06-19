@@ -42,6 +42,9 @@ The DKE official-guide preflight source is already recorded in `submission_metad
 
 - Selected target journal:
 - Article type:
+- Article type controlled value for this manuscript:
+- Use `research_article` for the final upload:
+- Do not use `review_article`, `case_report`, or other article-type values unless the manuscript is rewritten and revalidated for that route:
 - Review mode:
 - Review mode controlled value for single-anonymized author-visible final upload routes:
 - Use `single_anonymized_with_final_author_identities` or `single_anonymized_author_visible_final_upload` for DKE, Information Systems, or Scientometrics final upload:

@@ -129,6 +129,7 @@ FINAL_UPLOAD_TRUE_FIELDS = {
 ARTICLE_TYPE_COVER_LETTER_MARKERS = {
     "research_article": "research article",
 }
+FINAL_UPLOAD_ARTICLE_TYPES = set(ARTICLE_TYPE_COVER_LETTER_MARKERS)
 
 
 def strip_yaml_value(value: str) -> str:
@@ -711,6 +712,23 @@ def doi_from_url(value: str) -> str:
     return unquote(parsed_url.path.lstrip("/")).strip()
 
 
+def check_final_upload_article_type(metadata_text: str) -> list[str]:
+    """Check whether final-upload article type is explicit and supported.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages.
+    """
+    article_type = scalar_value(metadata_text, "article_type").strip().lower()
+    if not article_type:
+        return ["article type is missing"]
+    if article_type not in FINAL_UPLOAD_ARTICLE_TYPES:
+        return [f"article type is unsupported: {article_type}"]
+    return []
+
+
 def check_final_upload_review_mode(metadata_text: str) -> list[str]:
     """Check whether final-upload review mode matches the selected journal route.
 
@@ -1073,5 +1091,6 @@ def check_final_upload_metadata_text(metadata_text: str) -> list[str]:
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_generative_ai_declaration(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_artifact_release_link(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_repository_reference(metadata_text))
+    errors.extend(f"final upload metadata unresolved: {message}" for message in check_final_upload_article_type(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_final_upload_review_mode(metadata_text))
     return sorted(set(errors))

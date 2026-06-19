@@ -104,7 +104,7 @@ Before upload, verify:
 
 Before upload, verify:
 
-1. The selected target journal and article type match the submission system.
+1. The selected target journal and article type match the submission system; `article_type` uses `research_article` for this manuscript and does not use `review_article`, `case_report`, or another article-type value unless the manuscript is rewritten and revalidated for that route.
 2. `target_journal_template_bound` is true and the selected journal template matches the final manuscript source.
 3. `selected_author_guide_source`, non-placeholder `selected_author_guide_source_url`, `selected_author_guide_rechecked_date`, and `selected_template_requirements_confirmed` are complete before final upload.
 4. `ranking_confirmation_completed`, `ranking_confirmation_source`, non-placeholder `ranking_confirmation_source_url`, `ranking_confirmation_checked_date`, and `selected_target_author_confirmed` are complete before final upload.
