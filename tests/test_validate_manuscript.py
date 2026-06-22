@@ -4648,6 +4648,13 @@ def test_check_result_interpretation_guardrails_accepts_complete_boundaries() ->
             "The representation rows test false-merge exposure.",
             "The RoBERTa row is a strong supervised comparator.",
             "The IAD-Risk rows test split-held-out risk gating.",
+            "These passes correspond to RQ1--RQ4 rather than to a single leaderboard.",
+            "RQ1 is answered by same-work F1 under the applicable identity-label scope.",
+            "RQ2 by HNFMR under the silver hard-negative scope.",
+            "RQ3 by the joint FMR/HNFMR pattern across representation, RoBERTa, and IAD-Risk rows.",
+            "RQ4 by the visible scope and label-stratum boundaries.",
+            "The row-family reading guide prevents ranking overread.",
+            "Rows should not be collapsed into one same-scope performance ranking.",
             "The IAD-Risk rows still report FMR=0.001.",
             "The ordinary FMR=0.001 is still reported for all non-identity rows.",
             "The zero observed HNFMR should be read as no observed false merge in the agenda-hard-negative stratum.",
@@ -4694,6 +4701,9 @@ def test_check_result_interpretation_guardrails_rejects_missing_unsupported_read
     assert any("Unsupported reading" in error for error in errors)
     assert any("not a same-scope comparative ranking" in error for error in errors)
     assert any("result-interpretation-guardrails" in error for error in errors)
+    assert any("RQ1 is answered by same-work F1" in error for error in errors)
+    assert any("single leaderboard" in error for error in errors)
+    assert any("same-scope performance ranking" in error for error in errors)
 
 
 def test_check_result_interpretation_guardrails_rejects_missing_scope_type_labels() -> None:
