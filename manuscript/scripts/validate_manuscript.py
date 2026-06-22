@@ -6102,7 +6102,8 @@ def check_elsevier_draft_source(manuscript_text: str, keywords_text: str, genera
         return [f"Elsevier draft source could not be regenerated: {exc}"]
     if generated_text.strip() != expected_text.strip():
         return ["Elsevier draft source is stale; rerun python manuscript/scripts/build_elsevier_draft.py"]
-    return []
+    abstract_length_errors = check_abstract_length(generated_text)
+    return [f"Elsevier draft source {error}" for error in abstract_length_errors]
 
 
 def load_submission_package_validator():

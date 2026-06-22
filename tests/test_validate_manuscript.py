@@ -1403,6 +1403,35 @@ Body.
     assert any("stale" in error for error in errors)
 
 
+def test_check_elsevier_draft_source_rejects_over_limit_abstract() -> None:
+    """验证Elsevier预转换源摘要超过 DKE 限制时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = (
+        r"\title{IAD-Risk}"
+        "\n"
+        r"\begin{abstract}"
+        + " ".join(["evidence"] * 251)
+        + r"\end{abstract}"
+        "\n"
+        r"\section{Introduction}"
+        "\n"
+        "Body."
+        "\n"
+        r"\bibliographystyle{plainnat}"
+        "\n"
+        r"\bibliography{references}"
+    )
+    keywords_text = "# Keywords\n\nentity matching\n"
+    builder = module.load_elsevier_draft_builder()
+    generated_text = builder.build_elsevier_latex(manuscript_text, ["entity matching"])
+
+    errors = module.check_elsevier_draft_source(manuscript_text, keywords_text, generated_text)
+
+    assert any("Elsevier draft source abstract has 251 words" in error for error in errors)
+    assert any("expected at most 250" in error for error in errors)
+
+
 def test_check_abstract_length_accepts_abstract_within_limit() -> None:
     """验证摘要不超过 250 词时可通过检查。"""
 
