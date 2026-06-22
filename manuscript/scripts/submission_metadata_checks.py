@@ -133,6 +133,7 @@ ARTICLE_TYPE_COVER_LETTER_MARKERS = {
 }
 FINAL_UPLOAD_ARTICLE_TYPES = set(ARTICLE_TYPE_COVER_LETTER_MARKERS)
 DKE_EDITABLE_BIOGRAPHY_EXTENSIONS = {".doc", ".docx", ".rtf", ".txt", ".md", ".tex"}
+DKE_PHOTOGRAPH_EXTENSIONS = {".jpg", ".jpeg", ".png", ".tif", ".tiff"}
 ELSEVIER_DECLARATION_FILE_EXTENSIONS = {".doc", ".docx"}
 FINAL_UPLOAD_COVER_LETTER_UNRESOLVED_MARKERS = {
     "anonymous draft cover letter": "cover letter still describes an anonymous draft",
@@ -883,6 +884,35 @@ def check_author_identity_material_counts(metadata_text: str) -> list[str]:
     return errors
 
 
+def check_author_photograph_file_paths(metadata_text: str) -> list[str]:
+    """Check whether DKE author photograph paths use image file formats.
+
+    功能:
+        Validate that DKE author photograph file paths use supported image extensions.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages for missing or non-image photograph file paths.
+    """
+    photograph_files = parse_section_sequence_values(metadata_text, "author_identity_materials", "photograph_files")
+    errors: list[str] = []
+    for photograph_file in photograph_files:
+        normalized_path = unquote(photograph_file).strip()
+        suffix_match = re.search(r"(\.[A-Za-z0-9]+)(?:[?#].*)?$", normalized_path)
+        suffix = suffix_match.group(1).lower() if suffix_match else ""
+        if not suffix:
+            errors.append(f"author photograph file must include an image file extension: {photograph_file}")
+            continue
+        if suffix not in DKE_PHOTOGRAPH_EXTENSIONS:
+            errors.append(
+                "author photograph file must use an image format "
+                f"({', '.join(sorted(DKE_PHOTOGRAPH_EXTENSIONS))}): {photograph_file}"
+            )
+    return errors
+
+
 def check_author_identity_materials(metadata_text: str) -> list[str]:
     """Check DKE/Elsevier author biography and photograph material records.
 
@@ -912,6 +942,8 @@ def check_author_identity_materials(metadata_text: str) -> list[str]:
         errors.extend(check_editable_biography_file_paths(metadata_text))
     if not section_key_has_value(metadata_text, "author_identity_materials", "photograph_files"):
         errors.append("author photograph file list is missing")
+    else:
+        errors.extend(check_author_photograph_file_paths(metadata_text))
     errors.extend(check_author_identity_material_counts(metadata_text))
     return errors
 

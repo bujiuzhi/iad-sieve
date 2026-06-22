@@ -621,6 +621,28 @@ def test_check_final_upload_information_request_rejects_missing_author_material_
     assert any("number of author rows" in error for error in errors)
 
 
+def test_check_final_upload_information_request_rejects_missing_photo_format_rule() -> None:
+    """验证最终上传信息表必须说明作者照片文件为图像格式。"""
+
+    module = _load_validate_manuscript_module()
+    request_text = Path("manuscript/final_upload_information_request.md").read_text(encoding="utf-8")
+    request_text = request_text.replace(
+        "The passport-type photograph is a separate image file and must use an image format such as "
+        "`.jpg`, `.jpeg`, `.png`, `.tif`, or `.tiff`.",
+        "The passport-type photograph is a separate file.",
+    )
+    request_text = request_text.replace(
+        "- Photograph file must use image format `.jpg`, `.jpeg`, `.png`, `.tif`, or `.tiff`:\n",
+        "",
+    )
+
+    errors = module.check_final_upload_information_request(request_text)
+
+    assert any("separate image file and must use an image format" in error for error in errors)
+    assert any("Photograph file must use image format" in error for error in errors)
+    assert any(".jpg" in error for error in errors)
+
+
 def test_check_final_upload_information_request_rejects_missing_metadata_mapping() -> None:
     """验证最终上传信息表必须说明外部输入如何同步到元数据文件。"""
 
@@ -7034,8 +7056,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Readiness Summary",
-            "Readiness gates covered: 132.",
-            "Highest current reviewer-facing risks are tracked as a risk inventory rather than a claim that every gate is currently failing: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, DKE author identity material cardinality drift, Elsevier competing-interest declaration file traceability, introduction contribution first-screen alignment, conclusion first-screen boundary alignment, submission-day official-source drift, processing-run-log schema bypass, process-note vocabulary bypass, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, pre-submission cover-letter declaration boundary, preflight metadata declaration placeholders, anonymous review-file declaration boundary, introduction row-scope comparison overread, main-result operating-point overread, figure metric-scope overread, cover-letter Git-only reproduction boundary, Q2/B ranking evidence packet traceability, public documentation index drift, local submission-package artifact tracking drift, DKE/Elsevier draft abstract-length drift, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, ANI threshold notation drift, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final cover-letter preflight wording gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, latex-engine panic diagnostic gap, and stronger evidence gates.",
+            "Readiness gates covered: 133.",
+            "Highest current reviewer-facing risks are tracked as a risk inventory rather than a claim that every gate is currently failing: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, DKE author identity material cardinality drift, DKE photograph file-format drift, Elsevier competing-interest declaration file traceability, introduction contribution first-screen alignment, conclusion first-screen boundary alignment, submission-day official-source drift, processing-run-log schema bypass, process-note vocabulary bypass, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, pre-submission cover-letter declaration boundary, preflight metadata declaration placeholders, anonymous review-file declaration boundary, introduction row-scope comparison overread, main-result operating-point overread, figure metric-scope overread, cover-letter Git-only reproduction boundary, Q2/B ranking evidence packet traceability, public documentation index drift, local submission-package artifact tracking drift, DKE/Elsevier draft abstract-length drift, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, ANI threshold notation drift, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final cover-letter preflight wording gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, latex-engine panic diagnostic gap, and stronger evidence gates.",
             "External final-upload blockers cannot be resolved from the repository alone.",
             "Local gates currently controlled by validators must still be rerun after source or package edits.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
@@ -8161,6 +8183,13 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "author photograph file count must match author count",
             "author-material completeness, not scientific evidence",
             "does not place identity-bearing author materials into the anonymous preflight package",
+            "## Readiness Gate 133: DKE Photograph File Format Gate",
+            "DKE photograph file-format coverage",
+            "`author_identity_materials.photograph_files` points to a PDF, Word document, or extensionless placeholder",
+            "without an image extension",
+            "extension is not `.jpg`, `.jpeg`, `.png`, `.tif`, or `.tiff`",
+            "publisher upload hygiene, not scientific evidence",
+            "non-image path as a passport-type photograph",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             r"Method threshold notation uses `\tau_n` for the ANI risk-head threshold",
@@ -8171,6 +8200,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "Generated submission-package directories and archives remain ignored and untracked",
             "The DKE/Elsevier draft source abstract remains within the 250-word front-matter limit",
             "DKE/Elsevier final-upload metadata records one editable biography file and one passport-type photograph file per listed author",
+            "DKE/Elsevier final-upload metadata records passport-type photograph paths with image extensions",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
         ]
     )
@@ -8187,7 +8217,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Readiness Summary",
-        "Readiness gates covered: 132",
+        "Readiness gates covered: 133",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -8198,7 +8228,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Readiness Summary" in error for error in errors)
-    assert any("Readiness gates covered: 132" in error for error in errors)
+    assert any("Readiness gates covered: 133" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -9320,6 +9350,32 @@ def test_check_reviewer_readiness_audit_rejects_missing_dke_author_material_card
     assert any("DKE author identity material cardinality drift" in error for error in errors)
     assert any("author biography file count must match author count" in error for error in errors)
     assert any("author photograph file count must match author count" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_dke_photo_format_gate() -> None:
+    """验证审稿准备度审计必须覆盖 DKE 作者照片格式门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Readiness Gate 133: DKE Photograph File Format Gate",
+        "DKE photograph file-format drift",
+        "DKE photograph file-format coverage",
+        "`author_identity_materials.photograph_files` points to a PDF, Word document, or extensionless placeholder",
+        "without an image extension",
+        "extension is not `.jpg`, `.jpeg`, `.png`, `.tif`, or `.tiff`",
+        "publisher upload hygiene, not scientific evidence",
+        "non-image path as a passport-type photograph",
+        "DKE/Elsevier final-upload metadata records passport-type photograph paths with image extensions",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("DKE Photograph File Format Gate" in error for error in errors)
+    assert any("DKE photograph file-format drift" in error for error in errors)
+    assert any("author_identity_materials.photograph_files" in error for error in errors)
+    assert any("passport-type photograph" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_fixture_evidence_isolation_gate() -> None:
@@ -10940,6 +10996,38 @@ def test_check_final_upload_metadata_rejects_dke_author_material_count_mismatch(
     assert any("author biography file count must match author count" in error for error in errors)
     assert any("expected 2, found 1" in error for error in errors)
     assert any("author photograph file count must match author count" in error for error in errors)
+
+
+def test_check_final_upload_metadata_rejects_non_image_dke_author_photograph_file() -> None:
+    """验证 DKE final-upload 门禁拒绝非图像格式的作者照片文件。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = _build_filled_final_upload_metadata_text()
+    metadata_text = metadata_text.replace(
+        'target_journal: "Journal of Scholarly Data"',
+        'target_journal: "Data & Knowledge Engineering"',
+    )
+    metadata_text = metadata_text.replace(
+        'review_mode: "journal_system_confirmed"',
+        'review_mode: "single_anonymized_with_final_author_identities"',
+    )
+    metadata_text = metadata_text.replace(
+        "  author_biography_and_photo_required_before_upload: false",
+        "  author_biography_and_photo_required_before_upload: true",
+    )
+    metadata_text = metadata_text.replace(
+        "  biography_files: []",
+        '  biography_files: ["author-materials/example-author-biography.md"]',
+    )
+    metadata_text = metadata_text.replace(
+        "  photograph_files: []",
+        '  photograph_files: ["author-materials/example-author-photo.pdf"]',
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any("author photograph file must use an image format" in error for error in errors)
+    assert any(".jpg" in error and ".tiff" in error for error in errors)
 
 
 def test_check_final_upload_metadata_rejects_missing_elsevier_declaration_file() -> None:
