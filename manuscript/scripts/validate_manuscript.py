@@ -1625,7 +1625,7 @@ def check_result_claim_boundary(manuscript_text: str, supplementary_text: str) -
         r"\label{tab:claim-evidence-boundary-main}",
         "Claim-evidence boundary used to interpret the reported results",
         "Identity-agenda confusion is a concrete false-merge pathway",
-        "IAD-Risk reduces risky automatic merges in the reported setting",
+        "IAD-Risk supports targeted false-merge control in the reported setting",
         "IAD-Bench supports provenance-aware evaluation",
         "Repository-level reproduction is possible without committing raw data",
         r"\label{tab:result-artifact-crosswalk}",
@@ -1681,6 +1681,13 @@ def check_result_claim_boundary(manuscript_text: str, supplementary_text: str) -
     for marker in required_supplement_markers:
         if marker not in supplementary_text:
             errors.append(f"Open-v2 result table missing supplementary artifact boundary marker: {marker}")
+    overbroad_supplement_markers = [
+        "IAD-Risk suppresses hard-negative false merges under the reported setting",
+        "IAD-Risk reduces risky automatic merges in the reported setting",
+    ]
+    for marker in overbroad_supplement_markers:
+        if marker in supplementary_text:
+            errors.append(f"Open-v2 result table uses overbroad effect marker: {marker}")
     return errors
 
 

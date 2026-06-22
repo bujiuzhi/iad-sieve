@@ -1740,7 +1740,7 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
             r"\label{tab:claim-evidence-boundary-main}",
             "Claim-evidence boundary used to interpret the reported results.",
             "Identity-agenda confusion is a concrete false-merge pathway.",
-            "IAD-Risk reduces risky automatic merges in the reported setting.",
+            "IAD-Risk supports targeted false-merge control in the reported setting.",
             "IAD-Bench supports provenance-aware evaluation.",
             "Repository-level reproduction is possible without committing raw data.",
             r"\label{tab:result-artifact-crosswalk}",
@@ -1792,6 +1792,129 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
     errors = module.check_result_claim_boundary(manuscript_text, supplementary_text)
 
     assert errors == []
+
+
+def test_check_result_claim_boundary_rejects_overbroad_effect_markers() -> None:
+    """验证结果证据边界不能把目标控制证据写成完整效果动词。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Claim-Evidence Boundary for Result Interpretation}",
+            r"\subsection{Result Audit Trail}",
+            "The full claim-evidence boundary table is reported in the supplementary material.",
+            "The identity-agenda confusion is supported only as a false-merge pathway.",
+            "IAD-Risk support is bounded to the reported Open-v2 setting.",
+            "IAD-Bench is a provenance-aware evaluation contract.",
+            "The repository-level reproduction does not by itself prove full numerical results.",
+            "The complete row-family artifact crosswalk is reported in the supplementary material.",
+            r"\path{open_v2_main_results}",
+            r"\path{iad_bench_split_summary}",
+            r"\path{representation_baseline_scores}",
+            r"\path{supervised_baseline_predictions}",
+            r"\path{iad_risk_predictions}",
+            r"\path{threshold_selection_logs}",
+            r"\path{source_input_manifest}",
+            r"\path{processing_run_log}",
+            r"\path{bootstrap_intervals}",
+            r"\path{ablation_suite}",
+            r"\path{manual_validation_slice}",
+            r"\path{threshold_sensitivity_grid}",
+            "Each row uses a prediction or score file, metric summary, and checksum or manifest.",
+            "Each row records per-row denominator counts.",
+            "Each row records the per-row threshold source.",
+            "Each row records the scope label used in the main table.",
+            "Each row records automatic merge count.",
+            "Each row records block count.",
+            "Each row records defer count.",
+            "Each row records automatic merge coverage.",
+            "Each row records defer rate.",
+            "Each row records capacity-normalized review load.",
+            "Prediction JSONL artifacts expose pair/document IDs.",
+            "Prediction JSONL artifacts expose score or probability fields.",
+            "Threshold logs expose threshold name.",
+            "Threshold logs expose selection split.",
+            "Threshold logs expose selection metric.",
+            "Rebuild provenance exposes public input provenance.",
+            "Rebuild provenance exposes code commits.",
+            "Rebuild provenance exposes output paths.",
+            "Rebuild provenance exposes exit status.",
+            "External artifacts require artifact-level and manuscript-package validation.",
+            "The source artifact directory contains the files required by the release manifest.",
+            "The preflight returns without writing release files.",
+            "The preflight is not itself result evidence.",
+            r"\path{manuscript/scripts/validate_artifact_release.py}",
+            r"\path{manuscript/scripts/validate_submission_package.py}",
+            r"\texttt{--final-upload --artifact-dir /path/to/release}",
+            "The release and manuscript package refer to the same source commit.",
+            "The release should not be used to support the Open-v2 numerical table when validation fails.",
+            "The evidence does not support a broad method-ranking claim.",
+            r"\label{tab:openv2-results}",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Artifact Package Requirements}",
+            r"\section{Claim-Evidence Matrix}",
+            r"\label{tab:claim-evidence-boundary-main}",
+            "Claim-evidence boundary used to interpret the reported results.",
+            "Identity-agenda confusion is a concrete false-merge pathway.",
+            "IAD-Risk supports targeted false-merge control in the reported setting.",
+            "IAD-Risk suppresses hard-negative false merges under the reported setting.",
+            "IAD-Risk reduces risky automatic merges in the reported setting.",
+            "IAD-Bench supports provenance-aware evaluation.",
+            "Repository-level reproduction is possible without committing raw data.",
+            r"\label{tab:result-artifact-crosswalk}",
+            "Result artifact crosswalk for the Open-v2 evidence snapshot.",
+            "The released artifact package includes checksums.sha256.",
+            "Reviewers can run python manuscript/scripts/build_artifact_release_skeleton.py.",
+            "Reviewers can run with --preflight-only.",
+            r"The preflight does not write \path{artifact_population_log.jsonl}.",
+            "The source artifact directory is structurally ready for population.",
+            "The preflight does not prove row-level schemas.",
+            "Reviewers can run python manuscript/scripts/populate_artifact_release.py.",
+            "Reviewers can run python manuscript/scripts/finalize_artifact_release.py.",
+            "Reviewers can run python manuscript/scripts/validate_artifact_release.py.",
+            "The validator checks required result identifiers.",
+            "The validator checks conditional claim artifacts.",
+            r"The package documents \path{open_v2_main_results}.",
+            r"The package documents \path{iad_bench_split_summary}.",
+            r"The package documents \path{representation_baseline_scores}.",
+            r"The package documents \path{supervised_baseline_predictions}.",
+            r"The package documents \path{iad_risk_predictions}.",
+            r"The package documents \path{threshold_selection_logs}.",
+            r"The package documents \path{bootstrap_intervals}.",
+            r"The package documents \path{ablation_suite}.",
+            r"The package documents \path{manual_validation_slice}.",
+            "The artifact package records per-row denominator counts.",
+            "The artifact package records the per-row threshold source.",
+            "The artifact package records the scope label used in the main table.",
+            "The artifact package records automatic merge count.",
+            "The artifact package records block count.",
+            "The artifact package records defer count.",
+            "The artifact package records automatic merge coverage.",
+            "The artifact package records defer rate.",
+            "The artifact package records capacity-normalized review load.",
+            "Prediction and threshold artifacts are row-auditable.",
+            "Prediction artifacts include pair_id.",
+            "Representation artifacts include normalized score.",
+            "Supervised artifacts include match_probability.",
+            "Threshold logs include selection_rule.",
+            r"The package documents \path{threshold_sensitivity_grid}.",
+            r"The package documents \path{cluster_metric_summary}.",
+            r"The package documents \path{cannot_link_audit}.",
+            "The package states that cluster-level quality claims require cluster assignments.",
+            "The package states that cluster-level quality claims require cannot-link coverage.",
+            "The package states that cluster-level quality claims require cluster contamination rate.",
+            "The validator checks exclusion of raw third-party data.",
+        ]
+    )
+
+    errors = module.check_result_claim_boundary(manuscript_text, supplementary_text)
+
+    assert any("overbroad effect marker" in error for error in errors)
+    assert any("suppresses hard-negative false merges" in error for error in errors)
+    assert any("reduces risky automatic merges" in error for error in errors)
 
 
 def test_check_result_claim_boundary_rejects_result_table_without_audit_trail() -> None:

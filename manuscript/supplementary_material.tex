@@ -626,7 +626,7 @@ Table~\ref{tab:claim-evidence} maps the major manuscript claims to the evidence 
 Claim & Required evidence & Boundary \\
 \midrule
 Identity-agenda confusion is a practical false-merge risk. & Open-v2 hard-negative evaluation with FMR and HNFMR fields. & Supports a targeted scholarly deduplication failure mode, not a prevalence estimate for all domains. \\
-IAD-Risk suppresses hard-negative false merges under the reported setting. & IAD-Risk prediction files, metric summaries, split identifiers, thresholds, and checksums. & Supports targeted false-merge suppression; does not establish broad method superiority. \\
+IAD-Risk reports targeted hard-negative false-merge control under the reported setting. & IAD-Risk prediction files, metric summaries, split identifiers, thresholds, and checksums. & Supports targeted false-merge control; does not establish broad method superiority. \\
 IAD-Bench is provenance-aware. & Pair schema, label strength, label source, provenance fields, and fixture rebuild commands. & Supports a benchmark contract; does not turn silver or proxy labels into human gold. \\
 Repository-level reproduction is possible without committing raw data. & L0/L1 fixture rebuild, public-release scan, unit tests, and documented public-source commands. & Verifies code and schema behavior; full numerical reproduction requires L2/L3 source files or artifacts. \\
 Cluster-level quality is claimed only after pair-to-cluster audit. & \path{cluster_metric_summary}, \path{cannot_link_audit}, cluster assignments, cannot-link coverage, and cluster contamination rate. & Supports cluster-level quality claims only when the released artifact package includes these files with checksums; otherwise the claim remains pair-level. \\
@@ -644,7 +644,7 @@ Cluster-level quality is claimed only after pair-to-cluster audit. & \path{clust
 Claim class & Required support & Boundary not claimed \\
 \midrule
 Identity-agenda confusion is a concrete false-merge pathway. & Hard-negative false-merge rate on agenda-level silver pairs, compared with single-space scientific representation baselines. & A prevalence estimate for all scholarly corpora. \\
-IAD-Risk reduces risky automatic merges in the reported setting. & Held-out Open-v2 IAD-Risk predictions, thresholds, metric summaries, and checksums. & A broad method-ranking claim or a claim that every source distribution is covered. \\
+IAD-Risk supports targeted false-merge control in the reported setting. & Held-out Open-v2 IAD-Risk predictions, thresholds, metric summaries, and checksums. & A broad method-ranking claim or a claim that every source distribution is covered. \\
 IAD-Bench supports provenance-aware evaluation. & Pair schema fields for relation type, label source, label strength, provenance, split, and hard-negative level. & A claim that proxy or silver rows are human-gold labels. \\
 Repository-level reproduction is possible without committing raw data. & Public code, fixture tests, documented data-processing commands, manifest rules, and PDF build scripts. & Full numerical reproduction without public source files or a released artifact package. \\
 \bottomrule
