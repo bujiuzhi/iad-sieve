@@ -2340,6 +2340,9 @@ def test_check_contribution_evidence_summary_accepts_complete_summary() -> None:
         [
             r"\label{tab:contribution-evidence-summary}",
             "Contribution-evidence summary",
+            "The introduction requires conservative work identity decisions, not only retrieval-quality relatedness scores.",
+            "The root challenge is a decision-semantics gap.",
+            "A close pair can be merged, blocked, or deferred.",
             "Identity-agenda confusion as a scholarly deduplication failure mode.",
             "IAD-Bench as a provenance-aware pair contract.",
             "IAD-Risk as a risk-aware merge mechanism.",
@@ -2378,6 +2381,7 @@ def test_check_contribution_evidence_summary_rejects_missing_boundary() -> None:
     assert any("artifact-release audit claims remain outside the primary evidence" in error for error in errors)
     assert any("Open-v2 evidence snapshot" in error for error in errors)
     assert any("targeted pair-level conclusion" in error for error in errors)
+    assert any("decision-semantics gap" in error for error in errors)
     assert any("not a broad method-ranking claim" in error for error in errors)
 
 
@@ -6538,6 +6542,7 @@ def test_check_related_work_positioning_accepts_main_text_and_supplementary_matr
             "Neural entity matching",
             "Scientific document representations",
             "Open scholarly metadata benchmarks",
+            "The closest-work positioning makes the novelty boundary auditable.",
             "false-merge risk gates",
             "gold, proxy, and silver strata",
             "data-integration perspective",
@@ -6615,6 +6620,7 @@ def test_check_related_work_positioning_rejects_missing_novelty_boundaries() -> 
     assert any("not a replacement for end-to-end entity resolution workflows" in error for error in errors)
     assert any("not a comparative ranking over all neural matching methods" in error for error in errors)
     assert any("OpenAlex/OpenCitations silver evidence is human gold" in error for error in errors)
+    assert any("novelty boundary auditable" in error for error in errors)
 
 
 def test_check_data_processing_pipeline_document_accepts_reproducible_pipeline() -> None:

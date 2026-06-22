@@ -1238,6 +1238,9 @@ def check_contribution_evidence_summary(manuscript_text: str) -> list[str]:
     required_markers = [
         r"\label{tab:contribution-evidence-summary}",
         "Contribution-evidence summary",
+        "not only retrieval-quality relatedness scores",
+        "decision-semantics gap",
+        "merged, blocked, or deferred",
         "Identity-agenda confusion as a scholarly deduplication failure mode",
         "IAD-Bench as a provenance-aware pair contract",
         "IAD-Risk as a risk-aware merge mechanism",
@@ -6266,6 +6269,7 @@ def check_related_work_positioning(manuscript_text: str, supplementary_text: str
         "Neural entity matching",
         "Scientific document representations",
         "Open scholarly metadata benchmarks",
+        "novelty boundary auditable",
         "false-merge risk gates",
         "gold, proxy, and silver strata",
         "data-integration perspective",
