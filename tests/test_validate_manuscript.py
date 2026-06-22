@@ -8945,6 +8945,9 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "conservative pair-level conclusion",
             "scope-bounded mechanism evidence rather than as a same-scope comparative ranking",
             "ordinary FMR still reported separately as 0.001",
+            "RoBERTa pair-classifier row remains a strong supervised comparator",
+            "auditable relation-role and risk-gate design",
+            "broad pair-classifier superiority evidence",
             "cluster-level deployment quality, broad method ranking, and source-heldout generalization",
             "conclusion claim boundary, not new empirical evidence",
             "Conclusion preserves the same first-screen claim boundary as the abstract, cover letter, and highlights",
@@ -10060,6 +10063,9 @@ def test_check_reviewer_readiness_audit_rejects_missing_conclusion_claim_boundar
         "conservative pair-level conclusion",
         "scope-bounded mechanism evidence rather than as a same-scope comparative ranking",
         "ordinary FMR still reported separately as 0.001",
+        "RoBERTa pair-classifier row remains a strong supervised comparator",
+        "auditable relation-role and risk-gate design",
+        "broad pair-classifier superiority evidence",
         "cluster-level deployment quality, broad method ranking, and source-heldout generalization",
         "conclusion claim boundary, not new empirical evidence",
         "Conclusion preserves the same first-screen claim boundary as the abstract, cover letter, and highlights",
@@ -10072,6 +10078,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_conclusion_claim_boundar
     assert any("conclusion first-screen boundary alignment" in error for error in errors)
     assert any("conservative pair-level conclusion" in error for error in errors)
     assert any("scope-bounded mechanism evidence" in error for error in errors)
+    assert any("RoBERTa pair-classifier row remains a strong supervised comparator" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_submission_day_source_recheck_gate() -> None:
@@ -11341,6 +11348,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
             "The results support a conservative pair-level conclusion.",
             "The result includes HNFMR 0.790--0.999 and zero observed HNFMR in the held-out hard-negative stratum, with ordinary FMR still reported separately as 0.001.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
+            "The RoBERTa pair-classifier row remains a strong supervised comparator within the auditable relation-role and risk-gate design.",
             "The contribution includes a provenance-aware benchmark contract for reproducibility review.",
             "It does not claim cluster-level deployment quality without cluster artifacts.",
             "Additional validation is needed before broad method ranking.",
@@ -11425,6 +11433,34 @@ def test_check_editorial_claim_alignment_rejects_overbroad_effect_wording() -> N
     assert any("overbroad effect wording" in error and "main conclusion" in error for error in errors)
 
 
+def test_check_editorial_claim_alignment_rejects_conclusion_without_roberta_boundary() -> None:
+    """验证结论必须保留 RoBERTa 强监督基线边界。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = Path("manuscript/main.tex").read_text(encoding="utf-8")
+    manuscript_text = manuscript_text.replace(
+        "The RoBERTa pair-classifier row is part of this boundary: it remains a strong supervised comparator "
+        "that already controls many unsafe merges, so the IAD-Risk contribution is the auditable relation-role "
+        "and risk-gate design rather than a broad claim that every strong pair classifier is outperformed.",
+        "",
+    )
+    cover_letter_text = Path("manuscript/cover_letter.md").read_text(encoding="utf-8")
+    highlights_text = Path("manuscript/highlights.md").read_text(encoding="utf-8")
+    keywords_text = Path("manuscript/keywords.md").read_text(encoding="utf-8")
+    metadata_text = Path("manuscript/submission_metadata.yml").read_text(encoding="utf-8")
+
+    errors = module.check_editorial_claim_alignment(
+        manuscript_text,
+        cover_letter_text,
+        highlights_text,
+        keywords_text,
+        metadata_text,
+    )
+
+    assert any("main conclusion" in error and "RoBERTa pair-classifier row" in error for error in errors)
+    assert any("main conclusion" in error and "auditable relation-role and risk-gate design" in error for error in errors)
+
+
 def test_check_editorial_claim_alignment_rejects_over_broad_zero_hnfmr_scope() -> None:
     """验证首屏材料不能把 zero observed HNFMR 绑定到宽泛 held-out test scope。"""
 
@@ -11491,6 +11527,7 @@ def test_check_editorial_claim_alignment_rejects_abstract_without_scope_ranking_
             "The results support a conservative pair-level conclusion.",
             "The result includes HNFMR 0.790--0.999 and zero observed HNFMR, with ordinary FMR still reported separately as 0.001.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
+            "The RoBERTa pair-classifier row remains a strong supervised comparator within the auditable relation-role and risk-gate design.",
             "The contribution includes a provenance-aware benchmark contract for reproducibility review.",
             "It does not claim cluster-level deployment quality without cluster artifacts.",
             "Additional validation is needed before broad method ranking.",
@@ -11549,6 +11586,7 @@ def test_check_editorial_claim_alignment_rejects_abstract_without_pair_cluster_b
             "The results support a conservative pair-level conclusion.",
             "The result includes HNFMR 0.790--0.999 and zero observed HNFMR, with ordinary FMR still reported separately as 0.001.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
+            "The RoBERTa pair-classifier row remains a strong supervised comparator within the auditable relation-role and risk-gate design.",
             "The contribution includes a provenance-aware benchmark contract for reproducibility review.",
             "It does not claim cluster-level deployment quality without cluster artifacts.",
             "Additional validation is needed before broad method ranking.",
@@ -11619,6 +11657,7 @@ def test_check_editorial_claim_alignment_rejects_conclusion_without_cluster_boun
             "The results support a conservative pair-level conclusion.",
             "The result includes HNFMR 0.790--0.999 and zero observed HNFMR, with ordinary FMR still reported separately as 0.001.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
+            "The RoBERTa pair-classifier row remains a strong supervised comparator within the auditable relation-role and risk-gate design.",
             "The contribution includes a provenance-aware benchmark contract for reproducibility review.",
             "Additional validation is needed before broad method ranking.",
         ]
@@ -11693,6 +11732,7 @@ def test_check_editorial_claim_alignment_rejects_overbroad_reproducible_benchmar
             "The results support a conservative pair-level conclusion.",
             "The result includes HNFMR 0.790--0.999 and zero observed HNFMR in the held-out hard-negative stratum, with ordinary FMR still reported separately as 0.001.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
+            "The RoBERTa pair-classifier row remains a strong supervised comparator within the auditable relation-role and risk-gate design.",
             "The contribution includes a provenance-aware benchmark contract for reproducibility review.",
             "The contribution includes a reproducible benchmark contract.",
             "It does not claim cluster-level deployment quality without cluster artifacts.",
