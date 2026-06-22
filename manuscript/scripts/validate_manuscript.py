@@ -2327,7 +2327,7 @@ def check_pair_cluster_evidence_boundary(manuscript_text: str, supplementary_tex
     required_main_markers = [
         r"\subsection{Pair-to-Cluster Evidence Boundary}",
         "full pair-to-cluster evidence boundary table is reported in the supplementary material",
-        "pair-level metrics do not by themselves prove cluster-level deduplication quality",
+        "pair-level metrics do not by themselves establish cluster-level deduplication quality",
         "transitive merge propagation",
         "cannot-link violations",
         "cluster assignments",
@@ -2335,7 +2335,7 @@ def check_pair_cluster_evidence_boundary(manuscript_text: str, supplementary_tex
         "cluster_metric_summary",
         "cannot_link_audit",
         "cluster contamination rate",
-        "does not claim cluster-level contamination is eliminated",
+        "keeps cluster-level contamination claims outside the current evidence package",
     ]
     required_supplement_markers = [
         r"\section{Pair-to-Cluster Evidence Boundary}",
@@ -2361,6 +2361,20 @@ def check_pair_cluster_evidence_boundary(manuscript_text: str, supplementary_tex
         for marker in required_supplement_markers
         if marker not in evidence_text
     )
+    unsafe_elimination_phrases = [
+        "cluster-level contamination is eliminated",
+        "cluster-level contamination be eliminated",
+        "cluster-level contamination has been reduced or eliminated",
+        "proof that cluster-level contamination",
+    ]
+    for document_name, document_text in {
+        "main manuscript": manuscript_text,
+        "supplementary material": supplementary_text,
+    }.items():
+        lowered_text = document_text.lower()
+        for phrase in unsafe_elimination_phrases:
+            if phrase in lowered_text:
+                errors.append(f"pair-to-cluster evidence boundary uses over-strong elimination wording in {document_name}: {phrase}")
     return errors
 
 
@@ -6137,7 +6151,7 @@ def check_mechanism_evidence_boundary(manuscript_text: str, supplementary_text: 
         "Does topical relatedness create merge risk?",
         "Does explicit risk gating suppress hard-negative merges?",
         "Is the gain caused by each IAD-Risk component?",
-        "Can cluster-level contamination be eliminated?",
+        "What artifacts are needed for cluster-level contamination claims?",
     ]
     errors = [
         f"mechanism evidence boundary missing manuscript marker: {marker}"

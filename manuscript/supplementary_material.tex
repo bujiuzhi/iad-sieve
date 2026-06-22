@@ -490,7 +490,7 @@ cluster assignments & Released component or cluster ID for each evaluated record
 cannot-link violations & \path{cannot_link_audit} generated from the same merge decisions and identifier-conflict rules. & Needed before claiming that risk gates prevent transitive false merges. \\
 Cluster metric summary & \path{cluster_metric_summary} with cluster contamination rate, singleton rate, merge coverage, and conflict counts. & Needed before claiming cluster-level quality rather than pair-level risk control. \\
 Pair-to-cluster trace & Mapping from pair decisions, thresholds, and cannot-link flags to final components. & Required to audit whether a pair-level error changes a downstream cluster. \\
-Current manuscript claim & Pair-level F1, FMR, and HNFMR under fixed operating points. & The paper does not claim cluster-level contamination is eliminated. \\
+Current manuscript claim & Pair-level F1, FMR, and HNFMR under fixed operating points. & Cluster-level contamination claims remain outside the current evidence package. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -864,7 +864,7 @@ Threshold-stability claims should be tied to a released threshold-sensitivity gr
 
 Mechanism claims should be tied to explicit ablation outputs. The repository provides \emph{run-iad-ablation-suite} for comparing full IAD-Risk decisions with protocol variants that remove risk gating, agenda-non-identity blocking, single-space separation, cannot-link blocking, or replace the fixed operating point with a post-hoc threshold diagnostic. The summary files expose the manuscript-facing names in \texttt{protocol\_variant}; the post-hoc-threshold row is retained as a threshold-overfitting diagnostic and not as standalone causal evidence. Without those outputs, the main manuscript should keep the mechanism claim at the level of stratified HNFMR evidence rather than claiming a complete ablation study.
 
-Cluster-level claims should be tied to artifacts generated after the pair decisions are converted into connected components. A defensible package should include cluster assignments, a cluster metric summary, a cannot-link audit, and command logs for the merge policy. Without those outputs, pair-level FMR and HNFMR should not be interpreted as proof that cluster-level contamination has been reduced or eliminated.
+Cluster-level claims should be tied to artifacts generated after the pair decisions are converted into connected components. A defensible package should include cluster assignments, a cluster metric summary, a cannot-link audit, and command logs for the merge policy. Without those outputs, pair-level FMR and HNFMR should not be interpreted as evidence for cluster-level contamination reduction.
 
 \section{Claim Interpretation Boundary}
 
@@ -930,7 +930,7 @@ Mechanism question & Current evidence & Interpretation boundary \\
 Does topical relatedness create merge risk? & Representation baselines show high false-merge rates on OpenAlex silver hard negatives. & Supports a targeted failure mode, not a universal prevalence estimate. \\
 Does explicit risk gating suppress hard-negative merges? & IAD-Risk transformer variants keep low HNFMR under the reported Open-v2 split. & Supports the reported contract and thresholds; transfer must be rechecked on new source mixes. \\
 Is the gain caused by each IAD-Risk component? & The current manuscript reports mechanism-consistent HNFMR evidence. & A full causal claim requires protocol-variant outputs for no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold diagnostics. \\
-Can cluster-level contamination be eliminated? & The method supports cannot-link-aware constrained union-find. & Cluster-level contamination claims require sufficient cannot-link coverage and cluster-level artifact audits. \\
+What artifacts are needed for cluster-level contamination claims? & The method supports cannot-link-aware constrained union-find. & Cluster-level contamination claims require sufficient cannot-link coverage and cluster-level artifact audits. \\
 \bottomrule
 \end{tabular}
 \end{table}

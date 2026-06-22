@@ -3331,7 +3331,7 @@ def test_check_pair_cluster_evidence_boundary_accepts_supplementary_table() -> N
         [
             r"\subsection{Pair-to-Cluster Evidence Boundary}",
             "The full pair-to-cluster evidence boundary table is reported in the supplementary material.",
-            "pair-level metrics do not by themselves prove cluster-level deduplication quality.",
+            "pair-level metrics do not by themselves establish cluster-level deduplication quality.",
             "transitive merge propagation",
             "cannot-link violations",
             "cluster assignments",
@@ -3339,7 +3339,7 @@ def test_check_pair_cluster_evidence_boundary_accepts_supplementary_table() -> N
             "cluster_metric_summary",
             "cannot_link_audit",
             "cluster contamination rate",
-            "does not claim cluster-level contamination is eliminated",
+            "keeps cluster-level contamination claims outside the current evidence package",
         ]
     )
     supplementary_text = "\n".join(
@@ -3373,7 +3373,7 @@ def test_check_pair_cluster_evidence_boundary_rejects_missing_supplementary_tabl
         [
             r"\subsection{Pair-to-Cluster Evidence Boundary}",
             "The full pair-to-cluster evidence boundary table is reported in the supplementary material.",
-            "pair-level metrics do not by themselves prove cluster-level deduplication quality.",
+            "pair-level metrics do not by themselves establish cluster-level deduplication quality.",
             "transitive merge propagation",
             "cannot-link violations",
             "cluster assignments",
@@ -3381,7 +3381,7 @@ def test_check_pair_cluster_evidence_boundary_rejects_missing_supplementary_tabl
             "cluster_metric_summary",
             "cannot_link_audit",
             "cluster contamination rate",
-            "does not claim cluster-level contamination is eliminated",
+            "keeps cluster-level contamination claims outside the current evidence package",
         ]
     )
 
@@ -3389,6 +3389,51 @@ def test_check_pair_cluster_evidence_boundary_rejects_missing_supplementary_tabl
 
     assert any("pair-cluster-evidence-boundary" in error for error in errors)
     assert any("Pair-to-Cluster Evidence Boundary" in error for error in errors)
+
+
+def test_check_pair_cluster_evidence_boundary_rejects_elimination_wording() -> None:
+    """验证 pair-to-cluster 边界拒绝 cluster contamination 消除类表述。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_pair_cluster_evidence_boundary", None)
+    assert callable(checker)
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Pair-to-Cluster Evidence Boundary}",
+            "The full pair-to-cluster evidence boundary table is reported in the supplementary material.",
+            "pair-level metrics do not by themselves establish cluster-level deduplication quality.",
+            "transitive merge propagation",
+            "cannot-link violations",
+            "cluster assignments",
+            "pair-to-cluster trace files",
+            "cluster_metric_summary",
+            "cannot_link_audit",
+            "cluster contamination rate",
+            "The paper does not claim cluster-level contamination is eliminated.",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Pair-to-Cluster Evidence Boundary}",
+            r"\label{tab:pair-cluster-evidence-boundary}",
+            "Pair-to-cluster evidence boundary.",
+            "Evidence item",
+            "Required artifact source",
+            "Interpretation boundary",
+            "cluster assignments",
+            "cannot-link violations",
+            "Cluster metric summary",
+            "Pair-to-cluster trace",
+            "cluster contamination rate",
+            "Without outputs, pair-level metrics are not proof that cluster-level contamination has been reduced or eliminated.",
+        ]
+    )
+
+    errors = checker(manuscript_text, supplementary_text)
+
+    assert any("over-strong elimination wording" in error for error in errors)
+    assert any("main manuscript" in error for error in errors)
+    assert any("supplementary material" in error for error in errors)
 
 
 def test_check_error_taxonomy_accepts_supplementary_table() -> None:
@@ -3481,7 +3526,7 @@ def test_check_mechanism_evidence_boundary_accepts_supplementary_table() -> None
             "Does topical relatedness create merge risk?",
             "Does explicit risk gating suppress hard-negative merges?",
             "Is the gain caused by each IAD-Risk component?",
-            "Can cluster-level contamination be eliminated?",
+            "What artifacts are needed for cluster-level contamination claims?",
         ]
     )
 
