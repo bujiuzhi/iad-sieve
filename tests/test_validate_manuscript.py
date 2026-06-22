@@ -7201,8 +7201,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Readiness Summary",
-            "Readiness gates covered: 138.",
-            "Highest current reviewer-facing risks are tracked as a risk inventory rather than a claim that every gate is currently failing: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, DKE author identity material cardinality drift, DKE photograph file-format drift, Git-only CLI discovery drift, DKE research-data statement drift, data-processing command implementation-map drift, manuscript product-boundary table drift, Elsevier competing-interest declaration file traceability, introduction contribution first-screen alignment, conclusion first-screen boundary alignment, main-result strong-baseline interpretation drift, submission-day official-source drift, processing-run-log schema bypass, process-note vocabulary bypass, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, pre-submission cover-letter declaration boundary, preflight metadata declaration placeholders, anonymous review-file declaration boundary, introduction row-scope comparison overread, main-result operating-point overread, figure metric-scope overread, cover-letter Git-only reproduction boundary, Q2/B ranking evidence packet traceability, public documentation index drift, local submission-package artifact tracking drift, DKE/Elsevier draft abstract-length drift, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, ANI threshold notation drift, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final cover-letter preflight wording gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, latex-engine panic diagnostic gap, and stronger evidence gates.",
+            "Readiness gates covered: 139.",
+            "Highest current reviewer-facing risks are tracked as a risk inventory rather than a claim that every gate is currently failing: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, DKE author identity material cardinality drift, DKE photograph file-format drift, Git-only CLI discovery drift, DKE research-data statement drift, data-processing command implementation-map drift, manuscript product-boundary table drift, Elsevier competing-interest declaration file traceability, introduction contribution first-screen alignment, conclusion first-screen boundary alignment, main-result strong-baseline interpretation drift, abstract strong-baseline interpretation drift, submission-day official-source drift, processing-run-log schema bypass, process-note vocabulary bypass, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, pre-submission cover-letter declaration boundary, preflight metadata declaration placeholders, anonymous review-file declaration boundary, introduction row-scope comparison overread, main-result operating-point overread, figure metric-scope overread, cover-letter Git-only reproduction boundary, Q2/B ranking evidence packet traceability, public documentation index drift, local submission-package artifact tracking drift, DKE/Elsevier draft abstract-length drift, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, ANI threshold notation drift, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final cover-letter preflight wording gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, latex-engine panic diagnostic gap, and stronger evidence gates.",
             "External final-upload blockers cannot be resolved from the repository alone.",
             "Local gates currently controlled by validators must still be rerun after source or package edits.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
@@ -8027,7 +8027,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "metadata fit",
             "not stronger evidence",
             "## Readiness Gate 96: DKE Abstract-Length Gate",
-            "current abstract is 219 words",
+            "current abstract is 242 words",
             "250-word DKE preflight limit",
             "abstract-length compliance",
             "not writing quality or scientific evidence",
@@ -8386,6 +8386,12 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "fixed risk gate decides whether a related pair may merge, block, or defer",
             "does not convert held-out IAD-Risk rows and full-scope RoBERTa rows into a same-scope comparative ranking",
             "same-scope prediction files, threshold logs, bootstrap intervals, and checksums",
+            "## Readiness Gate 139: Abstract Strong-Baseline First-Screen Gate",
+            "abstract strong-baseline first-screen alignment",
+            "abstract could still present the Open-v2 evidence as a two-way contrast",
+            "RoBERTa pair-classifier row remains a strong supervised comparator",
+            "not broad-superiority evidence",
+            "abstract first-screen fairness, not new empirical evidence",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             r"Method threshold notation uses `\tau_n` for the ANI risk-head threshold",
@@ -8402,6 +8408,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "`docs/data-processing-pipeline.md` keeps a command-to-source map",
             "`manuscript/README.md` and `manuscript/MANIFEST.md` keep a product-boundary table",
             "Main-result, conclusion, cover-letter, and reviewer-response wording keep RoBERTa pair classification as a strong supervised baseline",
+            "The abstract states that the RoBERTa pair-classifier row remains a strong supervised comparator",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
         ]
     )
@@ -8418,7 +8425,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Readiness Summary",
-        "Readiness gates covered: 138",
+        "Readiness gates covered: 139",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -8429,7 +8436,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Readiness Summary" in error for error in errors)
-    assert any("Readiness gates covered: 138" in error for error in errors)
+    assert any("Readiness gates covered: 139" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -9719,6 +9726,30 @@ def test_check_reviewer_readiness_audit_rejects_missing_main_result_strong_basel
     assert any("same-scope comparative ranking" in error for error in errors)
 
 
+def test_check_reviewer_readiness_audit_rejects_missing_abstract_strong_baseline_gate() -> None:
+    """验证审稿准备度审计必须覆盖摘要强基线第一屏门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Readiness Gate 139: Abstract Strong-Baseline First-Screen Gate",
+        "abstract strong-baseline interpretation drift",
+        "abstract strong-baseline first-screen alignment",
+        "abstract could still present the Open-v2 evidence as a two-way contrast",
+        "RoBERTa pair-classifier row remains a strong supervised comparator",
+        "not broad-superiority evidence",
+        "abstract first-screen fairness, not new empirical evidence",
+        "The abstract states that the RoBERTa pair-classifier row remains a strong supervised comparator",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Abstract Strong-Baseline First-Screen Gate" in error for error in errors)
+    assert any("abstract strong-baseline interpretation drift" in error for error in errors)
+    assert any("RoBERTa pair-classifier row remains a strong supervised comparator" in error for error in errors)
+
+
 def test_check_reviewer_readiness_audit_rejects_missing_fixture_evidence_isolation_gate() -> None:
     """验证审稿准备度审计必须隔离测试夹具和真实投稿证据。"""
 
@@ -10267,6 +10298,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
             "It exposes identity, agenda, and agenda-non-identity signals.",
             "It evaluates IAD-Bench under an Open-v2 evidence snapshot.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
+            "The RoBERTa pair-classifier row remains a strong supervised comparator and is not broad-superiority evidence.",
             "The results include HNFMR 0.790--0.999 and zero observed HNFMR, with ordinary FMR still reported separately as 0.001.",
             "The results support a conservative pair-level conclusion.",
             "Cluster-level quality claims require cluster artifacts before broad method-ranking claims.",
