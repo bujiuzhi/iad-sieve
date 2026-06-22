@@ -142,7 +142,7 @@ The anonymous package hygiene gate checks that generated submission packages exc
 
 Outcome: pass for template-independent first-screen claim alignment; must be repeated after journal-specific edits.
 
-The editorial desk check compares the title, abstract, conclusion, cover letter, highlights, and keywords against the same core story: IAD-Risk addresses identity-agenda confusion in scholarly work deduplication; IAD-Bench separates gold, proxy, and silver evidence; the Open-v2 evidence snapshot supports targeted false-merge suppression; and the paper does not claim broad method ranking, statistical superiority, threshold stability, cluster-level deployment quality, or human-gold validation. This keeps the editorial claim alignment consistent before the manuscript reaches external review.
+The editorial desk check compares the title, abstract, conclusion, cover letter, highlights, and keywords against the same core story: IAD-Risk addresses identity-agenda confusion in scholarly work deduplication; IAD-Bench separates gold, proxy, and silver evidence; the Open-v2 evidence snapshot supports targeted pair-level false-merge control; and the paper does not claim broad method ranking, statistical superiority, threshold stability, cluster-level deployment quality, or human-gold validation. This keeps the editorial claim alignment consistent before the manuscript reaches external review.
 
 ## Readiness Gate 6: Reviewer Rebuttal Boundary
 

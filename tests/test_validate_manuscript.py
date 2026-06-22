@@ -10912,7 +10912,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
             r"\end{abstract}",
             r"\section{Conclusion}",
             "IAD-Risk addresses a specific failure mode by separating identity and agenda evidence.",
-            "It uses false-merge risk and supports targeted false-merge suppression.",
+            "It uses false-merge risk and supports targeted pair-level false-merge control.",
             "The results support a conservative pair-level conclusion.",
             "The result includes HNFMR 0.790--0.999 and zero observed HNFMR in the held-out hard-negative stratum, with ordinary FMR still reported separately as 0.001.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
@@ -10968,6 +10968,36 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
     )
 
     assert errors == []
+
+
+def test_check_editorial_claim_alignment_rejects_overbroad_effect_wording() -> None:
+    """验证首屏摘要和结论不能使用过宽效果动词。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = Path("manuscript/main.tex").read_text(encoding="utf-8")
+    manuscript_text = manuscript_text.replace(
+        "identity-agenda disentanglement supports targeted pair-level false-merge control",
+        "identity-agenda disentanglement can reduce risky automatic merges",
+    )
+    manuscript_text = manuscript_text.replace(
+        "identity-agenda disentanglement provides targeted pair-level false-merge control",
+        "identity-agenda disentanglement can reduce risky automatic merges",
+    )
+    cover_letter_text = Path("manuscript/cover_letter.md").read_text(encoding="utf-8")
+    highlights_text = Path("manuscript/highlights.md").read_text(encoding="utf-8")
+    keywords_text = Path("manuscript/keywords.md").read_text(encoding="utf-8")
+    metadata_text = Path("manuscript/submission_metadata.yml").read_text(encoding="utf-8")
+
+    errors = module.check_editorial_claim_alignment(
+        manuscript_text,
+        cover_letter_text,
+        highlights_text,
+        keywords_text,
+        metadata_text,
+    )
+
+    assert any("overbroad effect wording" in error and "main abstract" in error for error in errors)
+    assert any("overbroad effect wording" in error and "main conclusion" in error for error in errors)
 
 
 def test_check_editorial_claim_alignment_rejects_over_broad_zero_hnfmr_scope() -> None:
@@ -11032,7 +11062,7 @@ def test_check_editorial_claim_alignment_rejects_abstract_without_scope_ranking_
             r"\end{abstract}",
             r"\section{Conclusion}",
             "IAD-Risk addresses a specific failure mode by separating identity and agenda evidence.",
-            "It uses false-merge risk and supports targeted false-merge suppression.",
+            "It uses false-merge risk and supports targeted pair-level false-merge control.",
             "The results support a conservative pair-level conclusion.",
             "The result includes HNFMR 0.790--0.999 and zero observed HNFMR, with ordinary FMR still reported separately as 0.001.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
@@ -11090,7 +11120,7 @@ def test_check_editorial_claim_alignment_rejects_abstract_without_pair_cluster_b
             r"\end{abstract}",
             r"\section{Conclusion}",
             "IAD-Risk addresses a specific failure mode by separating identity and agenda evidence.",
-            "It uses false-merge risk and supports targeted false-merge suppression.",
+            "It uses false-merge risk and supports targeted pair-level false-merge control.",
             "The results support a conservative pair-level conclusion.",
             "The result includes HNFMR 0.790--0.999 and zero observed HNFMR, with ordinary FMR still reported separately as 0.001.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
@@ -11160,7 +11190,7 @@ def test_check_editorial_claim_alignment_rejects_conclusion_without_cluster_boun
             r"\end{abstract}",
             r"\section{Conclusion}",
             "IAD-Risk addresses a specific failure mode by separating identity and agenda evidence.",
-            "It uses false-merge risk and supports targeted false-merge suppression.",
+            "It uses false-merge risk and supports targeted pair-level false-merge control.",
             "The results support a conservative pair-level conclusion.",
             "The result includes HNFMR 0.790--0.999 and zero observed HNFMR, with ordinary FMR still reported separately as 0.001.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
@@ -11234,7 +11264,7 @@ def test_check_editorial_claim_alignment_rejects_overbroad_reproducible_benchmar
             r"\end{abstract}",
             r"\section{Conclusion}",
             "IAD-Risk addresses a specific failure mode by separating identity and agenda evidence.",
-            "It uses false-merge risk and supports targeted false-merge suppression.",
+            "It uses false-merge risk and supports targeted pair-level false-merge control.",
             "The results support a conservative pair-level conclusion.",
             "The result includes HNFMR 0.790--0.999 and zero observed HNFMR in the held-out hard-negative stratum, with ordinary FMR still reported separately as 0.001.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",

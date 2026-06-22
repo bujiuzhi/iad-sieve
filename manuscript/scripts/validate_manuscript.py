@@ -6812,7 +6812,7 @@ def check_editorial_claim_alignment(
                 "identity and agenda evidence",
                 "false-merge risk",
                 "pair-level conclusion",
-                "targeted false-merge suppression",
+                "targeted pair-level false-merge control",
                 "HNFMR 0.790--0.999",
                 "zero observed HNFMR",
                 "held-out hard-negative stratum",
@@ -6897,6 +6897,16 @@ def check_editorial_claim_alignment(
         for phrase in unsafe_zero_hnfmr_scope_phrases:
             if phrase.lower() in document_text.lower():
                 errors.append(f"editorial claim alignment uses over-broad HNFMR scope in {document_name}: {phrase}")
+    overbroad_effect_phrases = [
+        "can reduce risky automatic merges",
+    ]
+    for phrase in overbroad_effect_phrases:
+        for document_name, document_text in {
+            "main abstract": abstract_text,
+            "main conclusion": conclusion_text,
+        }.items():
+            if phrase.lower() in document_text.lower():
+                errors.append(f"editorial claim alignment uses overbroad effect wording in {document_name}: {phrase}")
     overbroad_reproducibility_phrases = [
         "reproducible benchmark contract",
     ]
