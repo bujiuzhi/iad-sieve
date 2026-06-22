@@ -626,6 +626,8 @@ The installable package source is under \path{src/iad_sieve}; \path{pyproject.to
 
 After installation, the reproducibility entry points include CLI commands for DeepMatcher conversion, proximity conversion in the SciRepEval style, weak-label construction from \mbox{OpenAlex} and OpenCitations, IAD-Bench assembly, stratification checks, source-bias diagnostics, baseline execution, IAD-Risk training, bootstrap analysis, and manuscript PDF generation.
 
+The public-source reconstruction chain is documented as \texttt{prepare-deepmatcher}, \texttt{prepare-scirepeval-proximity}, \texttt{fetch-openalex-works}, \texttt{prepare-openalex-weak-labels}, and \texttt{build-iad-bench}; these commands write schema-bound JSONL and summary outputs rather than raw-data copies.
+
 Raw third-party data are not redistributed in the repository because the original sources have their own access conditions and licenses.
 
 The repository instead provides data-processing commands, schema contracts, fixture tests, and artifact-release guidance so that independent readers can reproduce the benchmark construction from public sources and verify generated artifacts through manifests, checksums, command logs, and fixed commit identifiers.
