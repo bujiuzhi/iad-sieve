@@ -134,6 +134,14 @@ ARTICLE_TYPE_COVER_LETTER_MARKERS = {
 FINAL_UPLOAD_ARTICLE_TYPES = set(ARTICLE_TYPE_COVER_LETTER_MARKERS)
 DKE_EDITABLE_BIOGRAPHY_EXTENSIONS = {".doc", ".docx", ".rtf", ".txt", ".md", ".tex"}
 ELSEVIER_DECLARATION_FILE_EXTENSIONS = {".doc", ".docx"}
+FINAL_UPLOAD_COVER_LETTER_UNRESOLVED_MARKERS = {
+    "anonymous draft cover letter": "cover letter still describes an anonymous draft",
+    "anonymous preflight": "cover letter still describes an anonymous preflight package",
+    "preflight cover letter": "cover letter still describes a preflight cover letter",
+    "submission-planning boundaries": "cover letter still describes submission-planning boundaries",
+    "scope-fit note is preparatory": "cover letter still contains a preparatory scope-fit note",
+    "must be replaced after author confirmation": "cover letter still contains replacement instructions",
+}
 
 
 def strip_yaml_value(value: str) -> str:
@@ -1154,6 +1162,9 @@ def check_final_upload_cover_letter_text(cover_letter_text: str, metadata_text: 
     if re.search(r"(?im)^\s*anonymous\s+authors?\s*[,.:;-]?\s*$", cover_letter_text):
         errors.append("final upload cover letter unresolved: cover letter still uses anonymous author signature")
     lowered_text = cover_letter_text.lower()
+    for marker, message in FINAL_UPLOAD_COVER_LETTER_UNRESOLVED_MARKERS.items():
+        if marker in lowered_text:
+            errors.append(f"final upload cover letter unresolved: {message}")
     if "artifact release" not in lowered_text and "artifact url" not in lowered_text and "artifact doi" not in lowered_text:
         errors.append("final upload cover letter unresolved: cover letter missing artifact release boundary")
     artifact_row = parse_mapping_section(metadata_text, "artifact_boundary")

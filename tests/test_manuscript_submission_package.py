@@ -363,6 +363,40 @@ def _write_final_upload_cover_letter(manuscript_root: Path) -> None:
     )
 
 
+def _write_preflight_wording_final_upload_cover_letter(manuscript_root: Path) -> None:
+    """写入残留匿名预投稿语义的正式上传投稿信。
+
+    参数:
+        manuscript_root: 临时稿件目录。
+
+    返回:
+        无。
+    """
+    _write_file(
+        manuscript_root / "cover_letter.md",
+        "\n".join(
+            [
+                "# Cover Letter",
+                "",
+                "Dear Editors of Journal of Scholarly Data,",
+                "",
+                "We submit the manuscript titled "
+                '"IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication" '
+                "for consideration as a research article in Journal of Scholarly Data.",
+                "This anonymous draft cover letter records only submission-planning boundaries.",
+                "The scope-fit note is preparatory and must be replaced after author confirmation.",
+                "The artifact release is available at https://doi.org/10.0000/example "
+                "with DOI 10.0000/example and supports result-level review.",
+                "",
+                "Sincerely,",
+                "",
+                "Example Author",
+            ]
+        )
+        + "\n",
+    )
+
+
 def _write_dke_final_upload_metadata(manuscript_root: Path) -> None:
     """写入满足 DKE 正式上传门禁的投稿元数据。
 
@@ -1166,6 +1200,27 @@ def test_build_submission_package_rejects_generic_final_upload_cover_letter(tmp_
     assert "cover letter missing artifact release boundary" in message
 
 
+def test_build_submission_package_rejects_preflight_wording_final_upload_cover_letter(tmp_path) -> None:
+    """验证正式上传构建器拒绝残留匿名预投稿说明的投稿信。"""
+
+    module = _load_submission_package_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_final_upload_metadata(manuscript_root)
+    _write_preflight_wording_final_upload_cover_letter(manuscript_root)
+
+    with pytest.raises(ValueError) as exc_info:
+        module.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True)
+
+    message = str(exc_info.value)
+    assert "anonymous draft" in message
+    assert "submission-planning boundaries" in message
+    assert "preparatory scope-fit note" in message
+    assert "replacement instructions" in message
+
+
 def test_build_submission_package_rejects_malformed_final_upload_metadata(tmp_path) -> None:
     """验证投稿包生成器拒绝结构不完整的正式上传元数据。"""
 
@@ -1958,6 +2013,27 @@ def test_validate_submission_package_rejects_generic_final_upload_cover_letter(t
 
     assert any("cover letter missing target journal" in error for error in errors)
     assert any("cover letter missing artifact release boundary" in error for error in errors)
+
+
+def test_validate_submission_package_rejects_preflight_wording_final_upload_cover_letter(tmp_path) -> None:
+    """验证正式上传校验器拒绝残留匿名预投稿说明的投稿信。"""
+
+    builder = _load_submission_package_module()
+    validator = _load_submission_validator_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_final_upload_metadata(manuscript_root)
+    _write_preflight_wording_final_upload_cover_letter(manuscript_root)
+
+    builder.build_submission_package(manuscript_root, output_dir, zip_path)
+    errors = validator.validate_submission_package(output_dir, zip_path, final_upload=True)
+
+    assert any("anonymous draft" in error for error in errors)
+    assert any("submission-planning boundaries" in error for error in errors)
+    assert any("preparatory scope-fit note" in error for error in errors)
+    assert any("replacement instructions" in error for error in errors)
 
 
 def test_validate_submission_package_rejects_malformed_final_upload_metadata(tmp_path) -> None:

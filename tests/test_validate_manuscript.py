@@ -6529,8 +6529,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Readiness Summary",
-            "Readiness gates covered: 123.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, Elsevier competing-interest declaration file traceability, introduction contribution first-screen alignment, conclusion first-screen boundary alignment, submission-day official-source drift, processing-run-log schema bypass, process-note vocabulary bypass, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, ANI threshold notation drift, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, latex-engine panic diagnostic gap, and stronger evidence gates.",
+            "Readiness gates covered: 124.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, Elsevier competing-interest declaration file traceability, introduction contribution first-screen alignment, conclusion first-screen boundary alignment, submission-day official-source drift, processing-run-log schema bypass, process-note vocabulary bypass, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, ANI threshold notation drift, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final cover-letter preflight wording gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, latex-engine panic diagnostic gap, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, Elsevier competing-interest declaration file generated by the declarations tool, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -7559,9 +7559,21 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "method-symbol clarity, not new empirical evidence",
             "does not alter the Open-v2 evidence",
             "Future method edits must keep `main.tex`, `supplementary_material.tex`, the Elsevier preview source, and PDF outputs synchronized",
+            "## Readiness Gate 124: Final Cover-Letter Preflight-Wording Gate",
+            "final-upload cover-letter preflight-wording rejection coverage",
+            r"`anonymous draft cover letter`",
+            r"`anonymous preflight`",
+            r"`preflight cover letter`",
+            r"`submission-planning boundaries`",
+            r"`scope-fit note is preparatory`",
+            r"`must be replaced after author confirmation`",
+            "upload-material finality, not scientific evidence",
+            "The anonymous cover letter may still record planning boundaries for preflight checks",
+            "completed author-approved submission letter",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             r"Method threshold notation uses `\tau_n` for the ANI risk-head threshold",
+            "The final-upload cover letter contains no anonymous preflight wording",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
         ]
     )
@@ -7578,7 +7590,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Readiness Summary",
-        "Readiness gates covered: 123",
+        "Readiness gates covered: 124",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -7589,7 +7601,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Readiness Summary" in error for error in errors)
-    assert any("Readiness gates covered: 123" in error for error in errors)
+    assert any("Readiness gates covered: 124" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -8459,6 +8471,37 @@ def test_check_reviewer_readiness_audit_rejects_missing_ani_threshold_notation_g
     assert any("ANI threshold notation drift" in error for error in errors)
     assert any("agenda-non-identity risk-head threshold" in error for error in errors)
     assert any("ambiguous `\\tau_a` notation" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_cover_letter_preflight_wording_gate() -> None:
+    """验证审稿准备度审计必须覆盖投稿信预投稿语义门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Readiness Gate 124: Final Cover-Letter Preflight-Wording Gate",
+        "final cover-letter preflight wording gap",
+        "final-upload cover-letter preflight-wording rejection coverage",
+        r"`anonymous draft cover letter`",
+        r"`anonymous preflight`",
+        r"`preflight cover letter`",
+        r"`submission-planning boundaries`",
+        r"`scope-fit note is preparatory`",
+        r"`must be replaced after author confirmation`",
+        "upload-material finality, not scientific evidence",
+        "The anonymous cover letter may still record planning boundaries for preflight checks",
+        "completed author-approved submission letter",
+        "The final-upload cover letter contains no anonymous preflight wording",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Final Cover-Letter Preflight-Wording Gate" in error for error in errors)
+    assert any("final cover-letter preflight wording gap" in error for error in errors)
+    assert any("anonymous draft cover letter" in error for error in errors)
+    assert any("submission-planning boundaries" in error for error in errors)
+    assert any("upload-material finality" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_fixture_evidence_isolation_gate() -> None:
@@ -11673,6 +11716,42 @@ def test_check_final_upload_cover_letter_rejects_case_variant_generic_cover_lett
 
     assert any("generic editor greeting" in error for error in errors)
     assert any("anonymous author signature" in error for error in errors)
+
+
+def test_check_final_upload_cover_letter_rejects_preflight_planning_text() -> None:
+    """验证 final-upload 门禁拒绝残留匿名预投稿说明。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = "\n".join(
+        [
+            'target_journal: "Data & Knowledge Engineering"',
+            'article_type: "research_article"',
+            "corresponding_author:",
+            '  name: "Corresponding Author"',
+            "artifact_boundary:",
+            '  artifact_release_url: "https://doi.org/10.0000/iad-risk-artifact"',
+            '  artifact_release_doi: "10.0000/iad-risk-artifact"',
+        ]
+    )
+    cover_letter_text = "\n".join(
+        [
+            "Dear Data & Knowledge Engineering Editors,",
+            "We submit the manuscript as a research article in Data & Knowledge Engineering.",
+            "The artifact release is available at https://doi.org/10.0000/iad-risk-artifact.",
+            "This anonymous draft cover letter records only submission-planning boundaries.",
+            "The scope-fit note is preparatory and must be replaced after author confirmation.",
+            "Corresponding Author is the corresponding author for this submission.",
+            "Sincerely,",
+            "Corresponding Author",
+        ]
+    )
+
+    errors = module.check_final_upload_cover_letter(cover_letter_text, metadata_text)
+
+    assert any("anonymous draft" in error for error in errors)
+    assert any("submission-planning boundaries" in error for error in errors)
+    assert any("preparatory scope-fit note" in error for error in errors)
+    assert any("replacement instructions" in error for error in errors)
 
 
 def test_check_final_upload_cover_letter_accepts_complete_targeted_letter() -> None:
