@@ -487,7 +487,7 @@ The complete row-family artifact crosswalk is reported in the supplementary mate
 
 \subsection{Main Open-v2 Results}
 
-The Scope type column is part of the result interpretation: full Open-v2 rows and held-out test rows support a mechanism comparison, not a cross-row ranking.
+Table~\ref{tab:openv2-results} should be read in three passes. First, the representation rows test whether single-space scientific relatedness can become unsafe merge evidence. Second, the RoBERTa pair classifier provides a strong supervised comparator showing that pair classification already reduces many unsafe merges. Third, the IAD-Risk rows test whether explicit identity, agenda, and agenda-non-identity signals can preserve same-work F1 while blocking agenda hard negatives under the held-out test scope. The Scope type column is part of this result interpretation: full Open-v2 rows and held-out test rows support a mechanism comparison, not a cross-row ranking.
 
 The IAD-Risk rows also use a fixed operating point. Unless an artifact row records a validation-selected override, $\tau_w$, $\tau_n$, and $\tau_r$ are treated as predeclared default thresholds rather than as thresholds optimized on the reported test rows. This convention makes the decision rule auditable, but it is not evidence that the default thresholds are optimal or stable across source mixtures. Threshold-stability or model-ranking claims require released threshold-selection logs, threshold-sensitivity grids, prediction files, and checksums generated from the same row scope.
 
