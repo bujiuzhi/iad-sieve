@@ -117,7 +117,7 @@ Failure pathway & Design response & Remaining boundary \\
 Topically close papers receive high semantic similarity. & Separate agenda evidence from identity evidence before the merge gate. & Requires the benchmark to include agenda-level hard negatives. \\
 Silver metadata is treated as if it were human gold. & Preserve label strength and provenance, and mask supervision by valid label source. & Silver labels support stress testing, not exhaustive truth claims. \\
 Pairwise errors contaminate clusters through transitivity. & Apply risk gating before constrained union-find and respect cannot-link evidence. & Cluster-level claims require sufficient cannot-link coverage and cluster-level artifact audits. \\
-Thresholds turn a classifier into an unsafe automatic merger. & Expose work, ANI, and risk thresholds and evaluate held-out merge decisions. & Threshold transfer should be rechecked under new source distributions. \\
+Thresholds turn a classifier into an unsafe automatic merger. & Expose work, agenda-non-identity, and risk thresholds and evaluate held-out merge decisions. & Threshold transfer should be rechecked under new source distributions. \\
 Proxy labels are over-interpreted. & Keep proxy rows separate unless the label source supports the relation being evaluated. & Proxy rows remain non-human evidence even when reproducible. \\
 \bottomrule
 \end{tabular}
@@ -133,7 +133,7 @@ Proxy labels are over-interpreted. & Keep proxy rows separate unless the label s
 \toprule
 Design element & Design rationale & Boundary \\
 \midrule
-$p_{\mathrm{ani}}$ term & Directly represents evidence that a related pair is not the same work. & Requires valid ANI supervision or artifact-backed hard-negative evidence. \\
+$p_{\mathrm{ani}}$ term & Directly represents evidence that a related pair is not the same work. & Requires valid agenda-non-identity supervision or artifact-backed hard-negative evidence. \\
 $p_{\mathrm{agenda}}(1-p_{\mathrm{work}})$ term & Flags pairs that are topically related but lack corresponding identity support. & It is not a calibrated probability unless validated against held-out artifacts. \\
 Max operator & Makes either risk pathway sufficient to block a merge. & Conservative blocking can increase deferrals and must be tuned to the application. \\
 Threshold gate & Converts the risk proxy into a merge, block, or defer decision. & Threshold transfer must be rechecked under new source distributions. \\
@@ -173,7 +173,7 @@ Head or stage & Main input fields & Supervision or calculation & Output role \\
 \midrule
 Identity head & Transformer distances, title similarity, author overlap, first-author match, venue similarity, year match, DOI/arXiv/OpenAlex identifier agreement. & Same-work labels from valid identity evidence, with provenance-aware masking. & Estimates $p_{\mathrm{work}}$ as positive merge evidence. \\
 Agenda head & Transformer cosine, title and venue similarity, OpenAlex-style topic overlap, reference Jaccard similarity, year-distance score. & Same-agenda proxy or silver evidence when the source supports agenda relatedness. & Estimates $p_{\mathrm{agenda}}$ as relatedness evidence, not direct merge evidence. \\
-ANI risk head & Transformer distances, title and author signals, topic overlap, reference overlap, year conflict, identifier agreement, and different-identifier conflicts. & Agenda-non-identity hard negatives from valid hard-negative sources. & Estimates $p_{\mathrm{ani}}$ as direct blocking evidence. \\
+Agenda-non-identity risk head & Transformer distances, title and author signals, topic overlap, reference overlap, year conflict, identifier agreement, and different-identifier conflicts. & Agenda-non-identity hard negatives from valid hard-negative sources. & Estimates $p_{\mathrm{ani}}$ as direct blocking evidence. \\
 Risk gate & $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, $p_{\mathrm{ani}}$, $\tau_w$, $\tau_n$, $\tau_r$, and cannot-link flags. & Computes $p_{\mathrm{risk}}=\max\{p_{\mathrm{ani}},p_{\mathrm{agenda}}(1-p_{\mathrm{work}})\}$. & Emits merge, block, or defer decisions. \\
 Audit metadata & Pair ID, source pair ID, label strength, label source, provenance, split, and hard-negative level. & Copied from pair records and result artifacts. & Supports artifact review; it is not a training feature. \\
 \bottomrule
@@ -211,7 +211,7 @@ Metric export & Count same-work F1, FMR, HNFMR, coverage, block rate, and defer 
 Step & Operation & Required inputs or outputs & Audit role \\
 \midrule
 1 & Load a candidate pair and schema metadata. & Pair ID, document IDs, label strength, provenance, split, and hard-negative level. & Fixes row identity before scoring. \\
-2 & Build feature groups without using audit metadata as predictors. & Identity, agenda, ANI, and cannot-link feature groups. & Prevents provenance or split leakage. \\
+2 & Build feature groups without using audit metadata as predictors. & Identity, agenda, agenda-non-identity, and cannot-link feature groups. & Prevents provenance or split leakage. \\
 3 & Predict relation heads. & $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, and $p_{\mathrm{ani}}$. & Records interpretable relation evidence. \\
 4 & Compute derived false-merge risk. & $p_{\mathrm{risk}}=\max\{p_{\mathrm{ani}},p_{\mathrm{agenda}}(1-p_{\mathrm{work}})\}$. & Makes the blocking score reproducible. \\
 5 & Apply the merge gate and cannot-link evidence. & $\tau_w$, $\tau_n$, $\tau_r$, cannot-link flag, and threshold source. & Emits merge, block, or defer under a fixed operating point. \\
@@ -230,7 +230,7 @@ Step & Operation & Required inputs or outputs & Audit role \\
 \toprule
 Operational item & Required practice & Net-benefit boundary \\
 \midrule
-Model complexity & Train and audit same-work, same-agenda, and ANI heads under one pair schema. & The net benefit is strongest in high-stakes scholarly indexes where false merges are costly. \\
+Model complexity & Train and audit same-work, same-agenda, and agenda-non-identity heads under one pair schema. & The net benefit is strongest in high-stakes scholarly indexes where false merges are costly. \\
 Threshold governance & Select shared thresholds on validation evidence and record them in artifacts. & Thresholds are not tuned per pair or changed after test inspection. \\
 Deferral policy & Record the deferral budget and manual-review capacity before deployment. & A high defer rate is acceptable only when review capacity exists. \\
 Automation claim & Compare automatic merge coverage, block rate, defer rate, and manual-review capacity under the predeclared operating point. & Without workload evidence, the method should be interpreted as a conservative safety filter rather than as a throughput-improving pipeline. \\
@@ -664,7 +664,7 @@ Result row family & Directly supported reading & Unsupported reading \\
 \midrule
 Representation baselines & The representation rows test false-merge exposure when one-space scientific relatedness is used as merge evidence. & They do not define the best possible representation-threshold system under a fully tuned, same-scope comparative ranking. \\
 RoBERTa pair classifier & The RoBERTa row is a strong supervised comparator that shows pair classification can suppress many hard-negative merges. & It is not a component-level explanation of identity-agenda risk control. \\
-IAD-Risk transformer variants & The IAD-Risk rows test split-held-out risk gating with explicit identity, agenda, and ANI signals. & The rows are not a claim of broad method superiority without same-scope predictions, intervals, and artifact checksums. \\
+IAD-Risk transformer variants & The IAD-Risk rows test split-held-out risk gating with explicit identity, agenda, and agenda-non-identity signals. & The rows are not a claim of broad method superiority without same-scope predictions, intervals, and artifact checksums. \\
 Zero-HNFMR IAD-Risk rows & Zero observed HNFMR means no observed false merge in the agenda-hard-negative stratum under the reported scope and operating point, while ordinary FMR is still reported separately. & A zero HNFMR value is not evidence that all non-identity false merges are absent or that risk is zero across sources. \\
 Whole table & The table gives a mechanism-supported reading that semantic relatedness alone can be unsafe and risk gating can block hard-negative merges in the reported setting. & The table is not a same-scope comparative ranking and is not evidence of threshold stability or zero risk. \\
 \bottomrule
@@ -683,7 +683,7 @@ Row family & Pair scope & Supported interpretation & Not supported \\
 \midrule
 Representation baselines & Full available Open-v2 pair scope. & Tests whether one-space scientific relatedness creates hard-negative merge risk. & A tuned neural pair-classifier ranking under the same held-out prediction file. \\
 RoBERTa pair classifier & Full available Open-v2 pair scope. & Shows that a strong supervised pair classifier can suppress most hard-negative merges. & A component-level explanation of identity-agenda risk control. \\
-IAD-Risk transformer variants & Held-out Open-v2 test scope. & Tests whether explicit identity, agenda, and ANI heads support risk-gated held-out decisions. & A general ranking over every baseline before all rows share the same released prediction scope. \\
+IAD-Risk transformer variants & Held-out Open-v2 test scope. & Tests whether explicit identity, agenda, and agenda-non-identity heads support risk-gated held-out decisions. & A general ranking over every baseline before all rows share the same released prediction scope. \\
 Future stronger comparison & Same released prediction scope plus manual-validation slice. & Would support a stricter comparative ranking and stronger label-precision claims. & A claim that this stronger comparison has already been completed by the current evidence snapshot. \\
 \bottomrule
 \end{tabular}
@@ -885,7 +885,7 @@ Contribution clarity & Introduction, problem formulation, and IAD-Bench contract
 Writing reproducibility & Method, implementation details, data/code availability, and supplementary protocol. & The repository supports code-level checks, fixture rebuilds, schema validation, and artifact-release preparation. & Full numerical audit requires external artifacts with predictions, logs, manifests, and checksums. \\
 Experimental strength & Open-v2 evidence snapshot, operating-point disclosure, and result audit trail. & Current evidence supports targeted pair-level false-merge control under the stated Open-v2 scope. & Stronger ranking claims require same-scope predictions, threshold logs, bootstrap intervals, and released metric tables. \\
 Evaluation completeness & Claim-evidence boundary, manual-validation boundary, and uncertainty requirements. & The manuscript separates gold, proxy, silver, and future manual-review evidence layers. & Component causality or human-gold claims require artifact-backed ablations, threshold grids, and a manual-validation slice. \\
-Method design soundness & Risk score rationale, merge-decision rule, and validity threats. & IAD-Risk exposes identity, agenda, ANI risk, thresholds, and cannot-link behavior. & Broad deployment claims require source-heldout validation, topic-heldout checks, and failure-case analysis. \\
+Method design soundness & Risk score rationale, merge-decision rule, and validity threats. & IAD-Risk exposes identity, agenda, agenda-non-identity risk, thresholds, and cannot-link behavior. & Broad deployment claims require source-heldout validation, topic-heldout checks, and failure-case analysis. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -907,7 +907,7 @@ Review dimension & Current supported reading & Evidence required before stronger
 Contribution clarity & Identity-agenda confusion is a targeted scholarly false-merge failure mode. & Broader task-replacement claims require source diversity, same-scope prediction files, and domain-facing error analysis. \\
 Experimental strength & Open-v2 supports fixed-scope false-merge control under the reported operating points. & Model-ranking claims require same-scope prediction files, threshold logs, bootstrap intervals, and released metric tables. \\
 Evaluation completeness & The manuscript separates gold, proxy, silver, and future manual evidence layers. & Component-causality or label-precision claims require an ablation suite, threshold grid, and manual-validation slice. \\
-Method design soundness & Risk gating exposes identity, agenda, ANI, threshold, and cannot-link behavior. & Deployment claims require source-heldout validation, topic-heldout checks, review-load analysis, and cluster-level artifact audits. \\
+Method design soundness & Risk gating exposes identity, agenda, agenda-non-identity, threshold, and cannot-link behavior. & Deployment claims require source-heldout validation, topic-heldout checks, review-load analysis, and cluster-level artifact audits. \\
 Reproducibility & Git supports code-level checks, fixture rebuilds, schema validation, and artifact release preparation. & Full numerical audit requires an external release with manifests, checksums, command logs, and fixed commit identifiers. \\
 \bottomrule
 \end{tabular}
@@ -953,7 +953,7 @@ Error category & Typical source of confusion & IAD-Risk control & Stronger audit
 Same task, different contribution & Papers share a benchmark, model family, or problem statement. & Agenda-non-identity head and HNFMR reporting. & Human-reviewed hard-negative slice with pair notes. \\
 Citation-neighborhood neighbor & Papers share references or citation community but are distinct works. & Reference-overlap features contribute to agenda evidence, not direct merge evidence. & Citation-derived pair provenance and checksum-fixed predictions. \\
 Version or extension boundary & Preprint, short paper, conference, and journal records are similar but may not be mergeable. & Conservative defer/block behavior when identity evidence is incomplete. & Manual adjudication with version-policy labels. \\
-Identifier conflict & DOI, arXiv, or OpenAlex identifiers disagree despite text similarity. & Different-identifier conflicts enter the ANI risk head and cannot-link logic. & Identifier-resolution logs and conflict audit table. \\
+Identifier conflict & DOI, arXiv, or OpenAlex identifiers disagree despite text similarity. & Different-identifier conflicts enter the agenda-non-identity risk head and cannot-link logic. & Identifier-resolution logs and conflict audit table. \\
 Sparse metadata & Abstract, venue, author, or identifier fields are missing or noisy. & Merge requires positive identity evidence rather than semantic similarity alone. & Missing-field stratified metrics and per-source diagnostics. \\
 \bottomrule
 \end{tabular}

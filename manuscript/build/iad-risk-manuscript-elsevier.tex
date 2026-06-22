@@ -238,7 +238,7 @@ The method input is an IAD-Bench pair row joined to two normalized document reco
 \node[source] (pair) {Candidate\\record pair};
 \node[source, right=of pair] (contract) {IAD-Bench\\provenance contract};
 \node[process, right=of contract] (evidence) {Identity and\\agenda evidence};
-\node[process, right=of evidence] (heads) {Work, agenda,\\ANI heads};
+\node[process, right=of evidence] (heads) {Work, agenda,\\agenda-non-\\identity heads};
 \node[risk, right=of heads] (score) {False-merge\\risk score\\$p_{\mathrm{risk}}$};
 \node[risk, right=of score] (gate) {Risk-aware\\merge gate};
 \node[output, right=of gate] (decision) {Merge, block,\\or defer};
@@ -255,7 +255,7 @@ The method input is an IAD-Bench pair row joined to two normalized document reco
 \draw[arrow] (gate) -- (artifact);
 \end{tikzpicture}
 }
-\caption{IAD-Risk pipeline. The framework first anchors each candidate pair in the IAD-Bench provenance contract, separates identity evidence from agenda evidence, predicts work, agenda, and ANI heads, derives a false-merge risk score, and then applies a conservative merge gate. Dashed audit nodes mark the schema fields and external artifacts required to reproduce prediction, threshold, metric, and checksum evidence.}
+\caption{IAD-Risk pipeline. The framework first anchors each candidate pair in the IAD-Bench provenance contract, separates identity evidence from agenda evidence, predicts work, agenda, and agenda-non-identity heads, derives a false-merge risk score, and then applies a conservative merge gate. Dashed audit nodes mark the schema fields and external artifacts required to reproduce prediction, threshold, metric, and checksum evidence.}
 \label{fig:iad-risk-pipeline}
 \end{figure}
 
@@ -314,7 +314,7 @@ Operationally, the three outputs have different meanings. A pair is merged only 
 
 \subsection{Scoring and Merge Algorithm}
 
-The executable method follows a fixed scoring and merge order. The full scoring and merge algorithm table is reported in the supplementary material. For each candidate pair, IAD-Risk first loads pair ID, document IDs, label strength, provenance, split, and hard-negative level from the pair schema. It then builds identity, agenda, ANI, and audit fields, including cannot-link feature groups, without using audit metadata as predictors. The relation heads output $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, and $p_{\mathrm{ani}}$; the derived risk score is $p_{\mathrm{risk}}=\max\{p_{\mathrm{ani}},p_{\mathrm{agenda}}(1-p_{\mathrm{work}})\}$.
+The executable method follows a fixed scoring and merge order. The full scoring and merge algorithm table is reported in the supplementary material. For each candidate pair, IAD-Risk first loads pair ID, document IDs, label strength, provenance, split, and hard-negative level from the pair schema. It then builds identity, agenda, agenda-non-identity, and audit fields, including cannot-link feature groups, without using audit metadata as predictors. The relation heads output $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, and $p_{\mathrm{ani}}$; the derived risk score is $p_{\mathrm{risk}}=\max\{p_{\mathrm{ani}},p_{\mathrm{agenda}}(1-p_{\mathrm{work}})\}$.
 
 The merge gate combines $\tau_w$, $\tau_n$, $\tau_r$, the cannot-link flag, and threshold source to emit merge, block, or defer under a fixed operating point. The implementation then writes prediction and metric audit fields, including decision, row scope, denominators, thresholds, and checksum-bound artifact rows, so that same-work F1, FMR, HNFMR, coverage, and defer-rate audits all refer to the same decision file.
 
@@ -336,7 +336,7 @@ IAD-Risk is designed as a failure-control framework rather than another similari
 
 Topically close papers receive high semantic similarity, so the method separates agenda evidence from identity evidence before the merge gate and requires agenda-level hard negatives for this claim. Silver metadata is treated as if it were human gold only if label strength is ignored, so IAD-Risk preserves label strength and provenance and keeps silver labels as stress-test evidence rather than exhaustive truth claims. Pairwise errors can contaminate clusters through transitivity, so risk gating and cannot-link evidence are applied before constrained union-find, while cluster-level claims still require sufficient cannot-link coverage and cluster-level artifact audits.
 
-Thresholds can turn a classifier into an unsafe automatic merger, so work, ANI, and risk thresholds are exposed. Threshold transfer should be rechecked under new source distributions. Proxy labels are over-interpreted when relation support is mixed, so proxy rows remain non-human evidence even when reproducible.
+Thresholds can turn a classifier into an unsafe automatic merger, so work, agenda-non-identity, and risk thresholds are exposed. Threshold transfer should be rechecked under new source distributions. Proxy labels are over-interpreted when relation support is mixed, so proxy rows remain non-human evidence even when reproducible.
 
 \subsection{Design Alternatives and Rejected Shortcuts}
 
@@ -354,7 +354,7 @@ The reported transformer variants use frozen scientific document encoders rather
 
 The implementation uses label provenance for supervision control, not as a predictive shortcut. Pair metadata such as label source, label strength, provenance, split, and hard-negative level are copied to prediction outputs for auditing, but they are excluded from the identity, agenda, and risk feature groups used by the relation heads. The full feature and head specification table is reported in the supplementary material.
 
-In the main method narrative, the identity head uses Transformer distances, title similarity, author overlap, and DOI/arXiv/OpenAlex identifier agreement to estimate $p_{\mathrm{work}}$ with provenance-aware masking. The agenda head uses semantic similarity, topic overlap, and reference Jaccard similarity to estimate relatedness rather than direct merge evidence. The ANI risk head uses topic and reference evidence together with year conflict and different-identifier conflicts to estimate direct blocking evidence. The risk gate then combines $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, $p_{\mathrm{ani}}$, thresholds, and cannot-link flags to emit merge, block, or defer decisions, while audit metadata remains traceable but is not a training feature.
+In the main method narrative, the identity head uses Transformer distances, title similarity, author overlap, and DOI/arXiv/OpenAlex identifier agreement to estimate $p_{\mathrm{work}}$ with provenance-aware masking. The agenda head uses semantic similarity, topic overlap, and reference Jaccard similarity to estimate relatedness rather than direct merge evidence. The agenda-non-identity risk head uses topic and reference evidence together with year conflict and different-identifier conflicts to estimate direct blocking evidence. The risk gate then combines $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, $p_{\mathrm{ani}}$, thresholds, and cannot-link flags to emit merge, block, or defer decisions, while audit metadata remains traceable but is not a training feature.
 
 \section{Experiments}
 
@@ -567,7 +567,7 @@ The result interpretation is deliberately narrow. The same IAD-Risk rows still r
 
 \subsection{Result Interpretation Guardrails}
 
-The full result interpretation guardrails table is reported in the supplementary material. The Open-v2 table should be read as a mechanism profile with an artifact-release boundary until external artifact release and same-scope prediction files are available. Its Scope type column separates full available Open-v2 scope rows from held-out Open-v2 test scope rows. Scope labels prevent ranking interpretation because the row families do not yet share the same released prediction scope. The intended reading is explicit: representation rows test false-merge exposure, the RoBERTa row is a strong supervised comparator, and IAD-Risk rows test split-held-out risk gating with identity, agenda, and ANI signals.
+The full result interpretation guardrails table is reported in the supplementary material. The Open-v2 table should be read as a mechanism profile with an artifact-release boundary until external artifact release and same-scope prediction files are available. Its Scope type column separates full available Open-v2 scope rows from held-out Open-v2 test scope rows. Scope labels prevent ranking interpretation because the row families do not yet share the same released prediction scope. The intended reading is explicit: representation rows test false-merge exposure, the RoBERTa row is a strong supervised comparator, and IAD-Risk rows test split-held-out risk gating with identity, agenda, and agenda-non-identity signals.
 
 The zero-HNFMR rows also have a narrow reading. The ordinary FMR=0.001 is still reported for all non-identity rows, so zero observed HNFMR should be read as no observed false merge in the agenda-hard-negative stratum, not as absence of all non-identity false merges. The table is not a claim of broad method superiority, not a same-scope comparative ranking, and not evidence of threshold stability or zero risk.
 
@@ -591,7 +591,7 @@ For a source-heldout claim to become admissible, the artifact package must decla
 
 The central mechanism question is whether false-merge control follows from explicit agenda-non-identity supervision and the derived risk score. The supported Open-v2 comparison gives mechanism-consistent evidence: single-space scientific representations can over-merge agenda-related hard negatives, while IAD-Risk makes agenda-non-identity evidence a direct blocking signal. Within the current evidence, the mechanism reading is triangulated rather than component-causal: representation baselines expose relatedness-driven merge risk, RoBERTa anchors a supervised pair-classification comparator, and IAD-Risk rows show relation-role separation plus risk gating under the fixed operating point.
 
-This mechanism reading does not by itself establish a complete causal ablation. Isolating the effect size of each relation head remains an ablation-artifact requirement. The full mechanism-evidence boundary table is reported in the supplementary material. The main text keeps the mechanism boundary as a prose rule: topical relatedness creates merge risk only as a targeted failure-mode claim; explicit risk gating supports the reported Open-v2 contract and thresholds; component-causality claims require ablations removing risk gating, ANI supervision, and single-space separation; and cluster-level contamination claims require sufficient cannot-link coverage and cluster-level artifact audits.
+This mechanism reading does not by itself establish a complete causal ablation. Isolating the effect size of each relation head remains an ablation-artifact requirement. The full mechanism-evidence boundary table is reported in the supplementary material. The main text keeps the mechanism boundary as a prose rule: topical relatedness creates merge risk only as a targeted failure-mode claim; explicit risk gating supports the reported Open-v2 contract and thresholds; component-causality claims require ablations removing risk gating, agenda-non-identity supervision, and single-space separation; and cluster-level contamination claims require sufficient cannot-link coverage and cluster-level artifact audits.
 
 The full error taxonomy table is reported in the supplementary material. The main text keeps the taxonomy as a prose rule: same task, different contribution pairs, citation-neighborhood neighbors, version or extension boundaries, identifier conflicts, and sparse metadata cases are the main failure modes the framework is designed to expose. This taxonomy is diagnostic rather than a measured error distribution unless a released artifact contains per-category annotations and adjudication logs. The distinction matters because version boundaries, identifier conflicts, and sparse metadata cases require human judgment beyond metadata-derived silver evidence.
 
