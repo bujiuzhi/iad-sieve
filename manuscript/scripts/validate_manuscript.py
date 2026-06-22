@@ -4065,7 +4065,10 @@ def check_data_processing_pipeline_document(document_text: str) -> list[str]:
     required_markers = [
         "# 数据处理流水线",
         "远程仓库不提交原始数据",
+        "python -m pip install -e .",
         "python -m iad_sieve.cli --help",
+        "PYTHONPATH=src python -m iad_sieve.cli --help",
+        "正式复现、fixture 重建和 artifact 校验应使用安装后的环境",
         "tests/fixtures/",
         "outputs/repro_fixture",
         "data/raw/",

@@ -5867,7 +5867,10 @@ def test_check_data_processing_pipeline_document_accepts_reproducible_pipeline()
         [
             "# 数据处理流水线",
             "远程仓库不提交原始数据时，复现能力不能依赖口头说明。",
+            "python -m pip install -e .",
             "python -m iad_sieve.cli --help",
+            "PYTHONPATH=src python -m iad_sieve.cli --help",
+            "正式复现、fixture 重建和 artifact 校验应使用安装后的环境",
             "tests/fixtures/",
             "outputs/repro_fixture",
             "data/raw/",
@@ -5900,7 +5903,9 @@ def test_check_data_processing_pipeline_document_rejects_missing_cli_and_artifac
 
     errors = module.check_data_processing_pipeline_document(document_text)
 
+    assert any("python -m pip install -e ." in error for error in errors)
     assert any("python -m iad_sieve.cli --help" in error for error in errors)
+    assert any("PYTHONPATH=src python -m iad_sieve.cli --help" in error for error in errors)
     assert any("prepare-deepmatcher" in error for error in errors)
     assert any("Artifact release" in error for error in errors)
 

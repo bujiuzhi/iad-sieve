@@ -25,8 +25,17 @@
 统一 CLI 入口：
 
 ```bash
+python -m pip install -e .
 python -m iad_sieve.cli --help
 ```
+
+上述命令要求当前 Python 环境已安装本项目。若审稿人只想先检查新克隆源码中的 CLI 是否可发现，可在仓库根目录运行：
+
+```bash
+PYTHONPATH=src python -m iad_sieve.cli --help
+```
+
+正式复现、fixture 重建和 artifact 校验应使用安装后的环境，以保证 console script、依赖解析和 `pyproject.toml` 声明一致。
 
 ## 无网络最小复现
 

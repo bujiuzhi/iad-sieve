@@ -62,6 +62,8 @@ python -m pip install -e ".[specter2]"
 
 ## 快速验证
 
+以下命令假定已执行 `python -m pip install -e .`，并且当前 shell 使用的是该环境中的 Python。若只想在未安装包前检查源码入口，可使用 `PYTHONPATH=src python -m iad_sieve.cli --help`；正式复现和审稿校验仍应使用安装后的环境。
+
 ```bash
 python -m iad_sieve.cli --help
 python scripts/check_public_release.py
