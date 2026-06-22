@@ -3725,6 +3725,7 @@ def check_artifact_release_manifest_template(template_text: str) -> list[str]:
             "same_scope_prediction_files_required_for_broad_ranking",
             "threshold_grid_required_for_threshold_stability_claims",
             "cluster_artifacts_required_for_cluster_level_quality_claims",
+            "git_only_review_is_not_full_numerical_audit",
         ]:
             if claim_boundaries.get(field) is not True:
                 errors.append(f"artifact release claim boundary must be true: {field}")
@@ -3958,6 +3959,8 @@ def check_artifact_release_readme_template(readme_text: str) -> list[str]:
         "Claim Boundaries",
         "silver labels are not human gold",
         "full numerical audit requires external artifacts",
+        "Git-only review does not support full numerical audit",
+        "L2/L3 artifacts are required to audit the Open-v2 numerical results",
         "broad method ranking is not claimed unless conditional artifacts are complete",
         "cluster-level quality is not claimed unless cluster artifacts are complete",
         "Reproduction Levels",

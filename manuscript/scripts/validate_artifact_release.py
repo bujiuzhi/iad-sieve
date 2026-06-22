@@ -39,6 +39,8 @@ REQUIRED_README_MARKERS = {
     "source input manifest": "source_input_manifest",
     "processing run log": "processing_run_log",
     "result audit level": "L3 result audit",
+    "git-only numerical boundary": "Git-only review does not support full numerical audit",
+    "L2/L3 numerical boundary": "L2/L3 artifacts are required to audit the Open-v2 numerical results",
 }
 FORBIDDEN_RELEASE_STATUSES = {"template_pending_external_artifact", "skeleton_pending_artifacts"}
 REQUIRED_ARTIFACT_IDS = {
@@ -364,6 +366,7 @@ REQUIRED_TRUE_CLAIM_BOUNDARY_FIELDS = {
     "same_scope_prediction_files_required_for_broad_ranking",
     "threshold_grid_required_for_threshold_stability_claims",
     "cluster_artifacts_required_for_cluster_level_quality_claims",
+    "git_only_review_is_not_full_numerical_audit",
 }
 EXPECTED_FALSE_CLAIM_STATUS_FIELDS = {
     "confidence_intervals_claimed",

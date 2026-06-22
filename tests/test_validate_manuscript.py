@@ -5303,6 +5303,7 @@ def test_check_artifact_release_manifest_template_accepts_complete_template() ->
                 "same_scope_prediction_files_required_for_broad_ranking": True,
                 "threshold_grid_required_for_threshold_stability_claims": True,
                 "cluster_artifacts_required_for_cluster_level_quality_claims": True,
+                "git_only_review_is_not_full_numerical_audit": True,
                 "confidence_intervals_claimed": False,
                 "component_causality_claimed": False,
                 "human_validation_claimed": False,
@@ -5437,6 +5438,7 @@ def test_check_artifact_release_manifest_template_rejects_missing_cluster_claim_
                 "same_scope_prediction_files_required_for_broad_ranking": True,
                 "threshold_grid_required_for_threshold_stability_claims": True,
                 "cluster_artifacts_required_for_cluster_level_quality_claims": True,
+                "git_only_review_is_not_full_numerical_audit": True,
                 "confidence_intervals_claimed": False,
                 "component_causality_claimed": False,
                 "human_validation_claimed": False,
@@ -5520,6 +5522,7 @@ def test_check_artifact_release_manifest_template_rejects_missing_conditional_cl
                 "same_scope_prediction_files_required_for_broad_ranking": True,
                 "threshold_grid_required_for_threshold_stability_claims": True,
                 "cluster_artifacts_required_for_cluster_level_quality_claims": True,
+                "git_only_review_is_not_full_numerical_audit": True,
                 "confidence_intervals_claimed": False,
                 "component_causality_claimed": False,
                 "human_validation_claimed": False,
@@ -5720,6 +5723,8 @@ def test_check_artifact_release_readme_template_accepts_complete_template() -> N
             "## Claim Boundaries",
             "silver labels are not human gold.",
             "full numerical audit requires external artifacts.",
+            "Git-only review does not support full numerical audit.",
+            "L2/L3 artifacts are required to audit the Open-v2 numerical results.",
             "broad method ranking is not claimed unless conditional artifacts are complete.",
             "cluster-level quality is not claimed unless cluster artifacts are complete.",
             "## Reproduction Levels",
@@ -5788,6 +5793,8 @@ def test_check_artifact_release_readme_template_rejects_missing_release_boundari
     assert any("python -m iad_sieve.cli --help" in error for error in errors)
     assert any("threshold_sensitivity_grid" in error for error in errors)
     assert any("cluster_metric_summary" in error for error in errors)
+    assert any("Git-only review does not support full numerical audit" in error for error in errors)
+    assert any("L2/L3 artifacts are required to audit the Open-v2 numerical results" in error for error in errors)
 
 
 def test_check_manuscript_package_docs_accepts_result_row_schema() -> None:

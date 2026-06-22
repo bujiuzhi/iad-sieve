@@ -774,6 +774,8 @@ def _complete_readme_text() -> str:
             "Repository commit: 0123456789abcdef0123456789abcdef01234567.",
             "## Claim Boundaries",
             "Full numerical audit requires external artifacts.",
+            "Git-only review does not support full numerical audit.",
+            "L2/L3 artifacts are required to audit the Open-v2 numerical results.",
             "source_input_manifest records the public input boundary.",
             "processing_run_log records the processing command boundary.",
             "## Reproduction Levels",
@@ -857,6 +859,7 @@ def _write_complete_release(artifact_dir: Path, release_status: str = "release_c
             "same_scope_prediction_files_required_for_broad_ranking": True,
             "threshold_grid_required_for_threshold_stability_claims": True,
             "cluster_artifacts_required_for_cluster_level_quality_claims": True,
+            "git_only_review_is_not_full_numerical_audit": True,
             "confidence_intervals_claimed": False,
             "component_causality_claimed": False,
             "human_validation_claimed": False,
@@ -980,6 +983,42 @@ def test_validate_artifact_release_rejects_readme_without_reproducibility_marker
     assert any("python -m pip install -e ." in error for error in errors)
     assert any("python -m iad_sieve.cli --help" in error for error in errors)
     assert any("Repository commit" in error for error in errors)
+
+
+def test_validate_artifact_release_rejects_readme_without_git_only_boundary(tmp_path) -> None:
+    """验证 release README 必须说明 Git-only 不能支持完整数值复核。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    readme_path = artifact_dir / "README.md"
+    readme_text = readme_path.read_text(encoding="utf-8")
+    readme_text = readme_text.replace("Git-only review does not support full numerical audit.\n", "")
+    readme_text = readme_text.replace("L2/L3 artifacts are required to audit the Open-v2 numerical results.\n", "")
+    readme_path.write_text(readme_text, encoding="utf-8")
+    _refresh_checksums(artifact_dir)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("git-only numerical boundary" in error for error in errors)
+    assert any("L2/L3 numerical boundary" in error for error in errors)
+
+
+def test_validate_artifact_release_rejects_manifest_without_git_only_boundary(tmp_path) -> None:
+    """验证 release manifest 必须记录 Git-only 数值复核边界。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    manifest_path = artifact_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["claim_boundaries"].pop("git_only_review_is_not_full_numerical_audit")
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    _refresh_checksums(artifact_dir)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("git_only_review_is_not_full_numerical_audit" in error for error in errors)
 
 
 def test_validate_artifact_release_rejects_open_v2_results_without_row_audit_columns(tmp_path) -> None:

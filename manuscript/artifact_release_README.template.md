@@ -88,6 +88,8 @@ python scripts/check_public_release.py
 
 Silver labels are not human gold.
 Full numerical audit requires external artifacts.
+Git-only review does not support full numerical audit.
+L2/L3 artifacts are required to audit the Open-v2 numerical results.
 Broad method ranking is not claimed unless conditional artifacts are complete.
 Threshold-stability claims require threshold_sensitivity_grid and threshold_selection_logs.
 Component-causality claims require ablation_suite with full protocol_variant coverage and post-hoc threshold diagnostics separated from causal evidence.
