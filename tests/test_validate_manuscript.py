@@ -7015,8 +7015,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Readiness Summary",
-            "Readiness gates covered: 127.",
-            "Highest current reviewer-facing risks are tracked as a risk inventory rather than a claim that every gate is currently failing: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, Elsevier competing-interest declaration file traceability, introduction contribution first-screen alignment, conclusion first-screen boundary alignment, submission-day official-source drift, processing-run-log schema bypass, process-note vocabulary bypass, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, pre-submission cover-letter declaration boundary, preflight metadata declaration placeholders, anonymous review-file declaration boundary, introduction row-scope comparison overread, main-result operating-point overread, figure metric-scope overread, cover-letter Git-only reproduction boundary, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, ANI threshold notation drift, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final cover-letter preflight wording gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, latex-engine panic diagnostic gap, and stronger evidence gates.",
+            "Readiness gates covered: 131.",
+            "Highest current reviewer-facing risks are tracked as a risk inventory rather than a claim that every gate is currently failing: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, Elsevier competing-interest declaration file traceability, introduction contribution first-screen alignment, conclusion first-screen boundary alignment, submission-day official-source drift, processing-run-log schema bypass, process-note vocabulary bypass, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, pre-submission cover-letter declaration boundary, preflight metadata declaration placeholders, anonymous review-file declaration boundary, introduction row-scope comparison overread, main-result operating-point overread, figure metric-scope overread, cover-letter Git-only reproduction boundary, Q2/B ranking evidence packet traceability, public documentation index drift, local submission-package artifact tracking drift, DKE/Elsevier draft abstract-length drift, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, ANI threshold notation drift, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final cover-letter preflight wording gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, latex-engine panic diagnostic gap, and stronger evidence gates.",
             "External final-upload blockers cannot be resolved from the repository alone.",
             "Local gates currently controlled by validators must still be rerun after source or package edits.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
@@ -8098,11 +8098,49 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "does not make the Open-v2 numerical table reproducible from Git alone",
             "artifact release URL or DOI, checksum-bound prediction files, threshold logs, source manifests, and processing logs",
             "The pre-submission cover letter preserves the Git-only review boundary",
+            "## Readiness Gate 128: Q2/B Ranking Evidence Packet Checklist Gate",
+            "Q2/B ranking evidence packet traceability",
+            "selected journal ISSN or eISSN",
+            "ranking source type",
+            "subject category",
+            "reported category value",
+            "ranking source URL or institutional system URL",
+            "ranking source access date",
+            "evidence export or screenshot path",
+            "responsible author confirmation",
+            "publisher CiteScore, Impact Factor, aims-and-scope text, and this checklist are screening evidence only",
+            "ranking-evidence packet completeness, not ranking proof",
+            "## Readiness Gate 129: Public Documentation Index Consistency Gate",
+            "public documentation index drift coverage",
+            "`docs/README.md`",
+            "`docs/` directory whitelist",
+            "`method-design.md`",
+            "查看 IAD-Risk 方法设计、关系语义和风险门控",
+            "查看 IAD-Sieve 的核心流程和模块",
+            "public repository navigation hygiene",
+            "## Readiness Gate 130: Submission Package Local Artifact Exclusion Gate",
+            "local submission-package artifact tracking drift coverage",
+            "`*.zip`",
+            "`/manuscript/build/submission_package/`",
+            "`/manuscript/build/dke_preflight_package/`",
+            "local generated packages remain outside source control",
+            "artifact/package separation, not empirical evidence",
+            "## Readiness Gate 131: DKE/Elsevier Draft Abstract-Length Gate",
+            "DKE/Elsevier draft abstract-length drift coverage",
+            "Elsevier draft source abstract",
+            "expected at most 250",
+            "same abstract into the `elsarticle` front matter",
+            "front-matter compliance, not writing quality or scientific evidence",
+            "distinct from the main-manuscript abstract-length gate",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             r"Method threshold notation uses `\tau_n` for the ANI risk-head threshold",
             "The final-upload cover letter contains no anonymous preflight wording",
             "The pre-submission cover letter preserves the Git-only review boundary",
+            "The Q2/B ranking evidence packet records selected journal ISSN or eISSN",
+            "`docs/README.md` remains within the public documentation index contract",
+            "Generated submission-package directories and archives remain ignored and untracked",
+            "The DKE/Elsevier draft source abstract remains within the 250-word front-matter limit",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
         ]
     )
@@ -8119,7 +8157,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Readiness Summary",
-        "Readiness gates covered: 127",
+        "Readiness gates covered: 131",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -8130,7 +8168,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Readiness Summary" in error for error in errors)
-    assert any("Readiness gates covered: 127" in error for error in errors)
+    assert any("Readiness gates covered: 131" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -9114,6 +9152,115 @@ def test_check_reviewer_readiness_audit_rejects_missing_cover_letter_git_only_bo
     assert any("cover-letter Git-only reproduction boundary" in error for error in errors)
     assert any("Git-only review" in error for error in errors)
     assert any("Open-v2 numerical table" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_q2b_ranking_packet_gate() -> None:
+    """验证审稿准备度审计必须覆盖 Q2/B 排名证据包清单门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Readiness Gate 128: Q2/B Ranking Evidence Packet Checklist Gate",
+        "Q2/B ranking evidence packet traceability",
+        "selected journal ISSN or eISSN",
+        "ranking source type",
+        "subject category",
+        "reported category value",
+        "ranking source URL or institutional system URL",
+        "ranking source access date",
+        "evidence export or screenshot path",
+        "responsible author confirmation",
+        "publisher CiteScore, Impact Factor, aims-and-scope text, and this checklist are screening evidence only",
+        "ranking-evidence packet completeness, not ranking proof",
+        "The Q2/B ranking evidence packet records selected journal ISSN or eISSN",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Q2/B Ranking Evidence Packet Checklist Gate" in error for error in errors)
+    assert any("Q2/B ranking evidence packet traceability" in error for error in errors)
+    assert any("selected journal ISSN or eISSN" in error for error in errors)
+    assert any("screening evidence only" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_docs_index_gate() -> None:
+    """验证审稿准备度审计必须覆盖公开文档索引一致性门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Readiness Gate 129: Public Documentation Index Consistency Gate",
+        "public documentation index drift",
+        "public documentation index drift coverage",
+        "`docs/README.md`",
+        "`docs/` directory whitelist",
+        "`method-design.md`",
+        "查看 IAD-Risk 方法设计、关系语义和风险门控",
+        "查看 IAD-Sieve 的核心流程和模块",
+        "public repository navigation hygiene",
+        "`docs/README.md` remains within the public documentation index contract",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Public Documentation Index Consistency Gate" in error for error in errors)
+    assert any("public documentation index drift" in error for error in errors)
+    assert any("docs/README.md" in error for error in errors)
+    assert any("public repository navigation hygiene" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_local_package_exclusion_gate() -> None:
+    """验证审稿准备度审计必须覆盖本地生成投稿包排除门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Readiness Gate 130: Submission Package Local Artifact Exclusion Gate",
+        "local submission-package artifact tracking drift",
+        "local submission-package artifact tracking drift coverage",
+        "`*.zip`",
+        "`/manuscript/build/submission_package/`",
+        "`/manuscript/build/dke_preflight_package/`",
+        "local generated packages remain outside source control",
+        "artifact/package separation, not empirical evidence",
+        "Generated submission-package directories and archives remain ignored and untracked",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Submission Package Local Artifact Exclusion Gate" in error for error in errors)
+    assert any("local submission-package artifact tracking drift" in error for error in errors)
+    assert any("*.zip" in error for error in errors)
+    assert any("artifact/package separation" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_elsevier_draft_abstract_gate() -> None:
+    """验证审稿准备度审计必须覆盖 DKE/Elsevier 草稿摘要长度门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Readiness Gate 131: DKE/Elsevier Draft Abstract-Length Gate",
+        "DKE/Elsevier draft abstract-length drift",
+        "DKE/Elsevier draft abstract-length drift coverage",
+        "Elsevier draft source abstract",
+        "expected at most 250",
+        "same abstract into the `elsarticle` front matter",
+        "front-matter compliance, not writing quality or scientific evidence",
+        "distinct from the main-manuscript abstract-length gate",
+        "The DKE/Elsevier draft source abstract remains within the 250-word front-matter limit",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("DKE/Elsevier Draft Abstract-Length Gate" in error for error in errors)
+    assert any("DKE/Elsevier draft abstract-length drift" in error for error in errors)
+    assert any("Elsevier draft source abstract" in error for error in errors)
+    assert any("expected at most 250" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_fixture_evidence_isolation_gate() -> None:
