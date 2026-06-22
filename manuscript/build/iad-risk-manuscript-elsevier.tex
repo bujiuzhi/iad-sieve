@@ -442,7 +442,7 @@ Threshold stability is treated as an audit requirement, not as an unsupported ro
 
 \subsection{Baselines}
 
-The main table reports two scientific representation cosine baselines and one supervised pair-classifier baseline: SciNCL cosine, SPECTER2 adapter cosine, and RoBERTa pair classification. These rows are evaluated through the same pair schema so that same-work F1 and hard-negative false-merge rate can be interpreted without mixing label strengths. Other repository baseline utilities are not used as primary manuscript evidence unless their metric summaries, prediction files, thresholds, and checksums are included in the released artifact package.
+The main table reports two scientific representation cosine baselines and one supervised pair-classifier baseline: SciNCL cosine, SPECTER2 adapter cosine, and RoBERTa pair classification. These rows are evaluated through the same pair schema so that same-work F1 and hard-negative false-merge rate can be interpreted without mixing label strengths. This schema alignment makes each row auditable, but it does not by itself make rows with different available result scopes a same-scope ranking. Other repository baseline utilities are not used as primary manuscript evidence unless their metric summaries, prediction files, thresholds, and checksums are included in the released artifact package.
 
 \subsection{Baseline Inclusion Rationale}
 
@@ -452,7 +452,7 @@ Omitting a baseline family from Table~\ref{tab:openv2-results} is not a claim th
 
 \subsection{Baseline Fairness Controls}
 
-Baseline comparison is controlled through the pair contract rather than through a broad comparative-ranking claim. All baselines consume the same IAD-Bench pair records for the row scope being reported, and each row uses the same train/dev/test split field when training is required. Threshold-sensitive rows use validation-selected operating points before held-out reporting. All systems report same-work F1, FMR, and HNFMR from the same metric implementation. Label source, provenance, and split identifiers remain audit fields, not predictive features. A stricter comparative ranking requires same-scope released prediction files, and rows with different available scopes should not be read as a single comparative ranking. The full fairness-control matrix is in the supplementary material.
+Baseline comparison is controlled through the pair contract rather than through a broad comparative-ranking claim. All baselines consume the same IAD-Bench pair records for the row scope being reported, and each row uses the same train/dev/test split field when training is required. Threshold-sensitive rows use validation-selected operating points before held-out reporting, and all systems report same-work F1, FMR, and HNFMR from the same metric implementation. Label source, provenance, and split identifiers remain audit fields, not predictive features. These controls support row-level auditability and mechanism interpretation; a stricter comparative ranking still requires same-scope released prediction files, and rows with different available scopes should not be read as a single comparative ranking. The full fairness-control matrix is in the supplementary material.
 
 \subsection{Implementation and Reproducibility}
 
