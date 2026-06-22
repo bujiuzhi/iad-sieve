@@ -1742,7 +1742,7 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
             "Identity-agenda confusion is a concrete false-merge pathway.",
             "IAD-Risk supports targeted false-merge control in the reported setting.",
             "IAD-Bench supports provenance-aware evaluation.",
-            "Repository-level reproduction is possible without committing raw data.",
+            "Repository-level code and fixture checks are possible without committing raw data.",
             r"\label{tab:result-artifact-crosswalk}",
             "Result artifact crosswalk for the Open-v2 evidence snapshot.",
             "The released artifact package includes checksums.sha256.",
@@ -1794,8 +1794,8 @@ def test_check_result_claim_boundary_accepts_audited_result_table() -> None:
     assert errors == []
 
 
-def test_check_result_claim_boundary_rejects_overbroad_effect_markers() -> None:
-    """验证结果证据边界不能把目标控制证据写成完整效果动词。"""
+def test_check_result_claim_boundary_rejects_overbroad_markers() -> None:
+    """验证结果证据边界不能使用过宽效果或复现表述。"""
 
     module = _load_validate_manuscript_module()
     manuscript_text = "\n".join(
@@ -1863,6 +1863,7 @@ def test_check_result_claim_boundary_rejects_overbroad_effect_markers() -> None:
             "IAD-Risk suppresses hard-negative false merges under the reported setting.",
             "IAD-Risk reduces risky automatic merges in the reported setting.",
             "IAD-Bench supports provenance-aware evaluation.",
+            "Repository-level code and fixture checks are possible without committing raw data.",
             "Repository-level reproduction is possible without committing raw data.",
             r"\label{tab:result-artifact-crosswalk}",
             "Result artifact crosswalk for the Open-v2 evidence snapshot.",
@@ -1913,8 +1914,10 @@ def test_check_result_claim_boundary_rejects_overbroad_effect_markers() -> None:
     errors = module.check_result_claim_boundary(manuscript_text, supplementary_text)
 
     assert any("overbroad effect marker" in error for error in errors)
+    assert any("overbroad reproduction marker" in error for error in errors)
     assert any("suppresses hard-negative false merges" in error for error in errors)
     assert any("reduces risky automatic merges" in error for error in errors)
+    assert any("Repository-level reproduction is possible" in error for error in errors)
 
 
 def test_check_result_claim_boundary_rejects_result_table_without_audit_trail() -> None:
