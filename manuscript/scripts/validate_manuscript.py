@@ -6890,6 +6890,9 @@ def check_cover_letter(cover_letter_text: str) -> list[str]:
         "reproducible data-processing contracts",
         "RoBERTa pair classification is treated as a strong supervised baseline",
         "auditable relation-role design rather than a broad superiority claim",
+        "Open-v2 numbers are point estimates",
+        "does not present confidence intervals, statistical significance, or model-ranking claims",
+        "released bootstrap, test, and same-scope prediction artifacts",
         "Git-only review",
         "fixture rebuild validation",
         "full numerical audit of the Open-v2 table requires the L2/L3 public-source rebuild or a released external artifact package",
@@ -6953,6 +6956,8 @@ def check_submission_material_quantitative_summary(highlights_text: str, cover_l
         "held-out hard-negative stratum",
         "RoBERTa pair classification is treated as a strong supervised baseline",
         "auditable relation-role design rather than a broad superiority claim",
+        "Open-v2 numbers are point estimates",
+        "does not present confidence intervals, statistical significance, or model-ranking claims",
     ]
     for marker in cover_letter_scope_markers:
         if marker not in cover_letter_text:

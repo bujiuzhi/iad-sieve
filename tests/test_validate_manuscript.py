@@ -11073,6 +11073,9 @@ def test_check_cover_letter_accepts_clean_pre_submission_letter() -> None:
             "and reproducible data-processing contracts.",
             "RoBERTa pair classification is treated as a strong supervised baseline.",
             "IAD-Risk is presented as an auditable relation-role design rather than a broad superiority claim.",
+            "The Open-v2 numbers are point estimates for a fixed evidence snapshot.",
+            "This cover letter does not present confidence intervals, statistical significance, or model-ranking claims "
+            "without released bootstrap, test, and same-scope prediction artifacts.",
             "For a Git-only review, the repository supports fixture rebuild validation.",
             "full numerical audit of the Open-v2 table requires the L2/L3 public-source rebuild or a released external artifact package.",
         ]
@@ -11267,6 +11270,9 @@ def test_check_submission_material_quantitative_summary_accepts_scoped_highlight
             "IAD-Risk reports same-work F1=0.980 and zero observed HNFMR in the held-out hard-negative stratum, with ordinary FMR still reported separately as 0.001.",
             "RoBERTa pair classification is treated as a strong supervised baseline.",
             "IAD-Risk is presented as an auditable relation-role design rather than a broad superiority claim.",
+            "The Open-v2 numbers are point estimates for a fixed evidence snapshot.",
+            "This cover letter does not present confidence intervals, statistical significance, or model-ranking claims "
+            "without released bootstrap, test, and same-scope prediction artifacts.",
         ]
     )
 
@@ -11320,6 +11326,36 @@ def test_check_submission_material_quantitative_summary_rejects_cover_letter_wit
 
     assert any("scope-bounded mechanism evidence" in error for error in errors)
     assert any("same-scope comparative ranking" in error for error in errors)
+
+
+def test_check_submission_material_quantitative_summary_rejects_cover_letter_without_statistical_boundary() -> None:
+    """验证投稿信必须说明 Open-v2 数字不是统计显著性或区间支持的排名结论。"""
+
+    module = _load_validate_manuscript_module()
+    highlights_text = "\n".join(
+        [
+            "- Identity-agenda confusion causes risky scholarly work merges.",
+            "- IAD-Risk separates identity, agenda, and non-identity risk.",
+            "- IAD-Bench keeps gold, proxy, and silver labels separate.",
+            "- Open-v2 held-out hard-negative scope: zero observed HNFMR; ordinary FMR=0.001.",
+            "- Cluster-level claims require artifact-backed audits.",
+        ]
+    )
+    cover_letter_text = "\n".join(
+        [
+            "The manuscript reports an Open-v2 evidence snapshot.",
+            "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
+            "Single-space scientific representation baselines show HNFMR 0.790--0.999 on the full pair scope.",
+            "IAD-Risk reports same-work F1=0.980 and zero observed HNFMR in the held-out hard-negative stratum, with ordinary FMR still reported separately as 0.001.",
+            "RoBERTa pair classification is treated as a strong supervised baseline.",
+            "IAD-Risk is presented as an auditable relation-role design rather than a broad superiority claim.",
+        ]
+    )
+
+    errors = module.check_submission_material_quantitative_summary(highlights_text, cover_letter_text)
+
+    assert any("Open-v2 numbers are point estimates" in error for error in errors)
+    assert any("confidence intervals, statistical significance, or model-ranking claims" in error for error in errors)
 
 
 def test_check_editorial_claim_alignment_accepts_consistent_submission_materials() -> None:
