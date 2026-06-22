@@ -54,6 +54,8 @@ DKE official source snapshot date: 2026-06-22.
 
 DKE publisher-page facts in this shortlist were rechecked on 2026-06-22 from the official source links listed below, specifically the DKE source link. Information Systems and Scientometrics entries remain planning records from 2026-06-19 and must be rechecked before either route is selected. These checks support manuscript-preparation decisions only; JCR quartile, Chinese Academy of Sciences zone, CCF class, and local institutional category must still be rechecked in the authors' authorized ranking systems before final upload.
 
+For Q2/B decision-making, the final record must match the selected journal's ISSN or eISSN to the authors' accepted ranking source and record the subject category used by that source. Acceptable evidence may include JCR quartile, Chinese Academy of Sciences zone, CCF class when applicable, or a local institutional list; publisher CiteScore, Impact Factor, aims-and-scope text, and this shortlist are screening evidence only. Do not mark `ranking_confirmation_completed` true until the source URL or institutional system URL, access date, evidence export or screenshot path, and responsible author confirmation are recorded in the final-upload information packet.
+
 ### DKE Official Guide Evidence
 
 The DKE source check is an official-guide preflight record, not final target selection. It binds the current preflight package to the publisher's guide URL while leaving `selected_author_guide_source`, `selected_author_guide_source_url`, `selected_author_guide_rechecked_date`, and `selected_target_author_confirmed` incomplete until the authors confirm the final route.

@@ -568,6 +568,40 @@ def test_check_final_upload_information_request_rejects_missing_dke_preflight_st
     assert any("Final target journal decision still requires author confirmation" in error for error in errors)
 
 
+def test_check_final_upload_information_request_rejects_missing_q2b_ranking_packet() -> None:
+    """验证最终上传信息表必须记录 Q2/B 排名类别证据包。"""
+
+    module = _load_validate_manuscript_module()
+    request_text = Path("manuscript/final_upload_information_request.md").read_text(encoding="utf-8")
+    for marker in [
+        "Target ranking/category evidence packet",
+        "Q2/B route",
+        "Publisher CiteScore, Impact Factor, or scope text is not sufficient for Q2/B classification",
+        "Selected journal ISSN or eISSN matched to ranking source",
+        "Ranking source type, such as JCR, Chinese Academy of Sciences zone, CCF class, or institutional list",
+        "Subject category used by the ranking source",
+        "Reported category value, such as Q2, CAS Zone 2, CCF B, or institutional B-class equivalent",
+        "Ranking source URL or institutional system URL",
+        "Ranking source access date in YYYY-MM-DD",
+        "Evidence export, screenshot, or author decision record path",
+        "Responsible author confirming the target route",
+        "`target_preparation.ranking_confirmation_completed` must remain false until the packet is complete",
+        "`target_preparation.ranking_confirmation_source`",
+        "`target_preparation.ranking_confirmation_source_url`",
+        "`target_preparation.ranking_confirmation_checked_date`",
+        "Publisher metrics are screening signals only and do not replace JCR, CAS, CCF, or institutional category evidence",
+    ]:
+        request_text = request_text.replace(marker, "")
+
+    errors = module.check_final_upload_information_request(request_text)
+
+    assert any("Target ranking/category evidence packet" in error for error in errors)
+    assert any("Q2/B route" in error for error in errors)
+    assert any("Selected journal ISSN or eISSN matched to ranking source" in error for error in errors)
+    assert any("Ranking source URL or institutional system URL" in error for error in errors)
+    assert any("Publisher metrics are screening signals only" in error for error in errors)
+
+
 def test_check_final_upload_information_request_rejects_missing_metadata_mapping() -> None:
     """验证最终上传信息表必须说明外部输入如何同步到元数据文件。"""
 
@@ -4753,6 +4787,7 @@ def test_check_target_journal_shortlist_accepts_complete_shortlist() -> None:
             "Information Systems and Scientometrics entries remain planning records from 2026-06-19.",
             "The official source links are listed below.",
             "JCR quartile and CCF class must be rechecked in the authors' authorized ranking systems.",
+            "For Q2/B decision-making, the final record must match the selected journal's ISSN or eISSN to the authors' accepted ranking source and record the subject category used by that source. Acceptable evidence may include JCR quartile, Chinese Academy of Sciences zone, CCF class when applicable, or a local institutional list; publisher CiteScore, Impact Factor, aims-and-scope text, and this shortlist are screening evidence only. Do not mark `ranking_confirmation_completed` true until the source URL or institutional system URL, access date, evidence export or screenshot path, and responsible author confirmation are recorded in the final-upload information packet.",
             "Status: provisional preparation only.",
             "The current anonymous author placeholder is compatible with single anonymized review preparation.",
             "The current abstract is checked against a 250-word limit.",
@@ -4805,6 +4840,25 @@ def test_check_target_journal_shortlist_accepts_complete_shortlist() -> None:
     errors = module.check_target_journal_shortlist(shortlist_text)
 
     assert errors == []
+
+
+def test_check_target_journal_shortlist_rejects_missing_q2b_ranking_boundary() -> None:
+    """验证目标期刊候选清单必须保留 Q2/B 排名类别确认边界。"""
+
+    module = _load_validate_manuscript_module()
+    shortlist_text = Path("manuscript/target_journal_shortlist.md").read_text(encoding="utf-8")
+    shortlist_text = shortlist_text.replace(
+        "For Q2/B decision-making, the final record must match the selected journal's ISSN or eISSN to the authors' accepted ranking source and record the subject category used by that source. Acceptable evidence may include JCR quartile, Chinese Academy of Sciences zone, CCF class when applicable, or a local institutional list; publisher CiteScore, Impact Factor, aims-and-scope text, and this shortlist are screening evidence only. Do not mark `ranking_confirmation_completed` true until the source URL or institutional system URL, access date, evidence export or screenshot path, and responsible author confirmation are recorded in the final-upload information packet.",
+        "",
+    )
+
+    errors = module.check_target_journal_shortlist(shortlist_text)
+
+    assert any("Q2/B decision-making" in error for error in errors)
+    assert any("ISSN or eISSN" in error for error in errors)
+    assert any("subject category" in error for error in errors)
+    assert any("publisher CiteScore, Impact Factor" in error for error in errors)
+    assert any("responsible author confirmation" in error for error in errors)
 
 
 def test_check_target_journal_shortlist_rejects_missing_boundary() -> None:

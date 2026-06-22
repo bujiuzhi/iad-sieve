@@ -45,6 +45,7 @@ Before final-upload validation, maintain one ledger row per external value so th
 | External value | Confirmed value | Evidence source | Responsible author confirmation | YYYY-MM-DD confirmation date | Synchronization target | Validation evidence |
 | --- | --- | --- | --- | --- | --- | --- |
 | Selected target journal, article type, and review mode |  | Author decision record, author-guide URL, and ranking/category source |  |  | `submission_metadata.yml`, selected journal source package, and live submission-system field checked | `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` |
+| Target ranking/category evidence for Q2/B decision |  | JCR quartile, Chinese Academy of Sciences zone, CCF class when applicable, institutional ranking/category source, ISSN match, subject category, source URL, source access date, and evidence export or screenshot path |  |  | `target_preparation.ranking_confirmation_*`, `target_journal_shortlist.md`, and author decision record | Final-upload metadata validation plus author-confirmed rank/category evidence packet |
 | Author order, affiliations, emails, ORCID values, and corresponding author |  | Author-provided metadata record |  |  | `submission_metadata.yml`, title page, cover letter, and live submission-system field checked | Final package preview and metadata validation |
 | Funding, competing-interest, permissions, CRediT, and generative AI declarations |  | Author-approved declaration text and publisher declaration files when required |  |  | `submission_metadata.yml`, manuscript declaration sections, `cover_letter.md`, and live submission-system field checked | Final-upload package validation and publisher declaration-file check |
 | Artifact URL or DOI and public access status |  | Public release page, DOI landing page, or archive record |  |  | `submission_metadata.yml`, artifact manifest publication object, research-data statement, `cover_letter.md`, and live submission-system field checked | Artifact release validation plus final-upload package validation |
@@ -90,6 +91,27 @@ The DKE official-guide preflight source is already recorded in `submission_metad
 - Ranking/category checked date:
 - Ranking/category confirmation completed:
 - Selected target journal author-confirmed:
+
+### Target ranking/category evidence packet
+
+Use this packet before claiming a Q2/B route or marking `ranking_confirmation_completed: true`. Publisher CiteScore, Impact Factor, or scope text is not sufficient for Q2/B classification.
+
+| Evidence field | Confirmed value |
+| --- | --- |
+| Selected journal ISSN or eISSN matched to ranking source |  |
+| Ranking source type, such as JCR, Chinese Academy of Sciences zone, CCF class, or institutional list |  |
+| Subject category used by the ranking source |  |
+| Reported category value, such as Q2, CAS Zone 2, CCF B, or institutional B-class equivalent |  |
+| Ranking source URL or institutional system URL |  |
+| Ranking source access date in YYYY-MM-DD |  |
+| Evidence export, screenshot, or author decision record path |  |
+| Responsible author confirming the target route |  |
+
+- `target_preparation.ranking_confirmation_completed` must remain false until the packet is complete:
+- `target_preparation.ranking_confirmation_source`:
+- `target_preparation.ranking_confirmation_source_url`:
+- `target_preparation.ranking_confirmation_checked_date`:
+- Publisher metrics are screening signals only and do not replace JCR, CAS, CCF, or institutional category evidence:
 
 ## Author list
 
