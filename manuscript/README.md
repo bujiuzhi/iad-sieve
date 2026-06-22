@@ -63,7 +63,7 @@ LaTeX 环境诊断：
 python manuscript/scripts/diagnose_latex_environment.py
 ```
 
-`scripts/diagnose_latex_environment.py` 用于区分 TeX 源文件问题与本地构建环境问题。该脚本检查本机 LaTeX 引擎可用性、`TECTONIC_BUNDLE_DIR` 是否指向本地 Tectonic bundle、`build/logs/*.log` 中的 Tectonic/Rust runtime panic 标记，以及 `system-configuration`、`reqwest`、`Attempted to create a NULL object`、`event loop thread panicked` 等运行时失败线索。默认诊断还会运行一个最小 Tectonic compile smoke test，用于发现“版本可用但一运行即崩溃”的环境；如只需检查历史日志，可加 `--skip-smoke-test`，如在构建前尚无 `build/logs/` 文件，可加 `--skip-logs`。该诊断只记录构建环境阻断项，不替代 PDF 构建、LaTeX warning 检查、PDF rendering 检查或最终投稿包新鲜度校验。
+`scripts/diagnose_latex_environment.py` 用于区分 TeX 源文件问题与本地构建环境问题。该脚本检查本机 LaTeX 引擎可用性、`TECTONIC_BUNDLE_DIR` 是否指向本地 Tectonic bundle、`build/logs/*.log` 中的 Tectonic/Rust runtime panic 标记，以及 `system-configuration`、`reqwest`、`Attempted to create a NULL object`、`event loop thread panicked` 等运行时失败线索。默认诊断还会运行一个最小 Tectonic compile smoke test，用于发现“版本可用但一运行即崩溃”的环境；非 panic 类烟测失败会保留 bounded output excerpt，并识别 ``File `...' not found`` 这类 missing TeX resource，提示检查本地 Tectonic bundle 完整性。如只需检查历史日志，可加 `--skip-smoke-test`，如在构建前尚无 `build/logs/` 文件，可加 `--skip-logs`。该诊断只记录构建环境阻断项，不替代 PDF 构建、LaTeX warning 检查、PDF rendering 检查或最终投稿包新鲜度校验。
 
 稿件校验：
 

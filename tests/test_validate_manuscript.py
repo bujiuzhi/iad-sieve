@@ -5298,6 +5298,8 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
         "--skip-logs",
         "Tectonic/Rust runtime panic",
         "system-configuration",
+        "missing TeX resource",
+        "output excerpt",
         "PDF rendering 检查",
     ]:
         readme_text = readme_text.replace(marker, "")
@@ -5328,6 +5330,8 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
     assert any("--skip-logs" in error for error in errors)
     assert any("Tectonic/Rust runtime panic" in error for error in errors)
     assert any("system-configuration" in error for error in errors)
+    assert any("missing TeX resource" in error for error in errors)
+    assert any("output excerpt" in error for error in errors)
     assert any("PDF rendering 检查" in error for error in errors)
 
 
@@ -5389,6 +5393,10 @@ def test_check_latex_environment_diagnostic_script_accepts_required_markers() ->
             "reqwest",
             "Attempted to create a NULL object",
             "event loop thread panicked",
+            "missing TeX resource",
+            "MISSING_TEX_RESOURCE_PATTERNS",
+            "format_output_excerpt",
+            "Tectonic smoke test output excerpt",
             "check_engine_availability",
             "check_bundle_directory",
             "check_tectonic_smoke_test",
@@ -7450,6 +7458,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "Tectonic/Rust runtime panic markers",
             "Attempted to create a NULL object",
             "event loop thread panicked",
+            "missing TeX resource",
+            "Tectonic smoke test output excerpt",
             "PDF build scripts also run a pre-build diagnostic with `--skip-logs`",
             "`build_latex_pdf.sh` and the standalone Elsevier/DKE preview builder",
             "clean checkout can detect engine-level failures before build logs exist",
@@ -8270,6 +8280,8 @@ def test_check_reviewer_readiness_audit_rejects_missing_latex_environment_diagno
         "Tectonic/Rust runtime panic markers",
         "Attempted to create a NULL object",
         "event loop thread panicked",
+        "missing TeX resource",
+        "Tectonic smoke test output excerpt",
         "PDF build scripts also run a pre-build diagnostic with `--skip-logs`",
         "`build_latex_pdf.sh` and the standalone Elsevier/DKE preview builder",
         "clean checkout can detect engine-level failures before build logs exist",

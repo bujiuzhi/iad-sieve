@@ -64,6 +64,24 @@ def test_analyze_log_text_rejects_tectonic_runtime_panic() -> None:
     assert any("event loop thread panicked" in error for error in errors)
 
 
+def test_analyze_log_text_reports_missing_tex_resource() -> None:
+    """验证缺失 TeX 资源会被识别为 bundle 完整性问题。"""
+
+    module = _load_latex_diagnostic_module()
+    log_text = "\n".join(
+        [
+            "note: Running TeX ...",
+            "error: article.cls:113: ! LaTeX Error: File `size10.clo' not found.",
+            "error: halted on potentially-recoverable error as specified",
+        ]
+    )
+
+    errors = module.analyze_log_text(log_text, "smoke.log")
+
+    assert any("missing TeX resource: size10.clo" in error for error in errors)
+    assert any("Tectonic bundle completeness" in error for error in errors)
+
+
 def test_check_bundle_directory_accepts_existing_directory(tmp_path: Path) -> None:
     """验证本地 Tectonic bundle 目录存在时不会报错。"""
 
@@ -124,6 +142,35 @@ def test_check_tectonic_smoke_test_rejects_runtime_panic(monkeypatch) -> None:
     assert any("tectonic smoke test contains a Tectonic/Rust runtime panic" in error for error in errors)
     assert any("Attempted to create a NULL object" in error for error in errors)
     assert any("event loop thread panicked" in error for error in errors)
+
+
+def test_check_tectonic_smoke_test_reports_non_panic_output_excerpt(monkeypatch) -> None:
+    """验证非 panic 烟测失败会保留可定位的输出摘录。"""
+
+    module = _load_latex_diagnostic_module()
+    missing_resource_output = "\n".join(
+        [
+            "note: using only cached resource files",
+            "note: Running TeX ...",
+            "error: article.cls:113: ! LaTeX Error: File `size10.clo' not found.",
+            "error: halted on potentially-recoverable error as specified",
+        ]
+    )
+
+    def fake_run(command, check, capture_output, text, timeout):
+        """Return a synthetic missing-resource Tectonic failure."""
+        return subprocess.CompletedProcess(command, 1, stdout="", stderr=missing_resource_output)
+
+    monkeypatch.setattr(module.shutil, "which", lambda command_name: "/usr/bin/tectonic")
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+
+    warnings, errors = module.check_tectonic_smoke_test("/tmp/partial-bundle")
+
+    assert warnings == []
+    assert any("missing TeX resource: size10.clo" in error for error in errors)
+    assert any("Tectonic smoke test failed with exit code 1" in error for error in errors)
+    assert any("Tectonic smoke test output excerpt" in error for error in errors)
+    assert any("size10.clo" in error for error in errors)
 
 
 def test_diagnose_latex_environment_can_skip_smoke_test(tmp_path: Path, monkeypatch) -> None:

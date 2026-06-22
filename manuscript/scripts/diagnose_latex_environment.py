@@ -32,6 +32,10 @@ TECTONIC_RUNTIME_PATTERNS = [
     re.compile(r"system-configuration", re.IGNORECASE),
     re.compile(r"reqwest", re.IGNORECASE),
 ]
+MISSING_TEX_RESOURCE_PATTERNS = [
+    re.compile(r"File [`']([^`']+)['`] not found", re.IGNORECASE),
+    re.compile(r"I can't find file [`']?([^`'\s]+)", re.IGNORECASE),
+]
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -150,7 +154,34 @@ def analyze_log_text(log_text: str, log_name: str) -> list[str]:
         match = pattern.search(log_text)
         if match is not None:
             errors.append(f"{log_name} contains LaTeX engine runtime marker: {match.group(0)}")
+    for pattern in MISSING_TEX_RESOURCE_PATTERNS:
+        for match in pattern.finditer(log_text):
+            missing_resource = match.group(1).strip().rstrip(".")
+            errors.append(
+                f"{log_name} contains missing TeX resource: {missing_resource}; "
+                "check the local Tectonic bundle completeness"
+            )
     return sorted(set(errors))
+
+
+def format_output_excerpt(output_text: str, max_lines: int = 8, max_line_length: int = 240) -> str:
+    """Format a bounded stdout/stderr excerpt for failed smoke-test diagnostics.
+
+    Args:
+        output_text: Combined stdout and stderr text.
+        max_lines: Maximum non-empty lines to include.
+        max_line_length: Maximum characters per included line.
+
+    Returns:
+        str: Bounded one-line excerpt for diagnostic output.
+    """
+    lines = [line.strip() for line in output_text.splitlines() if line.strip()]
+    if not lines:
+        return "no stdout/stderr output"
+    excerpt_lines = [line[:max_line_length] for line in lines[:max_lines]]
+    if len(lines) > max_lines:
+        excerpt_lines.append("...")
+    return " | ".join(excerpt_lines)
 
 
 def analyze_log_files(log_paths: list[Path]) -> list[str]:
@@ -207,8 +238,9 @@ def check_tectonic_smoke_test(bundle_dir: str, timeout_seconds: int = 15) -> tup
     combined_output = "\n".join(part for part in [completed.stdout, completed.stderr] if part)
     runtime_errors = analyze_log_text(combined_output, "tectonic smoke test")
     errors = list(runtime_errors)
-    if completed.returncode != 0 and not runtime_errors:
+    if completed.returncode != 0:
         errors.append(f"Tectonic smoke test failed with exit code {completed.returncode}")
+        errors.append(f"Tectonic smoke test output excerpt: {format_output_excerpt(combined_output)}")
     if errors:
         return [], errors
     return ["Tectonic smoke test completed without runtime panic."], []

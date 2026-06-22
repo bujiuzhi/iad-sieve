@@ -3766,6 +3766,8 @@ def check_manuscript_package_docs(readme_text: str, manifest_text: str) -> list[
         "--skip-logs",
         "Tectonic/Rust runtime panic",
         "system-configuration",
+        "missing TeX resource",
+        "output excerpt",
         "PDF rendering 检查",
     ]
     errors: list[str] = []
@@ -3837,6 +3839,10 @@ def check_latex_environment_diagnostic_script(script_text: str) -> list[str]:
         "reqwest",
         "Attempted to create a NULL object",
         "event loop thread panicked",
+        "missing TeX resource",
+        "MISSING_TEX_RESOURCE_PATTERNS",
+        "format_output_excerpt",
+        "Tectonic smoke test output excerpt",
         "check_engine_availability",
         "check_bundle_directory",
         "check_tectonic_smoke_test",
@@ -4479,6 +4485,8 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Tectonic/Rust runtime panic markers",
         "Attempted to create a NULL object",
         "event loop thread panicked",
+        "missing TeX resource",
+        "Tectonic smoke test output excerpt",
         "PDF build scripts also run a pre-build diagnostic with `--skip-logs`",
         "`build_latex_pdf.sh` and the standalone Elsevier/DKE preview builder",
         "clean checkout can detect engine-level failures before build logs exist",
