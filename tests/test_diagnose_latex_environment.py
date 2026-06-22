@@ -145,6 +145,45 @@ def test_diagnose_latex_environment_can_skip_smoke_test(tmp_path: Path, monkeypa
     assert errors == []
 
 
+def test_diagnose_latex_environment_can_skip_missing_logs(tmp_path: Path, monkeypatch) -> None:
+    """验证构建前诊断可以跳过尚未生成的日志文件。"""
+
+    module = _load_latex_diagnostic_module()
+    missing_log = tmp_path / "missing-main.log"
+    monkeypatch.setattr(module, "check_engine_availability", lambda: (["tectonic: mocked"], []))
+    monkeypatch.setattr(module, "check_tectonic_smoke_test", lambda bundle_dir: (["smoke ok"], []))
+
+    warnings, errors = module.diagnose_latex_environment(
+        [missing_log],
+        "",
+        run_smoke_test=True,
+        run_log_checks=False,
+    )
+
+    assert any("TECTONIC_BUNDLE_DIR is not set" in warning for warning in warnings)
+    assert any("smoke ok" in warning for warning in warnings)
+    assert errors == []
+
+
+def test_diagnose_latex_environment_reports_missing_logs_when_enabled(tmp_path: Path, monkeypatch) -> None:
+    """验证未跳过日志检查时缺失构建日志仍会被报告。"""
+
+    module = _load_latex_diagnostic_module()
+    missing_log = tmp_path / "missing-main.log"
+    monkeypatch.setattr(module, "check_engine_availability", lambda: (["tectonic: mocked"], []))
+    monkeypatch.setattr(module, "check_tectonic_smoke_test", lambda bundle_dir: (["smoke ok"], []))
+
+    warnings, errors = module.diagnose_latex_environment(
+        [missing_log],
+        "",
+        run_smoke_test=True,
+        run_log_checks=True,
+    )
+
+    assert any("smoke ok" in warning for warning in warnings)
+    assert any("missing LaTeX build log for diagnosis" in error for error in errors)
+
+
 def test_diagnose_latex_environment_reports_smoke_test_errors(tmp_path: Path, monkeypatch) -> None:
     """验证诊断入口会汇总最小 Tectonic 烟测错误。"""
 

@@ -177,6 +177,7 @@ def run_tectonic(output_tex: Path, output_pdf: Path) -> None:
     异常:
         RuntimeError: Raised when tectonic fails or the PDF is missing.
     """
+    run_latex_environment_preflight()
     command = ["tectonic"]
     bundle_dir = os.environ.get("TECTONIC_BUNDLE_DIR")
     if bundle_dir:
@@ -194,6 +195,28 @@ def run_tectonic(output_tex: Path, output_pdf: Path) -> None:
     if generated_pdf != output_pdf:
         output_pdf.write_bytes(generated_pdf.read_bytes())
         generated_pdf.unlink()
+
+
+def run_latex_environment_preflight() -> None:
+    """Run the LaTeX environment diagnostic before invoking Tectonic.
+
+    参数:
+        无。
+
+    返回:
+        无。
+
+    异常:
+        RuntimeError: Raised when the diagnostic detects an engine or bundle problem.
+    """
+    diagnostic_script = Path(__file__).with_name("diagnose_latex_environment.py")
+    command = ["python", str(diagnostic_script), "--skip-logs"]
+    try:
+        subprocess.run(command, check=True)
+    except FileNotFoundError as exc:
+        raise RuntimeError("python is required to run the LaTeX environment diagnostic") from exc
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError("LaTeX environment diagnostic failed before Elsevier PDF build") from exc
 
 
 def build_draft(source_path: Path, keywords_path: Path, output_tex: Path, output_pdf: Path | None) -> dict[str, str]:

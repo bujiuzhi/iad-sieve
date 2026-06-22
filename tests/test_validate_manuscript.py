@@ -5295,6 +5295,7 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
         "TECTONIC_BUNDLE_DIR",
         "本地 Tectonic bundle",
         "diagnose_latex_environment.py",
+        "--skip-logs",
         "Tectonic/Rust runtime panic",
         "system-configuration",
         "PDF rendering 检查",
@@ -5324,6 +5325,7 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
     assert any("TECTONIC_BUNDLE_DIR" in error for error in errors)
     assert any("本地 Tectonic bundle" in error for error in errors)
     assert any("diagnose_latex_environment.py" in error for error in errors)
+    assert any("--skip-logs" in error for error in errors)
     assert any("Tectonic/Rust runtime panic" in error for error in errors)
     assert any("system-configuration" in error for error in errors)
     assert any("PDF rendering 检查" in error for error in errors)
@@ -5335,6 +5337,7 @@ def test_check_latex_build_scripts_accepts_offline_bundle_controls() -> None:
     module = _load_validate_manuscript_module()
     build_script_text = "\n".join(
         [
+            "python scripts/diagnose_latex_environment.py --skip-logs",
             "run_tectonic() {",
             'if [[ -n "${TECTONIC_BUNDLE_DIR:-}" ]]; then',
             'tectonic --bundle "$TECTONIC_BUNDLE_DIR" "$input_path"',
@@ -5345,6 +5348,9 @@ def test_check_latex_build_scripts_accepts_offline_bundle_controls() -> None:
     )
     elsevier_builder_text = "\n".join(
         [
+            "run_latex_environment_preflight",
+            "diagnose_latex_environment.py",
+            "--skip-logs",
             "bundle_dir = os.environ.get(\"TECTONIC_BUNDLE_DIR\")",
             "command.extend([\"--bundle\", bundle_dir])",
             "subprocess.run(command, cwd=output_tex.parent, check=True)",
@@ -5366,6 +5372,8 @@ def test_check_latex_build_scripts_rejects_missing_offline_bundle_controls() -> 
     assert any("TECTONIC_BUNDLE_DIR" in error for error in errors)
     assert any("--bundle" in error for error in errors)
     assert any("check_pdf_rendering.py" in error for error in errors)
+    assert any("diagnose_latex_environment.py" in error for error in errors)
+    assert any("--skip-logs" in error for error in errors)
 
 
 def test_check_latex_environment_diagnostic_script_accepts_required_markers() -> None:
@@ -5387,6 +5395,7 @@ def test_check_latex_environment_diagnostic_script_accepts_required_markers() ->
             "analyze_log_text",
             "analyze_log_files",
             "--skip-smoke-test",
+            "--skip-logs",
             "Tectonic smoke test",
             "minimal Tectonic compile smoke test",
             "does not rebuild manuscript PDFs",
@@ -5411,6 +5420,7 @@ def test_check_latex_environment_diagnostic_script_rejects_missing_runtime_marke
     assert any("event loop thread panicked" in error for error in errors)
     assert any("check_tectonic_smoke_test" in error for error in errors)
     assert any("--skip-smoke-test" in error for error in errors)
+    assert any("--skip-logs" in error for error in errors)
 
 
 def test_check_related_work_positioning_accepts_main_text_and_supplementary_matrix() -> None:
@@ -7440,6 +7450,9 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "Tectonic/Rust runtime panic markers",
             "Attempted to create a NULL object",
             "event loop thread panicked",
+            "PDF build scripts also run a pre-build diagnostic with `--skip-logs`",
+            "`build_latex_pdf.sh` and the standalone Elsevier/DKE preview builder",
+            "clean checkout can detect engine-level failures before build logs exist",
             "build-environment diagnosis, not PDF freshness",
             "does not rebuild manuscript PDFs",
             "LaTeX environment diagnostics are clean",
@@ -8257,6 +8270,9 @@ def test_check_reviewer_readiness_audit_rejects_missing_latex_environment_diagno
         "Tectonic/Rust runtime panic markers",
         "Attempted to create a NULL object",
         "event loop thread panicked",
+        "PDF build scripts also run a pre-build diagnostic with `--skip-logs`",
+        "`build_latex_pdf.sh` and the standalone Elsevier/DKE preview builder",
+        "clean checkout can detect engine-level failures before build logs exist",
         "build-environment diagnosis, not PDF freshness",
         "does not rebuild manuscript PDFs",
         "LaTeX environment diagnostics are clean",
@@ -8268,6 +8284,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_latex_environment_diagno
     assert any("LaTeX Environment Diagnostic Gate" in error for error in errors)
     assert any("latex-engine panic diagnostic gap" in error for error in errors)
     assert any("build-failure diagnostic coverage" in error for error in errors)
+    assert any("--skip-logs" in error for error in errors)
     assert any("does not rebuild manuscript PDFs" in error for error in errors)
 
 

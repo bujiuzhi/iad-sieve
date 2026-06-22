@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -86,3 +87,41 @@ def test_load_keywords_rejects_empty_keyword_file(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="expected 1 to 7 keywords"):
         module.load_keywords(keywords_path)
+
+
+def test_run_latex_environment_preflight_invokes_diagnostic(monkeypatch) -> None:
+    """验证 Elsevier PDF 构建前会先运行 LaTeX 环境诊断。"""
+
+    module = _load_build_elsevier_module()
+    recorded_commands: list[list[str]] = []
+
+    def fake_run(command, check):
+        """Record the diagnostic command and return success."""
+        recorded_commands.append(command)
+        assert check is True
+        return subprocess.CompletedProcess(command, 0)
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+
+    module.run_latex_environment_preflight()
+
+    assert recorded_commands
+    command = recorded_commands[0]
+    assert command[0] == "python"
+    assert command[-1] == "--skip-logs"
+    assert "diagnose_latex_environment.py" in command[1]
+
+
+def test_run_latex_environment_preflight_rejects_failed_diagnostic(monkeypatch) -> None:
+    """验证 LaTeX 环境诊断失败时不会继续构建 Elsevier PDF。"""
+
+    module = _load_build_elsevier_module()
+
+    def fake_run(command, check):
+        """Raise a diagnostic failure."""
+        raise subprocess.CalledProcessError(1, command)
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+
+    with pytest.raises(RuntimeError, match="LaTeX environment diagnostic failed"):
+        module.run_latex_environment_preflight()

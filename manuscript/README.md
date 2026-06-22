@@ -53,7 +53,7 @@ cd manuscript
 ./scripts/build_latex_pdf.sh
 ```
 
-构建脚本会同步生成主稿 PDF、补充材料 PDF、DKE/Elsevier 预转换 PDF，并在 `build/logs/` 下写入本地构建日志。`scripts/check_latex_warnings.py` 会拒绝严重 overfull hbox、未定义引用、未定义参考文献和致命 TeX 错误；`scripts/check_pdf_rendering.py` 会抽样渲染 PDF 页面，拒绝空白页、黑页和渲染失败。
+构建脚本会先运行 `python scripts/diagnose_latex_environment.py --skip-logs`，在正式编译前检查 LaTeX/Tectonic 引擎、bundle 路径和最小 Tectonic compile smoke test。通过前置诊断后，脚本会同步生成主稿 PDF、补充材料 PDF、DKE/Elsevier 预转换 PDF，并在 `build/logs/` 下写入本地构建日志。`scripts/check_latex_warnings.py` 会拒绝严重 overfull hbox、未定义引用、未定义参考文献和致命 TeX 错误；`scripts/check_pdf_rendering.py` 会抽样渲染 PDF 页面，拒绝空白页、黑页和渲染失败。
 
 离线或默认 Tectonic bundle 不可用时，可先准备一个只读本地 Tectonic bundle 目录，并通过 `TECTONIC_BUNDLE_DIR=/path/to/tectonic-bundle ./scripts/build_latex_pdf.sh` 构建。该环境变量只改变 TeX 资源来源，不改变主稿、补充材料、Elsevier 预转换稿、LaTeX 日志和 PDF rendering 检查的构建门禁；临时 bundle 目录应放在 `outputs/` 或其他不纳入 Git 的位置。
 
@@ -63,7 +63,7 @@ LaTeX 环境诊断：
 python manuscript/scripts/diagnose_latex_environment.py
 ```
 
-`scripts/diagnose_latex_environment.py` 用于区分 TeX 源文件问题与本地构建环境问题。该脚本检查本机 LaTeX 引擎可用性、`TECTONIC_BUNDLE_DIR` 是否指向本地 Tectonic bundle、`build/logs/*.log` 中的 Tectonic/Rust runtime panic 标记，以及 `system-configuration`、`reqwest`、`Attempted to create a NULL object`、`event loop thread panicked` 等运行时失败线索。默认诊断还会运行一个最小 Tectonic compile smoke test，用于发现“版本可用但一运行即崩溃”的环境；如只需检查历史日志，可加 `--skip-smoke-test`。该诊断只记录构建环境阻断项，不替代 PDF 构建、LaTeX warning 检查、PDF rendering 检查或最终投稿包新鲜度校验。
+`scripts/diagnose_latex_environment.py` 用于区分 TeX 源文件问题与本地构建环境问题。该脚本检查本机 LaTeX 引擎可用性、`TECTONIC_BUNDLE_DIR` 是否指向本地 Tectonic bundle、`build/logs/*.log` 中的 Tectonic/Rust runtime panic 标记，以及 `system-configuration`、`reqwest`、`Attempted to create a NULL object`、`event loop thread panicked` 等运行时失败线索。默认诊断还会运行一个最小 Tectonic compile smoke test，用于发现“版本可用但一运行即崩溃”的环境；如只需检查历史日志，可加 `--skip-smoke-test`，如在构建前尚无 `build/logs/` 文件，可加 `--skip-logs`。该诊断只记录构建环境阻断项，不替代 PDF 构建、LaTeX warning 检查、PDF rendering 检查或最终投稿包新鲜度校验。
 
 稿件校验：
 
@@ -99,6 +99,8 @@ Elsevier/DKE 预转换稿构建：
 ```bash
 python manuscript/scripts/build_elsevier_draft.py
 ```
+
+该命令在调用 Tectonic 生成 PDF 前同样运行 `diagnose_latex_environment.py --skip-logs`。若只需要更新 Elsevier LaTeX 源文件而不生成 PDF，可使用 `python manuscript/scripts/build_elsevier_draft.py --no-pdf`。
 
 DKE/Elsevier 匿名预投稿包构建：
 

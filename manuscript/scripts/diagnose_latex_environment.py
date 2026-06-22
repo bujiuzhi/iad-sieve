@@ -57,6 +57,11 @@ def parse_arguments() -> argparse.Namespace:
         action="store_true",
         help="Skip the minimal Tectonic compile smoke test and inspect only installed commands, bundle path, and logs.",
     )
+    parser.add_argument(
+        "--skip-logs",
+        action="store_true",
+        help="Skip build/logs inspection. Use this before a fresh PDF build when logs may not exist yet.",
+    )
     parser.add_argument("--log-level", default="INFO", help="Logging level.")
     return parser.parse_args()
 
@@ -213,6 +218,7 @@ def diagnose_latex_environment(
     log_paths: list[Path],
     bundle_dir: str,
     run_smoke_test: bool = True,
+    run_log_checks: bool = True,
 ) -> tuple[list[str], list[str]]:
     """Diagnose local LaTeX engine, bundle, and recent build logs.
 
@@ -220,6 +226,7 @@ def diagnose_latex_environment(
         log_paths: Log paths to inspect.
         bundle_dir: Optional Tectonic bundle directory.
         run_smoke_test: Whether to run a minimal Tectonic compile smoke test.
+        run_log_checks: Whether to inspect existing LaTeX build logs.
 
     Returns:
         tuple[list[str], list[str]]: Warnings and errors.
@@ -228,7 +235,8 @@ def diagnose_latex_environment(
     bundle_warnings, bundle_errors = check_bundle_directory(bundle_dir)
     warnings.extend(bundle_warnings)
     errors.extend(bundle_errors)
-    errors.extend(analyze_log_files(log_paths))
+    if run_log_checks:
+        errors.extend(analyze_log_files(log_paths))
     if run_smoke_test:
         smoke_warnings, smoke_errors = check_tectonic_smoke_test(bundle_dir)
         warnings.extend(smoke_warnings)
@@ -245,7 +253,12 @@ def main() -> int:
     args = parse_arguments()
     logging.basicConfig(level=getattr(logging, str(args.log_level).upper(), logging.INFO), format="%(levelname)s %(message)s")
     log_paths = [Path(log_path).resolve() for log_path in args.log] if args.log else DEFAULT_LOGS
-    warnings, errors = diagnose_latex_environment(log_paths, args.bundle_dir, not args.skip_smoke_test)
+    warnings, errors = diagnose_latex_environment(
+        log_paths,
+        args.bundle_dir,
+        not args.skip_smoke_test,
+        not args.skip_logs,
+    )
     for warning in warnings:
         LOGGER.warning(warning)
     if errors:

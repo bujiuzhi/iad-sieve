@@ -5,6 +5,8 @@ cd "$(dirname "$0")/.."
 mkdir -p build
 mkdir -p build/logs
 
+python scripts/diagnose_latex_environment.py --skip-logs
+
 run_and_log() {
   local log_path="$1"
   shift
