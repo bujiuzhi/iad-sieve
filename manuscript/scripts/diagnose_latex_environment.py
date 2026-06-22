@@ -25,6 +25,30 @@ DEFAULT_LOGS = [
     ROOT / "build" / "logs" / "elsevier_draft.log",
 ]
 LATEX_ENGINES = ["tectonic", "latexmk", "pdflatex", "xelatex"]
+SMOKE_TEST_DOCUMENTS = [
+    (
+        "article 11pt smoke test",
+        "\\documentclass[11pt]{article}\n\\begin{document}\nIAD-Sieve LaTeX smoke test.\n\\end{document}\n",
+    ),
+    (
+        "elsarticle 12pt smoke test",
+        "\n".join(
+            [
+                "\\documentclass[preprint,12pt]{elsarticle}",
+                "\\begin{document}",
+                "\\begin{frontmatter}",
+                "\\title{IAD-Sieve LaTeX smoke test}",
+                "\\author{Anonymous}",
+                "\\begin{abstract}Smoke test.\\end{abstract}",
+                "\\end{frontmatter}",
+                "\\section{Smoke}",
+                "Smoke test.",
+                "\\end{document}",
+                "",
+            ]
+        ),
+    ),
+]
 TECTONIC_RUNTIME_PATTERNS = [
     re.compile(r"panicked at", re.IGNORECASE),
     re.compile(r"event loop thread panicked", re.IGNORECASE),
@@ -208,7 +232,7 @@ def analyze_log_files(log_paths: list[Path]) -> list[str]:
 
 
 def check_tectonic_smoke_test(bundle_dir: str, timeout_seconds: int = 15) -> tuple[list[str], list[str]]:
-    """Compile a minimal document to detect runtime failures before manuscript builds.
+    """Compile project-relevant minimal documents before manuscript builds.
 
     Args:
         bundle_dir: Optional Tectonic bundle directory.
@@ -219,31 +243,41 @@ def check_tectonic_smoke_test(bundle_dir: str, timeout_seconds: int = 15) -> tup
     """
     if shutil.which("tectonic") is None:
         return ["Tectonic smoke test skipped because tectonic is missing."], []
+    warnings: list[str] = []
+    errors: list[str] = []
     with tempfile.TemporaryDirectory(prefix="iad-sieve-tectonic-smoke-") as temporary_directory:
-        smoke_tex = Path(temporary_directory) / "smoke.tex"
-        smoke_tex.write_text(
-            "\\documentclass{article}\n\\begin{document}\nIAD-Sieve LaTeX smoke test.\n\\end{document}\n",
-            encoding="utf-8",
-        )
-        command = ["tectonic", "-C"]
-        if bundle_dir.strip():
-            command.extend(["--bundle", str(Path(bundle_dir).expanduser())])
-        command.append(str(smoke_tex))
-        try:
-            completed = subprocess.run(command, check=False, capture_output=True, text=True, timeout=timeout_seconds)
-        except subprocess.TimeoutExpired as exc:
-            return [], [f"Tectonic smoke test timed out after {timeout_seconds} seconds: {exc}"]
-        except OSError as exc:
-            return [], [f"Tectonic smoke test failed to start: {exc}"]
-    combined_output = "\n".join(part for part in [completed.stdout, completed.stderr] if part)
-    runtime_errors = analyze_log_text(combined_output, "tectonic smoke test")
-    errors = list(runtime_errors)
-    if completed.returncode != 0:
-        errors.append(f"Tectonic smoke test failed with exit code {completed.returncode}")
-        errors.append(f"Tectonic smoke test output excerpt: {format_output_excerpt(combined_output)}")
+        for smoke_test_name, smoke_test_source in SMOKE_TEST_DOCUMENTS:
+            smoke_tex = Path(temporary_directory) / f"{smoke_test_name.replace(' ', '_')}.tex"
+            smoke_tex.write_text(smoke_test_source, encoding="utf-8")
+            command = ["tectonic", "-C"]
+            if bundle_dir.strip():
+                command.extend(["--bundle", str(Path(bundle_dir).expanduser())])
+            command.append(str(smoke_tex))
+            try:
+                completed = subprocess.run(
+                    command,
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                    timeout=timeout_seconds,
+                )
+            except subprocess.TimeoutExpired as exc:
+                errors.append(f"{smoke_test_name} timed out after {timeout_seconds} seconds: {exc}")
+                continue
+            except OSError as exc:
+                errors.append(f"{smoke_test_name} failed to start: {exc}")
+                continue
+            combined_output = "\n".join(part for part in [completed.stdout, completed.stderr] if part)
+            runtime_errors = analyze_log_text(combined_output, smoke_test_name)
+            errors.extend(runtime_errors)
+            if completed.returncode != 0:
+                errors.append(f"{smoke_test_name} failed with exit code {completed.returncode}")
+                errors.append(f"Tectonic smoke test output excerpt ({smoke_test_name}): {format_output_excerpt(combined_output)}")
+            elif not runtime_errors:
+                warnings.append(f"{smoke_test_name} completed without runtime panic.")
     if errors:
-        return [], errors
-    return ["Tectonic smoke test completed without runtime panic."], []
+        return warnings, errors
+    return warnings, []
 
 
 def diagnose_latex_environment(

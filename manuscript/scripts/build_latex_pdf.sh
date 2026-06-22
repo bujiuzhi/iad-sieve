@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+ORIGINAL_CWD="$(pwd)"
+if [[ -n "${TECTONIC_BUNDLE_DIR:-}" && "${TECTONIC_BUNDLE_DIR:0:1}" != "/" ]]; then
+  export TECTONIC_BUNDLE_DIR="${ORIGINAL_CWD}/${TECTONIC_BUNDLE_DIR}"
+fi
+
 cd "$(dirname "$0")/.."
 mkdir -p build
 mkdir -p build/logs

@@ -89,27 +89,39 @@ def test_load_keywords_rejects_empty_keyword_file(tmp_path: Path) -> None:
         module.load_keywords(keywords_path)
 
 
+def test_resolve_bundle_dir_converts_relative_path(tmp_path: Path, monkeypatch) -> None:
+    """验证相对 Tectonic bundle 路径按调用目录解析为绝对路径。"""
+
+    module = _load_build_elsevier_module()
+    monkeypatch.chdir(tmp_path)
+
+    resolved_path = module.resolve_bundle_dir("outputs/tectonic_dir_bundle")
+
+    assert resolved_path == str(tmp_path / "outputs" / "tectonic_dir_bundle")
+
+
 def test_run_latex_environment_preflight_invokes_diagnostic(monkeypatch) -> None:
     """验证 Elsevier PDF 构建前会先运行 LaTeX 环境诊断。"""
 
     module = _load_build_elsevier_module()
-    recorded_commands: list[list[str]] = []
+    recorded_commands: list[tuple[list[str], dict[str, str]]] = []
 
-    def fake_run(command, check):
+    def fake_run(command, check, env):
         """Record the diagnostic command and return success."""
-        recorded_commands.append(command)
+        recorded_commands.append((command, env))
         assert check is True
         return subprocess.CompletedProcess(command, 0)
 
     monkeypatch.setattr(module.subprocess, "run", fake_run)
 
-    module.run_latex_environment_preflight()
+    module.run_latex_environment_preflight("/tmp/project-bundle")
 
     assert recorded_commands
-    command = recorded_commands[0]
+    command, environment = recorded_commands[0]
     assert command[0] == "python"
     assert command[-1] == "--skip-logs"
     assert "diagnose_latex_environment.py" in command[1]
+    assert environment["TECTONIC_BUNDLE_DIR"] == "/tmp/project-bundle"
 
 
 def test_run_latex_environment_preflight_rejects_failed_diagnostic(monkeypatch) -> None:
@@ -117,7 +129,7 @@ def test_run_latex_environment_preflight_rejects_failed_diagnostic(monkeypatch) 
 
     module = _load_build_elsevier_module()
 
-    def fake_run(command, check):
+    def fake_run(command, check, env):
         """Raise a diagnostic failure."""
         raise subprocess.CalledProcessError(1, command)
 

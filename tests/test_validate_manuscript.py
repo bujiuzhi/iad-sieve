@@ -1675,14 +1675,14 @@ def test_check_contribution_evidence_summary_accepts_complete_summary() -> None:
             "IAD-Bench as a provenance-aware pair contract.",
             "IAD-Risk as a risk-aware merge mechanism.",
             "The contribution prose names the failure mode, benchmark contract, and merge mechanism.",
-            "It uses hard-negative false-merge rate to measure agenda-level false merges.",
+            "Agenda relatedness is measured as false-merge risk rather than treated as merge confidence.",
             "It keeps gold identity labels, proxy agenda evidence, silver hard negatives, and human-review targets separate.",
-            "It presents and evaluates IAD-Risk as a risk-aware merge mechanism.",
-            "Clustering behavior, broad statistical ranking, and artifact-release audit claims remain outside the primary evidence.",
+            "IAD-Risk uses separate identity, agenda, and agenda-non-identity signals.",
+            "The Open-v2 evidence snapshot evaluates these contributions under explicit row-scope boundaries.",
+            "clustering behavior, broad statistical ranking, and artifact-release audit claims remain outside the primary evidence.",
+            "The conclusion is a targeted pair-level conclusion.",
             "The paper reports hard-negative false-merge rate.",
             "Gold, proxy, silver, and manual-validation layers are separated.",
-            "The evaluation uses a shared Open-v2 pair schema.",
-            "It marks row-scope differences between full-scope baselines and held-out IAD-Risk rows.",
             "The result includes same-work F1=0.980 and zero observed HNFMR.",
             "The manuscript makes not a broad method-ranking claim.",
         ]
@@ -1703,11 +1703,12 @@ def test_check_contribution_evidence_summary_rejects_missing_boundary() -> None:
 
     assert any("IAD-Risk as a risk-aware merge mechanism" in error for error in errors)
     assert any("failure mode, benchmark contract, and merge mechanism" in error for error in errors)
-    assert any("uses hard-negative false-merge rate to measure agenda-level false merges" in error for error in errors)
+    assert any("false-merge risk rather than treated as merge confidence" in error for error in errors)
     assert any("gold identity labels" in error for error in errors)
+    assert any("separate identity, agenda, and agenda-non-identity signals" in error for error in errors)
     assert any("artifact-release audit claims remain outside the primary evidence" in error for error in errors)
-    assert any("shared Open-v2 pair schema" in error for error in errors)
-    assert any("row-scope differences" in error for error in errors)
+    assert any("Open-v2 evidence snapshot" in error for error in errors)
+    assert any("targeted pair-level conclusion" in error for error in errors)
     assert any("not a broad method-ranking claim" in error for error in errors)
 
 
@@ -5296,6 +5297,8 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
         "本地 Tectonic bundle",
         "diagnose_latex_environment.py",
         "--skip-logs",
+        "article[11pt]",
+        "elsarticle[preprint,12pt]",
         "Tectonic/Rust runtime panic",
         "system-configuration",
         "missing TeX resource",
@@ -5328,6 +5331,8 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
     assert any("本地 Tectonic bundle" in error for error in errors)
     assert any("diagnose_latex_environment.py" in error for error in errors)
     assert any("--skip-logs" in error for error in errors)
+    assert any("article[11pt]" in error for error in errors)
+    assert any("elsarticle[preprint,12pt]" in error for error in errors)
     assert any("Tectonic/Rust runtime panic" in error for error in errors)
     assert any("system-configuration" in error for error in errors)
     assert any("missing TeX resource" in error for error in errors)
@@ -5341,6 +5346,8 @@ def test_check_latex_build_scripts_accepts_offline_bundle_controls() -> None:
     module = _load_validate_manuscript_module()
     build_script_text = "\n".join(
         [
+            'ORIGINAL_CWD="$(pwd)"',
+            'export TECTONIC_BUNDLE_DIR="${ORIGINAL_CWD}/${TECTONIC_BUNDLE_DIR}"',
             "python scripts/diagnose_latex_environment.py --skip-logs",
             "run_tectonic() {",
             'if [[ -n "${TECTONIC_BUNDLE_DIR:-}" ]]; then',
@@ -5355,8 +5362,11 @@ def test_check_latex_build_scripts_accepts_offline_bundle_controls() -> None:
             "run_latex_environment_preflight",
             "diagnose_latex_environment.py",
             "--skip-logs",
+            "resolve_bundle_dir",
+            "Path.cwd()",
             "bundle_dir = os.environ.get(\"TECTONIC_BUNDLE_DIR\")",
             "command.extend([\"--bundle\", bundle_dir])",
+            "env=environment",
             "subprocess.run(command, cwd=output_tex.parent, check=True)",
         ]
     )
@@ -5374,6 +5384,8 @@ def test_check_latex_build_scripts_rejects_missing_offline_bundle_controls() -> 
     errors = module.check_latex_build_scripts("tectonic main.tex", "subprocess.run(['tectonic'])")
 
     assert any("TECTONIC_BUNDLE_DIR" in error for error in errors)
+    assert any("ORIGINAL_CWD" in error for error in errors)
+    assert any("resolve_bundle_dir" in error for error in errors)
     assert any("--bundle" in error for error in errors)
     assert any("check_pdf_rendering.py" in error for error in errors)
     assert any("diagnose_latex_environment.py" in error for error in errors)
@@ -5397,6 +5409,11 @@ def test_check_latex_environment_diagnostic_script_accepts_required_markers() ->
             "MISSING_TEX_RESOURCE_PATTERNS",
             "format_output_excerpt",
             "Tectonic smoke test output excerpt",
+            "SMOKE_TEST_DOCUMENTS",
+            "\\documentclass[11pt]{article}",
+            "\\documentclass[preprint,12pt]{elsarticle}",
+            "article 11pt smoke test",
+            "elsarticle 12pt smoke test",
             "check_engine_availability",
             "check_bundle_directory",
             "check_tectonic_smoke_test",
@@ -7460,6 +7477,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "event loop thread panicked",
             "missing TeX resource",
             "Tectonic smoke test output excerpt",
+            "article[11pt]",
+            "elsarticle[preprint,12pt]",
             "PDF build scripts also run a pre-build diagnostic with `--skip-logs`",
             "`build_latex_pdf.sh` and the standalone Elsevier/DKE preview builder",
             "clean checkout can detect engine-level failures before build logs exist",
@@ -8282,6 +8301,8 @@ def test_check_reviewer_readiness_audit_rejects_missing_latex_environment_diagno
         "event loop thread panicked",
         "missing TeX resource",
         "Tectonic smoke test output excerpt",
+        "article[11pt]",
+        "elsarticle[preprint,12pt]",
         "PDF build scripts also run a pre-build diagnostic with `--skip-logs`",
         "`build_latex_pdf.sh` and the standalone Elsevier/DKE preview builder",
         "clean checkout can detect engine-level failures before build logs exist",

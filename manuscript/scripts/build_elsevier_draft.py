@@ -177,9 +177,9 @@ def run_tectonic(output_tex: Path, output_pdf: Path) -> None:
     异常:
         RuntimeError: Raised when tectonic fails or the PDF is missing.
     """
-    run_latex_environment_preflight()
+    bundle_dir = resolve_bundle_dir(os.environ.get("TECTONIC_BUNDLE_DIR"))
+    run_latex_environment_preflight(bundle_dir)
     command = ["tectonic"]
-    bundle_dir = os.environ.get("TECTONIC_BUNDLE_DIR")
     if bundle_dir:
         command.extend(["--bundle", bundle_dir])
     command.append(output_tex.name)
@@ -197,11 +197,28 @@ def run_tectonic(output_tex: Path, output_pdf: Path) -> None:
         generated_pdf.unlink()
 
 
-def run_latex_environment_preflight() -> None:
+def resolve_bundle_dir(bundle_dir: str | None) -> str | None:
+    """Resolve a Tectonic bundle path against the caller working directory.
+
+    参数:
+        bundle_dir: Optional TECTONIC_BUNDLE_DIR value.
+
+    返回:
+        str | None: Absolute bundle path when configured, otherwise None.
+    """
+    if not bundle_dir:
+        return None
+    bundle_path = Path(bundle_dir).expanduser()
+    if not bundle_path.is_absolute():
+        bundle_path = Path.cwd() / bundle_path
+    return str(bundle_path.resolve())
+
+
+def run_latex_environment_preflight(bundle_dir: str | None = None) -> None:
     """Run the LaTeX environment diagnostic before invoking Tectonic.
 
     参数:
-        无。
+        bundle_dir: Optional absolute Tectonic bundle directory to pass to the diagnostic.
 
     返回:
         无。
@@ -211,8 +228,11 @@ def run_latex_environment_preflight() -> None:
     """
     diagnostic_script = Path(__file__).with_name("diagnose_latex_environment.py")
     command = ["python", str(diagnostic_script), "--skip-logs"]
+    environment = os.environ.copy()
+    if bundle_dir:
+        environment["TECTONIC_BUNDLE_DIR"] = bundle_dir
     try:
-        subprocess.run(command, check=True)
+        subprocess.run(command, check=True, env=environment)
     except FileNotFoundError as exc:
         raise RuntimeError("python is required to run the LaTeX environment diagnostic") from exc
     except subprocess.CalledProcessError as exc:

@@ -71,14 +71,14 @@ def test_analyze_log_text_reports_missing_tex_resource() -> None:
     log_text = "\n".join(
         [
             "note: Running TeX ...",
-            "error: article.cls:113: ! LaTeX Error: File `size10.clo' not found.",
+            "error: article.cls:113: ! LaTeX Error: File `size11.clo' not found.",
             "error: halted on potentially-recoverable error as specified",
         ]
     )
 
     errors = module.analyze_log_text(log_text, "smoke.log")
 
-    assert any("missing TeX resource: size10.clo" in error for error in errors)
+    assert any("missing TeX resource: size11.clo" in error for error in errors)
     assert any("Tectonic bundle completeness" in error for error in errors)
 
 
@@ -139,7 +139,7 @@ def test_check_tectonic_smoke_test_rejects_runtime_panic(monkeypatch) -> None:
     warnings, errors = module.check_tectonic_smoke_test("")
 
     assert warnings == []
-    assert any("tectonic smoke test contains a Tectonic/Rust runtime panic" in error for error in errors)
+    assert any("article 11pt smoke test contains a Tectonic/Rust runtime panic" in error for error in errors)
     assert any("Attempted to create a NULL object" in error for error in errors)
     assert any("event loop thread panicked" in error for error in errors)
 
@@ -152,7 +152,7 @@ def test_check_tectonic_smoke_test_reports_non_panic_output_excerpt(monkeypatch)
         [
             "note: using only cached resource files",
             "note: Running TeX ...",
-            "error: article.cls:113: ! LaTeX Error: File `size10.clo' not found.",
+            "error: article.cls:113: ! LaTeX Error: File `size11.clo' not found.",
             "error: halted on potentially-recoverable error as specified",
         ]
     )
@@ -167,10 +167,34 @@ def test_check_tectonic_smoke_test_reports_non_panic_output_excerpt(monkeypatch)
     warnings, errors = module.check_tectonic_smoke_test("/tmp/partial-bundle")
 
     assert warnings == []
-    assert any("missing TeX resource: size10.clo" in error for error in errors)
-    assert any("Tectonic smoke test failed with exit code 1" in error for error in errors)
-    assert any("Tectonic smoke test output excerpt" in error for error in errors)
-    assert any("size10.clo" in error for error in errors)
+    assert any("missing TeX resource: size11.clo" in error for error in errors)
+    assert any("article 11pt smoke test failed with exit code 1" in error for error in errors)
+    assert any("Tectonic smoke test output excerpt (article 11pt smoke test)" in error for error in errors)
+    assert any("size11.clo" in error for error in errors)
+
+
+def test_check_tectonic_smoke_test_uses_project_relevant_documents(monkeypatch) -> None:
+    """验证烟测覆盖主稿 article 11pt 和 Elsevier 12pt 构建路径。"""
+
+    module = _load_latex_diagnostic_module()
+    compiled_sources: list[str] = []
+
+    def fake_run(command, check, capture_output, text, timeout):
+        """Record the smoke-test source document and return success."""
+        source_path = Path(command[-1])
+        compiled_sources.append(source_path.read_text(encoding="utf-8"))
+        return subprocess.CompletedProcess(command, 0, stdout="note: Writing `smoke.pdf`", stderr="")
+
+    monkeypatch.setattr(module.shutil, "which", lambda command_name: "/usr/bin/tectonic")
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+
+    warnings, errors = module.check_tectonic_smoke_test("/tmp/project-bundle")
+
+    assert errors == []
+    assert any("\\documentclass[11pt]{article}" in source for source in compiled_sources)
+    assert any("\\documentclass[preprint,12pt]{elsarticle}" in source for source in compiled_sources)
+    assert any("article 11pt smoke test completed" in warning for warning in warnings)
+    assert any("elsarticle 12pt smoke test completed" in warning for warning in warnings)
 
 
 def test_diagnose_latex_environment_can_skip_smoke_test(tmp_path: Path, monkeypatch) -> None:
