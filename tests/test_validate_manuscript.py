@@ -5227,6 +5227,9 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
         "Artifact release URL or DOI",
         "TECTONIC_BUNDLE_DIR",
         "本地 Tectonic bundle",
+        "diagnose_latex_environment.py",
+        "Tectonic/Rust runtime panic",
+        "system-configuration",
         "PDF rendering 检查",
     ]:
         readme_text = readme_text.replace(marker, "")
@@ -5253,6 +5256,9 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
     assert any("Artifact release URL or DOI" in error for error in errors)
     assert any("TECTONIC_BUNDLE_DIR" in error for error in errors)
     assert any("本地 Tectonic bundle" in error for error in errors)
+    assert any("diagnose_latex_environment.py" in error for error in errors)
+    assert any("Tectonic/Rust runtime panic" in error for error in errors)
+    assert any("system-configuration" in error for error in errors)
     assert any("PDF rendering 检查" in error for error in errors)
 
 
@@ -5293,6 +5299,45 @@ def test_check_latex_build_scripts_rejects_missing_offline_bundle_controls() -> 
     assert any("TECTONIC_BUNDLE_DIR" in error for error in errors)
     assert any("--bundle" in error for error in errors)
     assert any("check_pdf_rendering.py" in error for error in errors)
+
+
+def test_check_latex_environment_diagnostic_script_accepts_required_markers() -> None:
+    """验证 LaTeX 环境诊断脚本覆盖运行时失败标记时可通过。"""
+
+    module = _load_validate_manuscript_module()
+    script_text = "\n".join(
+        [
+            "def diagnose_latex_environment(): pass",
+            "TECTONIC_BUNDLE_DIR",
+            "Tectonic/Rust runtime panic",
+            "system-configuration",
+            "reqwest",
+            "Attempted to create a NULL object",
+            "event loop thread panicked",
+            "check_engine_availability",
+            "check_bundle_directory",
+            "analyze_log_text",
+            "analyze_log_files",
+            "does not rebuild manuscript PDFs",
+        ]
+    )
+
+    errors = module.check_latex_environment_diagnostic_script(script_text)
+
+    assert errors == []
+
+
+def test_check_latex_environment_diagnostic_script_rejects_missing_runtime_markers() -> None:
+    """验证 LaTeX 环境诊断脚本缺少运行时失败标记时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+
+    errors = module.check_latex_environment_diagnostic_script("def diagnose_latex_environment(): pass")
+
+    assert any("TECTONIC_BUNDLE_DIR" in error for error in errors)
+    assert any("Tectonic/Rust runtime panic" in error for error in errors)
+    assert any("Attempted to create a NULL object" in error for error in errors)
+    assert any("event loop thread panicked" in error for error in errors)
 
 
 def test_check_related_work_positioning_accepts_main_text_and_supplementary_matrix() -> None:
@@ -6336,8 +6381,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Readiness Summary",
-            "Readiness gates covered: 119.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, Elsevier competing-interest declaration file traceability, introduction contribution first-screen compression, processing-run-log schema bypass, process-note vocabulary bypass, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, and stronger evidence gates.",
+            "Readiness gates covered: 120.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, Elsevier competing-interest declaration file traceability, introduction contribution first-screen compression, processing-run-log schema bypass, process-note vocabulary bypass, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, latex-engine panic diagnostic gap, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, Elsevier competing-interest declaration file generated by the declarations tool, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -6358,6 +6403,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "The introduction contribution paragraph may be too compressed for first-screen review.",
             "The external artifact processing log may exist without schema-level rebuild auditability.",
             "Formal submission materials may contain non-obvious process notes.",
+            "LaTeX/PDF build failures may be misread as manuscript-source failures.",
             "Reproducibility depends on files outside Git.",
             "## Claim-Evidence Check",
             "## Adversarial Self-Review Matrix",
@@ -7313,6 +7359,17 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "Cursor",
             "proper declaration fields",
             "expanded process-trace scan",
+            "## Readiness Gate 120: LaTeX Environment Diagnostic Gate",
+            "build-failure diagnostic coverage",
+            "local Tectonic engine or bundle is repaired",
+            "engine availability",
+            "inspected `build/logs/*.log`",
+            "Tectonic/Rust runtime panic markers",
+            "Attempted to create a NULL object",
+            "event loop thread panicked",
+            "build-environment diagnosis, not PDF freshness",
+            "does not rebuild manuscript PDFs",
+            "LaTeX environment diagnostics are clean",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -7331,7 +7388,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Readiness Summary",
-        "Readiness gates covered: 119",
+        "Readiness gates covered: 120",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -7342,7 +7399,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Readiness Summary" in error for error in errors)
-    assert any("Readiness gates covered: 119" in error for error in errors)
+    assert any("Readiness gates covered: 120" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -8085,6 +8142,36 @@ def test_check_reviewer_readiness_audit_rejects_missing_formal_process_trace_gat
     assert any("process-note vocabulary bypass" in error for error in errors)
     assert any("assistant draft" in error for error in errors)
     assert any("expanded process-trace scan" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_latex_environment_diagnostic_gate() -> None:
+    """验证审稿准备度审计必须覆盖 LaTeX 环境诊断门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Readiness Gate 120: LaTeX Environment Diagnostic Gate",
+        "latex-engine panic diagnostic gap",
+        "LaTeX/PDF build failures may be misread as manuscript-source failures",
+        "build-failure diagnostic coverage",
+        "local Tectonic engine or bundle is repaired",
+        "engine availability",
+        "inspected `build/logs/*.log`",
+        "Tectonic/Rust runtime panic markers",
+        "Attempted to create a NULL object",
+        "event loop thread panicked",
+        "build-environment diagnosis, not PDF freshness",
+        "does not rebuild manuscript PDFs",
+        "LaTeX environment diagnostics are clean",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("LaTeX Environment Diagnostic Gate" in error for error in errors)
+    assert any("latex-engine panic diagnostic gap" in error for error in errors)
+    assert any("build-failure diagnostic coverage" in error for error in errors)
+    assert any("does not rebuild manuscript PDFs" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_fixture_evidence_isolation_gate() -> None:

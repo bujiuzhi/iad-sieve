@@ -60,6 +60,7 @@ REQUIRED_FILES = [
     ROOT / "scripts" / "build_elsevier_draft.py",
     ROOT / "scripts" / "check_latex_warnings.py",
     ROOT / "scripts" / "check_pdf_rendering.py",
+    ROOT / "scripts" / "diagnose_latex_environment.py",
     ROOT / "scripts" / "build_latex_pdf.sh",
     ROOT / "build" / "iad-risk-manuscript-latex.pdf",
     ROOT / "build" / "iad-risk-manuscript-elsevier.tex",
@@ -3729,6 +3730,9 @@ def check_manuscript_package_docs(readme_text: str, manifest_text: str) -> list[
         "分支必须为 `main`",
         "TECTONIC_BUNDLE_DIR",
         "本地 Tectonic bundle",
+        "diagnose_latex_environment.py",
+        "Tectonic/Rust runtime panic",
+        "system-configuration",
         "PDF rendering 检查",
     ]
     errors: list[str] = []
@@ -3776,6 +3780,36 @@ def check_latex_build_scripts(build_script_text: str, elsevier_builder_text: str
         if marker not in elsevier_builder_text
     )
     return errors
+
+
+def check_latex_environment_diagnostic_script(script_text: str) -> list[str]:
+    """Check whether the LaTeX environment diagnostic covers engine failures.
+
+    参数:
+        script_text: Python source for the LaTeX environment diagnostic script.
+
+    返回:
+        list[str]: Error messages for missing diagnostic markers.
+    """
+    required_markers = [
+        "diagnose_latex_environment",
+        "TECTONIC_BUNDLE_DIR",
+        "Tectonic/Rust runtime panic",
+        "system-configuration",
+        "reqwest",
+        "Attempted to create a NULL object",
+        "event loop thread panicked",
+        "check_engine_availability",
+        "check_bundle_directory",
+        "analyze_log_text",
+        "analyze_log_files",
+        "does not rebuild manuscript PDFs",
+    ]
+    return [
+        f"diagnose_latex_environment.py missing diagnostic marker: {marker}"
+        for marker in required_markers
+        if marker not in script_text
+    ]
 
 
 def check_data_processing_pipeline_document(document_text: str) -> list[str]:
@@ -4132,7 +4166,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Readiness Summary",
-        "Readiness gates covered: 119",
+        "Readiness gates covered: 120",
         "Highest current reviewer-facing risks",
         "final-upload metadata",
         "target-journal template binding",
@@ -4195,6 +4229,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "final review-mode vocabulary gap",
         "method shortcut wording precision",
         "final-upload information request specificity",
+        "latex-engine panic diagnostic gap",
         "stronger evidence gates",
         "Current stopping rule",
         "do not claim Q2/B completion or final-upload readiness",
@@ -4353,6 +4388,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Readiness Gate 117: Introduction Contribution First-Screen Gate",
         "Readiness Gate 118: Processing Run-Log Schema Gate",
         "Readiness Gate 119: Formal Process-Trace Vocabulary Gate",
+        "Readiness Gate 120: LaTeX Environment Diagnostic Gate",
         "DKE/Elsevier declaration-file gate coverage",
         "only a prose competing-interest statement",
         "publisher_declaration_files.elsevier_declarations_tool_required_before_upload",
@@ -4388,6 +4424,17 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Cursor",
         "proper declaration fields",
         "expanded process-trace scan",
+        "LaTeX/PDF build failures may be misread as manuscript-source failures",
+        "build-failure diagnostic coverage",
+        "local Tectonic engine or bundle is repaired",
+        "engine availability",
+        "inspected `build/logs/*.log`",
+        "Tectonic/Rust runtime panic markers",
+        "Attempted to create a NULL object",
+        "event loop thread panicked",
+        "build-environment diagnosis, not PDF freshness",
+        "does not rebuild manuscript PDFs",
+        "LaTeX environment diagnostics are clean",
         "derived tables, predictions, logs, manifests, and checksums rather than raw provider files",
         "original provider terms explicitly allow redistribution",
         "source_input_manifest",
@@ -6332,6 +6379,12 @@ def main() -> int:
     latex_build_script_text = (
         latex_build_script_path.read_text(encoding="utf-8") if latex_build_script_path.exists() else ""
     )
+    latex_environment_diagnostic_path = ROOT / "scripts" / "diagnose_latex_environment.py"
+    latex_environment_diagnostic_text = (
+        latex_environment_diagnostic_path.read_text(encoding="utf-8")
+        if latex_environment_diagnostic_path.exists()
+        else ""
+    )
     elsevier_builder_path = ROOT / "scripts" / "build_elsevier_draft.py"
     elsevier_builder_text = elsevier_builder_path.read_text(encoding="utf-8") if elsevier_builder_path.exists() else ""
     submission_system_checklist_path = ROOT / "submission_system_checklist.md"
@@ -6465,6 +6518,7 @@ def main() -> int:
     errors.extend(check_artifact_release_populator(artifact_release_populator_text))
     errors.extend(check_artifact_release_finalizer(artifact_release_finalizer_text))
     errors.extend(check_latex_build_scripts(latex_build_script_text, elsevier_builder_text))
+    errors.extend(check_latex_environment_diagnostic_script(latex_environment_diagnostic_text))
     errors.extend(check_submission_system_checklist(submission_system_checklist_text))
     errors.extend(check_reviewer_readiness_audit(reviewer_readiness_audit_text))
     errors.extend(check_manual_validation_protocol(supplementary_text))

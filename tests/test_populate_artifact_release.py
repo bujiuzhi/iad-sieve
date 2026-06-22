@@ -120,6 +120,38 @@ def _required_artifact_content(artifact_id: str) -> str:
                 "score_field": "score",
             }
         )
+    if artifact_id == "source_input_manifest":
+        return json.dumps(
+            {
+                "inputs": [
+                    {
+                        "source_name": "OpenAlex fixture",
+                        "acquisition_date_or_version": "2026-06-19",
+                        "original_provider": "OpenAlex",
+                        "local_file_name": "works.jsonl",
+                        "record_count": 2,
+                        "license_boundary": "provider terms",
+                        "sha256": "0" * 64,
+                    }
+                ]
+            },
+            sort_keys=True,
+        ) + "\n"
+    if artifact_id == "processing_run_log":
+        return _jsonl_row(
+            {
+                "stage": "prepare-openalex-weak-labels",
+                "command_line": "python -m iad_sieve.cli prepare-openalex-weak-labels",
+                "code_commit": TEST_COMMIT,
+                "environment_summary": "python=3.11",
+                "random_seed": 42,
+                "started_at": "2026-06-19T00:00:00Z",
+                "finished_at": "2026-06-19T00:01:00Z",
+                "input_manifest_reference": "configs/source_input_manifest.json",
+                "output_path": "reports/iad_bench_split_summary.jsonl",
+                "exit_status": 0,
+            }
+        )
     return _jsonl_row({"artifact_id": artifact_id, "status": "present"})
 
 

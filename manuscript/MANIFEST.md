@@ -29,6 +29,7 @@
 | `scripts/build_elsevier_draft.py` | Elsevier/DKE 预转换稿生成脚本 |
 | `scripts/check_latex_warnings.py` | LaTeX 构建日志与严重版面警告校验 |
 | `scripts/check_pdf_rendering.py` | PDF 抽样渲染与空白页/黑页校验 |
+| `scripts/diagnose_latex_environment.py` | LaTeX/Tectonic 构建环境诊断 |
 | `scripts/build_latex_pdf.sh` | 正式 PDF 构建脚本 |
 | `build/iad-risk-manuscript-latex.pdf` | 主稿 PDF |
 | `build/iad-risk-manuscript-elsevier.tex` | DKE/Elsevier 匿名预转换 LaTeX 源 |
@@ -50,12 +51,15 @@ python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/r
 ./manuscript/scripts/build_latex_pdf.sh
 python manuscript/scripts/check_latex_warnings.py
 python manuscript/scripts/check_pdf_rendering.py
+python manuscript/scripts/diagnose_latex_environment.py
 python manuscript/scripts/build_elsevier_draft.py
 python manuscript/scripts/build_submission_package.py --dke-preflight
 python manuscript/scripts/validate_submission_package.py --dke-preflight
 ```
 
 若默认 Tectonic bundle 无法访问，可使用 `TECTONIC_BUNDLE_DIR=/path/to/tectonic-bundle ./manuscript/scripts/build_latex_pdf.sh` 指定本地 Tectonic bundle。该路径用于离线 PDF 构建，不应作为 Git 跟踪文件；构建完成后仍必须通过 LaTeX warning 检查、PDF rendering 检查和投稿包 PDF 新鲜度校验。
+
+`scripts/diagnose_latex_environment.py` 用于记录构建环境诊断结果，而不是生成投稿 PDF。该脚本检查本机 LaTeX 引擎、`TECTONIC_BUNDLE_DIR` 指向的本地 Tectonic bundle、`build/logs/*.log` 中的 Tectonic/Rust runtime panic 标记，以及 `system-configuration`、`reqwest`、`Attempted to create a NULL object`、`event loop thread panicked` 等运行时失败线索。该诊断用于判断失败是否来自本地引擎或 bundle 环境，不替代 `build_latex_pdf.sh`、LaTeX warning 检查、PDF rendering 检查和投稿包 PDF 新鲜度校验。
 
 ## 投稿边界
 
