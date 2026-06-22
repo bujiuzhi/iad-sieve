@@ -1794,7 +1794,7 @@ def check_risk_score_design_rationale(manuscript_text: str, supplementary_text: 
         "increases monotonically with agenda-non-identity evidence",
         "agenda evidence is high and identity evidence is weak",
         "max operator",
-        "direct ANI evidence or indirect agenda-without-identity evidence",
+        "direct agenda-non-identity evidence or indirect agenda-without-identity evidence",
         "not a calibrated probability",
         "Threshold transfer must be rechecked under new source distributions",
         "defer rather than merge",
@@ -5296,7 +5296,10 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "same-scope comparative-ranking limits",
         "highlights FMR/HNFMR first-screen separation",
         "Open-v2 held-out hard-negative scope: zero observed HNFMR; ordinary FMR=0.001",
+        "avoids the unexplained `ANI` abbreviation",
+        "identity, agenda, and non-identity risk",
         "highlight-level metric separation",
+        "acronym clarity",
         "document/cluster split-overread wording",
         "pair-record held-out evidence",
         "document-disjoint, cluster-disjoint, or unseen-source generalization",
@@ -6374,10 +6377,13 @@ def check_highlights(highlights_text: str) -> list[str]:
     required_markers = [
         "Cluster-level claims require artifact-backed audits",
         "Identity-agenda confusion creates data/knowledge-engineering merge risk",
+        "IAD-Risk separates identity, agenda, and non-identity risk",
     ]
     for marker in required_markers:
         if marker not in highlights_text:
             errors.append(f"highlights missing cluster-level claims boundary marker: {marker}")
+    if "ANI evidence" in highlights_text:
+        errors.append("highlights use undefined acronym wording: ANI evidence")
     for line in bullet_lines:
         highlight = line[2:]
         word_count = len(highlight.split())

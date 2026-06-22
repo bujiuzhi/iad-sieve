@@ -1258,7 +1258,7 @@ def test_check_highlights_accepts_five_concise_bullets() -> None:
             "# Highlights",
             "",
             "- Identity-agenda confusion creates data/knowledge-engineering merge risk.",
-            "- IAD-Risk separates identity, agenda, and ANI evidence.",
+            "- IAD-Risk separates identity, agenda, and non-identity risk.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
             "- Open-v2 held-out hard-negative scope: zero observed HNFMR; ordinary FMR=0.001.",
             "- Cluster-level claims require artifact-backed audits.",
@@ -1306,7 +1306,7 @@ def test_check_highlights_rejects_unscoped_hnfmr_numbers() -> None:
             "# Highlights",
             "",
             "- Identity-agenda confusion causes risky scholarly work merges.",
-            "- IAD-Risk separates identity, agenda, and ANI evidence.",
+            "- IAD-Risk separates identity, agenda, and non-identity risk.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
             "- Baselines show HNFMR 0.790--0.999; IAD-Risk shows zero observed HNFMR.",
             "- Fixtures and artifact rules support reproducible review.",
@@ -1328,7 +1328,7 @@ def test_check_highlights_rejects_zero_hnfmr_without_fmr_boundary() -> None:
             "# Highlights",
             "",
             "- Identity-agenda confusion creates data/knowledge-engineering merge risk.",
-            "- IAD-Risk separates identity, agenda, and ANI evidence.",
+            "- IAD-Risk separates identity, agenda, and non-identity risk.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
             "- Open-v2 held-out hard-negative scope reports IAD-Risk shows zero observed HNFMR.",
             "- Cluster-level claims require artifact-backed audits.",
@@ -1349,7 +1349,7 @@ def test_check_highlights_rejects_zero_hnfmr_without_hard_negative_scope() -> No
             "# Highlights",
             "",
             "- Identity-agenda confusion creates data/knowledge-engineering merge risk.",
-            "- IAD-Risk separates identity, agenda, and ANI evidence.",
+            "- IAD-Risk separates identity, agenda, and non-identity risk.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
             "- Open-v2 held-out scope: zero observed HNFMR; ordinary FMR=0.001.",
             "- Cluster-level claims require artifact-backed audits.",
@@ -1370,7 +1370,7 @@ def test_check_highlights_rejects_rounded_zero_hnfmr_wording() -> None:
             "# Highlights",
             "",
             "- Identity-agenda confusion creates data/knowledge-engineering merge risk.",
-            "- IAD-Risk separates identity, agenda, and ANI evidence.",
+            "- IAD-Risk separates identity, agenda, and non-identity risk.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
             "- Open-v2 held-out hard-negative scope: IAD-Risk HNFMR=0.000; ordinary FMR=0.001.",
             "- Cluster-level claims require artifact-backed audits.",
@@ -1382,6 +1382,28 @@ def test_check_highlights_rejects_rounded_zero_hnfmr_wording() -> None:
     assert any("zero observed HNFMR wording" in error for error in errors)
 
 
+def test_check_highlights_rejects_undefined_ani_acronym() -> None:
+    """验证 highlights 不使用未展开的 ANI evidence 缩写。"""
+
+    module = _load_validate_manuscript_module()
+    highlights_text = "\n".join(
+        [
+            "# Highlights",
+            "",
+            "- Identity-agenda confusion creates data/knowledge-engineering merge risk.",
+            "- IAD-Risk separates identity, agenda, and ANI evidence.",
+            "- IAD-Bench keeps gold, proxy, and silver labels separate.",
+            "- Open-v2 held-out hard-negative scope: zero observed HNFMR; ordinary FMR=0.001.",
+            "- Cluster-level claims require artifact-backed audits.",
+        ]
+    )
+
+    errors = module.check_highlights(highlights_text)
+
+    assert any("undefined acronym" in error and "ANI evidence" in error for error in errors)
+    assert any("non-identity risk" in error for error in errors)
+
+
 def test_check_highlights_rejects_missing_cluster_artifact_boundary() -> None:
     """验证 highlights 必须包含 cluster-level artifact 边界。"""
 
@@ -1391,7 +1413,7 @@ def test_check_highlights_rejects_missing_cluster_artifact_boundary() -> None:
             "# Highlights",
             "",
             "- Identity-agenda confusion causes risky scholarly work merges.",
-            "- IAD-Risk separates identity, agenda, and ANI evidence.",
+            "- IAD-Risk separates identity, agenda, and non-identity risk.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
             "- Open-v2 held-out hard-negative scope: zero observed HNFMR; ordinary FMR=0.001.",
             "- Fixtures and artifact rules support reproducible review.",
@@ -2729,7 +2751,7 @@ def test_check_risk_score_design_rationale_accepts_supplementary_table() -> None
             r"$p_{\mathrm{risk}}$ is a conservative upper-envelope risk proxy.",
             "The score increases monotonically with agenda-non-identity evidence.",
             "It also increases when agenda evidence is high and identity evidence is weak.",
-            "The max operator keeps either direct ANI evidence or indirect agenda-without-identity evidence sufficient to block automatic merging.",
+            "The max operator keeps either direct agenda-non-identity evidence or indirect agenda-without-identity evidence sufficient to block automatic merging.",
             "The product term is not a calibrated probability unless validated against held-out artifacts.",
             "Threshold transfer must be rechecked under new source distributions.",
             "defer rather than merge",
@@ -2767,7 +2789,7 @@ def test_check_risk_score_design_rationale_rejects_missing_supplementary_table()
             r"$p_{\mathrm{risk}}$ is a conservative upper-envelope risk proxy.",
             "The score increases monotonically with agenda-non-identity evidence.",
             "It also increases when agenda evidence is high and identity evidence is weak.",
-            "The max operator keeps either direct ANI evidence or indirect agenda-without-identity evidence sufficient to block automatic merging.",
+            "The max operator keeps either direct agenda-non-identity evidence or indirect agenda-without-identity evidence sufficient to block automatic merging.",
             "The product term is not a calibrated probability unless validated against held-out artifacts.",
             "Threshold transfer must be rechecked under new source distributions.",
             "defer rather than merge",
@@ -8526,7 +8548,10 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "## Readiness Gate 108: Highlights FMR-HNFMR First-Screen Gate",
             "highlights FMR/HNFMR first-screen separation",
             "Open-v2 held-out hard-negative scope: zero observed HNFMR; ordinary FMR=0.001",
+            "avoids the unexplained `ANI` abbreviation",
+            "identity, agenda, and non-identity risk",
             "highlight-level metric separation",
+            "acronym clarity",
             "## Readiness Gate 109: Document-Cluster Split Overread Gate",
             "document/cluster split-overread wording",
             "pair-record held-out evidence",
@@ -10821,7 +10846,7 @@ def test_check_submission_material_quantitative_summary_accepts_scoped_highlight
     highlights_text = "\n".join(
         [
             "- Identity-agenda confusion causes risky scholarly work merges.",
-            "- IAD-Risk separates identity, agenda, and ANI evidence.",
+            "- IAD-Risk separates identity, agenda, and non-identity risk.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
             "- Open-v2 held-out hard-negative scope: zero observed HNFMR; ordinary FMR=0.001.",
             "- Cluster-level claims require artifact-backed audits.",
@@ -10870,7 +10895,7 @@ def test_check_submission_material_quantitative_summary_rejects_cover_letter_wit
     highlights_text = "\n".join(
         [
             "- Identity-agenda confusion causes risky scholarly work merges.",
-            "- IAD-Risk separates identity, agenda, and ANI evidence.",
+            "- IAD-Risk separates identity, agenda, and non-identity risk.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
             "- Open-v2 held-out hard-negative scope: zero observed HNFMR; ordinary FMR=0.001.",
             "- Cluster-level claims require artifact-backed audits.",
@@ -10940,7 +10965,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
     highlights_text = "\n".join(
         [
             "- Identity-agenda confusion creates data/knowledge-engineering merge risk.",
-            "- IAD-Risk separates identity, agenda, and ANI evidence.",
+            "- IAD-Risk separates identity, agenda, and non-identity risk.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
             "- Open-v2 held-out hard-negative scope: zero observed HNFMR; ordinary FMR=0.001.",
             "- Cluster-level claims require artifact-backed audits.",
@@ -11142,7 +11167,7 @@ def test_check_editorial_claim_alignment_rejects_abstract_without_pair_cluster_b
     highlights_text = "\n".join(
         [
             "- Identity-agenda confusion causes risky scholarly work merges.",
-            "- IAD-Risk separates identity, agenda, and ANI evidence.",
+            "- IAD-Risk separates identity, agenda, and non-identity risk.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
             "- Open-v2 held-out hard-negative scope: zero observed HNFMR; ordinary FMR=0.001.",
             "- Cluster-level claims require artifact-backed audits.",
@@ -11211,7 +11236,7 @@ def test_check_editorial_claim_alignment_rejects_conclusion_without_cluster_boun
     highlights_text = "\n".join(
         [
             "- Identity-agenda confusion causes risky scholarly work merges.",
-            "- IAD-Risk separates identity, agenda, and ANI evidence.",
+            "- IAD-Risk separates identity, agenda, and non-identity risk.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
             "- Open-v2 held-out hard-negative scope: zero observed HNFMR; ordinary FMR=0.001.",
             "- Cluster-level claims require artifact-backed audits.",
@@ -11293,7 +11318,7 @@ def test_check_editorial_claim_alignment_rejects_overbroad_reproducible_benchmar
     highlights_text = "\n".join(
         [
             "- Identity-agenda confusion creates data/knowledge-engineering merge risk.",
-            "- IAD-Risk separates identity, agenda, and ANI evidence.",
+            "- IAD-Risk separates identity, agenda, and non-identity risk.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
             "- Open-v2 held-out hard-negative scope: zero observed HNFMR; ordinary FMR=0.001.",
             "- Cluster-level claims require artifact-backed audits.",

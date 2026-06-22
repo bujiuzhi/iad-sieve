@@ -625,7 +625,7 @@ The reviewer-facing boundary is feature-head clarity without main-text table ove
 
 Outcome: pass for risk-score rationale table-density reduction; blocked for calibrated-risk or threshold-transfer claims until held-out calibration artifacts, threshold grids, and checksum-fixed prediction files are released for the same evaluated rows.
 
-This gate checks whether the risk score design rationale table is needed in the main manuscript. The main manuscript now states the rationale in prose: $p_{\mathrm{risk}}$ is a conservative upper-envelope risk proxy, it increases with agenda-non-identity evidence, it increases when agenda evidence is high and identity evidence is weak, the max operator keeps direct ANI evidence or indirect agenda-without-identity evidence sufficient to block automatic merging, and the product term is not a calibrated probability. Threshold transfer must be rechecked under new source distributions. The supplementary material preserves the full risk score design rationale table with design element, design rationale, and boundary columns.
+This gate checks whether the risk score design rationale table is needed in the main manuscript. The main manuscript now states the rationale in prose: $p_{\mathrm{risk}}$ is a conservative upper-envelope risk proxy, it increases with agenda-non-identity evidence, it increases when agenda evidence is high and identity evidence is weak, the max operator keeps direct agenda-non-identity evidence or indirect agenda-without-identity evidence sufficient to block automatic merging, and the product term is not a calibrated probability. Threshold transfer must be rechecked under new source distributions. The supplementary material preserves the full risk score design rationale table with design element, design rationale, and boundary columns.
 
 The reviewer-facing boundary is risk-score clarity without main-text table overload. The validator still requires the supplementary risk score design rationale table, including the $p_{\mathrm{ani}}$ term, the $p_{\mathrm{agenda}}(1-p_{\mathrm{work}})$ term, Max operator, Threshold gate, the non-calibration boundary, and the threshold-transfer boundary.
 
@@ -987,9 +987,9 @@ The reviewer-facing boundary is first-screen metric separation, not stronger emp
 
 Outcome: pass for highlights FMR/HNFMR first-screen separation; blocked for zero-risk claims until external artifact release and broader validation are complete.
 
-This gate checks whether the submission highlights could still expose the zero-HNFMR overread after the abstract and cover letter were corrected. The quantitative highlight now states: "Open-v2 held-out hard-negative scope: zero observed HNFMR; ordinary FMR=0.001."
+This gate checks whether the submission highlights could still expose the zero-HNFMR overread after the abstract and cover letter were corrected. The quantitative highlight now states: "Open-v2 held-out hard-negative scope: zero observed HNFMR; ordinary FMR=0.001." The method highlight avoids the unexplained `ANI` abbreviation and instead states that IAD-Risk separates identity, agenda, and non-identity risk.
 
-The reviewer-facing boundary is highlight-level metric separation, not stronger empirical evidence. The highlight remains within the concise submission limit while using observational zero-HNFMR wording and making the held-out HNFMR stratum and ordinary FMR visibly separate, so first-screen materials no longer isolate the hard-negative stratum from the separately reported ordinary false-merge rate.
+The reviewer-facing boundary is highlight-level metric separation and acronym clarity, not stronger empirical evidence. The highlight remains within the concise submission limit while using observational zero-HNFMR wording, making the held-out HNFMR stratum and ordinary FMR visibly separate, and keeping the method signal self-explanatory for readers who see the highlights before the manuscript body.
 
 ## Readiness Gate 109: Document-Cluster Split Overread Gate
 
