@@ -21,6 +21,13 @@ from pathlib import Path
 LOGGER = logging.getLogger(__name__)
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 FIXTURE_ROOT = PROJECT_ROOT / "tests" / "fixtures"
+REQUIRED_CLI_DISCOVERY_MARKERS = [
+    "prepare-deepmatcher",
+    "prepare-scirepeval-proximity",
+    "fetch-openalex-works",
+    "prepare-openalex-weak-labels",
+    "build-iad-bench",
+]
 
 
 @dataclass(frozen=True)
@@ -156,6 +163,47 @@ def build_subprocess_environment(project_root: Path) -> dict[str, str]:
     return environment
 
 
+def check_cli_discovery(python_executable: str, environment: dict[str, str]) -> list[str]:
+    """Check whether the public-source reconstruction CLI commands are discoverable.
+
+    功能:
+        Run the installable CLI help command and verify that required public-source
+        reconstruction subcommands appear in the help output.
+
+    参数:
+        python_executable: Python executable path.
+        environment: Subprocess environment.
+
+    返回:
+        list[str]: Error messages for failed CLI help execution or missing commands.
+    """
+    command_args = [python_executable, "-m", "iad_sieve.cli", "--help"]
+    LOGGER.info("running cli-discovery")
+    try:
+        completed = subprocess.run(
+            command_args,
+            cwd=PROJECT_ROOT,
+            env=environment,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except subprocess.CalledProcessError as exc:
+        LOGGER.error("cli-discovery failed with exit code %s", exc.returncode)
+        if exc.stdout:
+            LOGGER.error("stdout:\n%s", exc.stdout.strip())
+        if exc.stderr:
+            LOGGER.error("stderr:\n%s", exc.stderr.strip())
+        return ["CLI discovery command failed: python -m iad_sieve.cli --help"]
+
+    help_text = f"{completed.stdout}\n{completed.stderr}"
+    return [
+        f"CLI discovery output missing command: {marker}"
+        for marker in REQUIRED_CLI_DISCOVERY_MARKERS
+        if marker not in help_text
+    ]
+
+
 def run_command(command: FixtureCommand, environment: dict[str, str]) -> None:
     """Run one fixture rebuild command.
 
@@ -263,6 +311,9 @@ def run_fixture_rebuild(python_executable: str, output_root: Path) -> list[str]:
     """
     output_root.mkdir(parents=True, exist_ok=True)
     environment = build_subprocess_environment(PROJECT_ROOT)
+    cli_errors = check_cli_discovery(python_executable, environment)
+    if cli_errors:
+        return cli_errors
     for command in build_fixture_commands(python_executable, output_root):
         run_command(command, environment)
     return check_rebuild_outputs(output_root)
