@@ -353,6 +353,9 @@ def _write_final_upload_cover_letter(manuscript_root: Path) -> None:
                 "The final-upload manuscript uses the selected journal template and the author metadata in the submission system.",
                 "The Open-v2 evidence remains scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
                 "The letter does not present confidence intervals, statistical significance, or model-ranking claims without validated artifacts.",
+                "Public-source commands are reconstruction code paths rather than frozen source snapshots, "
+                "and exact Open-v2 numerical reproduction requires recorded acquisition dates or versions, "
+                "input checksums, processing logs, and released derived artifacts rather than live API calls or changed public dumps.",
                 "The artifact release is available at https://doi.org/10.0000/example "
                 "with DOI 10.0000/example and supports result-level review.",
                 "",
@@ -550,6 +553,9 @@ def _write_dke_final_upload_cover_letter(manuscript_root: Path) -> None:
                 "The final-upload manuscript uses the selected Elsevier template and author-visible title page.",
                 "The Open-v2 evidence remains scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
                 "The letter does not present confidence intervals, statistical significance, or model-ranking claims without validated artifacts.",
+                "Public-source commands are reconstruction code paths rather than frozen source snapshots, "
+                "and exact Open-v2 numerical reproduction requires recorded acquisition dates or versions, "
+                "input checksums, processing logs, and released derived artifacts rather than live API calls or changed public dumps.",
                 "The artifact release is available at https://doi.org/10.0000/example "
                 "with DOI 10.0000/example and supports result-level review.",
                 "",

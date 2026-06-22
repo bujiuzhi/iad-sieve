@@ -175,6 +175,17 @@ FINAL_UPLOAD_COVER_LETTER_EVIDENCE_BOUNDARY_MARKERS = {
     "statistical significance": "cover letter missing statistical-significance boundary",
     "model-ranking claims": "cover letter missing model-ranking claim boundary",
 }
+FINAL_UPLOAD_COVER_LETTER_PUBLIC_SOURCE_BOUNDARY_MARKERS = {
+    "public-source commands": "cover letter missing public-source command boundary",
+    "reconstruction code paths": "cover letter missing reconstruction-code-path boundary",
+    "frozen source snapshots": "cover letter missing frozen-source-snapshot boundary",
+    "exact open-v2 numerical reproduction": "cover letter missing exact Open-v2 reproduction boundary",
+    "recorded acquisition dates or versions": "cover letter missing acquisition-date-or-version boundary",
+    "input checksums": "cover letter missing input-checksum boundary",
+    "processing logs": "cover letter missing processing-log boundary",
+    "released derived artifacts": "cover letter missing released-derived-artifact boundary",
+    "live api calls or changed public dumps": "cover letter missing live-source-change boundary",
+}
 
 
 def strip_yaml_value(value: str) -> str:
@@ -1280,6 +1291,9 @@ def check_final_upload_cover_letter_text(cover_letter_text: str, metadata_text: 
     if "artifact release" not in lowered_text and "artifact url" not in lowered_text and "artifact doi" not in lowered_text:
         errors.append("final upload cover letter unresolved: cover letter missing artifact release boundary")
     for marker, message in FINAL_UPLOAD_COVER_LETTER_EVIDENCE_BOUNDARY_MARKERS.items():
+        if marker not in lowered_text:
+            errors.append(f"final upload cover letter unresolved: {message}")
+    for marker, message in FINAL_UPLOAD_COVER_LETTER_PUBLIC_SOURCE_BOUNDARY_MARKERS.items():
         if marker not in lowered_text:
             errors.append(f"final upload cover letter unresolved: {message}")
     artifact_row = parse_mapping_section(metadata_text, "artifact_boundary")

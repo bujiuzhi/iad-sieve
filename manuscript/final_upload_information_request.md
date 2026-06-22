@@ -170,6 +170,7 @@ Use this section to replace the anonymous preflight cover letter only after the 
 - Article type sentence:
 - Target-journal scope sentence:
 - Evidence-boundary sentence preserving the Open-v2 scope-bounded mechanism evidence, same-scope ranking boundary, and no confidence-interval, statistical-significance, or model-ranking claim wording:
+- Public-source temporal-boundary sentence stating that public-source commands are reconstruction code paths rather than frozen source snapshots, and that exact Open-v2 numerical reproduction requires recorded acquisition dates or versions, input checksums, processing logs, and released derived artifacts rather than live API calls or changed public dumps:
 - Corresponding author name used for signature:
 - Artifact URL or DOI sentence:
 - Declaration-status sentence aligned with `submission_metadata.yml`:
@@ -188,6 +189,7 @@ Use this sentence map only after the external values above are confirmed; do not
 | Submission sentence | Use `submission.title`, `submission.article_type`, and `submission.target_journal`. | State the final article type exactly as recorded in `submission_metadata.yml`. |
 | Scope-fit sentence | Use `target_preparation.selected_author_guide_source`, target scope notes, and the paper's data-integration framing. | Treat the DKE-style route as scope-fit preparation unless the target is author-confirmed. |
 | Evidence-boundary sentence | Reuse the bounded Open-v2 wording from the abstract and cover letter. | Do not claim broad superiority, Q2/B completion, or final-upload readiness. Also state that the evidence remains scope-bounded mechanism evidence rather than a same-scope comparative ranking, and do not present confidence intervals, statistical significance, or model-ranking claims unless validated artifacts support them. |
+| Public-source temporal-boundary sentence | Use the Data and Code Availability boundary, `configs/source_input_manifest.json`, `logs/processing_run_log.jsonl`, and artifact-release provenance fields. | State that public-source commands are reconstruction code paths rather than frozen source snapshots, and that exact Open-v2 numerical reproduction requires recorded acquisition dates or versions, input checksums, processing logs, and released derived artifacts rather than live API calls or changed public dumps. |
 | Artifact sentence | Use `artifact_boundary.artifact_release_url` or `artifact_boundary.artifact_release_doi`. | Do not cite an artifact link until the release validates against the final package. |
 | Declaration sentence | Use funding, competing-interest, permissions, generative-AI, data, and research-data fields from `submission_metadata.yml`. | The sentence must match the live submission system and publisher declaration files. |
 | Signature line | Use `corresponding_author.name` and confirmed author metadata. | Do not use `Anonymous Authors` in the final cover letter. |
