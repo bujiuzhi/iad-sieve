@@ -73,6 +73,21 @@ pytest -q
 
 `scripts/check_public_release.py` 会扫描公开范围内的大文件、密钥片段、本机路径和远程路径线索。
 
+## 稿件与投稿包验证
+
+审稿人从 Git 仓库检查论文材料时，应先运行代码级验证，再运行稿件和投稿包验证。以下命令只证明 Git-only 审稿入口、fixture、PDF/LaTeX 和本地投稿包一致；不能复核 Open-v2 数值表，结果级复核仍需要 L2 public-source rebuild 或 L3 result audit。
+
+```bash
+python manuscript/scripts/verify_fixture_rebuild.py
+python manuscript/scripts/validate_manuscript.py --strict-latex
+python manuscript/scripts/build_submission_package.py
+python manuscript/scripts/validate_submission_package.py
+python manuscript/scripts/build_submission_package.py --dke-preflight
+python manuscript/scripts/validate_submission_package.py --dke-preflight
+```
+
+生成目录 `manuscript/build/submission_package/` 和 `manuscript/build/dke_preflight_package/` 以及对应 zip 文件是本地检查产物，不提交仓库。正式上传前还必须补齐作者信息、目标期刊确认、artifact URL/DOI 和 live submission-system 核对，再使用 `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` 校验最终包。
+
 ## 数据与复现
 
 `IAD-Bench-Open-v2` 和 `IAD-Bench-Open-v3` 是项目基于公开来源构建的衍生评测包，不是第三方原封不动发布的原始金标数据集。

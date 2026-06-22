@@ -6707,6 +6707,46 @@ def test_check_data_artifact_release_document_rejects_obsolete_reproduction_leve
     assert any("| L4 | 第三方复验 |" in error for error in errors)
 
 
+def test_check_project_readme_review_entrypoint_accepts_current_readme() -> None:
+    """验证根 README 提供审稿人可执行的稿件和投稿包验证入口。"""
+
+    module = _load_validate_manuscript_module()
+    readme_text = Path("README.md").read_text(encoding="utf-8")
+
+    errors = module.check_project_readme_review_entrypoint(readme_text)
+
+    assert errors == []
+
+
+def test_check_project_readme_review_entrypoint_rejects_missing_manuscript_validation_chain() -> None:
+    """验证根 README 缺少稿件验证链和 Git-only 边界时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    readme_text = Path("README.md").read_text(encoding="utf-8")
+    for marker in [
+        "## 稿件与投稿包验证",
+        "python manuscript/scripts/verify_fixture_rebuild.py",
+        "python manuscript/scripts/validate_manuscript.py --strict-latex",
+        "python manuscript/scripts/build_submission_package.py --dke-preflight",
+        "python manuscript/scripts/validate_submission_package.py --dke-preflight",
+        "Git-only",
+        "不能复核 Open-v2 数值表",
+        "L2 public-source rebuild",
+        "L3 result audit",
+        "`manuscript/build/submission_package/`",
+        "`manuscript/build/dke_preflight_package/`",
+        "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
+    ]:
+        readme_text = readme_text.replace(marker, "")
+
+    errors = module.check_project_readme_review_entrypoint(readme_text)
+
+    assert any("稿件与投稿包验证" in error for error in errors)
+    assert any("validate_manuscript.py --strict-latex" in error for error in errors)
+    assert any("Git-only" in error for error in errors)
+    assert any("final-upload --artifact-dir" in error for error in errors)
+
+
 def test_check_artifact_release_skeleton_builder_accepts_required_markers() -> None:
     """验证 artifact release 骨架生成脚本包含必要入口和安全边界。"""
 

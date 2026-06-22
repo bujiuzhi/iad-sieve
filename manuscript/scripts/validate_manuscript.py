@@ -4378,6 +4378,46 @@ def check_data_artifact_release_document(document_text: str) -> list[str]:
     return errors
 
 
+def check_project_readme_review_entrypoint(readme_text: str) -> list[str]:
+    """Check whether the project README exposes reviewer-facing manuscript validation.
+
+    参数:
+        readme_text: Root project README Markdown text.
+
+    返回:
+        list[str]: Error messages for missing reviewer entrypoint markers.
+    """
+    required_markers = [
+        "# iad-sieve",
+        "## 快速验证",
+        "## 稿件与投稿包验证",
+        "python -m iad_sieve.cli --help",
+        "python scripts/check_public_release.py",
+        "python -m compileall -q src tests scripts",
+        "pytest -q",
+        "python manuscript/scripts/verify_fixture_rebuild.py",
+        "python manuscript/scripts/validate_manuscript.py --strict-latex",
+        "python manuscript/scripts/build_submission_package.py",
+        "python manuscript/scripts/validate_submission_package.py",
+        "python manuscript/scripts/build_submission_package.py --dke-preflight",
+        "python manuscript/scripts/validate_submission_package.py --dke-preflight",
+        "Git-only",
+        "不能复核 Open-v2 数值表",
+        "L2 public-source rebuild",
+        "L3 result audit",
+        "`manuscript/build/submission_package/`",
+        "`manuscript/build/dke_preflight_package/`",
+        "不提交仓库",
+        "正式上传前",
+        "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
+    ]
+    return [
+        f"project README missing reviewer validation marker: {marker}"
+        for marker in required_markers
+        if marker not in readme_text
+    ]
+
+
 def check_artifact_release_skeleton_builder(script_text: str) -> list[str]:
     """Check whether the artifact release scaffold builder keeps required safeguards.
 
@@ -7316,6 +7356,8 @@ def main() -> int:
     data_artifact_release_text = (
         data_artifact_release_path.read_text(encoding="utf-8") if data_artifact_release_path.exists() else ""
     )
+    project_readme_path = PROJECT_ROOT / "README.md"
+    project_readme_text = project_readme_path.read_text(encoding="utf-8") if project_readme_path.exists() else ""
     artifact_release_skeleton_builder_path = ROOT / "scripts" / "build_artifact_release_skeleton.py"
     artifact_release_skeleton_builder_text = (
         artifact_release_skeleton_builder_path.read_text(encoding="utf-8")
@@ -7474,6 +7516,7 @@ def main() -> int:
     errors.extend(check_manuscript_package_docs(readme_text, manifest_text))
     errors.extend(check_data_processing_pipeline_document(data_processing_pipeline_text))
     errors.extend(check_data_artifact_release_document(data_artifact_release_text))
+    errors.extend(check_project_readme_review_entrypoint(project_readme_text))
     errors.extend(check_artifact_release_skeleton_builder(artifact_release_skeleton_builder_text))
     errors.extend(check_artifact_release_populator(artifact_release_populator_text))
     errors.extend(check_artifact_release_finalizer(artifact_release_finalizer_text))
