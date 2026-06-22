@@ -288,7 +288,7 @@ The supervision sources remain label-strength aware. DeepMatcher pairs supervise
 
 \subsection{Training and Inference Trace}
 
-The implementation keeps training, threshold fixation, inference, and metric export in one auditable trace. The full training and inference trace table is reported in the supplementary material. This trace is needed for auditability because IAD-Risk is a selective decision system: the same row-level decisions that produce same-work F1 also determine FMR, HNFMR, automatic merge coverage, block rate, and defer rate.
+The implementation keeps training, threshold fixation, inference, and metric export in one auditable trace, so relation-head outputs remain connected to the exact decisions used for evaluation. The full training and inference trace table is reported in the supplementary material. This trace is needed for auditability because IAD-Risk is a selective decision system: the same row-level decisions that produce same-work F1 also determine FMR, HNFMR, automatic merge coverage, block rate, and defer rate.
 
 The main execution contract is that schema loading preserves pair IDs and split fields, supervised fitting uses the masked objective without converting gold, proxy, or silver labels into unrelated supervision, threshold fixation records $\tau_w$, $\tau_n$, $\tau_r$, threshold source, selection split, and selection metric before held-out reporting, pair scoring writes $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, $p_{\mathrm{ani}}$, and $p_{\mathrm{risk}}$, decision emission records merge, block, or defer with cannot-link status, and metric export binds denominators and checksums to the same prediction artifact. Here $\tau_n$ denotes the agenda-non-identity risk-head threshold, not an agenda-relatedness threshold.
 
@@ -302,7 +302,7 @@ p_{\mathrm{ani}}<\tau_n,\quad
 p_{\mathrm{risk}}<\tau_r,\quad
 \mathrm{cannot\_link}_{ij}=0.
 \]
-This rule is deliberately selective. It can reject or defer high-risk pairs instead of forcing every semantically related pair into a binary match decision. The same decision interface also supports constrained union-find clustering, where cannot-link evidence can block documented conflicts when coverage is available.
+This rule is deliberately selective: uncertain identity or high agenda-non-identity risk prevents automatic merging, while only strong identity evidence under low risk permits it. It can reject or defer high-risk pairs instead of forcing every semantically related pair into a binary match decision. The same decision interface also supports constrained union-find clustering, where cannot-link evidence can block documented conflicts when coverage is available.
 
 Operationally, the three outputs have different meanings. A pair is merged only when all gate conditions pass. A pair is blocked when explicit cannot-link evidence, high agenda-non-identity evidence, or high derived risk makes an automatic merge unsafe under the fixed operating point. A pair is deferred when identity evidence is insufficient for automatic merging but the available evidence does not justify a hard block. This distinction routes false-merge risk into pair-level decisions and audit fields without claiming that every unresolved pair has been fully adjudicated.
 
