@@ -1260,7 +1260,7 @@ def test_check_highlights_accepts_five_concise_bullets() -> None:
             "- Identity-agenda confusion creates data/knowledge-engineering merge risk.",
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
-            "- Open-v2 held-out scope: IAD-Risk HNFMR=0.000; ordinary FMR=0.001.",
+            "- Open-v2 held-out scope: IAD-Risk shows zero observed HNFMR; ordinary FMR=0.001.",
             "- Cluster-level claims require artifact-backed audits.",
         ]
     )
@@ -1308,7 +1308,7 @@ def test_check_highlights_rejects_unscoped_hnfmr_numbers() -> None:
             "- Identity-agenda confusion causes risky scholarly work merges.",
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
-            "- Baselines show HNFMR 0.790--0.999; IAD-Risk HNFMR=0.000.",
+            "- Baselines show HNFMR 0.790--0.999; IAD-Risk shows zero observed HNFMR.",
             "- Fixtures and artifact rules support reproducible review.",
         ]
     )
@@ -1330,7 +1330,7 @@ def test_check_highlights_rejects_zero_hnfmr_without_fmr_boundary() -> None:
             "- Identity-agenda confusion creates data/knowledge-engineering merge risk.",
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
-            "- Open-v2 held-out scope reports IAD-Risk HNFMR=0.000.",
+            "- Open-v2 held-out scope reports IAD-Risk shows zero observed HNFMR.",
             "- Cluster-level claims require artifact-backed audits.",
         ]
     )
@@ -1338,6 +1338,27 @@ def test_check_highlights_rejects_zero_hnfmr_without_fmr_boundary() -> None:
     errors = module.check_highlights(highlights_text)
 
     assert any("ordinary FMR=0.001 boundary" in error for error in errors)
+
+
+def test_check_highlights_rejects_rounded_zero_hnfmr_wording() -> None:
+    """验证 highlights 不接受 HNFMR=0.000 作为首屏零值表述。"""
+
+    module = _load_validate_manuscript_module()
+    highlights_text = "\n".join(
+        [
+            "# Highlights",
+            "",
+            "- Identity-agenda confusion creates data/knowledge-engineering merge risk.",
+            "- IAD-Risk separates identity, agenda, and ANI evidence.",
+            "- IAD-Bench keeps gold, proxy, and silver labels separate.",
+            "- Open-v2 held-out scope: IAD-Risk HNFMR=0.000; ordinary FMR=0.001.",
+            "- Cluster-level claims require artifact-backed audits.",
+        ]
+    )
+
+    errors = module.check_highlights(highlights_text)
+
+    assert any("zero observed HNFMR wording" in error for error in errors)
 
 
 def test_check_highlights_rejects_missing_cluster_artifact_boundary() -> None:
@@ -1351,7 +1372,7 @@ def test_check_highlights_rejects_missing_cluster_artifact_boundary() -> None:
             "- Identity-agenda confusion causes risky scholarly work merges.",
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
-            "- Open-v2 held-out scope: IAD-Risk HNFMR=0.000; ordinary FMR=0.001.",
+            "- Open-v2 held-out scope: IAD-Risk shows zero observed HNFMR; ordinary FMR=0.001.",
             "- Fixtures and artifact rules support reproducible review.",
         ]
     )
@@ -8067,7 +8088,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "same-scope comparative-ranking limits",
             "## Readiness Gate 108: Highlights FMR-HNFMR First-Screen Gate",
             "highlights FMR/HNFMR first-screen separation",
-            "Open-v2 held-out scope: IAD-Risk HNFMR=0.000; ordinary FMR=0.001",
+            "Open-v2 held-out scope: IAD-Risk shows zero observed HNFMR; ordinary FMR=0.001",
             "highlight-level metric separation",
             "## Readiness Gate 109: Document-Cluster Split Overread Gate",
             "document/cluster split-overread wording",
@@ -10144,7 +10165,7 @@ def test_check_submission_material_quantitative_summary_accepts_scoped_highlight
             "- Identity-agenda confusion causes risky scholarly work merges.",
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
-            "- Open-v2 held-out scope: IAD-Risk HNFMR=0.000; ordinary FMR=0.001.",
+            "- Open-v2 held-out scope: IAD-Risk shows zero observed HNFMR; ordinary FMR=0.001.",
             "- Cluster-level claims require artifact-backed audits.",
         ]
     )
@@ -10166,7 +10187,7 @@ def test_check_submission_material_quantitative_summary_rejects_unscoped_highlig
     """验证投稿 highlights 的 HNFMR 数字缺少范围边界时会被拒绝。"""
 
     module = _load_validate_manuscript_module()
-    highlights_text = "- IAD-Risk HNFMR=0.000."
+    highlights_text = "- IAD-Risk shows zero observed HNFMR."
     cover_letter_text = "\n".join(
         [
             "The manuscript reports an Open-v2 evidence snapshot.",
@@ -10191,7 +10212,7 @@ def test_check_submission_material_quantitative_summary_rejects_cover_letter_wit
             "- Identity-agenda confusion causes risky scholarly work merges.",
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
-            "- Open-v2 held-out scope: IAD-Risk HNFMR=0.000; ordinary FMR=0.001.",
+            "- Open-v2 held-out scope: IAD-Risk shows zero observed HNFMR; ordinary FMR=0.001.",
             "- Cluster-level claims require artifact-backed audits.",
         ]
     )
@@ -10257,7 +10278,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
             "- Identity-agenda confusion creates data/knowledge-engineering merge risk.",
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
-            "- Open-v2 held-out scope: IAD-Risk HNFMR=0.000; ordinary FMR=0.001.",
+            "- Open-v2 held-out scope: IAD-Risk shows zero observed HNFMR; ordinary FMR=0.001.",
             "- Cluster-level claims require artifact-backed audits.",
         ]
     )
@@ -10321,7 +10342,7 @@ def test_check_editorial_claim_alignment_rejects_abstract_without_scope_ranking_
             "raw third-party data and full experimental outputs are not redistributed in Git.",
         ]
     )
-    highlights_text = "- Open-v2 held-out scope: IAD-Risk HNFMR=0.000; ordinary FMR=0.001."
+    highlights_text = "- Open-v2 held-out scope: IAD-Risk shows zero observed HNFMR; ordinary FMR=0.001."
     keywords_text = "scholarly entity matching; false-merge risk"
     metadata_text = "\n".join(
         [
@@ -10384,7 +10405,7 @@ def test_check_editorial_claim_alignment_rejects_abstract_without_pair_cluster_b
             "- Identity-agenda confusion causes risky scholarly work merges.",
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
-            "- Open-v2 held-out scope: IAD-Risk HNFMR=0.000; ordinary FMR=0.001.",
+            "- Open-v2 held-out scope: IAD-Risk shows zero observed HNFMR; ordinary FMR=0.001.",
             "- Cluster-level claims require artifact-backed audits.",
         ]
     )
@@ -10453,7 +10474,7 @@ def test_check_editorial_claim_alignment_rejects_conclusion_without_cluster_boun
             "- Identity-agenda confusion causes risky scholarly work merges.",
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
-            "- Open-v2 held-out scope: IAD-Risk HNFMR=0.000; ordinary FMR=0.001.",
+            "- Open-v2 held-out scope: IAD-Risk shows zero observed HNFMR; ordinary FMR=0.001.",
             "- Cluster-level claims require artifact-backed audits.",
         ]
     )
