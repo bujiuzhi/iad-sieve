@@ -5736,6 +5736,7 @@ def check_highlights(highlights_text: str) -> list[str]:
         errors.append(f"highlights has {len(bullet_lines)} bullet lines; expected 3 to 5")
     required_markers = [
         "Cluster-level claims require artifact-backed audits",
+        "Identity-agenda confusion creates data/knowledge-engineering merge risk",
     ]
     for marker in required_markers:
         if marker not in highlights_text:
@@ -6020,6 +6021,8 @@ def check_cover_letter(cover_letter_text: str) -> list[str]:
         "artifact-release instructions",
         "manifests and checksums",
         "does not claim cluster-level deployment quality without cluster artifacts",
+        "single-score matching",
+        "identity, agenda, and agenda-non-identity signals",
         "DKE-style data and knowledge engineering editorial screen",
         "database-oriented scholarly data integration",
         "knowledge engineering for scholarly records",
@@ -6135,6 +6138,7 @@ def check_editorial_claim_alignment(
             abstract_text,
             [
                 "identity-agenda confusion",
+                "single match score",
                 "IAD-Risk",
                 "IAD-Bench",
                 "Open-v2 evidence snapshot",
@@ -6171,6 +6175,8 @@ def check_editorial_claim_alignment(
             cover_letter_text,
             [
                 "identity-agenda confusion",
+                "single-score matching",
+                "identity, agenda, and agenda-non-identity signals",
                 "IAD-Risk",
                 "IAD-Bench",
                 "Open-v2 evidence snapshot",
@@ -6187,7 +6193,7 @@ def check_editorial_claim_alignment(
             highlights_text,
             [
                 "Identity-agenda confusion",
-                "data/knowledge-engineering",
+                "data/knowledge-engineering merge risk",
                 "IAD-Risk",
                 "IAD-Bench",
                 "Open-v2 held-out scope",

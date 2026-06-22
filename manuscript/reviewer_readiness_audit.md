@@ -854,7 +854,7 @@ The reviewer-facing boundary is request specificity, not completed metadata. The
 
 Outcome: pass for DKE first-screen scope-fit wording; blocked for final target confirmation until authors confirm the selected journal route and final live-system fields.
 
-This gate checks whether the first-screen submission materials state a concrete data and knowledge engineering scope fit instead of only naming broad adjacent areas. The cover letter now limits the DKE-style editorial-screen claim to database-oriented scholarly data integration, knowledge engineering for scholarly records, entity matching, benchmark construction, and reproducible data-processing contracts. The highlights also frame identity-agenda confusion as a data/knowledge-engineering merge-safety problem.
+This gate checks whether the first-screen submission materials state a concrete data and knowledge engineering scope fit instead of only naming broad adjacent areas. The cover letter now limits the DKE-style editorial-screen claim to database-oriented scholarly data integration, knowledge engineering for scholarly records, entity matching, benchmark construction, and reproducible data-processing contracts. The highlights also frame identity-agenda confusion as a data/knowledge-engineering merge risk.
 
 The reviewer-facing boundary is scope-fit precision, not final journal selection. The wording supports DKE/Elsevier preflight review while preserving the requirement that authors later confirm the selected target journal, author-guide source, ranking/category status, template, artifact URL or DOI, and live submission-system fields.
 
@@ -960,7 +960,7 @@ Outcome: pass for abstract and cover-letter FMR/HNFMR first-screen separation; b
 
 This gate checks whether the first-screen abstract and preflight cover letter could report zero observed HNFMR without the ordinary FMR boundary. The abstract and cover letter now state that IAD-Risk reports same-work F1=0.980 and zero observed HNFMR on the held-out test scope, with ordinary FMR still reported separately as 0.001.
 
-The gate also checks first-screen method-evidence alignment. The abstract now motivates identity-agenda confusion through semantic relatedness converted into merge evidence and through the ambiguity of a single match score, rather than claiming that pair classifiers generally assign high merge scores to agenda-related non-identities. This keeps the abstract aligned with the Open-v2 table, where RoBERTa is reported as a strong supervised comparator rather than as the main high-HNFMR failure row.
+The gate also checks first-screen method-evidence alignment. The abstract now motivates identity-agenda confusion through semantic relatedness converted into merge evidence and states that a single match score does not reveal whether evidence reflects identity or agenda relatedness. The cover letter uses the corresponding single-score matching formulation and states that IAD-Risk exposes identity, agenda, and agenda-non-identity signals separately, rather than making a broad pair-classifier failure claim. This keeps first-screen text aligned with the Open-v2 table, where RoBERTa is reported as a strong supervised comparator rather than as the main high-HNFMR failure row.
 
 The reviewer-facing boundary is first-screen metric separation, not stronger empirical evidence. The new sentence prevents readers from treating zero observed hard-negative false merges as zero ordinary false-merge rate, while preserving the existing scope-bounded mechanism-evidence and same-scope comparative-ranking limits.
 

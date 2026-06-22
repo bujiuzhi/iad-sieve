@@ -988,7 +988,7 @@ def test_check_highlights_accepts_five_concise_bullets() -> None:
         [
             "# Highlights",
             "",
-            "- Identity-agenda confusion risks data/knowledge-engineering merges.",
+            "- Identity-agenda confusion creates data/knowledge-engineering merge risk.",
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
             "- Open-v2 held-out scope: IAD-Risk HNFMR=0.000; ordinary FMR=0.001.",
@@ -1058,7 +1058,7 @@ def test_check_highlights_rejects_zero_hnfmr_without_fmr_boundary() -> None:
         [
             "# Highlights",
             "",
-            "- Identity-agenda confusion risks data/knowledge-engineering merges.",
+            "- Identity-agenda confusion creates data/knowledge-engineering merge risk.",
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
             "- Open-v2 held-out scope reports IAD-Risk HNFMR=0.000.",
@@ -7401,7 +7401,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "concrete data and knowledge engineering scope fit",
             "database-oriented scholarly data integration",
             "knowledge engineering for scholarly records",
-            "data/knowledge-engineering merge-safety problem",
+            "data/knowledge-engineering merge risk",
             "scope-fit precision",
             "not final journal selection",
             "## Readiness Gate 95: Keyword Scope-Fit Gate",
@@ -8859,6 +8859,8 @@ def test_check_cover_letter_accepts_preflight_declaration_boundary() -> None:
             "The repository includes artifact-release instructions.",
             "Released artifacts should include manifests and checksums.",
             "The manuscript does not claim cluster-level deployment quality without cluster artifacts.",
+            "The framework is motivated by the ambiguity of single-score matching.",
+            "It exposes identity, agenda, and agenda-non-identity signals separately.",
             "The cover letter supports a DKE-style data and knowledge engineering editorial screen.",
             "It covers database-oriented scholarly data integration.",
             "It covers knowledge engineering for scholarly records.",
@@ -9070,6 +9072,8 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
             rf"\title{{{title}}}",
             r"\begin{abstract}",
             "This paper studies identity-agenda confusion and proposes IAD-Risk.",
+            "A single match score does not reveal whether the evidence reflects identity or agenda relatedness.",
+            "It exposes identity, agenda, and agenda-non-identity signals.",
             "It evaluates IAD-Bench under an Open-v2 evidence snapshot.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
             "The results include HNFMR 0.790--0.999 and zero observed HNFMR, with ordinary FMR still reported separately as 0.001.",
@@ -9091,6 +9095,8 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
         [
             title,
             "The paper studies identity-agenda confusion and proposes IAD-Risk.",
+            "The framework is motivated by single-score matching.",
+            "It exposes identity, agenda, and agenda-non-identity signals.",
             "The manuscript contributes IAD-Bench and reports an Open-v2 evidence snapshot.",
             "The result includes HNFMR 0.790--0.999 and zero observed HNFMR, with ordinary FMR still reported separately as 0.001.",
             "The manuscript does not claim broad method superiority.",
@@ -9101,7 +9107,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
     )
     highlights_text = "\n".join(
         [
-            "- Identity-agenda confusion risks data/knowledge-engineering merges.",
+            "- Identity-agenda confusion creates data/knowledge-engineering merge risk.",
             "- IAD-Risk separates identity, agenda, and ANI evidence.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
             "- Open-v2 held-out scope: IAD-Risk HNFMR=0.000; ordinary FMR=0.001.",

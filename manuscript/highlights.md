@@ -1,6 +1,6 @@
 # Highlights
 
-- Identity-agenda confusion risks data/knowledge-engineering merges.
+- Identity-agenda confusion creates data/knowledge-engineering merge risk.
 - IAD-Risk separates identity, agenda, and ANI evidence.
 - IAD-Bench keeps gold, proxy, and silver labels separate.
 - Open-v2 held-out scope: IAD-Risk HNFMR=0.000; ordinary FMR=0.001.

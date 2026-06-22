@@ -4,7 +4,7 @@ Dear Editor,
 
 We submit the manuscript titled "IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication" for consideration as a research article.
 
-This work studies a practical failure mode in scholarly entity matching: semantically related papers can share a research agenda without describing the same scholarly work. Such identity-agenda confusion can create false merges in digital libraries, literature review systems, citation graphs, and recommendation pipelines. The manuscript proposes IAD-Risk, a risk-aware framework that separates identity evidence from agenda evidence and gates automatic merges by false-merge risk.
+This work studies a practical failure mode in scholarly entity matching: semantically related papers can share a research agenda without describing the same scholarly work. Such identity-agenda confusion can create false merges in digital libraries, literature review systems, citation graphs, and recommendation pipelines. The manuscript proposes IAD-Risk, a risk-aware framework motivated by the ambiguity of single-score matching: it exposes identity, agenda, and agenda-non-identity signals separately and gates automatic merges by false-merge risk.
 
 The manuscript contributes a provenance-aware evaluation contract, IAD-Bench, and reports stratified evidence over gold, proxy, and silver labels.
 
