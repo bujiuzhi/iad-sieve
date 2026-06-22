@@ -642,6 +642,29 @@ def test_check_final_upload_information_request_rejects_missing_q2b_ranking_pack
     assert any("Publisher metrics are screening signals only" in error for error in errors)
 
 
+def test_check_final_upload_information_request_rejects_missing_q2b_cross_check() -> None:
+    """验证最终上传信息表必须包含 Q2/B 排名交叉核对项。"""
+
+    module = _load_validate_manuscript_module()
+    request_text = Path("manuscript/final_upload_information_request.md").read_text(encoding="utf-8")
+    for marker in [
+        "Q2/B ranking cross-check before final upload",
+        "Selected journal name exactly matches `submission.target_journal`",
+        "Selected journal ISSN or eISSN matches the ranking source lookup",
+        "Ranking source category and reported value are captured in the evidence export or screenshot",
+        "Ranking source access date is not later than the final upload date",
+        "Responsible author has confirmed the ranking/category interpretation",
+        "Final cover letter and first-screen materials still avoid Q2/B-complete wording",
+    ]:
+        request_text = request_text.replace(marker, "")
+
+    errors = module.check_final_upload_information_request(request_text)
+
+    assert any("Q2/B ranking cross-check before final upload" in error for error in errors)
+    assert any("Selected journal ISSN or eISSN matches the ranking source lookup" in error for error in errors)
+    assert any("Final cover letter and first-screen materials still avoid Q2/B-complete wording" in error for error in errors)
+
+
 def test_check_final_upload_information_request_rejects_missing_author_material_count_rule() -> None:
     """验证最终上传信息表必须说明 DKE 作者材料数量与作者行数一致。"""
 
@@ -842,6 +865,31 @@ def test_check_final_upload_information_request_rejects_missing_artifact_process
     assert any("configs/source_input_manifest.json" in error for error in errors)
     assert any("logs/processing_run_log.jsonl" in error for error in errors)
     assert any("python -m pip install -e ." in error for error in errors)
+
+
+def test_check_final_upload_information_request_rejects_missing_artifact_publication_cross_check() -> None:
+    """验证最终上传信息表必须包含 artifact 发布交叉核对项。"""
+
+    module = _load_validate_manuscript_module()
+    request_text = Path("manuscript/final_upload_information_request.md").read_text(encoding="utf-8")
+    for marker in [
+        "Artifact publication cross-check before final upload",
+        "Public artifact URL or DOI resolves to the release landing page",
+        "Artifact manifest `publication` object matches `submission_metadata.yml`",
+        "Artifact manifest repository commit matches the final repository commit",
+        "`checksums.sha256` covers result files, source manifest, and processing logs",
+        "`configs/source_input_manifest.json` is included in the public release",
+        "`logs/processing_run_log.jsonl` is included in the public release",
+        "`python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release` passed",
+        "`python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passed against the same release",
+    ]:
+        request_text = request_text.replace(marker, "")
+
+    errors = module.check_final_upload_information_request(request_text)
+
+    assert any("Artifact publication cross-check before final upload" in error for error in errors)
+    assert any("Public artifact URL or DOI resolves to the release landing page" in error for error in errors)
+    assert any("passed against the same release" in error for error in errors)
 
 
 def test_check_final_upload_information_request_rejects_missing_text_consistency() -> None:

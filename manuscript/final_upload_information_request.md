@@ -113,6 +113,17 @@ Use this packet before claiming a Q2/B route or marking `ranking_confirmation_co
 - `target_preparation.ranking_confirmation_checked_date`:
 - Publisher metrics are screening signals only and do not replace JCR, CAS, CCF, or institutional category evidence:
 
+### Q2/B ranking cross-check before final upload
+
+Complete this cross-check before changing `ranking_confirmation_completed` to true or using any Q2/B-complete wording in the manuscript, cover letter, metadata, or live system.
+
+- Selected journal name exactly matches `submission.target_journal`:
+- Selected journal ISSN or eISSN matches the ranking source lookup:
+- Ranking source category and reported value are captured in the evidence export or screenshot:
+- Ranking source access date is not later than the final upload date:
+- Responsible author has confirmed the ranking/category interpretation:
+- Final cover letter and first-screen materials still avoid Q2/B-complete wording unless the packet above is complete and validated:
+
 ## Author list
 
 For each author, provide the final Author order, name, affiliation, email, ORCID, and contribution roles.
@@ -276,6 +287,19 @@ For the DKE/Elsevier route, the research data statement must either link to the 
 - `checksums.sha256` validation status:
 - `open_v2_main_results` row-level schema validated:
 - Public access status:
+
+### Artifact publication cross-check before final upload
+
+Complete this cross-check before inserting an artifact URL or DOI into the final cover letter, research-data statement, or live submission-system fields.
+
+- Public artifact URL or DOI resolves to the release landing page:
+- Artifact manifest `publication` object matches `submission_metadata.yml`:
+- Artifact manifest repository commit matches the final repository commit:
+- `checksums.sha256` covers result files, source manifest, and processing logs:
+- `configs/source_input_manifest.json` is included in the public release:
+- `logs/processing_run_log.jsonl` is included in the public release:
+- `python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release` passed:
+- `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passed against the same release:
 
 ### Artifact processing provenance
 
