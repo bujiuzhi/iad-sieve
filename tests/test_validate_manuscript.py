@@ -414,6 +414,33 @@ def test_check_final_upload_information_request_rejects_missing_review_mode_pres
     assert any("review_mode_confirmed" in error for error in errors)
 
 
+def test_check_final_upload_information_request_rejects_missing_cover_letter_replacement_packet() -> None:
+    """验证最终上传信息表必须收集最终投稿信替换字段。"""
+
+    module = _load_validate_manuscript_module()
+    request_text = Path("manuscript/final_upload_information_request.md").read_text(encoding="utf-8")
+    for marker in [
+        "Final cover letter replacement values",
+        "Final cover letter replacement",
+        "Target-specific greeting line",
+        "Corresponding author name used for signature",
+        "Artifact URL or DOI sentence",
+        "Generic `Dear Editor` greeting removed",
+        "Anonymous author signature removed",
+        "Anonymous preflight wording removed",
+        "Final cover letter checked by `check_final_upload_cover_letter`",
+    ]:
+        request_text = request_text.replace(marker, "")
+
+    errors = module.check_final_upload_information_request(request_text)
+
+    assert any("Final cover letter replacement values" in error for error in errors)
+    assert any("Target-specific greeting line" in error for error in errors)
+    assert any("Corresponding author name used for signature" in error for error in errors)
+    assert any("Artifact URL or DOI sentence" in error for error in errors)
+    assert any("check_final_upload_cover_letter" in error for error in errors)
+
+
 def test_check_final_upload_information_request_rejects_missing_article_type_controlled_values() -> None:
     """验证最终上传信息收集表必须提示 article_type 受控取值。"""
 

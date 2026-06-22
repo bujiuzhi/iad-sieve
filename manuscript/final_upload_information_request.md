@@ -12,6 +12,7 @@ Do not start final-upload package generation until this packet is complete and s
 | Author identity materials | Final author order, affiliations, emails, ORCID values if used, corresponding author, DKE biography files, and photograph files when required. | Title page, `authors`, `corresponding_author`, `author_identity_materials`, cover letter, and live submission system. |
 | Author-approved declarations | Funding statement, CRediT contribution statement, competing-interest statement, permissions statement, generative AI declaration, and Elsevier declaration-tool file when required. | Manuscript declaration sections, `submission_metadata.yml`, publisher declaration files, and live submission system. |
 | Artifact publication record | Public artifact URL or DOI, publication access status, finalized release manifest, checksums, and source artifact preflight result. | `artifact_boundary`, research-data statement, cover letter, artifact manifest publication object, and live submission system. |
+| Final cover letter replacement values | Target-specific greeting, article type sentence, corresponding-author signature name, artifact URL or DOI sentence, declaration-status sentence, and confirmation that generic `Dear Editor`, anonymous signature, and anonymous preflight wording are removed. | `cover_letter.md`, `submission_metadata.yml`, and live submission system. |
 | Live-system verification | Previewed title, abstract, keywords, highlights, uploaded files, source archive, final package, and first-screen claim boundary. | `upload_preparation`, `final_upload_checklist`, submission-system checklist, and final package validation. |
 
 ## Submission metadata mapping
@@ -33,6 +34,7 @@ Repository URL and commit binding: keep the source `repository_reference` fields
 | Publisher declaration files | `publisher_declaration_files` | Elsevier declarations tool output, including the competing-interest `.doc` or `.docx` file when the DKE/Elsevier route is selected |
 | Data and code availability statement | `repository_reference`, `artifact_boundary`, `statements.research_data_statement` | Manuscript declarations and research-data statement field |
 | Artifact release | `artifact_boundary`, `final_upload_checklist.artifact_release_prepared_or_linked` | Public artifact record and live submission system |
+| Final cover letter | `submission.target_journal`, `submission.article_type`, `corresponding_author`, `artifact_boundary`, `statements`, `funding`, `author_contributions`, `permissions`, and `generative_ai` | `cover_letter.md` and live submission system |
 | PDF and system checks | `final_upload_checklist.manuscript_pdf_rebuilt_after_template`, `final_upload_checklist.supplementary_pdf_rebuilt_after_template`, `final_upload_checklist.submission_system_files_verified`, `final_upload_checklist.first_screen_claim_lockdown_confirmed`, `upload_preparation.live_submission_system_verified`, `upload_preparation.final_upload_package_verified_against_system` | Rebuilt PDFs, first-screen claim lockdown, and live submission system |
 | Submission text consistency | `final_upload_checklist.submission_system_files_verified`, `upload_preparation.live_submission_system_verified`, `upload_preparation.final_upload_package_verified_against_system` | Title, abstract, keywords, highlights, uploaded files, and final package checked in the live submission system |
 
@@ -112,6 +114,21 @@ For the DKE/Elsevier route, provide a short biography and a passport-type photog
 - Email:
 - ORCID:
 - Postal address, if required:
+
+## Final cover letter replacement
+
+Use this section to replace the anonymous preflight cover letter only after the selected target journal, corresponding author, artifact release, and declarations are confirmed. The final cover letter must pass `check_final_upload_cover_letter` through `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release`.
+
+- Target-specific greeting line:
+- Article type sentence:
+- Target-journal scope sentence:
+- Corresponding author name used for signature:
+- Artifact URL or DOI sentence:
+- Declaration-status sentence aligned with `submission_metadata.yml`:
+- Generic `Dear Editor` greeting removed:
+- Anonymous author signature removed:
+- Anonymous preflight wording removed:
+- Final cover letter checked by `check_final_upload_cover_letter`:
 
 ## Funding statement
 
