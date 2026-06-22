@@ -401,7 +401,7 @@ Stage & Local input boundary & Processing entry point & Expected output & Git bo
 DeepMatcher gold & Raw benchmark tables and pair labels. & \texttt{prepare-deepmatcher}. & Eval documents, eval pairs, and dataset summary. & Raw tables excluded; fixtures tested. \\
 SciRepEval proxy & Public metadata and citation-pair files. & \texttt{prepare-scirepeval-\allowbreak proximity}. & Proxy agenda pairs and source summaries. & Full metadata excluded; schema retained. \\
 OpenAlex weak labels & OpenAlex works and OpenCitations COCI files. & \texttt{prepare-openalex-\allowbreak weak-labels}. & Silver hard negatives with provenance. & Large sources excluded; rules retained. \\
-IAD-Bench assembly & Processed source directories from previous stages. & \texttt{build-iad-bench}. & Unified documents, pairs, splits, provenance, and dataset card. & Full package released as L2/L3 artifact. \\
+IAD-Bench assembly & Processed source directories from previous stages. & \texttt{build-iad-bench}. & Unified documents, pairs, splits, provenance, and dataset card. & Full package required for L2/L3 artifact release. \\
 Result audit & Prediction, score, threshold, log, and metric files. & Artifact finalization and validation scripts. & Manifest, checksums, tables, predictions, and command logs. & External artifact required. \\
 \bottomrule
 \end{tabular}

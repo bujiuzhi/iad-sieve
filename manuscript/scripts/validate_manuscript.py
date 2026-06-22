@@ -3242,12 +3242,22 @@ def check_public_source_rebuild_audit_boundary(supplementary_text: str) -> list[
         "output summaries",
         "chain of custody",
         "do not upgrade fixture-level reproduction into a full numerical audit",
+        "Full package required for L2/L3 artifact release",
     ]
-    return [
+    errors = [
         f"public-source rebuild audit boundary missing marker: {marker}"
         for marker in required_markers
         if marker not in supplementary_text
     ]
+    forbidden_markers = [
+        "Full package released as L2/L3 artifact",
+    ]
+    errors.extend(
+        f"public-source rebuild audit boundary uses overclaiming release marker: {marker}"
+        for marker in forbidden_markers
+        if marker in supplementary_text
+    )
+    return errors
 
 
 def check_reviewer_evidence_gate(supplementary_text: str) -> list[str]:

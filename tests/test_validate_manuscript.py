@@ -4914,6 +4914,7 @@ def test_check_public_source_rebuild_audit_boundary_accepts_complete_boundary() 
             "The release includes output summaries.",
             "The package preserves chain of custody.",
             "These files do not upgrade fixture-level reproduction into a full numerical audit.",
+            "Full package required for L2/L3 artifact release.",
         ]
     )
 
@@ -4933,6 +4934,33 @@ def test_check_public_source_rebuild_audit_boundary_rejects_missing_manifest_and
     assert any("source_input_manifest" in error for error in errors)
     assert any("processing_run_log" in error for error in errors)
     assert any("chain of custody" in error for error in errors)
+
+
+def test_check_public_source_rebuild_audit_boundary_rejects_released_artifact_overclaim() -> None:
+    """验证 L2/L3 artifact 尚未绑定时不能写成完整包已经发布。"""
+
+    module = _load_validate_manuscript_module()
+    supplementary_text = "\n".join(
+        [
+            r"\section{Public-Source Rebuild Audit Boundary}",
+            r"\label{tab:public-source-rebuild-audit-boundary}",
+            r"The package includes \path{source_input_manifest}.",
+            r"The package includes \path{processing_run_log}.",
+            "Source name and acquisition date or version are recorded.",
+            "The original provider and license boundary are recorded.",
+            "Each input has a SHA256 checksum.",
+            "Command line, code commit, environment summary, and random seed are recorded.",
+            "The release includes output summaries.",
+            "The package preserves chain of custody.",
+            "These files do not upgrade fixture-level reproduction into a full numerical audit.",
+            "Full package released as L2/L3 artifact.",
+        ]
+    )
+
+    errors = module.check_public_source_rebuild_audit_boundary(supplementary_text)
+
+    assert any("overclaiming release marker" in error for error in errors)
+    assert any("Full package released as L2/L3 artifact" in error for error in errors)
 
 
 def test_check_reviewer_evidence_gate_rejects_missing_artifact_gates() -> None:
