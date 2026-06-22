@@ -104,6 +104,27 @@ Before upload, verify:
 4. `submission_manifest.json` records the same `repository_commit` and `repository_branch` as the package copy of `submission_metadata.yml`.
 5. `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes after the package is built, the external artifact release is finalized, and the artifact manifest publication object records the same public artifact URL or DOI as `submission_metadata.yml`.
 
+## Final Evidence-Chain Cross-Checks
+
+Before changing live submission-system fields from preparatory values to final-upload values, verify both evidence chains below.
+
+### Q2/B ranking cross-check before final upload
+
+1. Selected journal name exactly matches `submission.target_journal`.
+2. Selected journal ISSN or eISSN matches the ranking source lookup.
+3. Ranking source category and reported value are captured in the evidence export or screenshot.
+4. Ranking source access date is not later than the final upload date.
+5. Responsible author has confirmed the ranking/category interpretation.
+6. Final cover letter, metadata fields, and live-system first-screen text still avoid Q2/B-complete wording unless the ranking evidence packet is complete and validated.
+
+### Artifact publication cross-check before final upload
+
+1. The public artifact URL or DOI resolves to the release landing page.
+2. The artifact manifest `publication` object matches `submission_metadata.yml`.
+3. The manifest repository commit matches the final repository commit.
+4. `checksums.sha256` covers result files, `configs/source_input_manifest.json`, and `logs/processing_run_log.jsonl`.
+5. `python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release` and `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` pass against the same release.
+
 ## Final Metadata Checks
 
 Before upload, verify:
@@ -168,6 +189,7 @@ Do not upload the manuscript package until all hard-stop conditions are cleared:
 4. A public artifact URL or DOI resolves, the external artifact release validates, and the artifact manifest `publication` object matches the final-upload metadata.
 5. The live submission system preview has been checked against the current title, abstract, keywords, highlights, uploaded files, declaration fields, and final package contents.
 6. No first-screen material, cover letter, metadata field, or live-system text claims Q2/B completion, final-upload readiness, broad method superiority, fixed-number reproducibility from Git alone, threshold stability, statistical superiority, human-gold validation, cluster-level deployment quality, or workload reduction unless the corresponding evidence package validates.
+7. The Q2/B ranking cross-check and artifact publication cross-check are complete before final-upload package validation is treated as a pass condition.
 
 ## Current Blocking Items
 

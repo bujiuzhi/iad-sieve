@@ -7048,6 +7048,22 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "`submission_manifest.json` records the same `repository_commit` and `repository_branch` as the package copy.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
             "The external artifact release is finalized before final-upload package validation.",
+            "## Final Evidence-Chain Cross-Checks",
+            "Before changing live submission-system fields from preparatory values to final-upload values.",
+            "Q2/B ranking cross-check before final upload",
+            "Selected journal name exactly matches `submission.target_journal`.",
+            "Selected journal ISSN or eISSN matches the ranking source lookup.",
+            "Ranking source category and reported value are captured in the evidence export or screenshot.",
+            "Ranking source access date is not later than the final upload date.",
+            "Responsible author has confirmed the ranking/category interpretation.",
+            "Final cover letter, metadata fields, and live-system first-screen text still avoid Q2/B-complete wording.",
+            "Artifact publication cross-check before final upload",
+            "The public artifact URL or DOI resolves to the release landing page.",
+            "The artifact manifest `publication` object matches `submission_metadata.yml`.",
+            "The manifest repository commit matches the final repository commit.",
+            "`checksums.sha256` covers result files, `configs/source_input_manifest.json`, and `logs/processing_run_log.jsonl`.",
+            "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
+            "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` pass against the same release.",
             "## Live Submission Text Checks",
             "Title, abstract, keywords, and highlights are copied from the current source files.",
             "The title and abstract match `main.tex` after journal-template conversion.",
@@ -7103,6 +7119,7 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "A public artifact URL or DOI resolves.",
             "The artifact manifest `publication` object matches the final-upload metadata.",
             "The live submission system preview has been checked against the current title, abstract, keywords, highlights, uploaded files, declaration fields, and final package contents.",
+            "The Q2/B ranking cross-check and artifact publication cross-check are complete before final-upload package validation is treated as a pass condition.",
             "No first-screen material claims fixed-number reproducibility from Git alone.",
             "No first-screen material claims workload reduction unless the corresponding evidence package validates.",
             "## Current Blocking Items",
@@ -7229,6 +7246,39 @@ def test_check_submission_system_checklist_rejects_missing_q2b_ranking_evidence_
     assert any("subject category" in error for error in errors)
     assert any("evidence export or screenshot path" in error for error in errors)
     assert any("screening evidence only" in error for error in errors)
+
+
+def test_check_submission_system_checklist_rejects_missing_evidence_chain_cross_checks() -> None:
+    """验证投稿系统清单必须保留终稿前证据链交叉核对。"""
+
+    module = _load_validate_manuscript_module()
+    checklist_text = Path("manuscript/submission_system_checklist.md").read_text(encoding="utf-8")
+    for marker in [
+        "## Final Evidence-Chain Cross-Checks",
+        "Q2/B ranking cross-check before final upload",
+        "Selected journal name exactly matches `submission.target_journal`",
+        "Selected journal ISSN or eISSN matches the ranking source lookup",
+        "Ranking source category and reported value are captured in the evidence export or screenshot",
+        "Ranking source access date is not later than the final upload date",
+        "Responsible author has confirmed the ranking/category interpretation",
+        "Artifact publication cross-check before final upload",
+        "The public artifact URL or DOI resolves to the release landing page",
+        "The artifact manifest `publication` object matches `submission_metadata.yml`",
+        "The manifest repository commit matches the final repository commit",
+        "`checksums.sha256` covers result files, `configs/source_input_manifest.json`, and `logs/processing_run_log.jsonl`",
+        "pass against the same release",
+        "The Q2/B ranking cross-check and artifact publication cross-check are complete",
+    ]:
+        checklist_text = checklist_text.replace(marker, "")
+
+    errors = module.check_submission_system_checklist(checklist_text)
+
+    assert any("Final Evidence-Chain Cross-Checks" in error for error in errors)
+    assert any("Q2/B ranking cross-check before final upload" in error for error in errors)
+    assert any("submission.target_journal" in error for error in errors)
+    assert any("Artifact publication cross-check before final upload" in error for error in errors)
+    assert any("checksums.sha256" in error for error in errors)
+    assert any("same release" in error for error in errors)
 
 
 def test_check_submission_system_checklist_rejects_missing_public_link_policy() -> None:
