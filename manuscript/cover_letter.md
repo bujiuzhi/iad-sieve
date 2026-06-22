@@ -10,7 +10,7 @@ The manuscript contributes a provenance-aware evaluation contract, IAD-Bench, an
 
 In the Open-v2 evidence snapshot, the result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking: single-space scientific representation baselines show HNFMR 0.790--0.999 on the full pair scope, whereas transformer-backed IAD-Risk variants report same-work F1=0.980 and zero observed HNFMR on the held-out test scope, with ordinary FMR still reported separately as 0.001.
 
-The claims are intentionally conservative: OpenAlex and OpenCitations labels are treated as silver hard-negative evidence, not as human gold, the manuscript does not claim broad method superiority, and it does not claim cluster-level deployment quality without cluster artifacts.
+The claims are intentionally conservative: OpenAlex and OpenCitations labels are treated as silver hard-negative evidence, not as human gold, the manuscript does not claim broad method superiority, and it does not claim cluster-level deployment quality without cluster artifacts or workload reduction without coverage and review-capacity evidence.
 
 We also include supplementary material that documents the reproduction levels, fixture rebuild commands, public-source rebuild commands, artifact package requirements, and claim boundaries.
 
