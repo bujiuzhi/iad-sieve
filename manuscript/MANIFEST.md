@@ -8,6 +8,16 @@
 
 本目录只保留与本课题投稿直接相关的材料，不保存内部过程材料、编辑日志或与课题无关的文档。
 
+## 产物分层与追踪边界
+
+| 产物层 | 位置 | Git 状态 | 用途 | 不替代内容 |
+| --- | --- | --- | --- | --- |
+| 期刊源文件 | `manuscript/main.tex`、`manuscript/supplementary_material.tex`、`manuscript/references.bib`、投稿文本、元数据和脚本 | Git 跟踪 | 形成可审计的稿件源码和投稿准备材料 | 不替代目标期刊最终模板套用、作者确认和 live submission-system 核对 |
+| 跟踪 PDF 预览 | `manuscript/build/iad-risk-manuscript-latex.pdf`、`manuscript/build/iad-risk-manuscript-elsevier.tex`、`manuscript/build/iad-risk-manuscript-elsevier.pdf`、`manuscript/build/iad-risk-supplementary-material.pdf` | Git 跟踪 | 证明当前源码可生成可读主稿、补充材料和 DKE/Elsevier 匿名预转换预览 | 不替代最终上传包、目标期刊作者版源文件或投稿系统预览 |
+| 本地提交包 | `manuscript/build/submission_package/`、`manuscript/build/dke_preflight_package/`、`manuscript/build/iad-risk-submission-package.zip`、`manuscript/build/iad-risk-dke-preflight-package.zip` | 忽略且不提交 | 本地检查投稿文件组合、manifest 和 checksum | 不替代 Git 跟踪源文件或外部 artifact release |
+| 外部结果 artifact | 仓库外 release 目录或公开 DOI/URL | 仓库外发布 | 承载 L2/L3 数值复验所需的派生表格、预测、日志、manifest 和 checksum | 不重新分发原始第三方数据，除非原始来源条款明确允许 |
+| 本地数据与运行输出 | `data/`、`outputs/` | 忽略且不提交 | 存放本地输入、实验输出、PDF 构建缓存或离线 Tectonic bundle | 不作为期刊上传材料或公开源码包内容 |
+
 ## 文件清单
 
 | 路径 | 用途 |

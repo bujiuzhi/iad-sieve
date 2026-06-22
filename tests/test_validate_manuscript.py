@@ -5809,6 +5809,22 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
         "`manuscript/build/dke_preflight_package/`",
         "本地构建产物，不纳入 Git 跟踪",
         "不保存内部过程材料、编辑日志或与课题无关的文档",
+        "产物分层与追踪边界",
+        "期刊源文件",
+        "跟踪 PDF 预览",
+        "`manuscript/build/iad-risk-manuscript-latex.pdf`",
+        "`manuscript/build/iad-risk-manuscript-elsevier.tex`",
+        "`manuscript/build/iad-risk-manuscript-elsevier.pdf`",
+        "`manuscript/build/iad-risk-supplementary-material.pdf`",
+        "本地提交包",
+        "`manuscript/build/iad-risk-submission-package.zip`",
+        "`manuscript/build/iad-risk-dke-preflight-package.zip`",
+        "忽略且不提交",
+        "外部结果 artifact",
+        "仓库外 release 目录或公开 DOI/URL",
+        "本地数据与运行输出",
+        "`data/`、`outputs/`",
+        "不作为期刊上传材料或公开源码包内容",
         "`/path/to/source-artifacts`",
         "不是 `outputs/` 根目录",
         "不是 PDF 构建目录",
@@ -5850,6 +5866,16 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
     assert any("outputs/` 保存本地实验输出" in error for error in errors)
     assert any("manuscript/build/submission_package/" in error for error in errors)
     assert any("不保存内部过程材料、编辑日志" in error for error in errors)
+    assert any("产物分层与追踪边界" in error for error in errors)
+    assert any("期刊源文件" in error for error in errors)
+    assert any("跟踪 PDF 预览" in error for error in errors)
+    assert any("iad-risk-manuscript-latex.pdf" in error for error in errors)
+    assert any("iad-risk-submission-package.zip" in error for error in errors)
+    assert any("忽略且不提交" in error for error in errors)
+    assert any("外部结果 artifact" in error for error in errors)
+    assert any("仓库外 release 目录" in error for error in errors)
+    assert any("本地数据与运行输出" in error for error in errors)
+    assert any("不作为期刊上传材料" in error for error in errors)
     assert any("TECTONIC_BUNDLE_DIR" in error for error in errors)
     assert any("本地 Tectonic bundle" in error for error in errors)
     assert any("diagnose_latex_environment.py" in error for error in errors)
@@ -7146,8 +7172,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Readiness Summary",
-            "Readiness gates covered: 136.",
-            "Highest current reviewer-facing risks are tracked as a risk inventory rather than a claim that every gate is currently failing: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, DKE author identity material cardinality drift, DKE photograph file-format drift, Git-only CLI discovery drift, DKE research-data statement drift, data-processing command implementation-map drift, Elsevier competing-interest declaration file traceability, introduction contribution first-screen alignment, conclusion first-screen boundary alignment, submission-day official-source drift, processing-run-log schema bypass, process-note vocabulary bypass, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, pre-submission cover-letter declaration boundary, preflight metadata declaration placeholders, anonymous review-file declaration boundary, introduction row-scope comparison overread, main-result operating-point overread, figure metric-scope overread, cover-letter Git-only reproduction boundary, Q2/B ranking evidence packet traceability, public documentation index drift, local submission-package artifact tracking drift, DKE/Elsevier draft abstract-length drift, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, ANI threshold notation drift, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final cover-letter preflight wording gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, latex-engine panic diagnostic gap, and stronger evidence gates.",
+            "Readiness gates covered: 137.",
+            "Highest current reviewer-facing risks are tracked as a risk inventory rather than a claim that every gate is currently failing: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, DKE author identity material cardinality drift, DKE photograph file-format drift, Git-only CLI discovery drift, DKE research-data statement drift, data-processing command implementation-map drift, manuscript product-boundary table drift, Elsevier competing-interest declaration file traceability, introduction contribution first-screen alignment, conclusion first-screen boundary alignment, submission-day official-source drift, processing-run-log schema bypass, process-note vocabulary bypass, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, pre-submission cover-letter declaration boundary, preflight metadata declaration placeholders, anonymous review-file declaration boundary, introduction row-scope comparison overread, main-result operating-point overread, figure metric-scope overread, cover-letter Git-only reproduction boundary, Q2/B ranking evidence packet traceability, public documentation index drift, local submission-package artifact tracking drift, DKE/Elsevier draft abstract-length drift, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, ANI threshold notation drift, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final cover-letter preflight wording gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, latex-engine panic diagnostic gap, and stronger evidence gates.",
             "External final-upload blockers cannot be resolved from the repository alone.",
             "Local gates currently controlled by validators must still be rerun after source or package edits.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
@@ -8307,6 +8333,12 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "code traceability, not full numerical reproduction",
             "does not provide raw third-party files",
             "freeze API responses",
+            "## Readiness Gate 137: Manuscript Product Boundary Table Gate",
+            "manuscript product-boundary table coverage",
+            "single-directory product requirement",
+            "tracked journal sources, tracked PDF previews, ignored local submission packages, external result artifacts, and ignored local data/output directories",
+            "directory hygiene, not final-upload readiness",
+            "does not create the final author-confirmed upload package",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             r"Method threshold notation uses `\tau_n` for the ANI risk-head threshold",
@@ -8321,6 +8353,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "Git-only fixture rebuild validation starts with `python -m iad_sieve.cli --help`",
             "DKE/Elsevier final-upload metadata includes a `statements.research_data_statement`",
             "`docs/data-processing-pipeline.md` keeps a command-to-source map",
+            "`manuscript/README.md` and `manuscript/MANIFEST.md` keep a product-boundary table",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
         ]
     )
@@ -8337,7 +8370,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Readiness Summary",
-        "Readiness gates covered: 136",
+        "Readiness gates covered: 137",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -8348,7 +8381,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Readiness Summary" in error for error in errors)
-    assert any("Readiness gates covered: 136" in error for error in errors)
+    assert any("Readiness gates covered: 137" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -9580,6 +9613,31 @@ def test_check_reviewer_readiness_audit_rejects_missing_data_processing_command_
     assert any("data-processing command implementation-map drift" in error for error in errors)
     assert any("command-to-source map" in error for error in errors)
     assert any("CLI handler functions" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_manuscript_product_boundary_gate() -> None:
+    """验证审稿准备度审计必须覆盖稿件产物分层边界门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Readiness Gate 137: Manuscript Product Boundary Table Gate",
+        "manuscript product-boundary table drift",
+        "manuscript product-boundary table coverage",
+        "single-directory product requirement",
+        "tracked journal sources, tracked PDF previews, ignored local submission packages, external result artifacts, and ignored local data/output directories",
+        "directory hygiene, not final-upload readiness",
+        "does not create the final author-confirmed upload package",
+        "`manuscript/README.md` and `manuscript/MANIFEST.md` keep a product-boundary table",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Manuscript Product Boundary Table Gate" in error for error in errors)
+    assert any("manuscript product-boundary table drift" in error for error in errors)
+    assert any("single-directory product requirement" in error for error in errors)
+    assert any("tracked PDF previews" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_fixture_evidence_isolation_gate() -> None:
