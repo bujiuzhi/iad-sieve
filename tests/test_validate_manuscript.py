@@ -4436,6 +4436,26 @@ def test_check_target_journal_shortlist_accepts_complete_shortlist() -> None:
             "Review model and author metadata rules determine anonymization.",
             "Data statement and artifact link requirements determine final-upload blockers.",
             "Recheck publisher pages on submission day.",
+            "## Submission-Day Official Source Recheck",
+            "re-open the DKE guide URL",
+            "selected_author_guide_rechecked_date",
+            "separate from author confirmation and institutional ranking/category confirmation",
+            "Publisher metrics",
+            "current CiteScore and Impact Factor",
+            "publisher screening signals only",
+            "Aims and scope",
+            "data engineering, knowledge engineering, and their interface",
+            "Peer review model",
+            "single anonymized review",
+            "Source-file and LaTeX rules",
+            "editable source-file and LaTeX requirements",
+            "Abstract, keywords, and highlights",
+            "Research data and data statement",
+            "release manifest and checksums validate",
+            "Declarations and CRediT",
+            "Elsevier declaration-tool Word file",
+            "Author biographies and photographs",
+            "outside anonymous preflight packages",
         ]
     )
 
@@ -4550,6 +4570,31 @@ def test_check_target_journal_shortlist_rejects_missing_source_decision_audit() 
     assert any("Source-to-Decision Audit" in error for error in errors)
     assert any("Metrics are screening signals" in error for error in errors)
     assert any("Recheck publisher pages on submission day" in error for error in errors)
+
+
+def test_check_target_journal_shortlist_rejects_missing_submission_day_source_recheck() -> None:
+    """验证目标期刊候选清单必须覆盖投稿日官方来源复核。"""
+
+    module = _load_validate_manuscript_module()
+    shortlist_text = Path("manuscript/target_journal_shortlist.md").read_text(encoding="utf-8")
+    for marker in [
+        "## Submission-Day Official Source Recheck",
+        "re-open the DKE guide URL",
+        "selected_author_guide_rechecked_date",
+        "separate from author confirmation and institutional ranking/category confirmation",
+        "current CiteScore and Impact Factor",
+        "release manifest and checksums validate",
+        "Elsevier declaration-tool Word file",
+        "outside anonymous preflight packages",
+    ]:
+        shortlist_text = shortlist_text.replace(marker, "")
+
+    errors = module.check_target_journal_shortlist(shortlist_text)
+
+    assert any("Submission-Day Official Source Recheck" in error for error in errors)
+    assert any("selected_author_guide_rechecked_date" in error for error in errors)
+    assert any("current CiteScore and Impact Factor" in error for error in errors)
+    assert any("Elsevier declaration-tool Word file" in error for error in errors)
 
 
 def test_check_artifact_release_manifest_template_accepts_complete_template() -> None:

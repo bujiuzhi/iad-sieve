@@ -87,6 +87,21 @@ The shortlist uses official publisher pages only to decide manuscript preparatio
 | Scientometrics title-page, abstract, keyword, and data availability rules | Keep Scientometrics as a domain backup that would need Springer formatting, 150--250 word abstract, 4--6 keywords, and a stronger science-of-science interpretation. | Confirm Springer submission fields and decide whether a domain-facing rewrite is worth the effort. |
 | Artifact and data availability requirements | Keep external artifact release as a final-upload blocker rather than a cosmetic repository link. | Add a real artifact URL or DOI and validate checksums before citing result artifacts. |
 
+## Submission-Day Official Source Recheck
+
+Before final upload, re-open the DKE guide URL and record the new access date in `submission_metadata.yml` under `target_preparation.selected_author_guide_rechecked_date`. This recheck is separate from author confirmation and institutional ranking/category confirmation.
+
+| Official source item | Recheck action | Metadata or package consequence |
+| --- | --- | --- |
+| Publisher metrics | Verify current CiteScore and Impact Factor on the ScienceDirect DKE page. | Keep these as publisher screening signals only; do not convert them into JCR quartile, Chinese Academy of Sciences zone, CCF class, or institutional ranking proof. |
+| Aims and scope | Verify that DKE still covers data engineering, knowledge engineering, and their interface. | Keep the cover letter and abstract framed around data/knowledge-engineering methods rather than broad scientometrics. |
+| Peer review model | Verify whether the live route still uses single anonymized review. | Use author-visible final-upload metadata when required; do not treat the anonymous preflight package as the final package. |
+| Source-file and LaTeX rules | Verify editable source-file and LaTeX requirements. | Rebuild the selected journal source, PDF, and source archive after template conversion. |
+| Abstract, keywords, and highlights | Verify the abstract word limit, keyword count, highlight count, and highlight length. | Rerun `validate_manuscript.py --strict-latex` and regenerate submission packages after any front-matter edit. |
+| Research data and data statement | Verify current research-data deposit/linking or explanatory-statement requirements. | Insert the real artifact URL or DOI only after the release manifest and checksums validate. |
+| Declarations and CRediT | Verify competing-interest, funding, CRediT, and generative AI declaration requirements. | Fill author-approved declarations and the Elsevier declaration-tool Word file before final upload. |
+| Author biographies and photographs | Verify whether DKE still requests short biographies and passport-type photographs. | Keep biography and photograph files outside anonymous preflight packages and record verified paths only after author order is confirmed. |
+
 ## Candidate Matrix
 
 | Candidate | Publisher evidence | Fit to IAD-Risk | Pre-submission action |
