@@ -966,9 +966,9 @@ The reviewer-facing boundary is first-screen metric separation, not stronger emp
 
 Outcome: pass for highlights FMR/HNFMR first-screen separation; blocked for zero-risk claims until external artifact release and broader validation are complete.
 
-This gate checks whether the submission highlights could still expose the zero-HNFMR overread after the abstract and cover letter were corrected. The quantitative highlight now states: "Open-v2 scope-bounded evidence: zero observed IAD-Risk HNFMR; FMR=0.001."
+This gate checks whether the submission highlights could still expose the zero-HNFMR overread after the abstract and cover letter were corrected. The quantitative highlight now states: "Open-v2 held-out scope: IAD-Risk HNFMR=0.000; ordinary FMR=0.001."
 
-The reviewer-facing boundary is highlight-level metric separation, not stronger empirical evidence. The highlight remains within the concise submission limit while making ordinary FMR visible beside zero observed HNFMR, so first-screen materials no longer isolate the hard-negative stratum from the separately reported ordinary false-merge rate.
+The reviewer-facing boundary is highlight-level metric separation, not stronger empirical evidence. The highlight remains within the concise submission limit while making the held-out HNFMR stratum and ordinary FMR visibly separate, so first-screen materials no longer isolate the hard-negative stratum from the separately reported ordinary false-merge rate.
 
 ## Readiness Gate 109: Document-Cluster Split Overread Gate
 

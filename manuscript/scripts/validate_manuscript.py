@@ -4606,7 +4606,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "first-screen metric separation",
         "same-scope comparative-ranking limits",
         "highlights FMR/HNFMR first-screen separation",
-        "Open-v2 scope-bounded evidence: zero observed IAD-Risk HNFMR; FMR=0.001",
+        "Open-v2 held-out scope: IAD-Risk HNFMR=0.000; ordinary FMR=0.001",
         "highlight-level metric separation",
         "document/cluster split-overread wording",
         "pair-record held-out evidence",
@@ -5634,7 +5634,8 @@ def check_highlights(highlights_text: str) -> list[str]:
                     "HNFMR highlight must mention Open-v2 and scope boundary when reporting numbers: "
                     f"{line}"
                 )
-        if "zero observed" in highlight and "HNFMR" in highlight and "FMR=0.001" not in highlight:
+        zero_hnfmr_claimed = "zero observed" in highlight or "HNFMR=0.000" in highlight
+        if zero_hnfmr_claimed and "HNFMR" in highlight and "ordinary FMR=0.001" not in highlight:
             errors.append(
                 "zero-observed HNFMR highlight must include ordinary FMR=0.001 boundary: "
                 f"{line}"
@@ -5939,9 +5940,9 @@ def check_submission_material_quantitative_summary(highlights_text: str, cover_l
         list[str]: Error messages for missing quantitative submission markers.
     """
     highlight_required_markers = [
-        "Open-v2 scope-bounded evidence",
-        "zero observed IAD-Risk HNFMR",
-        "FMR=0.001",
+        "Open-v2 held-out scope",
+        "IAD-Risk HNFMR=0.000",
+        "ordinary FMR=0.001",
     ]
     errors: list[str] = []
     for marker in highlight_required_markers:
@@ -6069,9 +6070,9 @@ def check_editorial_claim_alignment(
                 "data/knowledge-engineering",
                 "IAD-Risk",
                 "IAD-Bench",
-                "Open-v2 scope-bounded evidence",
-                "zero observed IAD-Risk HNFMR",
-                "FMR=0.001",
+                "Open-v2 held-out scope",
+                "IAD-Risk HNFMR=0.000",
+                "ordinary FMR=0.001",
                 "artifact-backed audits",
             ],
         ),
