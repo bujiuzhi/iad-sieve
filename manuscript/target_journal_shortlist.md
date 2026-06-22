@@ -45,14 +45,19 @@ Official guide rechecked: 2026-06-23.
 
 This audit records the publisher-facing constraints that determine the next manuscript pass. It does not replace author confirmation of institutional rankings, journal class, or final submission-system fields.
 
+Candidate official source snapshot date: 2026-06-23.
 DKE official source snapshot date: 2026-06-23.
 
 - DKE guide verified: 2026-06-23.
 - DKE guide source URL: https://www.sciencedirect.com/journal/data-and-knowledge-engineering/publish/guide-for-authors.
-- Information Systems guide verified: 2026-06-19; not rechecked in this DKE-focused pass.
-- Scientometrics guide verified: 2026-06-19; not rechecked in this DKE-focused pass.
+- Information Systems guide verified: 2026-06-23.
+- Information Systems guide source URL: https://www.sciencedirect.com/journal/information-systems/publish/guide-for-authors.
+- Scientometrics journal page verified: 2026-06-23.
+- Scientometrics journal page URL: https://link.springer.com/journal/11192.
+- Scientometrics submission guidelines verified: 2026-06-23.
+- Scientometrics submission guidelines URL: https://link.springer.com/journal/11192/submission-guidelines.
 
-DKE publisher-page facts in this shortlist were rechecked on 2026-06-23 from the official source links listed below, specifically the DKE source link. Information Systems and Scientometrics entries remain planning records from 2026-06-19 and must be rechecked before either route is selected. These checks support manuscript-preparation decisions only; JCR quartile, Chinese Academy of Sciences zone, CCF class, and local institutional category must still be rechecked in the authors' authorized ranking systems before final upload.
+All candidate-route publisher-page facts in this shortlist were rechecked on 2026-06-23 from the official source links listed below. DKE and Information Systems use ScienceDirect guide pages; Scientometrics uses the Springer journal page and submission guidelines. These checks support manuscript-preparation decisions only; Information Systems and Scientometrics entries are current official-source planning records, not selected-route confirmations. JCR quartile, Chinese Academy of Sciences zone, CCF class, and local institutional category must still be rechecked in the authors' authorized ranking systems before final upload.
 
 For Q2/B decision-making, the final record must match the selected journal's ISSN or eISSN to the authors' accepted ranking source and record the subject category used by that source. Acceptable evidence may include JCR quartile, Chinese Academy of Sciences zone, CCF class when applicable, or a local institutional list; publisher CiteScore, Impact Factor, aims-and-scope text, and this shortlist are screening evidence only. Do not mark `ranking_confirmation_completed` true until the source URL or institutional system URL, access date, evidence export or screenshot path, and responsible author confirmation are recorded in the final-upload information packet.
 
@@ -67,6 +72,15 @@ The DKE source check is an official-guide preflight record, not final target sel
 | Front-matter limits | The guide lists a 250-word abstract limit, 1--7 keywords, and 3--5 highlights with an 85-character limit. | Continue validating abstract, keywords, and highlights before package creation and after any template conversion. |
 | Data and declarations | The guide requires research data handling or a data statement, CRediT author contribution reporting, and generative AI disclosure when AI tools were used in manuscript preparation. | Keep artifact URL/DOI, CRediT roles, and the target-specific generative AI declaration as final-upload blockers. |
 | Author identity materials | The guide requests a short biography for each author with a maximum 100 words, an editable biography file that must not be PDF, and a passport-type photograph as a separate figure. | Collect author-approved biographies and photographs only after author order is confirmed; keep them outside anonymous preflight packages. |
+
+### Secondary Candidate Official Source Evidence
+
+The secondary candidate source check keeps stretch and backup routes current without converting either route into the selected target journal. These records are used only to decide whether a later route switch would require a stronger artifact package, a domain-facing rewrite, or different template files.
+
+| Candidate route | Official source fact | Project consequence |
+| --- | --- | --- |
+| Information Systems route | ScienceDirect lists Information Systems with 9.8 CiteScore and 3.4 Impact Factor, a data-intensive systems scope, single anonymized review, serious experimentation expectations for systems papers, editable-source requirements, and the same Elsevier declaration and data-statement family used by the DKE route. | Keep Information Systems as a stretch route that requires L3 artifact release, same-scope baseline files, threshold logs, and stronger reproducibility evidence before final upload. |
+| Scientometrics route | Springer lists Scientometrics as a monthly peer-reviewed journal for quantitative science-of-science research with 2024 Impact Factor 3.5. The submission guidelines state single-blind review, editable source-file requirements, title-page author fields with ORCID when available, a 150--250 word abstract, 4--6 keywords, LaTeX support for mathematical content, data availability statement requirements, and large-language-model documentation rules with copy-editing-only use exempted from declaration. | Keep Scientometrics as a domain backup that requires Springer formatting, a stronger scholarly-communication framing, target-specific AI-use wording, and an artifact or repository link that supports the data availability statement. |
 
 ## DKE Final-Upload Metadata Lock
 
