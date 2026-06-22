@@ -4254,6 +4254,7 @@ def test_check_split_leakage_controls_accepts_supplementary_table() -> None:
             "Topic-heldout readiness audit.",
             "topic-stability claims.",
             "pair-record held-out mechanism evidence.",
+            "The model cannot directly use explicit provenance or split identifiers as features.",
             "document-disjoint, cluster-disjoint, or unseen-source generalization.",
             "grouped split manifests.",
             "document/cluster overlap reports.",
@@ -4312,6 +4313,7 @@ def test_check_split_leakage_controls_rejects_missing_supplementary_table() -> N
             "Topic-heldout readiness audit.",
             "topic-stability claims.",
             "pair-record held-out mechanism evidence.",
+            "The model cannot directly use explicit provenance or split identifiers as features.",
             "document-disjoint, cluster-disjoint, or unseen-source generalization.",
             "grouped split manifests.",
             "document/cluster overlap reports.",
@@ -4324,6 +4326,67 @@ def test_check_split_leakage_controls_rejects_missing_supplementary_table() -> N
 
     assert any("Split and Leakage Controls" in error for error in errors)
     assert any("tab:split-leakage-controls" in error for error in errors)
+
+
+def test_check_split_leakage_controls_rejects_accuracy_gain_overclaim() -> None:
+    """验证 split 控制不能声称排除显式元数据字段即可杜绝准确率收益。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Split and Leakage Controls}",
+            "The full split and leakage controls table is reported in the supplementary material.",
+            "Training uses only the declared training split.",
+            "threshold selection uses validation evidence.",
+            "Metadata fields that identify source, provenance, or split are excluded from model features.",
+            "Unordered pair leakage guard.",
+            "Document/cluster split-overread guard.",
+            "Label-stratum coverage audit.",
+            "Source-heldout readiness audit.",
+            "Topic-heldout readiness audit.",
+            "topic-stability claims.",
+            "pair-record held-out mechanism evidence.",
+            "The model cannot directly use explicit provenance or split identifiers as features.",
+            "The model cannot gain accuracy from explicit provenance or split identifiers.",
+            "document-disjoint, cluster-disjoint, or unseen-source generalization.",
+            "grouped split manifests.",
+            "document/cluster overlap reports.",
+            "per-scope denominators.",
+            "threshold logs.",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Split and Leakage Controls}",
+            r"\label{tab:split-leakage-controls}",
+            "Split and leakage controls used to interpret IAD-Bench results.",
+            "Control",
+            "Manuscript role",
+            "Stronger evidence boundary",
+            "Train/dev/test split field",
+            "Unordered pair leakage guard",
+            "Document/cluster split-overread guard",
+            "pair-record held-out evidence",
+            "document-disjoint or cluster-disjoint grouping before split assignment",
+            "Document-disjoint, cluster-disjoint, or unseen-source generalization",
+            "grouped split manifests",
+            "document/cluster overlap reports",
+            "per-scope denominators",
+            "threshold logs",
+            "Label-stratum coverage audit",
+            "Source-heldout readiness audit",
+            "train, validation, and held-out source partitions",
+            "per-source denominators",
+            "prediction checksums",
+            "Topic-heldout readiness audit",
+            "Cross-topic stability should not be claimed when topic coverage is insufficient.",
+        ]
+    )
+
+    errors = module.check_split_leakage_controls(manuscript_text, supplementary_text)
+
+    assert any("overbroad leakage marker" in error for error in errors)
+    assert any("cannot gain accuracy from explicit provenance" in error for error in errors)
 
 
 def test_check_result_interpretation_guardrails_accepts_complete_boundaries() -> None:

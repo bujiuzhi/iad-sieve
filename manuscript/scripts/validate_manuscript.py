@@ -3027,6 +3027,7 @@ def check_split_leakage_controls(manuscript_text: str, supplementary_text: str =
         "Topic-heldout readiness audit",
         "topic-stability claims",
         "pair-record held-out mechanism evidence",
+        "cannot directly use explicit provenance or split identifiers as features",
         "document-disjoint, cluster-disjoint, or unseen-source generalization",
         "grouped split manifests",
         "document/cluster overlap reports",
@@ -3068,6 +3069,14 @@ def check_split_leakage_controls(manuscript_text: str, supplementary_text: str =
         f"split and leakage controls missing supplementary marker: {marker}"
         for marker in required_supplement_markers
         if marker not in evidence_text
+    )
+    forbidden_main_markers = [
+        "cannot gain accuracy from explicit provenance or split identifiers",
+    ]
+    errors.extend(
+        f"split and leakage controls use overbroad leakage marker: {marker}"
+        for marker in forbidden_main_markers
+        if marker in manuscript_text
     )
     return errors
 
