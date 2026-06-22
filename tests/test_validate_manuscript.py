@@ -7224,9 +7224,10 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Readiness Summary",
-            "Readiness gates covered: 144.",
+            "Readiness gates covered: 145.",
             "Highest current reviewer-facing risks are tracked as a risk inventory rather than a claim that every gate is currently failing: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, target-route reviewer response drift, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, DKE author identity material cardinality drift, DKE photograph file-format drift, Git-only CLI discovery drift, DKE research-data statement drift, data-processing command implementation-map drift, manuscript product-boundary table drift, Elsevier competing-interest declaration file traceability, introduction contribution first-screen alignment, conclusion first-screen boundary alignment, main-result strong-baseline interpretation drift, abstract strong-baseline interpretation drift, submission-day official-source drift, processing-run-log schema bypass, process-note vocabulary bypass, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, reviewer workload-transfer response drift, rule-based baseline omission response drift, pre-submission cover-letter declaration boundary, preflight metadata declaration placeholders, anonymous review-file declaration boundary, introduction row-scope comparison overread, main-result operating-point overread, figure metric-scope overread, cover-letter Git-only reproduction boundary, Q2/B ranking evidence packet traceability, public documentation index drift, local submission-package artifact tracking drift, DKE/Elsevier draft abstract-length drift, abstract word-budget buffer drift, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, ANI threshold notation drift, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final cover-letter preflight wording gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, latex-engine panic diagnostic gap, and stronger evidence gates.",
             "artifact-link claim-upgrade response drift",
+            "public-source temporal drift reviewer response drift",
             "External final-upload blockers cannot be resolved from the repository alone.",
             "Local gates currently controlled by validators must still be rerun after source or package edits.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
@@ -7282,6 +7283,10 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "Why is the manuscript positioned toward Data & Knowledge Engineering rather than Information Systems or Scientometrics?",
             "current scope-fit preparation, not final journal, ranking, or acceptance confirmation",
             "Do not claim selected-journal confirmation, Q2/B completion, or final-upload readiness",
+            "If public-source APIs or dumps change after submission, can rerunning the commands still reproduce Open-v2?",
+            "public-source commands as reconstruction code paths, not as frozen source snapshots",
+            "Do not promise identical Open-v2 numerical rows from live API calls or changed public dumps",
+            "recorded acquisition dates or versions, input checksums, processing logs, and released derived artifacts",
             "If an artifact URL or DOI is added before upload, does that make the Open-v2 table fully reproducible?",
             "access and provenance binding",
             "Do not upgrade full numerical audit, same-scope comparison, or stronger evidence claims",
@@ -8454,6 +8459,10 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "artifact-link claim-upgrade response coverage",
             "artifact-link discipline, not evidence upgrade",
             "released artifacts contain the required prediction files, logs, manifests, checksums, and protocol outputs",
+            "## Readiness Gate 145: Public-Source Temporal Drift Response Gate",
+            "public-source temporal drift response coverage",
+            "temporal-source discipline, not a weaker reproducibility standard",
+            "must not claim fixed-source or fixed-number reproducibility from live public-source calls",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             r"Method threshold notation uses `\tau_n` for the ANI risk-head threshold",
@@ -8476,6 +8485,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "Reviewer-response wording treats omitted exact identifier, title-normalization, and traditional entity-resolution baselines as artifact-readiness gaps",
             "Reviewer-response wording treats the DKE-style route as scope-fit preparation",
             "Reviewer-response wording treats an artifact URL or DOI as access/provenance binding only",
+            "Reviewer-response wording treats public-source commands as reconstruction code paths rather than frozen source snapshots",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
         ]
     )
@@ -8492,7 +8502,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Readiness Summary",
-        "Readiness gates covered: 144",
+        "Readiness gates covered: 145",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -8503,7 +8513,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Readiness Summary" in error for error in errors)
-    assert any("Readiness gates covered: 144" in error for error in errors)
+    assert any("Readiness gates covered: 145" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -9943,6 +9953,32 @@ def test_check_reviewer_readiness_audit_rejects_missing_artifact_link_claim_upgr
     assert any("Artifact-Link Claim-Upgrade Response Gate" in error for error in errors)
     assert any("artifact-link claim-upgrade response drift" in error for error in errors)
     assert any("access and provenance binding" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_public_source_temporal_drift_gate() -> None:
+    """验证审稿准备度审计必须覆盖公开来源时序漂移回应边界。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Readiness Gate 145: Public-Source Temporal Drift Response Gate",
+        "public-source temporal drift reviewer response drift",
+        "public-source temporal drift response coverage",
+        "If public-source APIs or dumps change after submission, can rerunning the commands still reproduce Open-v2",
+        "public-source commands as reconstruction code paths, not as frozen source snapshots",
+        "Do not promise identical Open-v2 numerical rows from live API calls or changed public dumps",
+        "recorded acquisition dates or versions, input checksums, processing logs, and released derived artifacts",
+        "temporal-source discipline, not a weaker reproducibility standard",
+        "must not claim fixed-source or fixed-number reproducibility from live public-source calls",
+        "Reviewer-response wording treats public-source commands as reconstruction code paths rather than frozen source snapshots",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Public-Source Temporal Drift Response Gate" in error for error in errors)
+    assert any("public-source temporal drift reviewer response drift" in error for error in errors)
+    assert any("frozen source snapshots" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_fixture_evidence_isolation_gate() -> None:
