@@ -384,9 +384,9 @@ The reviewer-facing boundary is workload attribution. The current manuscript can
 
 ## Readiness Gate 35: Anonymous Cover-Letter Declaration Boundary Gate
 
-Outcome: pass for anonymous preflight cover-letter boundary; blocked for final upload until author-provided metadata confirms originality, author approval, competing-interest status, funding, author contribution, permission, and generative AI declarations.
+Outcome: pass for anonymous pre-submission cover-letter hygiene; blocked for final upload until author-provided metadata confirms originality, author approval, competing-interest status, funding, author contribution, permission, and generative AI declarations.
 
-This gate checks whether the anonymous cover letter prematurely asserts final author declarations. The preflight cover letter now keeps the scientific submission summary and evidence boundaries, but it states that it does not treat author declarations as finalized until the author-provided metadata and live submission-system fields are completed. This prevents the anonymous preflight package from representing unconfirmed author approval or competing-interest statements as final.
+This gate checks whether the anonymous cover letter prematurely asserts final author declarations or carries internal replacement instructions. The pre-submission cover letter now keeps only the scientific submission summary, evidence boundaries, scope fit, and data availability boundary; declaration finality is handled by `submission_metadata.yml`, `final_upload_information_request.md`, and the final-upload validator. This prevents the anonymous pre-submission package from representing unconfirmed author approval or competing-interest statements as final while also keeping planning notes out of the editor-facing letter.
 
 The reviewer-facing boundary is compliance discipline. The current package can be used to review the manuscript story, scope, and reproducibility boundaries, but it should not be treated as final-upload-ready until the selected journal, author identities, corresponding author, declarations, artifact release, and live system fields are confirmed.
 
@@ -884,7 +884,7 @@ Outcome: pass for final cover-letter gate coverage; blocked for final upload unt
 
 This gate checks that the final-upload cover-letter validator has a positive pass path, not only rejection rules for the anonymous preflight letter. A final cover letter is accepted only when it includes the target journal name, states the article type as a research article, includes the corresponding author name, includes the artifact release URL or DOI when metadata provides one, and confirms that the generic greeting and anonymous signature are absent.
 
-The reviewer-facing boundary is final-upload consistency, not final-upload completion. The current `cover_letter.md` remains an anonymous preflight letter and must not be uploaded as the final cover letter. The pass path shows what the final version must contain after target-journal confirmation, author metadata, and artifact publication are complete.
+The reviewer-facing boundary is final-upload consistency, not final-upload completion. The current `cover_letter.md` is clean enough for an anonymous pre-submission package but remains a generic unsigned letter and must not be uploaded as the final cover letter. The pass path shows what the final version must contain after target-journal confirmation, author metadata, and artifact publication are complete.
 
 ## Readiness Gate 98: Final Cover-Letter Generic-Variant Gate
 
@@ -1100,9 +1100,9 @@ The reviewer-facing boundary is method-symbol clarity, not new empirical evidenc
 
 Outcome: pass for final-upload cover-letter preflight-wording rejection coverage; blocked for final upload until the cover letter is target-specific, author-signed, and free of anonymous preflight wording.
 
-This gate checks whether a final-upload package can pass when the cover letter still contains phrases from the anonymous planning version, including `anonymous draft cover letter`, `anonymous preflight`, `preflight cover letter`, `submission-planning boundaries`, `scope-fit note is preparatory`, or `must be replaced after author confirmation`. It cannot. The shared metadata checker now rejects these phrases in final-upload cover-letter validation, and both the package builder and package validator reuse that check.
+This gate checks whether a final-upload package can pass when the cover letter still contains phrases from an anonymous planning version, including `anonymous draft cover letter`, `anonymous preflight`, `preflight cover letter`, `submission-planning boundaries`, `scope-fit note is preparatory`, or `must be replaced after author confirmation`. It cannot. The tracked `cover_letter.md` no longer carries those planning phrases in the generated pre-submission package, and the shared metadata checker still rejects them in final-upload cover-letter validation if they are reintroduced.
 
-The reviewer-facing boundary is upload-material finality, not scientific evidence. The anonymous cover letter may still record planning boundaries for preflight checks, but the final upload letter must read as a completed author-approved submission letter with the selected journal, article type, corresponding author, artifact URL or DOI, declarations, and target-specific scope statement already resolved.
+The reviewer-facing boundary is upload-material finality, not scientific evidence. Removing planning wording from the pre-submission cover letter improves package hygiene but does not finalize the cover letter. The final upload letter must still read as a completed author-approved submission letter with the selected journal, article type, corresponding author, artifact URL or DOI, declarations, and target-specific scope statement already resolved.
 
 ## Minimum Gate Before Final Upload
 

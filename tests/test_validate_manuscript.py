@@ -6875,12 +6875,13 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "selective-decision workload wording",
             "operational throughput or cost-saving claims",
             "## Readiness Gate 35: Anonymous Cover-Letter Declaration Boundary Gate",
-            "anonymous preflight cover-letter boundary",
+            "anonymous pre-submission cover-letter hygiene",
             "author-provided metadata confirms originality",
             "competing-interest status",
             "author contribution",
             "generative AI declarations",
-            "does not treat author declarations as finalized",
+            "pre-submission cover letter now keeps only the scientific submission summary",
+            "planning notes out of the editor-facing letter",
             "## Readiness Gate 36: Preflight Metadata Declaration Placeholder Gate",
             "tracked metadata declaration placeholders",
             "statements.originality",
@@ -7824,7 +7825,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             r"`scope-fit note is preparatory`",
             r"`must be replaced after author confirmation`",
             "upload-material finality, not scientific evidence",
-            "The anonymous cover letter may still record planning boundaries for preflight checks",
+            "Removing planning wording from the pre-submission cover letter improves package hygiene",
             "completed author-approved submission letter",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
@@ -8751,7 +8752,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_cover_letter_preflight_w
         r"`scope-fit note is preparatory`",
         r"`must be replaced after author confirmation`",
         "upload-material finality, not scientific evidence",
-        "The anonymous cover letter may still record planning boundaries for preflight checks",
+        "Removing planning wording from the pre-submission cover letter improves package hygiene",
         "completed author-approved submission letter",
         "The final-upload cover letter contains no anonymous preflight wording",
     ]:
@@ -9029,29 +9030,25 @@ def test_check_reviewer_readiness_audit_rejects_missing_journal_fit_novelty_cycl
     assert any("target-journal scope fit" in error for error in errors)
 
 
-def test_check_cover_letter_accepts_preflight_declaration_boundary() -> None:
-    """验证匿名预投稿信包含正式声明待确认边界时可通过检查。"""
+def test_check_cover_letter_accepts_clean_pre_submission_letter() -> None:
+    """验证匿名预提交投稿信不含流程说明但保留学术边界时可通过检查。"""
 
     module = _load_validate_manuscript_module()
     cover_letter_text = "\n".join(
         [
             "Dear Editor,",
-            "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication.",
-            "This anonymous draft cover letter does not treat author declarations as finalized.",
-            "Before final upload, the author-provided metadata must confirm originality, author approval, "
-            "competing-interest status, funding, author contribution, permission, and generative AI declarations.",
+            "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication "
+            "for consideration as a research article.",
+            "The paper studies identity-agenda confusion and is motivated by the ambiguity of single-score matching.",
+            "It exposes identity, agenda, and agenda-non-identity signals separately.",
             "The repository does not redistribute raw third-party data.",
             "full experimental outputs are not redistributed in Git.",
             "The repository includes artifact-release instructions.",
             "Released artifacts should include manifests and checksums.",
             "The manuscript does not claim cluster-level deployment quality without cluster artifacts.",
-            "The framework is motivated by the ambiguity of single-score matching.",
-            "It exposes identity, agenda, and agenda-non-identity signals separately.",
-            "The cover letter supports a DKE-style data and knowledge engineering editorial screen.",
-            "It covers database-oriented scholarly data integration.",
-            "It covers knowledge engineering for scholarly records.",
-            "It covers reproducible data-processing contracts.",
-            "The scope-fit note must be replaced after author confirmation of the target journal.",
+            "The manuscript is positioned for a data and knowledge engineering venue.",
+            "It covers database-oriented scholarly data integration, knowledge engineering for scholarly records, "
+            "and reproducible data-processing contracts.",
         ]
     )
 
@@ -9060,18 +9057,17 @@ def test_check_cover_letter_accepts_preflight_declaration_boundary() -> None:
     assert errors == []
 
 
-def test_check_cover_letter_rejects_missing_preflight_declaration_boundary() -> None:
-    """验证匿名预投稿信缺少声明待确认边界时会被拒绝。"""
+def test_check_cover_letter_rejects_missing_submission_scope_boundary() -> None:
+    """验证匿名预提交投稿信缺少学术范围和数据边界时会被拒绝。"""
 
     module = _load_validate_manuscript_module()
     cover_letter_text = "Dear Editor,\nWe submit the manuscript."
 
     errors = module.check_cover_letter(cover_letter_text)
 
-    assert any("anonymous draft cover letter" in error for error in errors)
-    assert any("author-provided metadata must confirm originality" in error for error in errors)
-    assert any("generative AI declarations" in error for error in errors)
-    assert any("DKE-style data and knowledge engineering editorial screen" in error for error in errors)
+    assert any("identity-agenda confusion" in error for error in errors)
+    assert any("data and knowledge engineering venue" in error for error in errors)
+    assert any("raw third-party data" in error for error in errors)
 
 
 def test_check_cover_letter_rejects_premature_final_declarations() -> None:
@@ -9081,10 +9077,10 @@ def test_check_cover_letter_rejects_premature_final_declarations() -> None:
     cover_letter_text = "\n".join(
         [
             "Dear Editor,",
-            "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication.",
-            "This anonymous draft cover letter does not treat author declarations as finalized.",
-            "Before final upload, the author-provided metadata must confirm originality, author approval, "
-            "competing-interest status, funding, author contribution, permission, and generative AI declarations.",
+            "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication "
+            "for consideration as a research article.",
+            "The paper studies identity-agenda confusion and is motivated by the ambiguity of single-score matching.",
+            "It exposes identity, agenda, and agenda-non-identity signals separately.",
             "All listed authors have approved the submitted version.",
             "The authors declare no competing interests.",
             "The repository does not redistribute raw third-party data.",
@@ -9092,6 +9088,9 @@ def test_check_cover_letter_rejects_premature_final_declarations() -> None:
             "The repository includes artifact-release instructions.",
             "Released artifacts should include manifests and checksums.",
             "The manuscript does not claim cluster-level deployment quality without cluster artifacts.",
+            "The manuscript is positioned for a data and knowledge engineering venue.",
+            "It covers database-oriented scholarly data integration, knowledge engineering for scholarly records, "
+            "and reproducible data-processing contracts.",
         ]
     )
 
@@ -9109,12 +9108,16 @@ def test_check_cover_letter_rejects_missing_artifact_release_boundary() -> None:
     cover_letter_text = "\n".join(
         [
             "Dear Editor,",
-            "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication.",
-            "This anonymous draft cover letter does not treat author declarations as finalized.",
-            "Before final upload, the author-provided metadata must confirm originality, author approval, "
-            "competing-interest status, funding, author contribution, permission, and generative AI declarations.",
+            "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication "
+            "for consideration as a research article.",
+            "The paper studies identity-agenda confusion and is motivated by the ambiguity of single-score matching.",
+            "It exposes identity, agenda, and agenda-non-identity signals separately.",
             "The repository does not redistribute raw third-party data.",
             "Released artifacts should include manifests and checksums.",
+            "The manuscript does not claim cluster-level deployment quality without cluster artifacts.",
+            "The manuscript is positioned for a data and knowledge engineering venue.",
+            "It covers database-oriented scholarly data integration, knowledge engineering for scholarly records, "
+            "and reproducible data-processing contracts.",
         ]
     )
 
@@ -9131,14 +9134,17 @@ def test_check_cover_letter_rejects_missing_cluster_claim_boundary() -> None:
     cover_letter_text = "\n".join(
         [
             "Dear Editor,",
-            "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication.",
-            "This anonymous draft cover letter does not treat author declarations as finalized.",
-            "Before final upload, the author-provided metadata must confirm originality, author approval, "
-            "competing-interest status, funding, author contribution, permission, and generative AI declarations.",
+            "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication "
+            "for consideration as a research article.",
+            "The paper studies identity-agenda confusion and is motivated by the ambiguity of single-score matching.",
+            "It exposes identity, agenda, and agenda-non-identity signals separately.",
             "The repository does not redistribute raw third-party data.",
             "full experimental outputs are not redistributed in Git.",
             "The repository includes artifact-release instructions.",
             "Released artifacts should include manifests and checksums.",
+            "The manuscript is positioned for a data and knowledge engineering venue.",
+            "It covers database-oriented scholarly data integration, knowledge engineering for scholarly records, "
+            "and reproducible data-processing contracts.",
         ]
     )
 
@@ -9155,15 +9161,18 @@ def test_check_cover_letter_rejects_subjective_fit_language() -> None:
     cover_letter_text = "\n".join(
         [
             "Dear Editor,",
-            "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication.",
-            "This anonymous draft cover letter does not treat author declarations as finalized.",
-            "Before final upload, the author-provided metadata must confirm originality, author approval, "
-            "competing-interest status, funding, author contribution, permission, and generative AI declarations.",
+            "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication "
+            "for consideration as a research article.",
+            "The paper studies identity-agenda confusion and is motivated by the ambiguity of single-score matching.",
+            "It exposes identity, agenda, and agenda-non-identity signals separately.",
             "The repository does not redistribute raw third-party data.",
             "full experimental outputs are not redistributed in Git.",
             "The repository includes artifact-release instructions.",
             "Released artifacts should include manifests and checksums.",
             "The manuscript does not claim cluster-level deployment quality without cluster artifacts.",
+            "The manuscript is positioned for a data and knowledge engineering venue.",
+            "It covers database-oriented scholarly data integration, knowledge engineering for scholarly records, "
+            "and reproducible data-processing contracts.",
             "We believe the paper is relevant to readers interested in scholarly data integration.",
         ]
     )
@@ -9287,8 +9296,8 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
             "The result includes HNFMR 0.790--0.999 and zero observed HNFMR, with ordinary FMR still reported separately as 0.001.",
             "The manuscript does not claim broad method superiority.",
             "raw third-party data and full experimental outputs are not redistributed in Git.",
-            "The cover letter supports a DKE-style data and knowledge engineering editorial screen.",
-            "The scope-fit note must be replaced after author confirmation of the target journal.",
+            "The manuscript is positioned for a data and knowledge engineering venue.",
+            "It covers database-oriented scholarly data integration and reproducible data-processing contracts.",
         ]
     )
     highlights_text = "\n".join(
