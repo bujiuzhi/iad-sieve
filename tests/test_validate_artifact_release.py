@@ -996,6 +996,102 @@ def test_validate_artifact_release_rejects_prediction_jsonl_without_row_audit_fi
     assert any("threshold_source" in error for error in errors)
 
 
+def test_validate_artifact_release_rejects_source_input_manifest_without_chain_of_custody_fields(tmp_path) -> None:
+    """验证 source_input_manifest 必须记录公开输入链路字段。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    _write_file(
+        artifact_dir / "configs" / "source_input_manifest.json",
+        json.dumps(
+            {
+                "inputs": [
+                    {
+                        "source_name": "",
+                        "local_file_name": "/tmp/private/raw.jsonl",
+                        "record_count": "many",
+                        "sha256": "not-a-sha",
+                    }
+                ]
+            },
+            sort_keys=True,
+        )
+        + "\n",
+    )
+    _refresh_manifest_artifact_checksums(artifact_dir)
+    _refresh_checksums(artifact_dir)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("source_input_manifest inputs[1]" in error for error in errors)
+    assert any("source_name" in error for error in errors)
+    assert any("acquisition_date_or_version" in error for error in errors)
+    assert any("original_provider" in error for error in errors)
+    assert any("license_boundary" in error for error in errors)
+    assert any("local_file_name must be a safe relative path" in error for error in errors)
+    assert any("sha256 must be a valid SHA256 digest" in error for error in errors)
+    assert any("record_count must be a non-negative integer" in error for error in errors)
+
+
+def test_validate_artifact_release_rejects_processing_run_log_without_rebuild_audit_fields(tmp_path) -> None:
+    """验证 processing_run_log 必须记录每个处理阶段的复现审计字段。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    _write_file(artifact_dir / "logs" / "processing_run_log.jsonl", _jsonl_row({"stage": "prepare-openalex-weak-labels"}))
+    _refresh_manifest_artifact_checksums(artifact_dir)
+    _refresh_checksums(artifact_dir)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("processing_run_log JSONL line 1" in error for error in errors)
+    assert any("command_line" in error for error in errors)
+    assert any("code_commit" in error for error in errors)
+    assert any("environment_summary" in error for error in errors)
+    assert any("input_manifest_reference" in error for error in errors)
+    assert any("output_path" in error for error in errors)
+    assert any("exit_status" in error for error in errors)
+
+
+def test_validate_artifact_release_rejects_processing_run_log_unbound_failed_stage(tmp_path) -> None:
+    """验证 processing_run_log 必须绑定提交号、输入 manifest、输出 checksum 和成功状态。"""
+
+    module = _load_artifact_release_validator_module()
+    artifact_dir = tmp_path / "artifact_release"
+    _write_complete_release(artifact_dir)
+    _write_file(
+        artifact_dir / "logs" / "processing_run_log.jsonl",
+        _jsonl_row(
+            {
+                "stage": "prepare-openalex-weak-labels",
+                "command_line": "python -m iad_sieve.cli prepare-openalex-weak-labels",
+                "code_commit": "abcdef1234567890abcdef1234567890abcdef12",
+                "environment_summary": "python=3.11",
+                "random_seed": "not-a-seed",
+                "started_at": "2026-06-19T00:02:00Z",
+                "finished_at": "2026-06-19T00:01:00Z",
+                "input_manifest_reference": "configs/other_source_manifest.json",
+                "output_path": "reports/not_listed_in_release.jsonl",
+                "exit_status": 1,
+            }
+        ),
+    )
+    _refresh_manifest_artifact_checksums(artifact_dir)
+    _refresh_checksums(artifact_dir)
+
+    errors = module.validate_artifact_release(artifact_dir, module.DEFAULT_TEMPLATE_PATH)
+
+    assert any("code_commit must match manifest.json repository.commit" in error for error in errors)
+    assert any("input_manifest_reference must be configs/source_input_manifest.json" in error for error in errors)
+    assert any("input_manifest_reference must be listed in checksums.sha256" in error for error in errors)
+    assert any("output_path must be listed in checksums.sha256" in error for error in errors)
+    assert any("exit_status must be 0" in error for error in errors)
+    assert any("random_seed must be an integer or not_applicable" in error for error in errors)
+    assert any("finished_at must not be earlier than started_at" in error for error in errors)
+
+
 def test_validate_artifact_release_rejects_missing_checksum_entry(tmp_path) -> None:
     """验证缺少 checksum 条目的 release 会被拒绝。"""
 

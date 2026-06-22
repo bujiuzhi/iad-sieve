@@ -82,6 +82,8 @@ paper-artifacts/
 - 随机种子、阈值和 split 配置。
 - 每个输出文件的 SHA256。
 
+正式论文 artifact 还应包含 `configs/source_input_manifest.json` 和 `logs/processing_run_log.jsonl`。前者记录公开输入的原始提供方、获取日期或版本、安全相对本地文件边界、许可边界和有效 SHA256；后者记录每个处理阶段的命令、与 `manifest.json` `repository.commit` 一致的代码提交、环境摘要、随机种子、开始/结束时间、输入 manifest 引用、进入 `checksums.sha256` 的输出路径和 `exit_status=0`。
+
 建议同时提供 `checksums.sha256`，并在 README 中写清楚如何用以下命令验收：
 
 ```bash

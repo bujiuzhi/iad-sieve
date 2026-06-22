@@ -13,6 +13,7 @@ import hashlib
 import json
 import logging
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -326,6 +327,26 @@ JSONL_REQUIRED_FIELDS_BY_ARTIFACT = {
         "applied_scope",
         "score_field",
     },
+}
+SOURCE_INPUT_MANIFEST_REQUIRED_FIELDS = {
+    "source_name",
+    "acquisition_date_or_version",
+    "original_provider",
+    "local_file_name",
+    "license_boundary",
+    "sha256",
+}
+PROCESSING_RUN_LOG_REQUIRED_FIELDS = {
+    "stage",
+    "command_line",
+    "code_commit",
+    "environment_summary",
+    "random_seed",
+    "started_at",
+    "finished_at",
+    "input_manifest_reference",
+    "output_path",
+    "exit_status",
 }
 EXPECTED_FALSE_DATA_POLICY_FIELDS = {
     "raw_third_party_data_included",
@@ -1319,6 +1340,41 @@ def _missing_jsonl_required_fields(row: dict[str, Any], required_fields: set[str
     return missing_fields
 
 
+def _is_safe_relative_path(path_text: str) -> bool:
+    """Check whether a release path is relative and does not traverse parents.
+
+    参数:
+        path_text: Path text recorded in an artifact or log row.
+
+    返回:
+        bool: True when the path is relative and parent-safe.
+    """
+    path = Path(path_text.strip())
+    return bool(path_text.strip()) and not path.is_absolute() and ".." not in path.parts
+
+
+def _parse_utc_timestamp(value: Any) -> datetime | None:
+    """Parse an ISO-like UTC timestamp from an artifact log row.
+
+    参数:
+        value: Timestamp value from JSON.
+
+    返回:
+        datetime | None: Parsed timezone-aware timestamp, or None when invalid.
+    """
+    text = str(value).strip()
+    if not text:
+        return None
+    normalized_text = text[:-1] + "+00:00" if text.endswith("Z") else text
+    try:
+        parsed = datetime.fromisoformat(normalized_text)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return None
+    return parsed.astimezone(timezone.utc)
+
+
 def check_jsonl_required_fields(jsonl_path: Path, artifact_id: str, required_fields: set[str]) -> list[str]:
     """Check row-level required fields in a JSONL artifact.
 
@@ -1356,6 +1412,141 @@ def check_jsonl_required_fields(jsonl_path: Path, artifact_id: str, required_fie
         return [f"{artifact_id} JSONL cannot be read: {exc}"]
     if row_count == 0:
         errors.append(f"{artifact_id} JSONL is empty")
+    return errors
+
+
+def check_source_input_manifest_schema(manifest_path: Path) -> list[str]:
+    """Check public-source input provenance records.
+
+    参数:
+        manifest_path: Path to configs/source_input_manifest.json.
+
+    返回:
+        list[str]: Error messages for incomplete source-provenance records.
+    """
+    source_manifest, load_errors = load_json(manifest_path, "source_input_manifest")
+    if load_errors:
+        return load_errors
+    if source_manifest is None:
+        return ["source_input_manifest could not be loaded"]
+    inputs = source_manifest.get("inputs")
+    if not isinstance(inputs, list) or not inputs:
+        return ["source_input_manifest must contain a non-empty inputs list"]
+
+    errors: list[str] = []
+    for index, row in enumerate(inputs, start=1):
+        if not isinstance(row, dict):
+            errors.append(f"source_input_manifest inputs[{index}] must contain a JSON object")
+            continue
+        missing_fields = _missing_jsonl_required_fields(row, SOURCE_INPUT_MANIFEST_REQUIRED_FIELDS)
+        for field in missing_fields:
+            errors.append(f"source_input_manifest inputs[{index}] missing chain-of-custody field: {field}")
+        local_file_name = str(row.get("local_file_name", "")).strip()
+        if local_file_name and not _is_safe_relative_path(local_file_name):
+            errors.append(f"source_input_manifest inputs[{index}] local_file_name must be a safe relative path")
+        checksum = str(row.get("sha256", "")).strip().lower()
+        if checksum and not SHA256_PATTERN.fullmatch(checksum):
+            errors.append(f"source_input_manifest inputs[{index}] sha256 must be a valid SHA256 digest")
+        if "record_count" in row:
+            record_count = _parse_int(row.get("record_count"))
+            if record_count is None or record_count < 0:
+                errors.append(f"source_input_manifest inputs[{index}] record_count must be a non-negative integer when present")
+        if len(errors) >= 30:
+            errors.append("source_input_manifest schema check stopped after 30 errors")
+            return errors
+    return errors
+
+
+def check_processing_run_log_schema(
+    log_path: Path,
+    manifest: dict[str, Any],
+    checksums: dict[str, str],
+) -> list[str]:
+    """Check rebuild-stage processing log rows.
+
+    参数:
+        log_path: Path to logs/processing_run_log.jsonl.
+        manifest: Parsed release manifest used for repository commit binding.
+        checksums: Parsed checksums.sha256 mapping.
+
+    返回:
+        list[str]: Error messages for incomplete or unbound processing log rows.
+    """
+    repository = manifest.get("repository")
+    repository_commit = ""
+    if isinstance(repository, dict):
+        repository_commit = str(repository.get("commit", "")).strip().lower()
+
+    errors: list[str] = []
+    row_count = 0
+    try:
+        with log_path.open("r", encoding="utf-8") as file_handle:
+            for line_number, line in enumerate(file_handle, start=1):
+                if not line.strip():
+                    continue
+                row_count += 1
+                try:
+                    row = json.loads(line)
+                except json.JSONDecodeError as exc:
+                    errors.append(f"processing_run_log JSONL line {line_number} is invalid JSON: {exc}")
+                    continue
+                if not isinstance(row, dict):
+                    errors.append(f"processing_run_log JSONL line {line_number} must contain a JSON object")
+                    continue
+                missing_fields = _missing_jsonl_required_fields(row, PROCESSING_RUN_LOG_REQUIRED_FIELDS)
+                for field in missing_fields:
+                    errors.append(f"processing_run_log JSONL line {line_number} missing rebuild audit field: {field}")
+
+                code_commit = str(row.get("code_commit", "")).strip().lower()
+                if code_commit and not COMMIT_PATTERN.fullmatch(code_commit):
+                    errors.append(f"processing_run_log JSONL line {line_number} code_commit must be a Git SHA")
+                if repository_commit and COMMIT_PATTERN.fullmatch(repository_commit) and code_commit and code_commit != repository_commit:
+                    errors.append(
+                        f"processing_run_log JSONL line {line_number} code_commit must match manifest.json repository.commit"
+                    )
+
+                input_manifest_reference = str(row.get("input_manifest_reference", "")).strip()
+                if input_manifest_reference and input_manifest_reference != "configs/source_input_manifest.json":
+                    errors.append(
+                        f"processing_run_log JSONL line {line_number} input_manifest_reference must be configs/source_input_manifest.json"
+                    )
+                if input_manifest_reference and input_manifest_reference not in checksums:
+                    errors.append(
+                        f"processing_run_log JSONL line {line_number} input_manifest_reference must be listed in checksums.sha256"
+                    )
+
+                output_path = str(row.get("output_path", "")).strip()
+                if output_path and not _is_safe_relative_path(output_path):
+                    errors.append(f"processing_run_log JSONL line {line_number} output_path must be a safe relative path")
+                elif output_path and output_path not in checksums:
+                    errors.append(f"processing_run_log JSONL line {line_number} output_path must be listed in checksums.sha256")
+
+                exit_status = _parse_int(row.get("exit_status"))
+                if exit_status != 0:
+                    errors.append(f"processing_run_log JSONL line {line_number} exit_status must be 0")
+
+                random_seed = str(row.get("random_seed", "")).strip()
+                if random_seed.casefold() != "not_applicable" and _parse_int(random_seed) is None:
+                    errors.append(
+                        f"processing_run_log JSONL line {line_number} random_seed must be an integer or not_applicable"
+                    )
+
+                started_at = _parse_utc_timestamp(row.get("started_at"))
+                finished_at = _parse_utc_timestamp(row.get("finished_at"))
+                if started_at is None:
+                    errors.append(f"processing_run_log JSONL line {line_number} started_at must be an ISO timestamp with timezone")
+                if finished_at is None:
+                    errors.append(f"processing_run_log JSONL line {line_number} finished_at must be an ISO timestamp with timezone")
+                if started_at is not None and finished_at is not None and finished_at < started_at:
+                    errors.append(f"processing_run_log JSONL line {line_number} finished_at must not be earlier than started_at")
+
+                if len(errors) >= 30:
+                    errors.append("processing_run_log schema check stopped after 30 errors")
+                    return errors
+    except OSError as exc:
+        return [f"processing_run_log JSONL cannot be read: {exc}"]
+    if row_count == 0:
+        errors.append("processing_run_log JSONL is empty")
     return errors
 
 
@@ -1450,6 +1641,30 @@ def check_manifest_artifacts(
             and (artifact_dir / artifact_location).is_file()
         ):
             errors.extend(check_jsonl_required_fields(artifact_dir / artifact_location, artifact_id, required_fields))
+
+    source_manifest_row = artifact_rows.get("source_input_manifest")
+    if isinstance(source_manifest_row, dict):
+        source_manifest_location = str(source_manifest_row.get("expected_location", "")).strip()
+        source_manifest_location_path = Path(source_manifest_location)
+        if (
+            source_manifest_location
+            and not source_manifest_location_path.is_absolute()
+            and ".." not in source_manifest_location_path.parts
+            and (artifact_dir / source_manifest_location).is_file()
+        ):
+            errors.extend(check_source_input_manifest_schema(artifact_dir / source_manifest_location))
+
+    processing_log_row = artifact_rows.get("processing_run_log")
+    if isinstance(processing_log_row, dict):
+        processing_log_location = str(processing_log_row.get("expected_location", "")).strip()
+        processing_log_location_path = Path(processing_log_location)
+        if (
+            processing_log_location
+            and not processing_log_location_path.is_absolute()
+            and ".." not in processing_log_location_path.parts
+            and (artifact_dir / processing_log_location).is_file()
+        ):
+            errors.extend(check_processing_run_log_schema(artifact_dir / processing_log_location, manifest, checksums))
 
     ablation_row = artifact_rows.get("ablation_suite")
     if isinstance(ablation_row, dict):

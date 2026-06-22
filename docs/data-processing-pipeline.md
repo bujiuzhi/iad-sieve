@@ -111,8 +111,8 @@ data/
 
 | 文件 | 内容 | 用途 |
 | --- | --- | --- |
-| `configs/source_input_manifest.json` | 来源名称、获取日期或版本、原始提供方、本地文件名、记录数、许可边界和输入文件 SHA256。 | 说明使用的是可识别公开输入，而不是仓库中隐藏的私有数据。 |
-| `logs/processing_run_log.jsonl` | 每个阶段的 CLI 命令、代码提交、环境摘要、随机种子、开始/结束时间、输入 manifest 引用、输出路径和退出状态。 | 说明数据转换和 IAD-Bench 组装在固定源码版本下执行。 |
+| `configs/source_input_manifest.json` | 来源名称、获取日期或版本、原始提供方、安全相对本地文件边界、记录数、许可边界和有效输入文件 SHA256。 | 说明使用的是可识别公开输入，而不是仓库中隐藏的私有数据。 |
+| `logs/processing_run_log.jsonl` | 每个阶段的 CLI 命令、与 artifact `manifest.json` `repository.commit` 一致的代码提交、环境摘要、随机种子、开始/结束时间、输入 manifest 引用、进入 `checksums.sha256` 的输出路径和 `exit_status=0`。 | 说明数据转换和 IAD-Bench 组装在固定源码版本下成功执行。 |
 | `reports/iad_bench_split_summary.jsonl` | 文档数、pair 数、split 分布、label strength 分布和来源覆盖。 | 说明派生评估包与论文报告的范围一致。 |
 | `checksums.sha256` | 所有可发布派生文件、日志、配置和报告的 SHA256。 | 让审稿人能验证 artifact release 未被后续替换。 |
 

@@ -9,7 +9,7 @@ Do not include model checkpoints.
 Do not include credentials, personal identifiers, or local paths.
 Include only derived evaluation artifacts that can be redistributed under the release policy.
 Redistribute derived tables, predictions, logs, manifests, and checksums rather than raw provider files unless the original provider terms explicitly allow redistribution.
-Record the original provider, acquisition date or version, license boundary, local file boundary, and SHA256 checksum for each public input in `configs/source_input_manifest.json`.
+Record the original provider, acquisition date or version, license boundary, safe relative local file boundary, and valid SHA256 checksum for each public input in `configs/source_input_manifest.json`.
 
 ## Required Top-Level Files
 
@@ -58,9 +58,9 @@ python scripts/check_public_release.py
   - logs/threshold_selection_logs.jsonl must include system, threshold_name, threshold_value, selection_split, selection_metric, selection_rule, applied_scope, and score_field.
 - iad_bench_split_summary
 - source_input_manifest
-  - configs/source_input_manifest.json must record source name, acquisition date or version, original provider, local file name, record count when known, license boundary, and SHA256 checksum for each public input file.
+  - configs/source_input_manifest.json must record source name, acquisition date or version, original provider, safe relative local file name, record count when known, license boundary, and valid SHA256 checksum for each public input file.
 - processing_run_log
-  - logs/processing_run_log.jsonl must record command line, code commit, environment summary, random seed, start and finish timestamps, input manifest reference, output path, and exit status for each rebuild stage.
+  - logs/processing_run_log.jsonl must record command line, code commit matching manifest repository.commit, environment summary, random seed, start and finish timestamps, input manifest reference, checksum-bound output path, and successful exit_status=0 for each rebuild stage.
 - bootstrap_intervals
   - reports/bootstrap_intervals.csv is required before confidence-interval claims. It must include metric_name rows for same_work_f1, fmr, and hnfmr, with system, scope_type, prediction_artifact_id, prediction_file_sha256, bootstrap_method, resample_unit, resample_count, confidence_level, alpha, random_seed, point_estimate, interval_lower, interval_upper, metric_denominator, threshold_source, and command_line. Each row must bind to the exact prediction file checksum and satisfy interval_lower <= point_estimate <= interval_upper.
 - ablation_suite
@@ -102,7 +102,7 @@ Cluster-level quality is not claimed unless cluster artifacts are complete.
 
 ## L2 Public-Source Rebuild Boundary
 
-The release must include source_input_manifest and processing_run_log so reviewers can trace public inputs to derived evaluation artifacts without receiving raw third-party data in Git. These files document the input boundary, command boundary, output boundary, and checksum boundary for the rebuild.
+The release must include source_input_manifest and processing_run_log so reviewers can trace public inputs to derived evaluation artifacts without receiving raw third-party data in Git. These files document the input boundary, command boundary, output boundary, checksum boundary, and repository-commit boundary for the rebuild.
 
 ## Release Metadata To Fill
 

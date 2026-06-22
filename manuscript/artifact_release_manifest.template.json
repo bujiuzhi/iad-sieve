@@ -80,13 +80,13 @@
       "artifact_id": "source_input_manifest",
       "required": true,
       "expected_location": "configs/source_input_manifest.json",
-      "claim_support": "L2 public-source rebuild chain of custody with source name, acquisition date or version, original provider, local file name, record count when known, license boundary, and SHA256 checksum for each public input file."
+      "claim_support": "L2 public-source rebuild chain of custody with source name, acquisition date or version, original provider, safe relative local file name, record count when known, license boundary, and valid SHA256 checksum for each public input file."
     },
     {
       "artifact_id": "processing_run_log",
       "required": true,
       "expected_location": "logs/processing_run_log.jsonl",
-      "claim_support": "Processing-stage audit log with command line, code commit, environment summary, random seed, start and finish timestamps, input manifest reference, output path, and exit status for each rebuild stage."
+      "claim_support": "Processing-stage audit log with command line, code commit matching manifest repository.commit, environment summary, random seed, start and finish timestamps, input manifest reference, checksum-bound output path, and successful exit_status=0 for each rebuild stage."
     },
     {
       "artifact_id": "bootstrap_intervals",
