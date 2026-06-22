@@ -2,6 +2,18 @@
 
 This file records external information that must be provided by the authors before final upload. It is not a manuscript file for journal upload.
 
+## Minimal external input packet
+
+Do not start final-upload package generation until this packet is complete and source-controlled metadata can be updated from confirmed values.
+
+| Required packet item | Minimum evidence to provide | Where it will be synchronized |
+| --- | --- | --- |
+| Target route confirmation | Selected target journal, article type, review mode, author-guide URL, author-guide recheck date, template requirement confirmation, ranking/category source, ranking/category URL, and ranking/category checked date. | `submission_metadata.yml`, selected journal template source, cover letter, and live submission system. |
+| Author identity materials | Final author order, affiliations, emails, ORCID values if used, corresponding author, DKE biography files, and photograph files when required. | Title page, `authors`, `corresponding_author`, `author_identity_materials`, cover letter, and live submission system. |
+| Author-approved declarations | Funding statement, CRediT contribution statement, competing-interest statement, permissions statement, generative AI declaration, and Elsevier declaration-tool file when required. | Manuscript declaration sections, `submission_metadata.yml`, publisher declaration files, and live submission system. |
+| Artifact publication record | Public artifact URL or DOI, publication access status, finalized release manifest, checksums, and source artifact preflight result. | `artifact_boundary`, research-data statement, cover letter, artifact manifest publication object, and live submission system. |
+| Live-system verification | Previewed title, abstract, keywords, highlights, uploaded files, source archive, final package, and first-screen claim boundary. | `upload_preparation`, `final_upload_checklist`, submission-system checklist, and final package validation. |
+
 ## Submission metadata mapping
 
 After the authors complete this form, copy the confirmed values into `submission_metadata.yml`, `cover_letter.md`, and the live submission system before running `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release`.

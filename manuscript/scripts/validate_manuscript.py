@@ -381,6 +381,17 @@ def check_final_upload_information_request(request_text: str) -> list[str]:
     """
     required_markers = [
         "# Final Upload Information Request",
+        "Minimal external input packet",
+        "Do not start final-upload package generation until this packet is complete",
+        "Required packet item",
+        "Minimum evidence to provide",
+        "Where it will be synchronized",
+        "Target route confirmation",
+        "Author identity materials",
+        "Author-approved declarations",
+        "Artifact publication record",
+        "Live-system verification",
+        "source-controlled metadata can be updated from confirmed values",
         "Submission metadata mapping",
         "After the authors complete this form",
         "`submission_metadata.yml`, `cover_letter.md`, and the live submission system",

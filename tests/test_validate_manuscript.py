@@ -560,6 +560,26 @@ def test_check_final_upload_information_request_rejects_missing_metadata_mapping
     assert any("target_journal_template_bound" in error for error in errors)
 
 
+def test_check_final_upload_information_request_rejects_missing_minimal_packet() -> None:
+    """验证最终上传信息表必须汇总最小外部输入包。"""
+
+    module = _load_validate_manuscript_module()
+    request_text = Path("manuscript/final_upload_information_request.md").read_text(encoding="utf-8")
+    request_text = request_text.replace("## Minimal external input packet", "## Removed packet")
+    request_text = request_text.replace("Target route confirmation", "Target route")
+    request_text = request_text.replace("Author-approved declarations", "Declarations")
+    request_text = request_text.replace("Artifact publication record", "Artifact publication")
+    request_text = request_text.replace("Live-system verification", "System verification")
+
+    errors = module.check_final_upload_information_request(request_text)
+
+    assert any("Minimal external input packet" in error for error in errors)
+    assert any("Target route confirmation" in error for error in errors)
+    assert any("Author-approved declarations" in error for error in errors)
+    assert any("Artifact publication record" in error for error in errors)
+    assert any("Live-system verification" in error for error in errors)
+
+
 def test_check_final_upload_information_request_rejects_legacy_checklist_names() -> None:
     """验证最终上传信息表不得使用与机器门禁不一致的旧字段名。"""
 
