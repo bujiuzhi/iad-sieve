@@ -7587,7 +7587,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "metadata fit",
             "not stronger evidence",
             "## Readiness Gate 96: DKE Abstract-Length Gate",
-            "current abstract is 237 words",
+            "current abstract is 219 words",
             "250-word DKE preflight limit",
             "abstract-length compliance",
             "not writing quality or scientific evidence",
