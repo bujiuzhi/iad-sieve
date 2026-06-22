@@ -259,7 +259,7 @@ IAD-Risk converts scholarly deduplication into selective risk-aware matching. Gi
 
 \subsection{Identity and Agenda Signals}
 
-IAD-Risk separates the representation space into identity-oriented and agenda-oriented evidence. Identity evidence includes strong identifiers, near-duplicate titles, author overlap, year and venue agreement, and work-level metadata. Agenda evidence includes shared research topics, similar abstracts, citation neighborhoods, shared references, and scientific representation similarity. The separation is necessary because the same feature can have different meanings: high embedding similarity may indicate same work, but it may also indicate two different papers in the same research area.
+IAD-Risk treats identity and agenda signals as separate evidence channels before scoring. Identity evidence includes strong identifiers, near-duplicate titles, author overlap, year and venue agreement, and work-level metadata. Agenda evidence includes shared research topics, similar abstracts, citation neighborhoods, shared references, and scientific representation similarity. This separation addresses feature ambiguity: high embedding similarity may support a same-work hypothesis when identifiers and metadata align, but it may also describe two distinct papers in the same research area. Keeping the channels separate lets the merge gate use relatedness as support, risk evidence, or a reason to defer instead of forcing it into one merge score.
 
 \subsection{Multi-Task Relation Heads}
 
@@ -290,7 +290,9 @@ where $\mathrm{CE}$ is binary cross-entropy and $\lambda_w,\lambda_a,\lambda_n$ 
 
 \subsection{Training and Inference Trace}
 
-The implementation keeps training, threshold fixation, inference, and metric export in one auditable trace. The full training and inference trace table is reported in the supplementary material. This trace is necessary because IAD-Risk is a selective decision system: the same row-level decisions that produce same-work F1 also determine FMR, HNFMR, automatic merge coverage, block rate, and defer rate. The main execution contract is that schema loading preserves pair IDs and split fields, supervised fitting uses the masked objective without converting gold, proxy, or silver labels into unrelated supervision, threshold fixation records $\tau_w$, $\tau_a$, $\tau_r$, threshold source, selection split, and selection metric before held-out reporting, pair scoring writes $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, $p_{\mathrm{ani}}$, and $p_{\mathrm{risk}}$, decision emission records merge, block, or defer with cannot-link status, and metric export binds denominators and checksums to the same prediction artifact.
+The implementation keeps training, threshold fixation, inference, and metric export in one auditable trace. The full training and inference trace table is reported in the supplementary material. This trace is needed for auditability because IAD-Risk is a selective decision system: the same row-level decisions that produce same-work F1 also determine FMR, HNFMR, automatic merge coverage, block rate, and defer rate.
+
+The main execution contract is that schema loading preserves pair IDs and split fields, supervised fitting uses the masked objective without converting gold, proxy, or silver labels into unrelated supervision, threshold fixation records $\tau_w$, $\tau_a$, $\tau_r$, threshold source, selection split, and selection metric before held-out reporting, pair scoring writes $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, $p_{\mathrm{ani}}$, and $p_{\mathrm{risk}}$, decision emission records merge, block, or defer with cannot-link status, and metric export binds denominators and checksums to the same prediction artifact.
 
 \subsection{Risk-Aware Merge Decision}
 
