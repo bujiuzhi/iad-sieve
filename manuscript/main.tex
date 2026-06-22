@@ -386,8 +386,9 @@ The metric formulas use the selective merge output after thresholding. Let TP de
 
 \subsection{Threshold Selection and Uncertainty Reporting}
 
-Threshold-sensitive systems are evaluated under a fixed selection protocol rather than by choosing the best test threshold after observing results. Merge thresholds are selected on validation evidence when validation rows are available; otherwise, the default implementation threshold is reported as a fixed operating point. The test split is then used only for final metric reporting. This protocol is necessary because a small threshold change can alter FMR and HNFMR more strongly than it alters same-work F1.
-The full threshold and uncertainty reporting protocol is reported in the supplementary material. Stronger uncertainty or mechanism claims require prediction files and resampling logs, ablation outputs for no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold variants, and an artifact audit that binds predictions, configs, logs, checksums, and commit identifiers to each reported table.
+Threshold-sensitive systems are evaluated under a fixed selection protocol rather than by choosing the best test threshold after observing results. Merge thresholds are selected on validation evidence when validation rows are available; otherwise, the default implementation threshold is reported as a fixed operating point. The test split is then used only for final metric reporting. This protocol is necessary because a small threshold change can alter FMR and HNFMR more strongly than it alters same-work F1, so the reported table should be read as an operating-point report rather than as a threshold-stability result.
+
+The full threshold and uncertainty reporting protocol is reported in the supplementary material. Stronger uncertainty or mechanism claims require prediction files and resampling logs, ablation outputs for no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold variants, and an artifact audit that binds predictions, configs, logs, checksums, and commit identifiers to each reported table. Until those artifacts are released, threshold sensitivity and component causality remain upgrade paths for future evidence rather than conclusions already supported by the current Open-v2 snapshot.
 
 \subsection{Ablation Acceptance Boundary}
 
