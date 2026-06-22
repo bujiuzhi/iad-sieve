@@ -356,6 +356,8 @@ def _write_final_upload_cover_letter(manuscript_root: Path) -> None:
                 "Public-source commands are reconstruction code paths rather than frozen source snapshots, "
                 "and exact Open-v2 numerical reproduction requires recorded acquisition dates or versions, "
                 "input checksums, processing logs, and released derived artifacts rather than live API calls or changed public dumps.",
+                "The funding, competing-interest, permissions, and generative AI declarations are completed "
+                "in the submission system and publisher files where required.",
                 "The artifact release is available at https://doi.org/10.0000/example "
                 "with DOI 10.0000/example and supports result-level review.",
                 "",
@@ -556,6 +558,8 @@ def _write_dke_final_upload_cover_letter(manuscript_root: Path) -> None:
                 "Public-source commands are reconstruction code paths rather than frozen source snapshots, "
                 "and exact Open-v2 numerical reproduction requires recorded acquisition dates or versions, "
                 "input checksums, processing logs, and released derived artifacts rather than live API calls or changed public dumps.",
+                "The funding, competing-interest, permissions, and generative AI declarations are completed "
+                "in the submission system and publisher files where required.",
                 "The artifact release is available at https://doi.org/10.0000/example "
                 "with DOI 10.0000/example and supports result-level review.",
                 "",

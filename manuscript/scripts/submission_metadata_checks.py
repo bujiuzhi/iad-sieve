@@ -186,6 +186,12 @@ FINAL_UPLOAD_COVER_LETTER_PUBLIC_SOURCE_BOUNDARY_MARKERS = {
     "released derived artifacts": "cover letter missing released-derived-artifact boundary",
     "live api calls or changed public dumps": "cover letter missing live-source-change boundary",
 }
+FINAL_UPLOAD_COVER_LETTER_DECLARATION_MARKERS = {
+    "funding": "cover letter missing funding declaration boundary",
+    "permission": "cover letter missing permissions declaration boundary",
+    "generative ai": "cover letter missing generative AI declaration boundary",
+    "declaration": "cover letter missing declaration-status sentence",
+}
 
 
 def strip_yaml_value(value: str) -> str:
@@ -1296,6 +1302,11 @@ def check_final_upload_cover_letter_text(cover_letter_text: str, metadata_text: 
     for marker, message in FINAL_UPLOAD_COVER_LETTER_PUBLIC_SOURCE_BOUNDARY_MARKERS.items():
         if marker not in lowered_text:
             errors.append(f"final upload cover letter unresolved: {message}")
+    for marker, message in FINAL_UPLOAD_COVER_LETTER_DECLARATION_MARKERS.items():
+        if marker not in lowered_text:
+            errors.append(f"final upload cover letter unresolved: {message}")
+    if "competing-interest" not in lowered_text and "competing interest" not in lowered_text:
+        errors.append("final upload cover letter unresolved: cover letter missing competing-interest declaration boundary")
     artifact_row = parse_mapping_section(metadata_text, "artifact_boundary")
     artifact_values = [
         value
