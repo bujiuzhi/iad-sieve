@@ -10,7 +10,7 @@ Risk-Calibrated Scientific Entity Matching under Agenda-Level Confounders.
 
 ## 仓库边界
 
-本仓库提交源码、测试、小型 fixture、脚本和公开文档；不提交原始大数据、实验输出、模型权重和远程连接配置。完整复现依赖公开数据来源、下载脚本、manifest、checksum 和单独发布的 artifact。
+本仓库提交源码、测试、小型 fixture、脚本和公开文档；不提交原始大数据、实验输出、模型权重和远程连接配置。结果级复核依赖公开数据来源记录、下载脚本、manifest、checksum 和单独发布的 artifact。
 
 ## 架构概览
 
@@ -131,7 +131,7 @@ scripts/run_main_experiment.sh 42 100000 cs.CL
 
 适合主张：
 
-- 议题级混杂会显著增加科学实体匹配中的 false merge 风险。
+- 议题级混杂会形成科学实体匹配中的 false merge 风险。
 - 风险校准和受约束合并可以把目标从“多合并”调整为“在错误预算下安全合并”。
 - Open-v2/Open-v3 是带有公开构造流程、复现分级和 artifact 审计边界的衍生压力评测框架；主数值复核仍依赖 L2/L3 产物。
 

@@ -166,6 +166,8 @@ def test_check_root_readme_reproduction_levels_accepts_current_levels(tmp_path: 
                 "| L2 public-source rebuild | 从独立获取的公开原始文件重建派生 eval source 和 IAD-Bench 包 | 本地 `data/raw/` 中的公开来源文件、`source_input_manifest` 和 `processing_run_log` | 审计公开输入、处理命令、输出摘要和 checksum 的 chain of custody |",
                 "| L3 result audit | 审计已发布的表格、预测、阈值日志、配置、运行日志、manifest 和 checksum | 外部 artifact release | 复核论文主结果、阈值、分母和逐行预测边界 |",
                 "L0/L1 只能证明公开仓库代码路径和小型样本处理契约可运行；L2/L3 才能支持 Open-v2 数值表的结果级审计。不存在单独的 L4 Git 仓库复现等级。",
+                "结果级复核依赖公开数据来源记录、下载脚本、manifest、checksum 和单独发布的 artifact。",
+                "议题级混杂会形成科学实体匹配中的 false merge 风险。",
                 "Open-v2/Open-v3 是带有公开构造流程、复现分级和 artifact 审计边界的衍生压力评测框架；主数值复核仍依赖 L2/L3 产物。",
             ]
         ),
@@ -186,6 +188,8 @@ def test_check_root_readme_reproduction_levels_rejects_obsolete_levels(tmp_path:
                 "| L2 | 小样本开发实验 | 公开来源小样本 | 验证端到端流程 |",
                 "| L3 | 论文主实验 | 完整数据与外部 baseline | 生成论文表格和证据包 |",
                 "| L4 | 第三方复验 | 固定 artifact release | 独立读者复现 |",
+                "完整复现依赖公开数据来源、下载脚本、manifest、checksum 和单独发布的 artifact。",
+                "议题级混杂会显著增加科学实体匹配中的 false merge 风险。",
                 "Open-v2/Open-v3 是可复验的衍生压力评测框架。",
             ]
         ),
@@ -196,6 +200,8 @@ def test_check_root_readme_reproduction_levels_rejects_obsolete_levels(tmp_path:
     assert any(finding.snippet == "| L2 | 小样本开发实验 |" for finding in findings)
     assert any(finding.snippet == "| L3 | 论文主实验 |" for finding in findings)
     assert any(finding.snippet == "| L4 | 第三方复验 |" for finding in findings)
+    assert any(finding.snippet == "完整复现依赖公开数据来源" for finding in findings)
+    assert any(finding.snippet == "议题级混杂会显著增加科学实体匹配中的 false merge 风险" for finding in findings)
     assert any(finding.snippet == "Open-v2/Open-v3 是可复验的衍生压力评测框架" for finding in findings)
     assert any(finding.category == "root_readme_reproduction_missing_marker" for finding in findings)
 
