@@ -8000,6 +8000,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "## Readiness Gate 94: DKE First-Screen Scope-Fit Gate",
             "DKE first-screen scope-fit wording",
             "concrete data and knowledge engineering scope fit",
+            "abstract now opens from scholarly data integration",
+            "introduction opens from scholarly data integration and knowledge engineering systems",
             "database-oriented scholarly data integration",
             "knowledge engineering for scholarly records",
             "data/knowledge-engineering merge risk",
@@ -10239,6 +10241,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
         [
             rf"\title{{{title}}}",
             r"\begin{abstract}",
+            "This paper studies scholarly data integration.",
             "This paper studies identity-agenda confusion and proposes IAD-Risk.",
             "A single match score does not reveal whether the evidence reflects identity or agenda relatedness.",
             "It exposes identity, agenda, and agenda-non-identity signals.",

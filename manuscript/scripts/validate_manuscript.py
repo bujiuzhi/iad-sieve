@@ -5307,6 +5307,15 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "ranking/category confirmation",
         "artifact URL or DOI",
         "live submission-system verification",
+        "DKE first-screen scope-fit wording",
+        "concrete data and knowledge engineering scope fit",
+        "abstract now opens from scholarly data integration",
+        "introduction opens from scholarly data integration and knowledge engineering systems",
+        "database-oriented scholarly data integration",
+        "knowledge engineering for scholarly records",
+        "data/knowledge-engineering merge risk",
+        "scope-fit precision",
+        "not final journal selection",
         "DKE final-upload information-request specificity",
         "requested external values are supplied and synchronized into metadata, cover letter, source package, and live submission system",
         "recorded DKE official-guide preflight source",
@@ -6567,6 +6576,7 @@ def check_editorial_claim_alignment(
         "main abstract": (
             abstract_text,
             [
+                "scholarly data integration",
                 "identity-agenda confusion",
                 "single match score",
                 "IAD-Risk",
