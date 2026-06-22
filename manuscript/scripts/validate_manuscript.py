@@ -5508,6 +5508,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "Open-v2 held-out hard-negative scope: zero observed HNFMR; ordinary FMR=0.001",
         "avoids the unexplained `ANI` abbreviation",
         "identity, agenda, and non-identity risk",
+        "no ranking or statistical claim",
         "highlight-level metric separation",
         "acronym clarity",
         "document/cluster split-overread wording",
@@ -6591,6 +6592,7 @@ def check_highlights(highlights_text: str) -> list[str]:
         "Cluster-level claims require artifact-backed audits",
         "Identity-agenda confusion creates data/knowledge-engineering merge risk",
         "IAD-Risk separates identity, agenda, and non-identity risk",
+        "no ranking or statistical claim",
     ]
     for marker in required_markers:
         if marker not in highlights_text:
@@ -6934,6 +6936,7 @@ def check_submission_material_quantitative_summary(highlights_text: str, cover_l
         "Open-v2 held-out hard-negative scope",
         "zero observed HNFMR",
         "ordinary FMR=0.001",
+        "no ranking or statistical claim",
     ]
     errors: list[str] = []
     for marker in highlight_required_markers:

@@ -1327,7 +1327,7 @@ def test_check_highlights_accepts_five_concise_bullets() -> None:
             "- IAD-Risk separates identity, agenda, and non-identity risk.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
             "- Open-v2 held-out hard-negative scope: zero observed HNFMR; ordinary FMR=0.001.",
-            "- Cluster-level claims require artifact-backed audits.",
+            "- Cluster-level claims require artifact-backed audits; no ranking or statistical claim.",
         ]
     )
 
@@ -8825,6 +8825,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "Open-v2 held-out hard-negative scope: zero observed HNFMR; ordinary FMR=0.001",
             "avoids the unexplained `ANI` abbreviation",
             "identity, agenda, and non-identity risk",
+            "no ranking or statistical claim",
             "highlight-level metric separation",
             "acronym clarity",
             "## Readiness Gate 109: Document-Cluster Split Overread Gate",
@@ -11259,7 +11260,7 @@ def test_check_submission_material_quantitative_summary_accepts_scoped_highlight
             "- IAD-Risk separates identity, agenda, and non-identity risk.",
             "- IAD-Bench keeps gold, proxy, and silver labels separate.",
             "- Open-v2 held-out hard-negative scope: zero observed HNFMR; ordinary FMR=0.001.",
-            "- Cluster-level claims require artifact-backed audits.",
+            "- Cluster-level claims require artifact-backed audits; no ranking or statistical claim.",
         ]
     )
     cover_letter_text = "\n".join(
