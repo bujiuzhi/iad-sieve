@@ -2717,6 +2717,24 @@ def test_check_method_cluster_overclaims_rejects_unqualified_prevention_claim() 
     assert any("prevents transitive false merges" in error for error in errors)
 
 
+def test_check_method_cluster_overclaims_rejects_supplementary_cluster_guarantees() -> None:
+    """验证补充材料不得使用 cluster-level guarantee 绝对表述。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_method_cluster_overclaims", None)
+    assert callable(checker)
+    manuscript_text = "Cluster-level claims require artifacts before deployment-level interpretation."
+    supplementary_text = (
+        "Pairwise errors contaminate clusters through transitivity. "
+        "Cluster-level guarantees require complete cannot-link coverage."
+    )
+
+    errors = checker(manuscript_text, supplementary_text)
+
+    assert any("supplementary material" in error for error in errors)
+    assert any("Cluster-level guarantees" in error for error in errors)
+
+
 def test_check_operational_net_benefit_boundary_accepts_complete_boundary() -> None:
     """验证方法复杂度和净收益边界完整时可通过检查。"""
 
@@ -3076,7 +3094,7 @@ def test_check_failure_control_rationale_accepts_supplementary_table() -> None:
             "Pairwise errors contaminate clusters through transitivity.",
             "Thresholds turn a classifier into an unsafe automatic merger.",
             "Proxy labels are over-interpreted.",
-            "Cluster-level guarantees require complete cannot-link coverage.",
+            "Cluster-level claims require sufficient cannot-link coverage and cluster-level artifact audits.",
         ]
     )
 

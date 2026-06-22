@@ -194,6 +194,9 @@ UNSUPPORTED_ABSTRACT_CLUSTER_PATTERNS = [
 UNSUPPORTED_METHOD_CLUSTER_PATTERNS = [
     re.compile(r"\bcannot-link\s+evidence\s+prevents\s+transitive\s+false\s+merges\b", re.IGNORECASE),
     re.compile(r"\bguarantee\w*\s+(?:complete\s+)?cluster[-\s]?level\b", re.IGNORECASE),
+    re.compile(r"\bcluster[-\s]?level\s+guarantee\w*\b", re.IGNORECASE),
+    re.compile(r"\bcluster\s+guarantee\w*\b", re.IGNORECASE),
+    re.compile(r"\bguarantee\w*\s+require\w*.{0,120}\bcluster[-\s]?level\b", re.IGNORECASE),
 ]
 AUXILIARY_MODEL_EVIDENCE_PHRASES = [
     "LLM",
@@ -1831,19 +1834,24 @@ def check_risk_calibration_overclaims(manuscript_text: str) -> list[str]:
     return errors
 
 
-def check_method_cluster_overclaims(manuscript_text: str) -> list[str]:
+def check_method_cluster_overclaims(manuscript_text: str, supplementary_text: str = "") -> list[str]:
     """Check whether the method avoids unsupported cluster-level guarantees.
 
     参数:
         manuscript_text: Main LaTeX manuscript source.
+        supplementary_text: Supplementary LaTeX source.
 
     返回:
         list[str]: Error messages for method claims that require cluster artifacts.
     """
     errors: list[str] = []
-    for pattern in UNSUPPORTED_METHOD_CLUSTER_PATTERNS:
-        for match in pattern.finditer(manuscript_text):
-            errors.append(f"unsupported method cluster-level claim found: {match.group(0)}")
+    for document_name, document_text in {
+        "main manuscript": manuscript_text,
+        "supplementary material": supplementary_text,
+    }.items():
+        for pattern in UNSUPPORTED_METHOD_CLUSTER_PATTERNS:
+            for match in pattern.finditer(document_text):
+                errors.append(f"unsupported method cluster-level claim found in {document_name}: {match.group(0)}")
     return errors
 
 
@@ -2151,7 +2159,7 @@ def check_failure_control_rationale(manuscript_text: str, supplementary_text: st
         "Pairwise errors contaminate clusters through transitivity",
         "Thresholds turn a classifier into an unsafe automatic merger",
         "Proxy labels are over-interpreted",
-        "Cluster-level guarantees require complete cannot-link coverage",
+        "Cluster-level claims require sufficient cannot-link coverage and cluster-level artifact audits",
     ]
     errors = [
         f"failure-control rationale missing manuscript marker: {marker}"
@@ -7310,7 +7318,7 @@ def main() -> int:
     errors.extend(check_training_objective_masking(manuscript_text))
     errors.extend(check_risk_score_design_rationale(manuscript_text, supplementary_text))
     errors.extend(check_risk_calibration_overclaims(manuscript_text))
-    errors.extend(check_method_cluster_overclaims(manuscript_text))
+    errors.extend(check_method_cluster_overclaims(manuscript_text, supplementary_text))
     errors.extend(check_operational_net_benefit_boundary(manuscript_text))
     errors.extend(check_version_identifier_policy(manuscript_text))
     errors.extend(check_method_design_supplementary_boundaries(supplementary_text))

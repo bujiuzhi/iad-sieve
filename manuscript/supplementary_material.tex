@@ -116,7 +116,7 @@ Failure pathway & Design response & Remaining boundary \\
 \midrule
 Topically close papers receive high semantic similarity. & Separate agenda evidence from identity evidence before the merge gate. & Requires the benchmark to include agenda-level hard negatives. \\
 Silver metadata is treated as if it were human gold. & Preserve label strength and provenance, and mask supervision by valid label source. & Silver labels support stress testing, not exhaustive truth claims. \\
-Pairwise errors contaminate clusters through transitivity. & Apply risk gating before constrained union-find and respect cannot-link evidence. & Cluster-level guarantees require complete cannot-link coverage. \\
+Pairwise errors contaminate clusters through transitivity. & Apply risk gating before constrained union-find and respect cannot-link evidence. & Cluster-level claims require sufficient cannot-link coverage and cluster-level artifact audits. \\
 Thresholds turn a classifier into an unsafe automatic merger. & Expose work, ANI, and risk thresholds and evaluate held-out merge decisions. & Threshold transfer should be rechecked under new source distributions. \\
 Proxy labels are over-interpreted. & Keep proxy rows separate unless the label source supports the relation being evaluated. & Proxy rows remain non-human evidence even when reproducible. \\
 \bottomrule
@@ -853,7 +853,7 @@ Internal validity & Threshold choice or split leakage can inflate metrics. & Ope
 External validity & Open-v2 may not cover every source, topic, or version policy. & Claims are tied to Open-v2 and source-heldout evidence boundaries. & Broad deployment requires domain-diverse validation. \\
 Conclusion validity & HNFMR evidence may be mistaken for full causality. & Ablation requirements precede component-level causal claims. & Complete causality requires no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold protocol variants. \\
 Reproducibility & Raw data and large predictions are not stored in Git. & Public commands, fixtures, manifests, checksums, and artifact rules are provided. & Full numeric audit requires L2/L3 artifacts. \\
-Operational validity & Pair errors can propagate through transitive merges. & Risk gating and cannot-link-aware clustering are described. & Cluster guarantees need complete cannot-link coverage. \\
+Operational validity & Pair errors can propagate through transitive merges. & Risk gating and cannot-link-aware clustering are described. & Cluster-level claims need sufficient cannot-link coverage and cluster-level artifact audits. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -930,7 +930,7 @@ Mechanism question & Current evidence & Interpretation boundary \\
 Does topical relatedness create merge risk? & Representation baselines show high false-merge rates on OpenAlex silver hard negatives. & Supports a targeted failure mode, not a universal prevalence estimate. \\
 Does explicit risk gating suppress hard-negative merges? & IAD-Risk transformer variants keep low HNFMR under the reported Open-v2 split. & Supports the reported contract and thresholds; transfer must be rechecked on new source mixes. \\
 Is the gain caused by each IAD-Risk component? & The current manuscript reports mechanism-consistent HNFMR evidence. & A full causal claim requires protocol-variant outputs for no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold diagnostics. \\
-Can cluster-level contamination be eliminated? & The method supports cannot-link-aware constrained union-find. & Guarantees require sufficient cannot-link coverage and cluster-level artifact audits. \\
+Can cluster-level contamination be eliminated? & The method supports cannot-link-aware constrained union-find. & Cluster-level contamination claims require sufficient cannot-link coverage and cluster-level artifact audits. \\
 \bottomrule
 \end{tabular}
 \end{table}
