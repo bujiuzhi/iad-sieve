@@ -1128,6 +1128,38 @@ def check_abstract_length(manuscript_text: str, max_words: int = 250) -> list[st
     return []
 
 
+def check_abstract_word_budget_buffer(
+    manuscript_text: str,
+    max_words: int = 250,
+    min_buffer_words: int = 15,
+) -> list[str]:
+    """Check whether the abstract preserves a submission-field word-count buffer.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+        max_words: Maximum allowed abstract word count.
+        min_buffer_words: Minimum reserved words below the maximum limit.
+
+    返回:
+        list[str]: Error messages for insufficient abstract word-budget buffer.
+    """
+    begin_marker = r"\begin{abstract}"
+    end_marker = r"\end{abstract}"
+    if begin_marker not in manuscript_text or end_marker not in manuscript_text:
+        return ["abstract word-budget buffer check could not locate abstract environment"]
+    abstract_text = manuscript_text.split(begin_marker, 1)[1].split(end_marker, 1)[0]
+    word_count = len(abstract_text.split())
+    expected_max_words = max_words - min_buffer_words
+    if word_count > expected_max_words:
+        return [
+            (
+                f"abstract has {word_count} words; expected at most {expected_max_words} "
+                f"to preserve a {min_buffer_words}-word buffer under the {max_words}-word limit"
+            )
+        ]
+    return []
+
+
 def check_abstract_cluster_overclaim(manuscript_text: str) -> list[str]:
     """Check whether the abstract avoids unsupported cluster-level guarantees.
 
@@ -4581,7 +4613,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "# Reviewer Readiness Audit",
         "conditionally ready for target-journal selection; not ready for final upload",
         "Readiness Summary",
-        "Readiness gates covered: 139",
+        "Readiness gates covered: 140",
         "Highest current reviewer-facing risks",
         "risk inventory rather than a claim that every gate is currently failing",
         "External final-upload blockers",
@@ -4639,6 +4671,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "public documentation index drift",
         "local submission-package artifact tracking drift",
         "DKE/Elsevier draft abstract-length drift",
+        "abstract word-budget buffer drift",
         "artifact release README completeness",
         "artifact release commit validity",
         "artifact README/manifest commit mismatch",
@@ -4942,7 +4975,8 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "check_editable_biography_file_paths",
         "passport-type photograph",
         "author-material completion",
-        "current abstract is 242 words",
+        "current abstract is 220 words",
+        "30-word buffer",
         "250-word DKE preflight limit",
         "abstract-length compliance",
         "not writing quality or scientific evidence",
@@ -5082,6 +5116,10 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "RoBERTa pair-classifier row remains a strong supervised comparator",
         "not broad-superiority evidence",
         "abstract first-screen fairness, not new empirical evidence",
+        "Readiness Gate 140: Abstract Word-Budget Buffer Gate",
+        "abstract word-budget buffer coverage",
+        "15-word buffer",
+        "word-budget buffer, not stronger scientific evidence",
         "unsupported review-mode rejection coverage",
         "`single_anonymized_with_final_author_identities`",
         "`single_anonymized_author_visible_final_upload`",
@@ -5856,6 +5894,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "`manuscript/README.md` and `manuscript/MANIFEST.md` keep a product-boundary table",
         "Main-result, conclusion, cover-letter, and reviewer-response wording keep RoBERTa pair classification as a strong supervised baseline",
         "The abstract states that the RoBERTa pair-classifier row remains a strong supervised comparator",
+        "The abstract keeps at least a 15-word DKE/Elsevier word-budget buffer",
         "Minimum Gate Before Final Upload",
         "Contribution",
         "Writing clarity",
@@ -6310,7 +6349,8 @@ def check_elsevier_draft_source(manuscript_text: str, keywords_text: str, genera
     if generated_text.strip() != expected_text.strip():
         return ["Elsevier draft source is stale; rerun python manuscript/scripts/build_elsevier_draft.py"]
     abstract_length_errors = check_abstract_length(generated_text)
-    return [f"Elsevier draft source {error}" for error in abstract_length_errors]
+    abstract_buffer_errors = check_abstract_word_budget_buffer(generated_text)
+    return [f"Elsevier draft source {error}" for error in abstract_length_errors + abstract_buffer_errors]
 
 
 def load_submission_package_validator():
@@ -7164,6 +7204,7 @@ def main() -> int:
     errors.extend(check_abstract_quantitative_evidence(manuscript_text))
     errors.extend(check_abstract_mechanism_claim_boundary(manuscript_text))
     errors.extend(check_abstract_length(manuscript_text))
+    errors.extend(check_abstract_word_budget_buffer(manuscript_text))
     errors.extend(check_abstract_cluster_overclaim(manuscript_text))
     errors.extend(check_contribution_evidence_summary(manuscript_text))
     errors.extend(check_motivating_failure_case(manuscript_text))
