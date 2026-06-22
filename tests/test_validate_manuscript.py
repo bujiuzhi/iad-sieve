@@ -4462,6 +4462,16 @@ def test_check_claim_interpretation_boundary_accepts_complete_boundary() -> None
             "The method design soundness remains bounded by source-heldout validation.",
             "The boundary requires topic-heldout checks.",
             "The boundary requires failure-case analysis.",
+            "The claim-upgrade ladder is explicit.",
+            "The current manuscript may claim a bounded pair-level mechanism result on Open-v2.",
+            "A full numerical-audit claim requires same-scope prediction files.",
+            "The audit includes source-input manifests.",
+            "The audit includes processing-run logs.",
+            "A statistical or component-causality claim requires bootstrap intervals.",
+            "A statistical or component-causality claim requires accepted ablation variants.",
+            "A deployment or broad method-ranking claim requires review-load records.",
+            "A deployment or broad method-ranking claim requires cluster-level artifacts.",
+            "The abstract, conclusion, cover letter, and reviewer responses remain bounded.",
         ]
     )
     supplementary_text = "\n".join(
@@ -4510,6 +4520,9 @@ def test_check_claim_interpretation_boundary_rejects_missing_boundaries() -> Non
     assert any("claim-interpretation-boundary" in error for error in errors)
     assert any("full claim-interpretation boundary table" in error for error in errors)
     assert any("manual-validation slice" in error for error in errors)
+    assert any("claim-upgrade ladder" in error for error in errors)
+    assert any("bounded pair-level mechanism result on Open-v2" in error for error in errors)
+    assert any("deployment or broad method-ranking claim" in error for error in errors)
 
 
 def test_check_claim_interpretation_boundary_rejects_reviewer_facing_title() -> None:
