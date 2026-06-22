@@ -133,6 +133,7 @@ ARTICLE_TYPE_COVER_LETTER_MARKERS = {
 }
 FINAL_UPLOAD_ARTICLE_TYPES = set(ARTICLE_TYPE_COVER_LETTER_MARKERS)
 DKE_EDITABLE_BIOGRAPHY_EXTENSIONS = {".doc", ".docx", ".rtf", ".txt", ".md", ".tex"}
+ELSEVIER_DECLARATION_FILE_EXTENSIONS = {".doc", ".docx"}
 
 
 def strip_yaml_value(value: str) -> str:
@@ -877,6 +878,42 @@ def check_author_identity_materials(metadata_text: str) -> list[str]:
     return errors
 
 
+def check_publisher_declaration_files(metadata_text: str) -> list[str]:
+    """Check Elsevier declaration-tool output file records for final upload.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages for unresolved publisher declaration files.
+    """
+    if not target_journal_requires_elsevier_files(metadata_text):
+        return []
+
+    row = parse_mapping_section(metadata_text, "publisher_declaration_files")
+    if not row:
+        return ["publisher declaration files section is missing"]
+
+    errors: list[str] = []
+    if row.get("elsevier_declarations_tool_required_before_upload", "").lower() != "true":
+        errors.append("Elsevier declarations tool requirement is not recorded")
+
+    declaration_file = row.get("competing_interest_declaration_file", "").strip()
+    if not declaration_file:
+        errors.append("Elsevier competing-interest declaration file is missing")
+    else:
+        normalized_path = unquote(declaration_file).strip()
+        suffix_match = re.search(r"(\.[A-Za-z0-9]+)(?:[?#].*)?$", normalized_path)
+        suffix = suffix_match.group(1).lower() if suffix_match else ""
+        if suffix not in ELSEVIER_DECLARATION_FILE_EXTENSIONS:
+            extensions = ", ".join(sorted(ELSEVIER_DECLARATION_FILE_EXTENSIONS))
+            errors.append(f"Elsevier competing-interest declaration file must use {extensions}: {declaration_file}")
+
+    if row.get("competing_interest_declaration_file_verified", "").lower() != "true":
+        errors.append("Elsevier competing-interest declaration file verification is incomplete")
+    return errors
+
+
 def check_funding_statement(metadata_text: str) -> list[str]:
     """Check whether final-upload metadata declares funding status and wording.
 
@@ -1163,6 +1200,7 @@ def check_final_upload_metadata_text(metadata_text: str) -> list[str]:
         for message in check_target_preparation_confirmation(metadata_text)
     )
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_author_identity_materials(metadata_text))
+    errors.extend(f"final upload metadata unresolved: {message}" for message in check_publisher_declaration_files(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_funding_statement(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_submission_statement_fields(metadata_text))
     errors.extend(f"final upload metadata unresolved: {message}" for message in check_data_code_availability_statement(metadata_text))

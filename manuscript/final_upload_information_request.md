@@ -18,6 +18,7 @@ Repository URL and commit binding: keep the source `repository_reference` fields
 | Author contribution statement | `author_contributions`, `final_upload_checklist.contribution_statement_complete` | Manuscript declarations and live submission system |
 | Permissions statement | `permissions`, `final_upload_checklist.permissions_statement_complete` | Manuscript declarations and permission files, if required |
 | Generative AI declaration | `generative_ai`, `final_upload_checklist.generative_ai_declaration_complete` | Manuscript declaration section and live submission system |
+| Publisher declaration files | `publisher_declaration_files` | Elsevier declarations tool output, including the competing-interest `.doc` or `.docx` file when the DKE/Elsevier route is selected |
 | Data and code availability statement | `repository_reference`, `artifact_boundary`, `statements.research_data_statement` | Manuscript declarations and research-data statement field |
 | Artifact release | `artifact_boundary`, `final_upload_checklist.artifact_release_prepared_or_linked` | Public artifact record and live submission system |
 | PDF and system checks | `final_upload_checklist.manuscript_pdf_rebuilt_after_template`, `final_upload_checklist.supplementary_pdf_rebuilt_after_template`, `final_upload_checklist.submission_system_files_verified`, `final_upload_checklist.first_screen_claim_lockdown_confirmed`, `upload_preparation.live_submission_system_verified`, `upload_preparation.final_upload_package_verified_against_system` | Rebuilt PDFs, first-screen claim lockdown, and live submission system |
@@ -144,6 +145,13 @@ For each author, select the applicable CRediT roles and then draft the final aut
 ### Competing interests
 
 - Final competing-interest statement:
+- Elsevier declarations tool output required for the DKE/Elsevier route:
+- Elsevier competing-interest declaration file path:
+- Elsevier competing-interest declaration file must use `.doc` or `.docx`:
+- Elsevier competing-interest declaration file verified against the live submission-system upload field:
+- `publisher_declaration_files.elsevier_declarations_tool_required_before_upload`:
+- `publisher_declaration_files.competing_interest_declaration_file`:
+- `publisher_declaration_files.competing_interest_declaration_file_verified`:
 
 ### Ethics statement
 

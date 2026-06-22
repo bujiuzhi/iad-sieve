@@ -5632,6 +5632,8 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "Permission files are listed when third-party permission is required.",
             "The data availability statement matches artifact release status.",
             "The generative AI declaration records AI tool use status, author review and responsibility, AI authorship exclusion, and whether any machine-generated figures, images, or artwork are included.",
+            "For the DKE/Elsevier route, the Elsevier declarations tool has generated the competing-interest declaration file as `.doc` or `.docx`.",
+            "`publisher_declaration_files.competing_interest_declaration_file` and `publisher_declaration_files.competing_interest_declaration_file_verified` are completed before final upload.",
             "`author_identity_materials`, `biography_files`, `photograph_files`, and `author_identity_materials_verified` are completed before `author_biographies_and_photos_ready` is marked true.",
             "## Cover Letter Customization Checks",
             "The cover letter names the selected target journal.",
@@ -5700,6 +5702,7 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "The author contribution statement is completed before final upload.",
             "The permissions statement records third-party material permission status.",
             "The generative AI declaration statement is complete and matches the selected journal's live submission field.",
+            "The Elsevier competing-interest declaration file is complete and matches the live submission field.",
             "## File Hygiene Checks",
             "No `data/`, `outputs/`, cache, local connection, credential, or raw third-party file.",
             "Anonymous packages contain no author email addresses, ORCID values, personal account URLs, local absolute paths, or development process notes.",
@@ -5716,6 +5719,8 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "final_upload_checklist.target_journal_selected",
             "final_upload_checklist.manuscript_pdf_rebuilt_after_template",
             "author_identity_materials.biography_files",
+            "publisher_declaration_files.competing_interest_declaration_file",
+            "publisher_declaration_files.competing_interest_declaration_file_verified",
             "artifact_boundary.artifact_release_url",
             "upload_preparation.live_submission_system_verified",
             "final_upload_checklist.first_screen_claim_lockdown_confirmed",
@@ -9415,6 +9420,93 @@ def test_check_final_upload_metadata_rejects_pdf_dke_author_biography_file() -> 
     assert any("author biography file must be editable and must not be PDF" in error for error in errors)
 
 
+def test_check_final_upload_metadata_rejects_missing_elsevier_declaration_file() -> None:
+    """验证 DKE final-upload 门禁拒绝缺失的 Elsevier 声明工具文件。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = _build_filled_final_upload_metadata_text()
+    metadata_text = metadata_text.replace(
+        'target_journal: "Journal of Scholarly Data"',
+        'target_journal: "Data & Knowledge Engineering"',
+    )
+    metadata_text = metadata_text.replace(
+        'review_mode: "journal_system_confirmed"',
+        'review_mode: "single_anonymized_with_final_author_identities"',
+    )
+    metadata_text = metadata_text.replace(
+        "  author_biography_and_photo_required_before_upload: false",
+        "  author_biography_and_photo_required_before_upload: true",
+    )
+    metadata_text = metadata_text.replace(
+        "  biography_files: []",
+        '  biography_files: ["author-materials/example-author-biography.md"]',
+    )
+    metadata_text = metadata_text.replace(
+        "  photograph_files: []",
+        '  photograph_files: ["author-materials/example-author-photo.jpg"]',
+    )
+    metadata_text = metadata_text.replace(
+        "author_contributions:",
+        "\n".join(
+            [
+                "publisher_declaration_files:",
+                "  elsevier_declarations_tool_required_before_upload: true",
+                '  competing_interest_declaration_file: ""',
+                "  competing_interest_declaration_file_verified: false",
+                "author_contributions:",
+            ]
+        ),
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any("Elsevier competing-interest declaration file is missing" in error for error in errors)
+    assert any("Elsevier competing-interest declaration file verification is incomplete" in error for error in errors)
+
+
+def test_check_final_upload_metadata_rejects_non_word_elsevier_declaration_file() -> None:
+    """验证 DKE final-upload 门禁拒绝非 Word 格式的 Elsevier 声明文件。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = _build_filled_final_upload_metadata_text()
+    metadata_text = metadata_text.replace(
+        'target_journal: "Journal of Scholarly Data"',
+        'target_journal: "Data & Knowledge Engineering"',
+    )
+    metadata_text = metadata_text.replace(
+        'review_mode: "journal_system_confirmed"',
+        'review_mode: "single_anonymized_with_final_author_identities"',
+    )
+    metadata_text = metadata_text.replace(
+        "  author_biography_and_photo_required_before_upload: false",
+        "  author_biography_and_photo_required_before_upload: true",
+    )
+    metadata_text = metadata_text.replace(
+        "  biography_files: []",
+        '  biography_files: ["author-materials/example-author-biography.md"]',
+    )
+    metadata_text = metadata_text.replace(
+        "  photograph_files: []",
+        '  photograph_files: ["author-materials/example-author-photo.jpg"]',
+    )
+    metadata_text = metadata_text.replace(
+        "author_contributions:",
+        "\n".join(
+            [
+                "publisher_declaration_files:",
+                "  elsevier_declarations_tool_required_before_upload: true",
+                '  competing_interest_declaration_file: "author-materials/competing-interest-declaration.pdf"',
+                "  competing_interest_declaration_file_verified: true",
+                "author_contributions:",
+            ]
+        ),
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any("Elsevier competing-interest declaration file must use .doc, .docx" in error for error in errors)
+
+
 def test_check_final_upload_metadata_rejects_missing_generative_ai_declaration() -> None:
     """验证 final-upload 门禁拒绝缺失的生成式 AI 声明。"""
 
@@ -10141,6 +10233,10 @@ def test_check_final_upload_metadata_accepts_dke_research_data_statement_with_ar
             '  biography_files: ["author-materials/example-author-biography.md"]',
             '  photograph_files: ["author-materials/example-author-photo.jpg"]',
             "  author_identity_materials_verified: true",
+            "publisher_declaration_files:",
+            "  elsevier_declarations_tool_required_before_upload: true",
+            '  competing_interest_declaration_file: "author-materials/competing-interest-declaration.docx"',
+            "  competing_interest_declaration_file_verified: true",
             "author_contributions:",
             "  credit_taxonomy_required_before_final_upload: true",
             '  contribution_statement: "Example Author: conceptualization, methodology, software, validation, and writing - original draft."',

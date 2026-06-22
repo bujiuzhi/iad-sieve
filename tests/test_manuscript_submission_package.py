@@ -429,6 +429,11 @@ def _write_dke_final_upload_metadata(manuscript_root: Path) -> None:
                 '  data_code_availability: "Source code and fixtures are available at https://github.com/bujiuzhi/iad-sieve.git commit abcdef1234567890; full result artifacts are available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
                 '  research_data_statement: "Source code and small fixtures are available in the repository; the full result artifact is available at https://doi.org/10.0000/example. Raw third-party data are not redistributed in Git."',
                 "",
+                "publisher_declaration_files:",
+                "  elsevier_declarations_tool_required_before_upload: true",
+                '  competing_interest_declaration_file: "author-materials/competing-interest-declaration.docx"',
+                "  competing_interest_declaration_file_verified: true",
+                "",
                 "author_contributions:",
                 "  credit_taxonomy_required_before_final_upload: true",
                 '  contribution_statement: "Example Author: conceptualization, methodology, software, validation, and writing - original draft."',
@@ -1060,6 +1065,37 @@ def test_build_submission_package_rejects_dke_final_upload_without_author_identi
     assert "author biography file list is missing" in message
     assert "author photograph file list is missing" in message
     assert "author identity materials verification is incomplete" in message
+
+
+def test_build_submission_package_rejects_dke_final_upload_without_elsevier_declaration_file(tmp_path) -> None:
+    """验证 DKE 正式上传包拒绝缺失的 Elsevier 声明工具文件。"""
+
+    module = _load_submission_package_module()
+    manuscript_root = tmp_path / "manuscript"
+    output_dir = tmp_path / "submission_package"
+    zip_path = tmp_path / "submission_package.zip"
+    _write_required_manuscript_files(manuscript_root)
+    _write_dke_preflight_files(manuscript_root)
+    _write_dke_final_upload_metadata(manuscript_root)
+    _write_dke_final_upload_cover_letter(manuscript_root)
+    metadata_path = manuscript_root / "submission_metadata.yml"
+    metadata_text = metadata_path.read_text(encoding="utf-8")
+    metadata_text = metadata_text.replace(
+        '  competing_interest_declaration_file: "author-materials/competing-interest-declaration.docx"',
+        '  competing_interest_declaration_file: ""',
+    )
+    metadata_text = metadata_text.replace(
+        "  competing_interest_declaration_file_verified: true",
+        "  competing_interest_declaration_file_verified: false",
+    )
+    metadata_path.write_text(metadata_text, encoding="utf-8")
+
+    with pytest.raises(ValueError) as exc_info:
+        module.build_submission_package(manuscript_root, output_dir, zip_path, final_upload=True, dke_preflight=True)
+
+    message = str(exc_info.value)
+    assert "Elsevier competing-interest declaration file is missing" in message
+    assert "Elsevier competing-interest declaration file verification is incomplete" in message
 
 
 def test_build_submission_package_rejects_dke_final_upload_with_pdf_author_biography_file(tmp_path) -> None:
