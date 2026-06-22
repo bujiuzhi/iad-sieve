@@ -1028,6 +1028,11 @@ def test_check_evaluation_protocol_boundary_accepts_supplementary_table() -> Non
             "RQ2 tests whether it reduces false merges on silver hard negatives with HNFMR.",
             "RQ3 examines whether the observed behavior is consistent with the proposed risk mechanism through FMR and HNFMR.",
             "RQ4 tests whether results remain interpretable under gold, proxy, and silver label strata through split metrics.",
+            r"These questions define the reading order for Table~\ref{tab:openv2-results}.",
+            "RQ1 is read from same-work F1.",
+            "RQ2 is read from HNFMR.",
+            "RQ3 is read from the joint FMR/HNFMR pattern and risk-gate interpretation.",
+            "RQ4 is read from the Scope type and label-stratum boundaries.",
             "The evidence strength is tied to the label stratum behind each question.",
             "gold, proxy, and silver evidence are not mixed into one undifferentiated score.",
         ]
@@ -1077,6 +1082,11 @@ def test_check_evaluation_protocol_boundary_rejects_missing_supplementary_table(
             "RQ2 tests whether it reduces false merges on silver hard negatives with HNFMR.",
             "RQ3 examines whether the observed behavior is consistent with the proposed risk mechanism through FMR and HNFMR.",
             "RQ4 tests whether results remain interpretable under gold, proxy, and silver label strata through split metrics.",
+            r"These questions define the reading order for Table~\ref{tab:openv2-results}.",
+            "RQ1 is read from same-work F1.",
+            "RQ2 is read from HNFMR.",
+            "RQ3 is read from the joint FMR/HNFMR pattern and risk-gate interpretation.",
+            "RQ4 is read from the Scope type and label-stratum boundaries.",
             "The evidence strength is tied to the label stratum behind each question.",
             "gold, proxy, and silver evidence are not mixed into one undifferentiated score.",
         ]
@@ -1086,6 +1096,56 @@ def test_check_evaluation_protocol_boundary_rejects_missing_supplementary_table(
 
     assert any("tab:evaluation-protocol" in error for error in errors)
     assert any("Evaluation Protocol Boundary" in error for error in errors)
+
+
+def test_check_evaluation_protocol_boundary_rejects_missing_result_table_mapping() -> None:
+    """验证实验问题必须说明 RQ 与主结果表的映射关系。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\subsection{Experimental Questions}",
+            "The full evaluation-protocol table is reported in the supplementary material.",
+            "RQ1 tests whether IAD-Risk preserves same-work matching performance on gold identity pairs.",
+            "RQ2 tests whether it reduces false merges on silver hard negatives with HNFMR.",
+            "RQ3 examines whether the observed behavior is consistent with the proposed risk mechanism through FMR and HNFMR.",
+            "RQ4 tests whether results remain interpretable under gold, proxy, and silver label strata through split metrics.",
+            "The evidence strength is tied to the label stratum behind each question.",
+            "gold, proxy, and silver evidence are not mixed into one undifferentiated score.",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Evaluation Protocol Boundary}",
+            r"\label{tab:evaluation-protocol}",
+            "Evaluation protocol. Each question is tied to a label stratum and a metric.",
+            "RQ",
+            "Evidence layer",
+            "Metric",
+            "Interpretation",
+            "RQ1",
+            "Gold identity pairs",
+            "Same-work F1",
+            "Duplicate matching ability",
+            "RQ2",
+            "Silver hard negatives",
+            "HNFMR",
+            "False-merge safety",
+            "RQ3",
+            "Mechanism analysis",
+            "FMR and HNFMR",
+            "Role of risk signals",
+            "RQ4",
+            "Gold/proxy/silver strata",
+            "Split metrics",
+            "Provenance-aware robustness",
+        ]
+    )
+
+    errors = module.check_evaluation_protocol_boundary(manuscript_text, supplementary_text)
+
+    assert any("reading order for Table" in error for error in errors)
+    assert any("RQ3 is read from the joint FMR/HNFMR pattern" in error for error in errors)
 
 
 def test_check_highlights_accepts_five_concise_bullets() -> None:

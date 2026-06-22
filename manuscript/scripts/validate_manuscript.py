@@ -831,6 +831,11 @@ def check_evaluation_protocol_boundary(manuscript_text: str, supplementary_text:
         "RQ2 tests whether it reduces false merges on silver hard negatives with HNFMR",
         "RQ3 examines whether the observed behavior is consistent with the proposed risk mechanism through FMR and HNFMR",
         "RQ4 tests whether results remain interpretable under gold, proxy, and silver label strata through split metrics",
+        r"reading order for Table~\ref{tab:openv2-results}",
+        "RQ1 is read from same-work F1",
+        "RQ2 is read from HNFMR",
+        "RQ3 is read from the joint FMR/HNFMR pattern and risk-gate interpretation",
+        "RQ4 is read from the Scope type and label-stratum boundaries",
         "evidence strength is tied to the label stratum behind each question",
         "gold, proxy, and silver evidence are not mixed into one undifferentiated score",
     ]
