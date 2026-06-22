@@ -512,16 +512,29 @@ def test_check_final_upload_information_request_rejects_missing_dke_preflight_st
     )
     for marker in [
         "DKE official guide source recorded",
+        "DKE official guide source URL",
+        "DKE official guide rechecked date",
+        "DKE official guide constraints verified",
+        "ScienceDirect Data & Knowledge Engineering guide for authors",
+        "https://www.sciencedirect.com/journal/data-and-knowledge-engineering/publish/guide-for-authors",
+        "2026-06-22",
+        "DKE primary practical candidate recorded",
+        "Data & Knowledge Engineering",
+        "DKE provisional target status recorded",
+        "dke_preflight_ready_pending_author_confirmation",
         "Final selected-author-guide fields still require author confirmation",
         "Final target journal decision still requires author confirmation",
         "Final ranking/category confirmation still requires institutional source confirmation",
     ]:
         request_text = request_text.replace(f"- {marker}:", "")
+        request_text = request_text.replace(marker, "")
 
     errors = module.check_final_upload_information_request(request_text)
 
     assert any("DKE preflight source status" in error for error in errors)
     assert any("preflight preparation only" in error for error in errors)
+    assert any("ScienceDirect Data & Knowledge Engineering guide for authors" in error for error in errors)
+    assert any("dke_preflight_ready_pending_author_confirmation" in error for error in errors)
     assert any("Final target journal decision still requires author confirmation" in error for error in errors)
 
 

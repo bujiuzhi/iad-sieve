@@ -33,13 +33,15 @@ Source URLs must be public HTTP/HTTPS URLs and must not use placeholder domains 
 
 The DKE official-guide preflight source is already recorded in `submission_metadata.yml` as `dke_official_guide_source`, `dke_official_guide_source_url`, `dke_official_guide_rechecked`, and `dke_official_guide_constraints_verified`. These fields support preflight preparation only. They do not replace the final selected-author-guide fields or the author-confirmed target-journal decision.
 
-- DKE official guide source recorded:
-- DKE official guide source URL:
-- DKE official guide rechecked date:
-- DKE official guide constraints verified:
-- Final selected-author-guide fields still require author confirmation:
-- Final target journal decision still requires author confirmation:
-- Final ranking/category confirmation still requires institutional source confirmation:
+- DKE official guide source recorded: ScienceDirect Data & Knowledge Engineering guide for authors
+- DKE official guide source URL: https://www.sciencedirect.com/journal/data-and-knowledge-engineering/publish/guide-for-authors
+- DKE official guide rechecked date: 2026-06-22
+- DKE official guide constraints verified: true
+- DKE primary practical candidate recorded: Data & Knowledge Engineering
+- DKE provisional target status recorded: dke_preflight_ready_pending_author_confirmation
+- Final selected-author-guide fields still require author confirmation: yes
+- Final target journal decision still requires author confirmation: yes
+- Final ranking/category confirmation still requires institutional source confirmation: yes
 
 - Selected target journal:
 - Article type:
