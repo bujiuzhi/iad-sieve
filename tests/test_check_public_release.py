@@ -6,6 +6,7 @@ from pathlib import Path
 
 from scripts.check_public_release import (
     DOCUMENT_TRACE_PATTERNS,
+    check_data_pipeline_reproduction_boundary,
     check_docs_index_consistency,
     check_document_directory_scope,
     check_required_gitignore_patterns,
@@ -205,6 +206,42 @@ def test_check_root_readme_reproduction_levels_rejects_obsolete_levels(tmp_path:
     assert any(finding.snippet == "议题级混杂会显著增加科学实体匹配中的 false merge 风险" for finding in findings)
     assert any(finding.snippet == "Open-v2/Open-v3 是可复验的衍生压力评测框架" for finding in findings)
     assert any(finding.category == "root_readme_reproduction_missing_marker" for finding in findings)
+
+
+def test_check_data_pipeline_reproduction_boundary_accepts_reviewer_boundary(tmp_path: Path) -> None:
+    """验证数据处理文档明确区分 Git-only 与 artifact 复验边界。"""
+
+    _write_text(
+        tmp_path / "docs" / "data-processing-pipeline.md",
+        "\n".join(
+            [
+                "## 审稿复现判定",
+                "Git-only 审稿只能确认 L0 code check 和 L1 fixture rebuild，不能据此复核 Open-v2/Open-v3 主表数值。",
+                "Open-v2/Open-v3 主数值复核必须进入 L2 public-source rebuild 或 L3 result audit。",
+                "`configs/source_input_manifest.json`、`logs/processing_run_log.jsonl` 和 `checksums.sha256` 必须随外部 artifact release 一起发布。",
+                "未经外部 artifact release 固定的 `outputs/` 结果不能作为论文主表复验依据。",
+            ]
+        ),
+    )
+
+    findings = check_data_pipeline_reproduction_boundary(tmp_path)
+
+    assert findings == []
+
+
+def test_check_data_pipeline_reproduction_boundary_rejects_git_only_result_claim(tmp_path: Path) -> None:
+    """验证数据处理文档缺少 artifact 复验边界时会被拦截。"""
+
+    _write_text(
+        tmp_path / "docs" / "data-processing-pipeline.md",
+        "## 复现边界\nGit 仓库提供数据处理代码。\n",
+    )
+
+    findings = check_data_pipeline_reproduction_boundary(tmp_path)
+
+    assert any(finding.category == "data_pipeline_reproduction_boundary_missing_marker" for finding in findings)
+    assert any("L2 public-source rebuild" in finding.snippet for finding in findings)
+    assert any("checksums.sha256" in finding.snippet for finding in findings)
 
 
 def test_check_required_gitignore_patterns_requires_texput_outputs(tmp_path: Path) -> None:

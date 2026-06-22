@@ -280,3 +280,11 @@ python -m iad_sieve.cli build-iad-bench-source-bias-diagnostic \
 - 论文主实验的大规模输出和模型权重。
 
 正式论文复验应配套 artifact release，包含 manifest、checksum、处理日期、提交哈希、依赖版本和运行命令。
+
+## 审稿复现判定
+
+审稿人只拿到 Git 仓库时，Git-only 审稿只能确认 L0 code check 和 L1 fixture rebuild：源码入口、测试、小型 fixture、schema 和数据处理 CLI 可以运行，不能据此复核 Open-v2/Open-v3 主表数值。
+
+Open-v2/Open-v3 主数值复核必须进入 L2 public-source rebuild 或 L3 result audit。L2 需要审计公开输入、处理命令、输出摘要和 checksum；L3 需要审计已经发布的表格、预测、阈值日志、配置、运行日志、manifest 和 checksum。
+
+`configs/source_input_manifest.json`、`logs/processing_run_log.jsonl` 和 `checksums.sha256` 必须随外部 artifact release 一起发布。未经外部 artifact release 固定的 `outputs/` 结果不能作为论文主表复验依据。

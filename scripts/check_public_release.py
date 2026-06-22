@@ -133,6 +133,15 @@ ROOT_README_REPRODUCTION_FORBIDDEN_MARKERS = (
     "Open-v2/Open-v3 是可复验的衍生压力评测框架",
 )
 
+DATA_PIPELINE_REPRODUCTION_REQUIRED_MARKERS = (
+    "## 审稿复现判定",
+    "Git-only 审稿只能确认 L0 code check 和 L1 fixture rebuild",
+    "不能据此复核 Open-v2/Open-v3 主表数值",
+    "Open-v2/Open-v3 主数值复核必须进入 L2 public-source rebuild 或 L3 result audit",
+    "`configs/source_input_manifest.json`、`logs/processing_run_log.jsonl` 和 `checksums.sha256` 必须随外部 artifact release 一起发布",
+    "未经外部 artifact release 固定的 `outputs/` 结果不能作为论文主表复验依据",
+)
+
 
 @dataclass(frozen=True)
 class RiskPattern:
@@ -640,6 +649,37 @@ def check_root_readme_reproduction_levels(project_root: Path) -> list[Finding]:
     return findings
 
 
+def check_data_pipeline_reproduction_boundary(project_root: Path) -> list[Finding]:
+    """检查数据处理文档是否明确 Git-only 与 artifact 复验边界。
+
+    参数:
+        project_root: 项目根目录。
+
+    返回:
+        数据处理复现边界缺失时返回发现项列表。
+    """
+
+    data_pipeline_path = project_root / "docs" / "data-processing-pipeline.md"
+    if not data_pipeline_path.exists():
+        return []
+
+    data_pipeline_text = "\n".join(safe_read_lines(data_pipeline_path))
+    findings: list[Finding] = []
+    for marker in DATA_PIPELINE_REPRODUCTION_REQUIRED_MARKERS:
+        if marker in data_pipeline_text:
+            continue
+        findings.append(
+            Finding(
+                path=data_pipeline_path,
+                line_number=0,
+                category="data_pipeline_reproduction_boundary_missing_marker",
+                message="数据处理文档缺少 Git-only 与 artifact 复验边界说明",
+                snippet=marker,
+            )
+        )
+    return findings
+
+
 def check_required_gitignore_patterns(project_root: Path) -> list[Finding]:
     """检查临时构建产物是否被 .gitignore 明确排除。
 
@@ -861,6 +901,7 @@ def run_public_release_check(project_root: Path, max_size_mb: float) -> int:
     unexpected_document_findings = check_document_directory_scope(resolved_root)
     docs_index_findings = check_docs_index_consistency(resolved_root)
     root_readme_reproduction_findings = check_root_readme_reproduction_levels(resolved_root)
+    data_pipeline_reproduction_findings = check_data_pipeline_reproduction_boundary(resolved_root)
     gitignore_findings = check_required_gitignore_patterns(resolved_root)
     tracked_scope_findings = check_tracked_release_scope(resolved_root)
     large_file_findings = find_large_files(resolved_root, max_size_mb)
@@ -871,6 +912,7 @@ def run_public_release_check(project_root: Path, max_size_mb: float) -> int:
         + unexpected_document_findings
         + docs_index_findings
         + root_readme_reproduction_findings
+        + data_pipeline_reproduction_findings
         + gitignore_findings
         + tracked_scope_findings
         + large_file_findings
