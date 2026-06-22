@@ -2119,7 +2119,7 @@ def test_check_contribution_evidence_summary_accepts_complete_summary() -> None:
             "The conclusion is a targeted pair-level conclusion.",
             "The paper reports hard-negative false-merge rate.",
             "Gold, proxy, silver, and manual-validation layers are separated.",
-            "The result includes same-work F1=0.980 and zero observed HNFMR.",
+            "The result includes same-work F1=0.980 and zero observed HNFMR in the hard-negative stratum.",
             "The manuscript makes not a broad method-ranking claim.",
         ]
     )
@@ -10505,7 +10505,7 @@ def test_check_submission_material_quantitative_summary_accepts_scoped_highlight
             "The manuscript reports an Open-v2 evidence snapshot.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
             "Single-space scientific representation baselines show HNFMR 0.790--0.999 on the full pair scope.",
-            "IAD-Risk reports same-work F1=0.980 and zero observed HNFMR on the held-out test scope, with ordinary FMR still reported separately as 0.001.",
+            "IAD-Risk reports same-work F1=0.980 and zero observed HNFMR in the held-out hard-negative stratum, with ordinary FMR still reported separately as 0.001.",
             "RoBERTa pair classification is treated as a strong supervised baseline.",
             "IAD-Risk is presented as an auditable relation-role design rather than a broad superiority claim.",
         ]
@@ -10526,7 +10526,7 @@ def test_check_submission_material_quantitative_summary_rejects_unscoped_highlig
             "The manuscript reports an Open-v2 evidence snapshot.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
             "Single-space scientific representation baselines show HNFMR 0.790--0.999 on the full pair scope.",
-            "IAD-Risk reports same-work F1=0.980 and zero observed HNFMR on the held-out test scope, with ordinary FMR still reported separately as 0.001.",
+            "IAD-Risk reports same-work F1=0.980 and zero observed HNFMR in the held-out hard-negative stratum, with ordinary FMR still reported separately as 0.001.",
         ]
     )
 
@@ -10553,7 +10553,7 @@ def test_check_submission_material_quantitative_summary_rejects_cover_letter_wit
         [
             "The manuscript reports an Open-v2 evidence snapshot.",
             "Single-space scientific representation baselines show HNFMR 0.790--0.999 on the full pair scope.",
-            "IAD-Risk reports same-work F1=0.980 and zero observed HNFMR on the held-out test scope.",
+            "IAD-Risk reports same-work F1=0.980 and zero observed HNFMR in the held-out hard-negative stratum.",
         ]
     )
 
@@ -10579,7 +10579,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
             "It evaluates IAD-Bench under an Open-v2 evidence snapshot.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
             "The RoBERTa pair-classifier row remains a strong supervised comparator and is not broad-superiority evidence.",
-            "The results include HNFMR 0.790--0.999 and zero observed HNFMR, with ordinary FMR still reported separately as 0.001.",
+            "The results include HNFMR 0.790--0.999 and zero observed HNFMR in the held-out hard-negative stratum, with ordinary FMR still reported separately as 0.001.",
             "The results support a conservative pair-level conclusion.",
             "Cluster-level quality claims require cluster artifacts before broad method-ranking claims.",
             r"\end{abstract}",
@@ -10587,7 +10587,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
             "IAD-Risk addresses a specific failure mode by separating identity and agenda evidence.",
             "It uses false-merge risk and supports targeted false-merge suppression.",
             "The results support a conservative pair-level conclusion.",
-            "The result includes HNFMR 0.790--0.999 and zero observed HNFMR, with ordinary FMR still reported separately as 0.001.",
+            "The result includes HNFMR 0.790--0.999 and zero observed HNFMR in the held-out hard-negative stratum, with ordinary FMR still reported separately as 0.001.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
             "The contribution includes a reproducible benchmark contract.",
             "It does not claim cluster-level deployment quality without cluster artifacts.",
@@ -10601,7 +10601,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
             "The framework is motivated by single-score matching.",
             "It exposes identity, agenda, and agenda-non-identity signals.",
             "The manuscript contributes IAD-Bench and reports an Open-v2 evidence snapshot.",
-            "The result includes HNFMR 0.790--0.999 and zero observed HNFMR, with ordinary FMR still reported separately as 0.001.",
+            "The result includes HNFMR 0.790--0.999 and zero observed HNFMR in the held-out hard-negative stratum, with ordinary FMR still reported separately as 0.001.",
             "The manuscript does not claim broad method superiority.",
             "RoBERTa pair classification is treated as a strong supervised baseline.",
             "IAD-Risk is presented as an auditable relation-role design rather than a broad superiority claim.",
@@ -10641,6 +10641,51 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
     )
 
     assert errors == []
+
+
+def test_check_editorial_claim_alignment_rejects_over_broad_zero_hnfmr_scope() -> None:
+    """验证首屏材料不能把 zero observed HNFMR 绑定到宽泛 held-out test scope。"""
+
+    module = _load_validate_manuscript_module()
+    title = "IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication"
+    manuscript_text = "\n".join(
+        [
+            rf"\title{{{title}}}",
+            r"\begin{abstract}",
+            "This paper studies scholarly data integration and identity-agenda confusion.",
+            "The results include zero observed HNFMR on the held-out test scope.",
+            r"\end{abstract}",
+            r"\section{Conclusion}",
+            "The conclusion keeps zero observed HNFMR in the held-out hard-negative stratum.",
+        ]
+    )
+    cover_letter_text = "\n".join(
+        [
+            title,
+            "The cover letter reports zero observed HNFMR on the held-out test scope.",
+        ]
+    )
+    highlights_text = "- Open-v2 held-out hard-negative scope: zero observed HNFMR; ordinary FMR=0.001."
+    keywords_text = "scholarly entity matching; false-merge risk"
+    metadata_text = "\n".join(
+        [
+            f'title: "{title}"',
+            "broad_method_ranking_claimed: false",
+            "silver_labels_claimed_as_human_gold: false",
+            "artifact_release_required_before_final_upload: true",
+        ]
+    )
+
+    errors = module.check_editorial_claim_alignment(
+        manuscript_text,
+        cover_letter_text,
+        highlights_text,
+        keywords_text,
+        metadata_text,
+    )
+
+    assert any("over-broad HNFMR scope" in error and "main abstract" in error for error in errors)
+    assert any("over-broad HNFMR scope" in error and "cover letter" in error for error in errors)
 
 
 def test_check_editorial_claim_alignment_rejects_abstract_without_scope_ranking_boundary() -> None:

@@ -1070,7 +1070,7 @@ def check_abstract_quantitative_evidence(manuscript_text: str) -> list[str]:
         "full pair scope",
         "same-work F1=0.980",
         "zero observed HNFMR",
-        "held-out test scope",
+        "held-out hard-negative stratum",
         "ordinary FMR still reported separately as 0.001",
     ]
     return [f"abstract missing bounded quantitative evidence marker: {marker}" for marker in required_markers if marker not in abstract_text]
@@ -1214,6 +1214,7 @@ def check_contribution_evidence_summary(manuscript_text: str) -> list[str]:
         "Gold, proxy, silver, and manual-validation layers",
         "same-work F1=0.980",
         "zero observed HNFMR",
+        "hard-negative stratum",
         "not a broad method-ranking claim",
     ]
     return [
@@ -6667,7 +6668,7 @@ def check_submission_material_quantitative_summary(highlights_text: str, cover_l
         "same-scope comparative ranking",
         "full pair scope",
         "same-work F1=0.980",
-        "held-out test scope",
+        "held-out hard-negative stratum",
         "RoBERTa pair classification is treated as a strong supervised baseline",
         "auditable relation-role design rather than a broad superiority claim",
     ]
@@ -6734,6 +6735,7 @@ def check_editorial_claim_alignment(
                 "broad-superiority evidence",
                 "HNFMR 0.790--0.999",
                 "zero observed HNFMR",
+                "held-out hard-negative stratum",
                 "ordinary FMR still reported separately as 0.001",
                 "pair-level conclusion",
                 "cluster artifacts",
@@ -6750,6 +6752,7 @@ def check_editorial_claim_alignment(
                 "targeted false-merge suppression",
                 "HNFMR 0.790--0.999",
                 "zero observed HNFMR",
+                "held-out hard-negative stratum",
                 "ordinary FMR still reported separately as 0.001",
                 "scope-bounded mechanism evidence",
                 "same-scope comparative ranking",
@@ -6770,6 +6773,7 @@ def check_editorial_claim_alignment(
                 "Open-v2 evidence snapshot",
                 "HNFMR 0.790--0.999",
                 "zero observed HNFMR",
+                "held-out hard-negative stratum",
                 "ordinary FMR still reported separately as 0.001",
                 "does not claim broad method superiority",
                 "RoBERTa pair classification is treated as a strong supervised baseline",
@@ -6818,6 +6822,17 @@ def check_editorial_claim_alignment(
         for marker in required_markers:
             if marker.lower() not in lowered_text:
                 errors.append(f"editorial claim alignment missing marker in {document_name}: {marker}")
+    unsafe_zero_hnfmr_scope_phrases = [
+        "zero observed HNFMR on the held-out test scope",
+    ]
+    for document_name, document_text in {
+        "main abstract": abstract_text,
+        "main conclusion": conclusion_text,
+        "cover letter": cover_letter_text,
+    }.items():
+        for phrase in unsafe_zero_hnfmr_scope_phrases:
+            if phrase.lower() in document_text.lower():
+                errors.append(f"editorial claim alignment uses over-broad HNFMR scope in {document_name}: {phrase}")
     return errors
 
 
