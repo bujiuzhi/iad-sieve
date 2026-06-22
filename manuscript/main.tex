@@ -482,8 +482,10 @@ The complete row-family artifact crosswalk is reported in the supplementary mate
 
 \subsection{Main Open-v2 Results}
 
+The Scope type column is part of the result interpretation: full Open-v2 rows and held-out test rows support a mechanism comparison, not a cross-row ranking.
+
 \begin{table}[H]
-\caption{Open-v2 evidence snapshot. Lower false-merge rate is better. Rows are reported only when supported by current output summaries; the scope type column marks whether a row uses the full available Open-v2 scope or the held-out Open-v2 test scope, so rows with different scopes support mechanism interpretation rather than a cross-row ranking. The Denom. audit column means that same-work F1, FMR, and HNFMR denominators must be present in the corresponding \texttt{open\_v2\_main\_results} artifact row before numerical audit.}
+\caption{Open-v2 evidence snapshot. Lower false-merge rate is better. Scope type separates full Open-v2 and held-out test rows. The Denom. audit column means that same-work F1, FMR, and HNFMR denominators must be present in the corresponding \texttt{open\_v2\_main\_results} artifact row before numerical audit.}
 \label{tab:openv2-results}
 \centering
 \footnotesize
