@@ -5705,12 +5705,47 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "## Current Blocking Items",
             "Target journal has not been author-confirmed.",
             "Artifact release URL or DOI has not been created.",
+            "## Blocking Evidence Matrix",
+            "Required evidence before final upload",
+            "Source field or file",
+            "Current status",
+            "Pending author confirmation",
+            "Pending real artifact release",
+            "Pending live system verification",
+            "final_upload_checklist.target_journal_selected",
+            "final_upload_checklist.manuscript_pdf_rebuilt_after_template",
+            "author_identity_materials.biography_files",
+            "artifact_boundary.artifact_release_url",
+            "upload_preparation.live_submission_system_verified",
+            "final_upload_checklist.first_screen_claim_lockdown_confirmed",
         ]
     )
 
     errors = module.check_submission_system_checklist(checklist_text)
 
     assert errors == []
+
+
+def test_check_submission_system_checklist_rejects_missing_blocking_evidence_matrix() -> None:
+    """验证投稿系统清单必须保留最终上传阻塞项证据矩阵。"""
+
+    module = _load_validate_manuscript_module()
+    checklist_text = Path("manuscript/submission_system_checklist.md").read_text(encoding="utf-8")
+    checklist_text = checklist_text.replace("## Blocking Evidence Matrix", "## Blocking Notes")
+    checklist_text = checklist_text.replace(
+        "Required evidence before final upload",
+        "Required evidence",
+    )
+    checklist_text = checklist_text.replace(
+        "artifact_boundary.artifact_release_url",
+        "artifact release URL",
+    )
+
+    errors = module.check_submission_system_checklist(checklist_text)
+
+    assert any("Blocking Evidence Matrix" in error for error in errors)
+    assert any("Required evidence before final upload" in error for error in errors)
+    assert any("artifact_boundary.artifact_release_url" in error for error in errors)
 
 
 def test_check_submission_system_checklist_rejects_missing_article_type_controlled_values() -> None:

@@ -1,6 +1,6 @@
 # Submission System Checklist
 
-Updated: 2026-06-19
+Updated: 2026-06-22
 
 ## Scope
 
@@ -163,3 +163,14 @@ Before upload, verify:
 - Final template-specific PDFs have not been rebuilt.
 - Submission-system file upload has not been checked against a live journal system.
 - Artifact release URL or DOI has not been created.
+
+## Blocking Evidence Matrix
+
+| Blocking item | Required evidence before final upload | Source field or file | Current status |
+| --- | --- | --- | --- |
+| Target journal and ranking/category confirmation | Author-confirmed selected journal, selected author-guide source URL, author-guide recheck date, and ranking/category source with checked date. | `submission_metadata.yml`: `final_upload_checklist.target_journal_selected`, `target_preparation.selected_author_guide_source`, `target_preparation.selected_author_guide_source_url`, `target_preparation.selected_author_guide_rechecked_date`, `target_preparation.ranking_confirmation_completed`, `target_preparation.ranking_confirmation_source_url`, `target_preparation.selected_target_author_confirmed`; `target_journal_shortlist.md`. | Pending author confirmation and ranking/category evidence. |
+| Journal template and rebuilt PDFs | Selected journal template is applied to the manuscript source, and final manuscript and supplementary PDFs are rebuilt from that source. | `submission_metadata.yml`: `submission.target_journal_template_bound`, `final_upload_checklist.target_journal_template_applied`, `final_upload_checklist.manuscript_pdf_rebuilt_after_template`, `final_upload_checklist.supplementary_pdf_rebuilt_after_template`; `build/`. | Pending selected-template binding and final rebuild. |
+| Author identity metadata | Final author order, affiliations, corresponding author, ORCID values when used, biographies, and photographs are complete and match the title page and journal system. | `submission_metadata.yml`: `authors`, `corresponding_author`, `author_identity_materials.biography_files`, `author_identity_materials.photograph_files`, `author_identity_materials.author_identity_materials_verified`, `final_upload_checklist.author_metadata_completed`, `final_upload_checklist.author_biographies_and_photos_ready`. | Pending author-provided identity materials. |
+| Publisher declarations | Funding, CRediT contribution, competing-interest, permission, data/code availability, ethics, and generative AI declarations match the manuscript and live submission fields. | `submission_metadata.yml`: `funding.funding_statement`, `author_contributions.contribution_statement`, `permissions.permissions_statement`, `generative_ai.declaration_statement`, `statements.*`, `final_upload_checklist.funding_statement_text_ready`, `final_upload_checklist.contribution_statement_complete`, `final_upload_checklist.permissions_statement_complete`, `final_upload_checklist.generative_ai_declaration_complete`. | Pending author-approved declarations. |
+| Artifact release and public reference | Real artifact release URL or DOI resolves, release manifest records the publication object, and checksums validate before the URL or DOI is cited in submission files. | `submission_metadata.yml`: `artifact_boundary.artifact_release_url`, `artifact_boundary.artifact_release_doi`, `artifact_boundary.artifact_release_required_before_final_upload`, `final_upload_checklist.artifact_release_prepared_or_linked`; `artifact_release_manifest.template.json`; external release manifest. | Pending real artifact release. |
+| Live submission-system verification | Uploaded files, metadata fields, first-screen text, and final package preview are checked in the selected journal submission system. | `submission_metadata.yml`: `upload_preparation.live_submission_system_verified`, `upload_preparation.final_upload_package_verified_against_system`, `final_upload_checklist.submission_system_files_verified`, `final_upload_checklist.first_screen_claim_lockdown_confirmed`; `submission_system_checklist.md`. | Pending live system verification. |
