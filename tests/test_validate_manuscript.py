@@ -6324,6 +6324,7 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "It does not use `review_article`, `case_report`, or another article-type value.",
             "`selected_author_guide_source`, non-placeholder `selected_author_guide_source_url`, `selected_author_guide_rechecked_date`, and `selected_template_requirements_confirmed` are complete before final upload.",
             "`ranking_confirmation_completed`, `ranking_confirmation_source`, non-placeholder `ranking_confirmation_source_url`, `ranking_confirmation_checked_date`, and `selected_target_author_confirmed` are complete before final upload.",
+            "The Q2/B ranking evidence packet records the selected journal ISSN or eISSN, ranking source type, subject category, reported category value, ranking source URL or institutional system URL, ranking source access date, evidence export or screenshot path, and responsible author confirmation; publisher CiteScore, Impact Factor, aims-and-scope text, and this checklist are screening evidence only.",
             "`review_mode` records the live submission-system review setting.",
             "`review_mode` uses an author-visible final-upload value.",
             "single_anonymized_with_final_author_identities",
@@ -6403,6 +6404,25 @@ def test_check_submission_system_checklist_rejects_missing_article_type_controll
     assert any("article_type" in error and "research_article" in error for error in errors)
     assert any("review_article" in error for error in errors)
     assert any("case_report" in error for error in errors)
+
+
+def test_check_submission_system_checklist_rejects_missing_q2b_ranking_evidence_packet() -> None:
+    """验证投稿系统清单必须核对 Q2/B 排名证据包字段。"""
+
+    module = _load_validate_manuscript_module()
+    checklist_text = Path("manuscript/submission_system_checklist.md").read_text(encoding="utf-8")
+    checklist_text = checklist_text.replace(
+        "The Q2/B ranking evidence packet records the selected journal ISSN or eISSN, ranking source type, subject category, reported category value, ranking source URL or institutional system URL, ranking source access date, evidence export or screenshot path, and responsible author confirmation; publisher CiteScore, Impact Factor, aims-and-scope text, and this checklist are screening evidence only.",
+        "",
+    )
+
+    errors = module.check_submission_system_checklist(checklist_text)
+
+    assert any("Q2/B ranking evidence packet" in error for error in errors)
+    assert any("selected journal ISSN or eISSN" in error for error in errors)
+    assert any("subject category" in error for error in errors)
+    assert any("evidence export or screenshot path" in error for error in errors)
+    assert any("screening evidence only" in error for error in errors)
 
 
 def test_check_submission_system_checklist_rejects_missing_public_link_policy() -> None:

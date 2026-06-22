@@ -112,17 +112,18 @@ Before upload, verify:
 2. `target_journal_template_bound` is true and the selected journal template matches the final manuscript source.
 3. `selected_author_guide_source`, non-placeholder `selected_author_guide_source_url`, `selected_author_guide_rechecked_date`, and `selected_template_requirements_confirmed` are complete before final upload.
 4. `ranking_confirmation_completed`, `ranking_confirmation_source`, non-placeholder `ranking_confirmation_source_url`, `ranking_confirmation_checked_date`, and `selected_target_author_confirmed` are complete before final upload.
-5. `review_mode` records the live submission-system review setting whenever `review_mode_confirmed` is true. For single-anonymized routes such as DKE, Information Systems, or Scientometrics, `review_mode` uses an author-visible final-upload value such as `single_anonymized_with_final_author_identities` or `single_anonymized_author_visible_final_upload`; do not use `anonymous_review` or a generic `single_anonymized` value for final upload. The final title page and submission-system fields include author identities; the anonymous package is only a preflight package.
-6. The author list, order, affiliations, ORCID values, and corresponding author match the title page.
-7. The funding statement text is completed and matches the manuscript and submission system.
-8. The author contribution statement is completed and matches the final author list.
-9. The permissions statement records whether third-party material permission is not required or lists the permission files needed by the journal.
-10. The generative AI declaration statement is complete and matches the selected journal's live submission field.
-11. Author biographies and photographs are ready when the selected DKE/Elsevier route requests them, each biography has a maximum 100 words, each biography file uses an editable format and must not be PDF, and `author_identity_materials.biography_files`, `author_identity_materials.photograph_files`, and `author_identity_materials.author_identity_materials_verified` record the external materials.
-12. The competing-interest statement, Elsevier competing-interest declaration file, data/code availability statement, and ethics statement are consistent across the manuscript and system fields.
-13. The artifact release URL or DOI resolves publicly or according to the journal's access policy, the artifact release URL is a public non-placeholder HTTP/HTTPS URL when a URL is used, and the artifact manifest `publication.public_access_status` records that public access state.
-14. `live_submission_system_verified` and `final_upload_package_verified_against_system` are true only after the live submission system preview and final package contents match the current source package.
-15. The manuscript does not claim human gold labels, broad method superiority, or threshold stability unless the corresponding artifact evidence exists.
+5. The Q2/B ranking evidence packet records the selected journal ISSN or eISSN, ranking source type, subject category, reported category value, ranking source URL or institutional system URL, ranking source access date, evidence export or screenshot path, and responsible author confirmation; publisher CiteScore, Impact Factor, aims-and-scope text, and this checklist are screening evidence only.
+6. `review_mode` records the live submission-system review setting whenever `review_mode_confirmed` is true. For single-anonymized routes such as DKE, Information Systems, or Scientometrics, `review_mode` uses an author-visible final-upload value such as `single_anonymized_with_final_author_identities` or `single_anonymized_author_visible_final_upload`; do not use `anonymous_review` or a generic `single_anonymized` value for final upload. The final title page and submission-system fields include author identities; the anonymous package is only a preflight package.
+7. The author list, order, affiliations, ORCID values, and corresponding author match the title page.
+8. The funding statement text is completed and matches the manuscript and submission system.
+9. The author contribution statement is completed and matches the final author list.
+10. The permissions statement records whether third-party material permission is not required or lists the permission files needed by the journal.
+11. The generative AI declaration statement is complete and matches the selected journal's live submission field.
+12. Author biographies and photographs are ready when the selected DKE/Elsevier route requests them, each biography has a maximum 100 words, each biography file uses an editable format and must not be PDF, and `author_identity_materials.biography_files`, `author_identity_materials.photograph_files`, and `author_identity_materials.author_identity_materials_verified` record the external materials.
+13. The competing-interest statement, Elsevier competing-interest declaration file, data/code availability statement, and ethics statement are consistent across the manuscript and system fields.
+14. The artifact release URL or DOI resolves publicly or according to the journal's access policy, the artifact release URL is a public non-placeholder HTTP/HTTPS URL when a URL is used, and the artifact manifest `publication.public_access_status` records that public access state.
+15. `live_submission_system_verified` and `final_upload_package_verified_against_system` are true only after the live submission system preview and final package contents match the current source package.
+16. The manuscript does not claim human gold labels, broad method superiority, or threshold stability unless the corresponding artifact evidence exists.
 
 ## Live Submission Text Checks
 
