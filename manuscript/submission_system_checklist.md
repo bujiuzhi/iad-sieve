@@ -38,7 +38,7 @@ Before linking an external artifact release, verify:
 5. Required tables, predictions, reports, configs, and logs have replaced all skeleton placeholders.
 6. `python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release` refreshes `manifest.json` and `checksums.sha256`.
 7. `python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release` passes.
-8. `python -m iad_sieve.cli --help` passes from the same repository checkout named by the release manifest.
+8. `python -m pip install -e .` is run from the same repository checkout named by the release manifest, and `python -m iad_sieve.cli --help` then passes from that environment.
 9. `manifest.json` records the release commit, source-tree cleanliness, required artifact IDs, claim boundaries, and SHA256 values for required artifacts.
 10. `manifest.json` contains a `publication` object whose `artifact_release_url`, `artifact_release_doi`, and `public_access_status` match the final-upload metadata and public release record.
 11. `checksums.sha256` covers every release file except itself and matches the file contents.

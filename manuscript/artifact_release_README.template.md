@@ -31,6 +31,7 @@ Run these commands from the repository root after unpacking the release:
 
 ```bash
 cd /path/to/iad-sieve
+python -m pip install -e .
 python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts --preflight-only
 python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts
 python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release

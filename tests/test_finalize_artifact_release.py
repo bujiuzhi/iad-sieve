@@ -337,6 +337,7 @@ def test_finalize_artifact_release_restores_required_validation_command(tmp_path
 
     finalized_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     validation_text = "\n".join(finalized_manifest["minimum_validation_commands"])
+    assert "python -m pip install -e ." in validation_text
     assert "python manuscript/scripts/finalize_artifact_release.py --artifact-dir" in validation_text
     assert validator.validate_artifact_release(artifact_dir, MANIFEST_TEMPLATE_PATH) == []
 

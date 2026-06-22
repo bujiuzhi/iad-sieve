@@ -88,6 +88,7 @@ paper-artifacts/
 
 ```bash
 sha256sum -c checksums.sha256
+python -m pip install -e .
 python -m iad_sieve.cli --help
 ```
 

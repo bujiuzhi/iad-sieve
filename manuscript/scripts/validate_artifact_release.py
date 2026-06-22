@@ -31,6 +31,7 @@ REQUIRED_README_MARKERS = {
     "checksum file": "checksums.sha256",
     "checksum command": "sha256sum -c checksums.sha256",
     "validator command": "python manuscript/scripts/validate_artifact_release.py --artifact-dir",
+    "editable install command": "python -m pip install -e .",
     "cli discovery command": "python -m iad_sieve.cli --help",
     "repository commit": "Repository commit",
     "claim boundaries": "Claim Boundaries",
@@ -1804,6 +1805,7 @@ def check_manifest_structure(
         validation_text = "\n".join(str(command) for command in validation_commands)
         for command in [
             "sha256sum -c checksums.sha256",
+            "python -m pip install -e .",
             "python manuscript/scripts/validate_artifact_release.py --artifact-dir",
             "python manuscript/scripts/populate_artifact_release.py --artifact-dir",
             "python manuscript/scripts/finalize_artifact_release.py --artifact-dir",

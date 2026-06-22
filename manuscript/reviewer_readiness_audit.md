@@ -770,7 +770,7 @@ The reviewer-facing boundary is interval auditability, not a new statistical res
 
 Outcome: pass for artifact release CLI discovery command consistency; blocked for final artifact publication until a real release directory passes the updated release validator.
 
-This gate checks whether the artifact release README command block and manifest command list can drift on the executable Git-only entry point. They cannot. The release README template, release README validator, artifact release validator, manuscript validator, and tests now require `python -m iad_sieve.cli --help` in the release `minimum_validation_commands` path, so reviewers can verify installable CLI discovery before artifact validation, fixture rebuild, or full result-audit commands are run.
+This gate checks whether the artifact release README command block and manifest command list can drift on the executable Git-only entry point. They cannot. The release README template, release README validator, artifact release validator, manuscript validator, and tests now require `python -m pip install -e .` followed by `python -m iad_sieve.cli --help` in the release `minimum_validation_commands` path, so reviewers can verify installable CLI discovery before artifact validation, fixture rebuild, or full result-audit commands are run.
 
 The reviewer-facing boundary is command discoverability, not new empirical evidence. This gate only proves that Git-only reviewers can verify CLI discovery before artifact validation; it does not prove the Open-v2 numerical table, external prediction files, bootstrap intervals, or final artifact URL/DOI. Those remain gated by the populated external artifact release, checksums, command logs, publication metadata, and final-upload package validation.
 
@@ -778,7 +778,7 @@ The reviewer-facing boundary is command discoverability, not new empirical evide
 
 Outcome: pass for submission-system checklist alignment; blocked for final upload until the live journal system and real artifact release are verified.
 
-This gate checks whether the final-upload checklist can omit the CLI discovery command while the artifact release README and manifest require it. It cannot. The submission-system checklist now requires `python -m iad_sieve.cli --help` from the same repository checkout named by the release manifest, immediately after artifact release validation and before final upload checks that depend on executable repository entry points.
+This gate checks whether the final-upload checklist can omit the CLI discovery command while the artifact release README and manifest require it. It cannot. The submission-system checklist now requires `python -m pip install -e .` and then `python -m iad_sieve.cli --help` from the same repository checkout named by the release manifest, immediately after artifact release validation and before final upload checks that depend on executable repository entry points.
 
 The reviewer-facing boundary is final-upload procedure consistency, not new evidence. The checklist alignment helps prevent a manual submission workflow from skipping installable CLI discovery, but it does not validate the external artifact URL or DOI, author metadata, selected journal template, or live submission-system preview. Those remain required before upload.
 

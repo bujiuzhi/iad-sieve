@@ -714,6 +714,7 @@ def test_check_final_upload_information_request_rejects_missing_artifact_process
         "input_manifest_reference",
         "output_path",
         "exit_status",
+        "`python -m pip install -e .`",
         "`python -m iad_sieve.cli --help`",
         "Processing code path and release manifest commit match the final repository commit",
         "Raw third-party data is not redistributed unless provider terms allow redistribution",
@@ -725,6 +726,7 @@ def test_check_final_upload_information_request_rejects_missing_artifact_process
     assert any("Artifact processing provenance" in error for error in errors)
     assert any("configs/source_input_manifest.json" in error for error in errors)
     assert any("logs/processing_run_log.jsonl" in error for error in errors)
+    assert any("python -m pip install -e ." in error for error in errors)
 
 
 def test_check_final_upload_information_request_rejects_missing_text_consistency() -> None:
@@ -5059,6 +5061,7 @@ def test_check_artifact_release_manifest_template_accepts_complete_template() ->
                 "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
                 "sha256sum -c checksums.sha256",
                 "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
+                "python -m pip install -e .",
                 "python -m iad_sieve.cli --help",
                 "python manuscript/scripts/validate_manuscript.py --strict-latex",
                 "python manuscript/scripts/verify_fixture_rebuild.py",
@@ -5145,6 +5148,7 @@ def test_check_artifact_release_manifest_template_rejects_unsafe_data_policy() -
     assert any("raw_third_party_data_included" in error for error in errors)
     assert any("iad_risk_predictions" in error for error in errors)
     assert any("sha256sum -c checksums.sha256" in error for error in errors)
+    assert any("python -m pip install -e ." in error for error in errors)
     assert any("python -m iad_sieve.cli --help" in error for error in errors)
 
 
@@ -5191,6 +5195,7 @@ def test_check_artifact_release_manifest_template_rejects_missing_cluster_claim_
                 "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
                 "sha256sum -c checksums.sha256",
                 "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
+                "python -m pip install -e .",
                 "python -m iad_sieve.cli --help",
                 "python manuscript/scripts/validate_manuscript.py --strict-latex",
                 "python manuscript/scripts/verify_fixture_rebuild.py",
@@ -5273,6 +5278,7 @@ def test_check_artifact_release_manifest_template_rejects_missing_conditional_cl
                 "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
                 "sha256sum -c checksums.sha256",
                 "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
+                "python -m pip install -e .",
                 "python -m iad_sieve.cli --help",
                 "python manuscript/scripts/validate_manuscript.py --strict-latex",
                 "python manuscript/scripts/verify_fixture_rebuild.py",
@@ -5331,6 +5337,7 @@ def test_check_artifact_release_readme_template_accepts_complete_template() -> N
             "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
             "sha256sum -c checksums.sha256",
             "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
+            "python -m pip install -e .",
             "python -m iad_sieve.cli --help",
             "python manuscript/scripts/validate_manuscript.py --strict-latex",
             "python manuscript/scripts/verify_fixture_rebuild.py",
@@ -6067,6 +6074,7 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "python manuscript/scripts/populate_artifact_release.py --artifact-dir /path/to/release --source-dir /path/to/source-artifacts",
             "python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/release",
             "python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release",
+            "python -m pip install -e .",
             "python -m iad_sieve.cli --help",
             "same repository checkout named by the release manifest",
             "`manifest.json` contains a `publication` object whose `artifact_release_url`, `artifact_release_doi`, and `public_access_status` match the final-upload metadata.",
@@ -6640,6 +6648,7 @@ def test_check_submission_system_checklist_rejects_missing_artifact_release_chec
 
     assert any("Artifact Release Package Checks" in error for error in errors)
     assert any("validate_artifact_release.py" in error for error in errors)
+    assert any("python -m pip install -e ." in error for error in errors)
     assert any("python -m iad_sieve.cli --help" in error for error in errors)
 
 
@@ -6649,6 +6658,7 @@ def test_check_submission_system_checklist_rejects_missing_artifact_cli_discover
     module = _load_validate_manuscript_module()
     checklist_text = Path("manuscript/submission_system_checklist.md").read_text(encoding="utf-8")
     for marker in [
+        "python -m pip install -e .",
         "python -m iad_sieve.cli --help",
         "same repository checkout named by the release manifest",
     ]:
@@ -6656,6 +6666,7 @@ def test_check_submission_system_checklist_rejects_missing_artifact_cli_discover
 
     errors = module.check_submission_system_checklist(checklist_text)
 
+    assert any("python -m pip install -e ." in error for error in errors)
     assert any("python -m iad_sieve.cli --help" in error for error in errors)
     assert any("same repository checkout named by the release manifest" in error for error in errors)
 
@@ -7508,6 +7519,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "Open-v2 values remain point estimates",
             "## Readiness Gate 83: Artifact Release CLI Discovery Command Consistency Gate",
             "artifact release CLI discovery command consistency",
+            "`python -m pip install -e .`",
             "`python -m iad_sieve.cli --help`",
             "minimum_validation_commands",
             "README command block",

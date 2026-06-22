@@ -235,6 +235,7 @@ For each author, select the applicable CRediT roles and then draft the final aut
 
 - `configs/source_input_manifest.json` completed with source acquisition date or version, original provider, local file boundary, license boundary, safe relative local file names, and SHA256 checksums:
 - `logs/processing_run_log.jsonl` completed with command line, environment summary, random seed or not_applicable, started_at, finished_at, input_manifest_reference, output_path, and exit_status:
+- `python -m pip install -e .` run from final source checkout:
 - `python -m iad_sieve.cli --help` run from final source checkout:
 - Processing code path and release manifest commit match the final repository commit:
 - Raw third-party data is not redistributed unless provider terms allow redistribution:
