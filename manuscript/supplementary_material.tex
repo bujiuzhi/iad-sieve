@@ -1014,14 +1014,14 @@ Availability class & Included location & Evaluation use \\
 \midrule
 Source code and CLI entry points & Project repository. & Supports installation, schema checks, fixture rebuilds, baseline execution, model training entry points, and manuscript builds. \\
 Small public fixtures and schema contracts & Project repository. & Supports L0/L1 code-level reproduction without downloading full raw datasets. \\
-Raw third-party source files & Excluded from Git; obtained from original providers. & Raw third-party data remain governed by original provider licenses and access conditions. \\
+Raw third-party source files & Excluded from Git; obtained from original providers. & Raw third-party data remain governed by original provider licenses and access conditions; released artifacts should not redistribute raw provider files unless source terms explicitly allow redistribution. \\
 Full prediction files and model checkpoints & Excluded from Git unless provided through an external artifact release. & Prevents large local outputs from being treated as repository source files. \\
 Derived evaluation artifacts & External artifact release. & Supports L2/L3 result-level audit through source input manifests, processing run logs, prediction files, threshold logs, manifests, checksums, and commit identifiers. \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Full numerical reproduction requires public-source rebuilds or released artifacts; the Git repository alone supports code-level checks, fixture behavior, schema validation, and manuscript builds.
+Full numerical reproduction requires public-source rebuilds or released artifacts; the Git repository alone supports code-level checks, fixture behavior, schema validation, and manuscript builds. The release should expose derived outputs, source input manifests, processing run logs, and checksums rather than raw provider files unless the original source terms explicitly permit redistribution.
 
 \section{Claim Boundary}
 

@@ -4,10 +4,12 @@ This template is for the external result artifact release associated with "IAD-R
 
 ## Data Policy
 
-Do not include raw third-party data.
+Do not include raw third-party data by default.
 Do not include model checkpoints.
 Do not include credentials, personal identifiers, or local paths.
 Include only derived evaluation artifacts that can be redistributed under the release policy.
+Redistribute derived tables, predictions, logs, manifests, and checksums rather than raw provider files unless the original provider terms explicitly allow redistribution.
+Record the original provider, acquisition date or version, license boundary, local file boundary, and SHA256 checksum for each public input in `configs/source_input_manifest.json`.
 
 ## Required Top-Level Files
 

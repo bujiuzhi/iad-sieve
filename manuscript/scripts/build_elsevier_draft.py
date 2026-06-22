@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import logging
+import os
 import re
 import subprocess
 from pathlib import Path
@@ -176,8 +177,13 @@ def run_tectonic(output_tex: Path, output_pdf: Path) -> None:
     异常:
         RuntimeError: Raised when tectonic fails or the PDF is missing.
     """
+    command = ["tectonic"]
+    bundle_dir = os.environ.get("TECTONIC_BUNDLE_DIR")
+    if bundle_dir:
+        command.extend(["--bundle", bundle_dir])
+    command.append(output_tex.name)
     try:
-        subprocess.run(["tectonic", output_tex.name], cwd=output_tex.parent, check=True)
+        subprocess.run(command, cwd=output_tex.parent, check=True)
     except FileNotFoundError as exc:
         raise RuntimeError("tectonic is required to build the Elsevier preview PDF") from exc
     except subprocess.CalledProcessError as exc:

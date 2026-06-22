@@ -17,9 +17,18 @@ run_and_log() {
   fi
 }
 
-run_and_log build/logs/main.log tectonic main.tex
+run_tectonic() {
+  local input_path="$1"
+  if [[ -n "${TECTONIC_BUNDLE_DIR:-}" ]]; then
+    tectonic --bundle "$TECTONIC_BUNDLE_DIR" "$input_path"
+  else
+    tectonic "$input_path"
+  fi
+}
+
+run_and_log build/logs/main.log run_tectonic main.tex
 mv main.pdf build/iad-risk-manuscript-latex.pdf
-run_and_log build/logs/supplementary_material.log tectonic supplementary_material.tex
+run_and_log build/logs/supplementary_material.log run_tectonic supplementary_material.tex
 mv supplementary_material.pdf build/iad-risk-supplementary-material.pdf
 run_and_log build/logs/elsevier_draft.log python scripts/build_elsevier_draft.py
 python scripts/check_latex_warnings.py \

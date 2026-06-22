@@ -67,6 +67,8 @@ python manuscript/scripts/validate_submission_package.py --dke-preflight
 
 `artifact_release_manifest.template.json` 和 `artifact_release_README.template.md` 用于准备正式 artifact release，不作为当前匿名预投稿包的替代物。`scripts/build_artifact_release_skeleton.py` 只生成外部 release 骨架；真实结果应从不纳入 Git 的 source artifact 目录先通过 `scripts/populate_artifact_release.py --preflight-only` 做只读完整性检查，再通过 `scripts/populate_artifact_release.py` 填充。填入真实结果 artifact 后，应使用 `scripts/finalize_artifact_release.py` 刷新 manifest 和 checksum。正式上传前应创建真实公开链接，并用 `scripts/validate_artifact_release.py` 校验 release 目录。最终上传还要求 artifact `manifest.json` 的 `publication.artifact_release_url`、`publication.artifact_release_doi` 和 `publication.public_access_status` 与 `submission_metadata.yml`、投稿信和 live submission-system data statement 保持一致；repository URL、artifact release URL 和 `publication.artifact_release_url` 均不得使用 `example.org`、`localhost`、`.test` 或 `.invalid` 等示例或本地域名。
 
+外部 artifact release 应发布派生表格、预测文件、日志、manifest 和 checksum，而不是原始第三方来源文件，除非原始来源条款明确允许再分发。`configs/source_input_manifest.json` 必须记录每个公开输入的 original provider、acquisition date or version、local file boundary、license boundary 和 SHA256 checksum，确保审稿人能复核来源边界而不要求 Git 仓库包含原始数据。
+
 Artifact release 的 `repository.commit` 必须是 7 到 40 位十六进制 Git 提交号。`scripts/build_artifact_release_skeleton.py` 和 `scripts/validate_artifact_release.py` 都会拒绝默认模板值或非 Git SHA 文本，避免外部结果包无法追溯到明确代码版本。
 
 `open_v2_main_results` 是主结果表对应的外部结果 artifact。正式 artifact release 中的 CSV 必须包含 per-row denominator counts、per-row threshold source、scope label used in the main table、automatic merge count、block count、defer count、automatic merge coverage、defer rate 和 capacity-normalized review load，确保主结果表不是仅由文件名和 checksum 支撑，而是可按行追溯 denominator、阈值来源、评价范围、选择性决策覆盖率和人工复核负担边界。

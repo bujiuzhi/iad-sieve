@@ -231,7 +231,10 @@ def test_check_declaration_statements_accepts_complete_declarations() -> None:
             "The source code, benchmark construction scripts, schema contracts, fixture tests,",
             "and artifact-release guidance are available for audit.",
             "Raw third-party data are not redistributed in Git.",
+            "The original sources have their own access conditions and licenses.",
             "The release records data-processing commands, manifests, checksums, and commit identifiers.",
+            "The release records source_input_manifest and license boundary fields.",
+            "External artifacts redistribute derived tables, predictions, logs, manifests, and checksums rather than raw provider files.",
             r"\section*{Ethics Statement}",
             "This study uses public scholarly metadata and does not involve human participants,",
             "clinical records, private user behavior, or sensitive personal information.",
@@ -670,6 +673,10 @@ def test_check_data_code_availability_boundary_accepts_complete_boundary() -> No
             "The statement distinguishes L0/L1 code-level reproduction from L2/L3 result-level audit.",
             "The statement names the data-processing path.",
             "The statement says raw data or full experiment outputs are not redistributed.",
+            "The original sources have their own access conditions and licenses.",
+            "The release redistributes derived tables, predictions, logs, manifests, and checksums rather than raw provider files.",
+            "The release does this unless the original provider terms explicitly allow redistribution.",
+            "The release records the license boundary.",
             "The statement says full numerical reproduction requires public-source rebuilds or released artifacts.",
         ]
     )
@@ -689,6 +696,8 @@ def test_check_data_code_availability_boundary_accepts_complete_boundary() -> No
             "processing run logs",
             "prediction files, threshold logs, manifests, checksums, and commit identifiers",
             "raw third-party data remain governed by original provider licenses",
+            "released artifacts should not redistribute raw provider files unless source terms explicitly allow redistribution",
+            "source terms explicitly permit redistribution",
             "full numerical reproduction requires public-source rebuilds or released artifacts",
         ]
     )
@@ -4924,6 +4933,9 @@ def test_check_artifact_release_readme_template_accepts_complete_template() -> N
             "Do not include raw third-party data.",
             "Do not include model checkpoints.",
             "Do not include credentials, personal identifiers, or local paths.",
+            "Redistribute derived tables, predictions, logs, manifests, and checksums rather than raw provider files.",
+            "The original provider terms explicitly allow redistribution.",
+            "The source manifest records the local file boundary.",
             "## Required Top-Level Files",
             "README.md",
             "manifest.json",
@@ -5525,6 +5537,11 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "python -m iad_sieve.cli --help",
             "same repository checkout named by the release manifest",
             "`manifest.json` contains a `publication` object whose `artifact_release_url`, `artifact_release_doi`, and `public_access_status` match the final-upload metadata.",
+            "configs/source_input_manifest.json",
+            "local file boundary",
+            "license boundary",
+            "derived tables, predictions, logs, manifests, and checksums rather than raw provider files",
+            "original provider terms explicitly allow redistribution",
             "open_v2_main_results",
             "per-row denominator counts",
             "per-row threshold source",
@@ -6227,8 +6244,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Audit Iteration Summary",
-            "Completed audit cycles: 114.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, and stronger evidence gates.",
+            "Completed audit cycles: 115.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -7155,6 +7172,12 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "check_editable_biography_file_paths",
             "passport-type photograph",
             "author-material completion",
+            "## Audit Cycle 115: Third-Party Data License and Redistribution Boundary Gate",
+            "derived tables, predictions, logs, manifests, and checksums rather than raw provider files",
+            "original provider terms explicitly allow redistribution",
+            "source_input_manifest",
+            "license boundary",
+            "artifact release README template",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -7173,7 +7196,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Audit Iteration Summary",
-        "Completed audit cycles: 114",
+        "Completed audit cycles: 115",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -7184,7 +7207,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Audit Iteration Summary" in error for error in errors)
-    assert any("Completed audit cycles: 114" in error for error in errors)
+    assert any("Completed audit cycles: 115" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
