@@ -133,13 +133,17 @@ ALWAYS_FORBIDDEN_CONTENT_PATTERNS = [
     (
         re.compile(
             r"\b(?:assistant\s+(?:draft|note|summary|response)|system\s+prompt|prompt\s+(?:note|log|record|trace)|"
-            r"work\s+(?:record|summary|log)|change\s+log|edit\s+log|revision\s+log)\b",
+            r"(?:work|change|edit|revision|implementation|update)\s+(?:record|summary|log|note)|"
+            r"(?:modification|adjustment)\s+(?:record|summary|log|note))\b",
             re.IGNORECASE,
         ),
         "process-note trace",
     ),
     (
-        re.compile(r"(?:AI\s*辅助|AI\s*生成|已修改|修改记录|工作记录|工作总结|本次修改|本轮修改|处理记录|变更记录)"),
+        re.compile(
+            r"(?:AI\s*辅助|AI\s*生成|已修改|修改记录|修改说明|工作记录|工作总结|本次修改|本轮修改|"
+            r"本轮处理|处理记录|处理总结|变更记录|变更说明|调整记录|调整说明|修订记录|修订说明|更新记录|更新说明)"
+        ),
         "process-note trace",
     ),
 ]

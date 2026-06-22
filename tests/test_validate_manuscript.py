@@ -7578,6 +7578,11 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "prompt note",
             "system prompt",
             "work summary",
+            "revision note",
+            "change record",
+            "implementation note",
+            "本轮处理",
+            "调整记录",
             "edit log",
             "Copilot",
             "Cursor",
@@ -8406,6 +8411,11 @@ def test_check_reviewer_readiness_audit_rejects_missing_formal_process_trace_gat
         "prompt note",
         "system prompt",
         "work summary",
+        "revision note",
+        "change record",
+        "implementation note",
+        "本轮处理",
+        "调整记录",
         "edit log",
         "Copilot",
         "Cursor",
@@ -8419,6 +8429,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_formal_process_trace_gat
     assert any("Formal Process-Trace Vocabulary Gate" in error for error in errors)
     assert any("process-note vocabulary bypass" in error for error in errors)
     assert any("assistant draft" in error for error in errors)
+    assert any("revision note" in error for error in errors)
     assert any("expanded process-trace scan" in error for error in errors)
 
 
@@ -9405,7 +9416,8 @@ def test_check_auxiliary_model_evidence_absent_rejects_process_traces() -> None:
         "cover letter": "Codex work record: 本次修改 cleaned the documentation.",
         "highlights": "AI-generated submission summary.",
         "keywords": "Assistant draft summary and prompt note.",
-        "metadata": "Cursor edit log.",
+        "metadata": "Cursor edit log. Revision note, change record, and implementation note.",
+        "cover metadata": "本轮处理后留下调整记录。",
     }
 
     errors = module.check_auxiliary_model_evidence_absent(document_texts)
@@ -9414,6 +9426,8 @@ def test_check_auxiliary_model_evidence_absent_rejects_process_traces() -> None:
     assert any("cover letter" in error and "本次修改" in error for error in errors)
     assert any("highlights" in error and "AI-generated" in error for error in errors)
     assert any("keywords" in error and "Assistant draft" in error for error in errors)
+    assert any("metadata" in error and "Revision note" in error for error in errors)
+    assert any("cover metadata" in error and "本轮处理" in error for error in errors)
     assert any("keywords" in error and "prompt note" in error for error in errors)
     assert any("metadata" in error and "Cursor" in error for error in errors)
 
