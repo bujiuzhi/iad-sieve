@@ -487,6 +487,8 @@ The complete row-family artifact crosswalk is reported in the supplementary mate
 
 The Scope type column is part of the result interpretation: full Open-v2 rows and held-out test rows support a mechanism comparison, not a cross-row ranking.
 
+The IAD-Risk rows also use a fixed operating point. Unless an artifact row records a validation-selected override, $\tau_w$, $\tau_n$, and $\tau_r$ are treated as predeclared default thresholds rather than as thresholds optimized on the reported test rows. This convention makes the decision rule auditable, but it is not evidence that the default thresholds are optimal or stable across source mixtures. Threshold-stability or model-ranking claims require released threshold-selection logs, threshold-sensitivity grids, prediction files, and checksums generated from the same row scope.
+
 \begin{table}[H]
 \caption{Open-v2 evidence snapshot. Lower false-merge rate is better. Scope type separates full Open-v2 and held-out test rows. The Denom. audit column means that same-work F1, FMR, and HNFMR denominators must be present in the corresponding \texttt{open\_v2\_main\_results} artifact row before numerical audit.}
 \label{tab:openv2-results}
