@@ -371,7 +371,7 @@ Outcome: pass for first-screen zero-risk overread control; blocked for stronger 
 
 This gate revises the abstract, contribution-evidence summary, result interpretation paragraph, cover letter, and highlights so that the IAD-Risk held-out result is described as zero observed HNFMR rather than as wording that can be read as absolute zero risk. The numerical result table still reports the measured HNFMR value, but the first-screen prose now keeps the observational scope visible.
 
-The reviewer-facing boundary is statistical interpretation. The current evidence means no hard-negative false merge was observed under the reported Open-v2 held-out scope and operating point; it does not prove zero risk under all scholarly sources, thresholds, version policies, or cluster-level merge workflows.
+The reviewer-facing boundary is statistical interpretation. The current evidence means no hard-negative false merge was observed under the reported Open-v2 held-out hard-negative scope and operating point; it does not prove zero risk under all scholarly sources, thresholds, version policies, or cluster-level merge workflows.
 
 ## Readiness Gate 32: L2 Public-Source Rebuild Traceability Gate
 
@@ -987,7 +987,7 @@ The reviewer-facing boundary is first-screen metric separation, not stronger emp
 
 Outcome: pass for highlights FMR/HNFMR first-screen separation; blocked for zero-risk claims until external artifact release and broader validation are complete.
 
-This gate checks whether the submission highlights could still expose the zero-HNFMR overread after the abstract and cover letter were corrected. The quantitative highlight now states: "Open-v2 held-out scope: IAD-Risk shows zero observed HNFMR; ordinary FMR=0.001."
+This gate checks whether the submission highlights could still expose the zero-HNFMR overread after the abstract and cover letter were corrected. The quantitative highlight now states: "Open-v2 held-out hard-negative scope: zero observed HNFMR; ordinary FMR=0.001."
 
 The reviewer-facing boundary is highlight-level metric separation, not stronger empirical evidence. The highlight remains within the concise submission limit while using observational zero-HNFMR wording and making the held-out HNFMR stratum and ordinary FMR visibly separate, so first-screen materials no longer isolate the hard-negative stratum from the separately reported ordinary false-merge rate.
 

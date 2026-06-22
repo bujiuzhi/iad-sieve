@@ -5239,7 +5239,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "first-screen metric separation",
         "same-scope comparative-ranking limits",
         "highlights FMR/HNFMR first-screen separation",
-        "Open-v2 held-out scope: IAD-Risk shows zero observed HNFMR; ordinary FMR=0.001",
+        "Open-v2 held-out hard-negative scope: zero observed HNFMR; ordinary FMR=0.001",
         "highlight-level metric separation",
         "document/cluster split-overread wording",
         "pair-record held-out evidence",
@@ -6339,6 +6339,11 @@ def check_highlights(highlights_text: str) -> list[str]:
                 "zero-observed HNFMR highlight must include ordinary FMR=0.001 boundary: "
                 f"{line}"
             )
+        if zero_hnfmr_claimed and "HNFMR" in highlight and "hard-negative" not in highlight.lower():
+            errors.append(
+                "zero-observed HNFMR highlight must identify the hard-negative scope boundary: "
+                f"{line}"
+            )
     return errors
 
 
@@ -6640,7 +6645,7 @@ def check_submission_material_quantitative_summary(highlights_text: str, cover_l
         list[str]: Error messages for missing quantitative submission markers.
     """
     highlight_required_markers = [
-        "Open-v2 held-out scope",
+        "Open-v2 held-out hard-negative scope",
         "zero observed HNFMR",
         "ordinary FMR=0.001",
     ]
@@ -6782,7 +6787,7 @@ def check_editorial_claim_alignment(
                 "data/knowledge-engineering merge risk",
                 "IAD-Risk",
                 "IAD-Bench",
-                "Open-v2 held-out scope",
+                "Open-v2 held-out hard-negative scope",
                 "zero observed HNFMR",
                 "ordinary FMR=0.001",
                 "artifact-backed audits",
