@@ -89,11 +89,12 @@ pytest -q
 
 | 等级 | 目标 | 输入 | 用途 |
 | --- | --- | --- | --- |
-| L0 | 安装与 CLI 验证 | 无大数据 | 检查仓库可用性 |
-| L1 | 单元测试 | `tests/fixtures/` | 验证算法和评测协议 |
-| L2 | 小样本开发实验 | 公开来源小样本 | 验证端到端流程 |
-| L3 | 论文主实验 | 完整数据与外部 baseline | 生成论文表格和证据包 |
-| L4 | 第三方复验 | 固定 artifact release | 独立读者复现 |
+| L0 code check | 安装、CLI、测试和公开发布扫描 | 无大数据 | 检查公开仓库是否可运行 |
+| L1 fixture rebuild | 小型 fixture 重建 | `tests/fixtures/` | 验证数据适配器、schema 和评测协议 |
+| L2 public-source rebuild | 从独立获取的公开原始文件重建派生 eval source 和 IAD-Bench 包 | 本地 `data/raw/` 中的公开来源文件、`source_input_manifest` 和 `processing_run_log` | 审计公开输入、处理命令、输出摘要和 checksum 的 chain of custody |
+| L3 result audit | 审计已发布的表格、预测、阈值日志、配置、运行日志、manifest 和 checksum | 外部 artifact release | 复核论文主结果、阈值、分母和逐行预测边界 |
+
+L0/L1 只能证明公开仓库代码路径和小型样本处理契约可运行；L2/L3 才能支持 Open-v2 数值表的结果级审计。不存在单独的 L4 Git 仓库复现等级；第三方复验应通过 L2 public-source rebuild 或 L3 result audit 完成。
 
 数据与 artifact 发布策略见 [docs/data-and-artifact-release.md](docs/data-and-artifact-release.md)。
 从公开原始数据到 IAD-Bench 的处理命令见 [docs/data-processing-pipeline.md](docs/data-processing-pipeline.md)。

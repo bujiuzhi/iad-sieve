@@ -97,6 +97,22 @@ DOCS_INDEX_FORBIDDEN_MARKERS = (
     "查看 IAD-Sieve 的核心流程和模块",
 )
 
+ROOT_README_REPRODUCTION_REQUIRED_MARKERS = (
+    "L0 code check",
+    "L1 fixture rebuild",
+    "L2 public-source rebuild",
+    "L3 result audit",
+    "L0/L1 只能证明公开仓库代码路径和小型样本处理契约可运行",
+    "L2/L3 才能支持 Open-v2 数值表的结果级审计",
+    "不存在单独的 L4 Git 仓库复现等级",
+)
+
+ROOT_README_REPRODUCTION_FORBIDDEN_MARKERS = (
+    "| L2 | 小样本开发实验 |",
+    "| L3 | 论文主实验 |",
+    "| L4 | 第三方复验 |",
+)
+
 
 @dataclass(frozen=True)
 class RiskPattern:
@@ -561,6 +577,49 @@ def check_docs_index_consistency(project_root: Path) -> list[Finding]:
     return findings
 
 
+def check_root_readme_reproduction_levels(project_root: Path) -> list[Finding]:
+    """检查根 README 是否使用当前论文一致的复现等级。
+
+    参数:
+        project_root: 项目根目录。
+
+    返回:
+        根 README 复现等级不一致时返回发现项列表。
+    """
+
+    readme_path = project_root / "README.md"
+    if not readme_path.exists():
+        return []
+
+    readme_text = "\n".join(safe_read_lines(readme_path))
+    findings: list[Finding] = []
+    for marker in ROOT_README_REPRODUCTION_REQUIRED_MARKERS:
+        if marker in readme_text:
+            continue
+        findings.append(
+            Finding(
+                path=readme_path,
+                line_number=0,
+                category="root_readme_reproduction_missing_marker",
+                message="根 README 缺少当前复现等级边界说明",
+                snippet=marker,
+            )
+        )
+    for marker in ROOT_README_REPRODUCTION_FORBIDDEN_MARKERS:
+        if marker not in readme_text:
+            continue
+        findings.append(
+            Finding(
+                path=readme_path,
+                line_number=0,
+                category="root_readme_reproduction_stale_marker",
+                message="根 README 包含旧版复现等级表述",
+                snippet=marker,
+            )
+        )
+    return findings
+
+
 def check_required_gitignore_patterns(project_root: Path) -> list[Finding]:
     """检查临时构建产物是否被 .gitignore 明确排除。
 
@@ -678,6 +737,7 @@ def run_public_release_check(project_root: Path, max_size_mb: float) -> int:
     missing_document_findings = check_required_documentation(resolved_root)
     unexpected_document_findings = check_document_directory_scope(resolved_root)
     docs_index_findings = check_docs_index_consistency(resolved_root)
+    root_readme_reproduction_findings = check_root_readme_reproduction_levels(resolved_root)
     gitignore_findings = check_required_gitignore_patterns(resolved_root)
     large_file_findings = find_large_files(resolved_root, max_size_mb)
     high_risk_findings = (
@@ -686,6 +746,7 @@ def run_public_release_check(project_root: Path, max_size_mb: float) -> int:
         + missing_document_findings
         + unexpected_document_findings
         + docs_index_findings
+        + root_readme_reproduction_findings
         + gitignore_findings
         + large_file_findings
     )
