@@ -86,6 +86,14 @@ ALLOWED_DOCS_FILES = {
     "docs/data-and-artifact-release.md",
 }
 
+DOCS_INDEX_REQUIRED_MARKERS = (
+    "| 方法设计 | `method-design.md` | 查看 IAD-Risk 方法设计、关系语义和风险门控 |",
+)
+
+DOCS_INDEX_FORBIDDEN_MARKERS = (
+    "查看 IAD-Sieve 的核心流程和模块",
+)
+
 
 @dataclass(frozen=True)
 class RiskPattern:
@@ -507,6 +515,49 @@ def check_document_directory_scope(project_root: Path) -> list[Finding]:
     return findings
 
 
+def check_docs_index_consistency(project_root: Path) -> list[Finding]:
+    """检查 docs 索引是否与当前论文方法主线一致。
+
+    参数:
+        project_root: 项目根目录。
+
+    返回:
+        docs 索引内容不一致时返回发现项列表。
+    """
+
+    docs_index_path = project_root / "docs" / "README.md"
+    if not docs_index_path.exists():
+        return []
+
+    index_text = "\n".join(safe_read_lines(docs_index_path))
+    findings: list[Finding] = []
+    for marker in DOCS_INDEX_REQUIRED_MARKERS:
+        if marker in index_text:
+            continue
+        findings.append(
+            Finding(
+                path=docs_index_path,
+                line_number=0,
+                category="docs_index_missing_marker",
+                message="docs 索引缺少当前 IAD-Risk 方法主线说明",
+                snippet=marker,
+            )
+        )
+    for marker in DOCS_INDEX_FORBIDDEN_MARKERS:
+        if marker not in index_text:
+            continue
+        findings.append(
+            Finding(
+                path=docs_index_path,
+                line_number=0,
+                category="docs_index_stale_marker",
+                message="docs 索引包含过期方法描述",
+                snippet=marker,
+            )
+        )
+    return findings
+
+
 def check_required_gitignore_patterns(project_root: Path) -> list[Finding]:
     """检查临时构建产物是否被 .gitignore 明确排除。
 
@@ -623,6 +674,7 @@ def run_public_release_check(project_root: Path, max_size_mb: float) -> int:
     document_trace_findings = scan_document_traces(resolved_root, DOCUMENT_TRACE_PATTERNS)
     missing_document_findings = check_required_documentation(resolved_root)
     unexpected_document_findings = check_document_directory_scope(resolved_root)
+    docs_index_findings = check_docs_index_consistency(resolved_root)
     gitignore_findings = check_required_gitignore_patterns(resolved_root)
     large_file_findings = find_large_files(resolved_root, max_size_mb)
     high_risk_findings = (
@@ -630,6 +682,7 @@ def run_public_release_check(project_root: Path, max_size_mb: float) -> int:
         + document_trace_findings
         + missing_document_findings
         + unexpected_document_findings
+        + docs_index_findings
         + gitignore_findings
         + large_file_findings
     )

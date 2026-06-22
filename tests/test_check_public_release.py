@@ -6,6 +6,7 @@ from pathlib import Path
 
 from scripts.check_public_release import (
     DOCUMENT_TRACE_PATTERNS,
+    check_docs_index_consistency,
     check_document_directory_scope,
     check_required_gitignore_patterns,
     check_required_documentation,
@@ -120,6 +121,36 @@ def test_check_document_directory_scope_flags_unlisted_docs_file(tmp_path: Path)
     assert len(findings) == 1
     assert findings[0].category == "unexpected_documentation_file"
     assert findings[0].snippet == "docs/codex-work-record.md"
+
+
+def test_check_docs_index_consistency_accepts_iad_risk_method_line(tmp_path: Path) -> None:
+    """验证 docs 索引必须使用当前 IAD-Risk 方法主线描述。"""
+
+    _write_text(
+        tmp_path / "docs" / "README.md",
+        "| 方法设计 | `method-design.md` | 查看 IAD-Risk 方法设计、关系语义和风险门控 |\n",
+    )
+
+    findings = check_docs_index_consistency(tmp_path)
+
+    assert findings == []
+
+
+def test_check_docs_index_consistency_rejects_stale_iad_sieve_method_line(tmp_path: Path) -> None:
+    """验证 docs 索引中的旧方法描述会被拦截。"""
+
+    _write_text(
+        tmp_path / "docs" / "README.md",
+        "| 方法设计 | `method-design.md` | 查看 IAD-Sieve 的核心流程和模块 |\n",
+    )
+
+    findings = check_docs_index_consistency(tmp_path)
+
+    assert len(findings) == 2
+    assert {finding.category for finding in findings} == {
+        "docs_index_missing_marker",
+        "docs_index_stale_marker",
+    }
 
 
 def test_check_required_gitignore_patterns_requires_texput_outputs(tmp_path: Path) -> None:
