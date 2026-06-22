@@ -6336,8 +6336,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Readiness Summary",
-            "Readiness gates covered: 118.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, Elsevier competing-interest declaration file traceability, introduction contribution first-screen compression, processing-run-log schema bypass, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, and stronger evidence gates.",
+            "Readiness gates covered: 119.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, Elsevier competing-interest declaration file traceability, introduction contribution first-screen compression, processing-run-log schema bypass, process-note vocabulary bypass, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, Elsevier competing-interest declaration file generated by the declarations tool, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -6357,6 +6357,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "Elsevier competing-interest declaration file may be missing or mismatched.",
             "The introduction contribution paragraph may be too compressed for first-screen review.",
             "The external artifact processing log may exist without schema-level rebuild auditability.",
+            "Formal submission materials may contain non-obvious process notes.",
             "Reproducibility depends on files outside Git.",
             "## Claim-Evidence Check",
             "## Adversarial Self-Review Matrix",
@@ -7301,6 +7302,17 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "successful exit_status=0",
             "started_at and finished_at",
             "data-processing provenance auditability",
+            "## Readiness Gate 119: Formal Process-Trace Vocabulary Gate",
+            "formal-material hygiene coverage",
+            "assistant draft",
+            "prompt note",
+            "system prompt",
+            "work summary",
+            "edit log",
+            "Copilot",
+            "Cursor",
+            "proper declaration fields",
+            "expanded process-trace scan",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -7319,7 +7331,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Readiness Summary",
-        "Readiness gates covered: 118",
+        "Readiness gates covered: 119",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -7330,7 +7342,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Readiness Summary" in error for error in errors)
-    assert any("Readiness gates covered: 118" in error for error in errors)
+    assert any("Readiness gates covered: 119" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -8044,6 +8056,35 @@ def test_check_reviewer_readiness_audit_rejects_missing_processing_run_log_gate(
     assert any("processing-run-log schema bypass" in error for error in errors)
     assert any("processing_run_log JSONL schema validation" in error for error in errors)
     assert any("output_path must be listed in checksums.sha256" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_formal_process_trace_gate() -> None:
+    """验证审稿准备度审计必须覆盖正式材料过程痕迹词表门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Readiness Gate 119: Formal Process-Trace Vocabulary Gate",
+        "process-note vocabulary bypass",
+        "formal-material hygiene coverage",
+        "assistant draft",
+        "prompt note",
+        "system prompt",
+        "work summary",
+        "edit log",
+        "Copilot",
+        "Cursor",
+        "proper declaration fields",
+        "expanded process-trace scan",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Formal Process-Trace Vocabulary Gate" in error for error in errors)
+    assert any("process-note vocabulary bypass" in error for error in errors)
+    assert any("assistant draft" in error for error in errors)
+    assert any("expanded process-trace scan" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_fixture_evidence_isolation_gate() -> None:
@@ -8852,6 +8893,8 @@ def test_check_auxiliary_model_evidence_absent_rejects_process_traces() -> None:
     document_texts = {
         "cover letter": "Codex work record: 本次修改 cleaned the documentation.",
         "highlights": "AI-generated submission summary.",
+        "keywords": "Assistant draft summary and prompt note.",
+        "metadata": "Cursor edit log.",
     }
 
     errors = module.check_auxiliary_model_evidence_absent(document_texts)
@@ -8859,6 +8902,9 @@ def test_check_auxiliary_model_evidence_absent_rejects_process_traces() -> None:
     assert any("cover letter" in error and "Codex" in error for error in errors)
     assert any("cover letter" in error and "本次修改" in error for error in errors)
     assert any("highlights" in error and "AI-generated" in error for error in errors)
+    assert any("keywords" in error and "Assistant draft" in error for error in errors)
+    assert any("keywords" in error and "prompt note" in error for error in errors)
+    assert any("metadata" in error and "Cursor" in error for error in errors)
 
 
 def test_check_formal_submission_claim_lockdown_accepts_conservative_boundaries() -> None:

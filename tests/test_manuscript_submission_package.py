@@ -1326,13 +1326,14 @@ def test_validate_submission_package_rejects_directory_text_hygiene_leaks(tmp_pa
     local_path_example = "/" + "Users" + "/reviewer/work/code/python/iad-sieve"
     _write_file(
         output_dir / "cover_letter.md",
-        f"Draft copied from {local_path_example}.\nCodex work record.\n",
+        f"Draft copied from {local_path_example}.\nCodex work record.\nAssistant draft summary.\nPrompt note.\n",
     )
     builder.write_checksums(output_dir)
     errors = validator.validate_package_directory(output_dir)
 
     assert any("local macOS absolute path" in error for error in errors)
     assert any("AI/tool trace" in error for error in errors)
+    assert any("process-note trace" in error for error in errors)
 
 
 def test_validate_submission_package_rejects_anonymous_identity_leaks_in_zip(tmp_path) -> None:
