@@ -1,6 +1,6 @@
 # Reviewer Readiness Audit
 
-Status date: 2026-06-22
+Status date: 2026-06-23
 
 ## Scope
 
@@ -34,6 +34,7 @@ This ledger records repeated skeptical-review passes. It is a quality-control re
 | Round 2 | Reproducibility and package audit | Pass for Git-only review; not full numerical audit. | `verify_fixture_rebuild.py`, `check_public_release.py`, strict manuscript validation, submission-package validation, and DKE preflight validation. | Publish L2/L3 source or artifact release with `source_input_manifest`, `processing_run_log`, predictions, thresholds, logs, manifests, and checksums. |
 | Round 3 | Final-upload boundary audit | Blocked for final upload. | `final_upload_information_request.md`, `submission_metadata.yml`, `submission_system_checklist.md`, source-control package binding, and final cover-letter sentence map. | Provide author metadata, declarations, target journal and ranking evidence, artifact URL or DOI, and live submission-system preview. |
 | Round 4 | Q2/B upgrade audit | Conditional; no Q2/B-complete wording allowed. | Reviewer risk register, Q2/B ranking evidence packet gate, self-review matrix, and reviewer response matrix. | Add same-scope prediction files, threshold logs, bootstrap intervals, ablation suite, manual-validation slice, and source-heldout package before stronger Q2/B-ready wording. |
+| Round 5 | Official-source freshness audit | Pass for DKE preflight source; still blocked for target confirmation and ranking proof. | DKE guide rechecked on 2026-06-23 in `target_journal_shortlist.md` and `submission_metadata.yml`; target metrics treated as screening evidence only. | Re-open the selected journal guide and ranking/category source on submission day before changing final-upload or Q2/B wording. |
 
 ## Audit Dimensions
 

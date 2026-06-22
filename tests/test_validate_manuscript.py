@@ -7728,6 +7728,12 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "Q2/B upgrade audit",
             "Conditional; no Q2/B-complete wording allowed",
             "same-scope prediction files, threshold logs, bootstrap intervals, ablation suite, manual-validation slice, and source-heldout package",
+            "Round 5",
+            "Official-source freshness audit",
+            "Pass for DKE preflight source; still blocked for target confirmation and ranking proof",
+            "DKE guide rechecked on 2026-06-23",
+            "target metrics treated as screening evidence only",
+            "Re-open the selected journal guide and ranking/category source on submission day",
             "## Audit Dimensions",
             "Contribution",
             "Writing clarity",
@@ -9036,6 +9042,10 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
         "Round 4",
         "Q2/B upgrade audit",
         "same-scope prediction files, threshold logs, bootstrap intervals, ablation suite, manual-validation slice, and source-heldout package",
+        "Round 5",
+        "Official-source freshness audit",
+        "DKE guide rechecked on 2026-06-23",
+        "target metrics treated as screening evidence only",
     ]:
         audit_text = audit_text.replace(marker, "")
 
@@ -9046,6 +9056,8 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     assert any("Adversarial Review Round Ledger" in error for error in errors)
     assert any("Q2/B upgrade audit" in error for error in errors)
     assert any("source-heldout package" in error for error in errors)
+    assert any("Official-source freshness audit" in error for error in errors)
+    assert any("DKE guide rechecked on 2026-06-23" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
