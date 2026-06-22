@@ -607,7 +607,7 @@ def _write_markdown(path: Path, rows: list[dict], summary: dict) -> None:
     """
     selected_rows = [row for row in rows if int(row.get("is_selected", 0) or 0) == 1]
     lines = [
-        "# Risk-Calibrated Selective Entity Matching Protocol",
+        "# Risk-Constrained Selective Entity Matching Protocol",
         "",
         "## 摘要",
         "",

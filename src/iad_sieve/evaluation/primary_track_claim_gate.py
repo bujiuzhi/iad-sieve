@@ -148,12 +148,12 @@ def _allowed_claim_boundary(claim_allowed: bool) -> str:
     """
     if claim_allowed:
         return (
-            "可写 Risk-Calibrated Scientific Entity Matching 在固定 FPR/FDR 风险预算下的 safe-merge coverage、"
+            "可写 Risk-Constrained Scientific Entity Matching 在固定 FPR/FDR 风险预算下的 safe-merge coverage、"
             "review rate 和 cluster contamination 闭环结果；IAD-Risk 仅定位为 agenda-aware conflict/risk module，"
             "仍需保留数据来源、silver 标签和分布外泛化局限。"
         )
     return (
-        "只能写主轨道交接已就绪、实验路径已锁定、人工 gold 暂缓，以及 Risk-Calibrated Scientific Entity Matching "
+        "只能写主轨道交接已就绪、实验路径已锁定、人工 gold 暂缓，以及 Risk-Constrained Scientific Entity Matching "
         "的问题定义和评价协议；IAD-Risk 仅定位为 agenda-aware conflict/risk module，不得把未回传远程结果写成已完成实验。"
     )
 

@@ -13,6 +13,7 @@ from scripts.check_public_release import (
     check_required_documentation,
     check_root_readme_reproduction_levels,
     check_tracked_release_scope,
+    check_public_claim_boundaries,
     run_public_release_check,
     scan_document_traces,
 )
@@ -242,6 +243,31 @@ def test_check_data_pipeline_reproduction_boundary_rejects_git_only_result_claim
     assert any(finding.category == "data_pipeline_reproduction_boundary_missing_marker" for finding in findings)
     assert any("L2 public-source rebuild" in finding.snippet for finding in findings)
     assert any("checksums.sha256" in finding.snippet for finding in findings)
+
+
+def test_check_public_claim_boundaries_accepts_risk_aware_description(tmp_path: Path) -> None:
+    """验证公开入口使用 risk-aware 描述时可通过 claim 边界检查。"""
+
+    _write_text(tmp_path / "README.md", "Risk-Aware Scientific Entity Matching under Agenda-Level Confounders.\n")
+    _write_text(tmp_path / "pyproject.toml", 'description = "IAD-Sieve: risk-aware scientific entity matching."\n')
+    _write_text(tmp_path / "docs" / "method-design.md", "IAD-Risk uses risk-aware merge gating.\n")
+
+    findings = check_public_claim_boundaries(tmp_path)
+
+    assert findings == []
+
+
+def test_check_public_claim_boundaries_rejects_risk_calibrated_overclaim(tmp_path: Path) -> None:
+    """验证公开入口中的 risk-calibrated 强表述会被拦截。"""
+
+    _write_text(tmp_path / "README.md", "Risk-Calibrated Scientific Entity Matching under Agenda-Level Confounders.\n")
+    _write_text(tmp_path / "pyproject.toml", 'description = "well-calibrated risk model."\n')
+    _write_text(tmp_path / "src" / "cli.py", 'command = "run-risk-calibrated-protocol"\n')
+
+    findings = check_public_claim_boundaries(tmp_path)
+
+    assert {finding.category for finding in findings} == {"public_claim_risk_calibrated_overclaim"}
+    assert {finding.snippet for finding in findings} == {"Risk-Calibrated", "well-calibrated"}
 
 
 def test_check_required_gitignore_patterns_requires_texput_outputs(tmp_path: Path) -> None:

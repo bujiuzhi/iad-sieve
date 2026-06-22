@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "iad-sieve"
 version = "0.1.0"
-description = "IAD-Sieve: risk-calibrated scientific entity matching under agenda-level confounders."
+description = "IAD-Sieve: risk-aware scientific entity matching under agenda-level confounders."
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
 dependencies = [

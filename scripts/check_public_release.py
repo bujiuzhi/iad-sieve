@@ -142,6 +142,30 @@ DATA_PIPELINE_REPRODUCTION_REQUIRED_MARKERS = (
     "未经外部 artifact release 固定的 `outputs/` 结果不能作为论文主表复验依据",
 )
 
+PUBLIC_CLAIM_ENTRY_FILES = {
+    "README.md",
+    "pyproject.toml",
+}
+
+PUBLIC_CLAIM_DIRECTORIES = {
+    "docs",
+    "manuscript",
+}
+
+PUBLIC_CLAIM_SUFFIXES = {
+    ".json",
+    ".md",
+    ".tex",
+    ".toml",
+    ".yaml",
+    ".yml",
+}
+
+PUBLIC_CLAIM_EXCLUDED_PATH_PARTS = {
+    ("manuscript", "build"),
+    ("manuscript", "scripts"),
+}
+
 
 @dataclass(frozen=True)
 class RiskPattern:
@@ -246,6 +270,14 @@ DOCUMENT_TRACE_PATTERNS: tuple[RiskPattern, ...] = (
             re.IGNORECASE,
         ),
         message="公开文档包含示例邮箱；应改为环境变量或作者确认的联系邮箱",
+    ),
+)
+
+PUBLIC_CLAIM_BOUNDARY_PATTERNS: tuple[RiskPattern, ...] = (
+    RiskPattern(
+        name="public_claim_risk_calibrated_overclaim",
+        regex=re.compile(r"\b(?:Risk-Calibrated|risk-calibrated|risk\s+calibrated|calibrated\s+risk|well-calibrated)\b"),
+        message="公开说明包含风险校准强表述；当前论文边界应使用 risk-aware 或 risk-constrained",
     ),
 )
 
@@ -680,6 +712,69 @@ def check_data_pipeline_reproduction_boundary(project_root: Path) -> list[Findin
     return findings
 
 
+def has_public_claim_excluded_path_parts(path: Path, project_root: Path) -> bool:
+    """判断公开 claim 扫描是否应跳过该路径。
+
+    参数:
+        path: 候选路径。
+        project_root: 项目根目录。
+
+    返回:
+        需要跳过时返回 True，否则返回 False。
+    """
+
+    relative_parts = normalize_relative_path(path, project_root).split("/")
+    for excluded_parts in PUBLIC_CLAIM_EXCLUDED_PATH_PARTS:
+        if tuple(relative_parts[: len(excluded_parts)]) == excluded_parts:
+            return True
+    return False
+
+
+def iter_public_claim_files(project_root: Path) -> Iterable[Path]:
+    """遍历公开说明和投稿源文件。
+
+    参数:
+        project_root: 项目根目录。
+
+    返回:
+        公开 claim 扫描候选文件路径。
+    """
+
+    for relative_path in PUBLIC_CLAIM_ENTRY_FILES:
+        path = project_root / relative_path
+        if path.exists():
+            yield path
+
+    for directory_name in PUBLIC_CLAIM_DIRECTORIES:
+        directory = project_root / directory_name
+        if not directory.exists():
+            continue
+        for current_root_text, dirnames, filenames in os.walk(directory):
+            current_root = Path(current_root_text)
+            dirnames[:] = [dirname for dirname in dirnames if not is_excluded_directory(current_root / dirname)]
+            if has_public_claim_excluded_path_parts(current_root, project_root):
+                continue
+            for filename in filenames:
+                path = current_root / filename
+                if has_public_claim_excluded_path_parts(path, project_root):
+                    continue
+                if path.suffix in PUBLIC_CLAIM_SUFFIXES:
+                    yield path
+
+
+def check_public_claim_boundaries(project_root: Path) -> list[Finding]:
+    """检查公开说明是否避免超出论文证据边界的强表述。
+
+    参数:
+        project_root: 项目根目录。
+
+    返回:
+        公开 claim 越界发现项列表。
+    """
+
+    return scan_patterns_in_files(iter_public_claim_files(project_root), PUBLIC_CLAIM_BOUNDARY_PATTERNS)
+
+
 def check_required_gitignore_patterns(project_root: Path) -> list[Finding]:
     """检查临时构建产物是否被 .gitignore 明确排除。
 
@@ -901,6 +996,7 @@ def run_public_release_check(project_root: Path, max_size_mb: float) -> int:
     unexpected_document_findings = check_document_directory_scope(resolved_root)
     docs_index_findings = check_docs_index_consistency(resolved_root)
     root_readme_reproduction_findings = check_root_readme_reproduction_levels(resolved_root)
+    public_claim_boundary_findings = check_public_claim_boundaries(resolved_root)
     data_pipeline_reproduction_findings = check_data_pipeline_reproduction_boundary(resolved_root)
     gitignore_findings = check_required_gitignore_patterns(resolved_root)
     tracked_scope_findings = check_tracked_release_scope(resolved_root)
@@ -912,6 +1008,7 @@ def run_public_release_check(project_root: Path, max_size_mb: float) -> int:
         + unexpected_document_findings
         + docs_index_findings
         + root_readme_reproduction_findings
+        + public_claim_boundary_findings
         + data_pipeline_reproduction_findings
         + gitignore_findings
         + tracked_scope_findings

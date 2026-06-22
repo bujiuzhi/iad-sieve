@@ -1,6 +1,6 @@
 # iad-sieve
 
-Risk-Calibrated Scientific Entity Matching under Agenda-Level Confounders.
+Risk-Aware Scientific Entity Matching under Agenda-Level Confounders.
 
 ## 项目概述
 
