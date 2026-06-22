@@ -948,7 +948,7 @@ Outcome: pass for selective workload denominator clarification; blocked for oper
 
 This gate checks whether capacity-normalized review load could be overread as all blocked and deferred pairs automatically requiring human review. The manuscript now defines review-required blocked and deferred pairs as $B_{\mathrm{review}}$ and $D_{\mathrm{review}}$, states $R=B_{\mathrm{review}}+D_{\mathrm{review}}$, and separates terminal cannot-link blocks from unresolved pairs that require manual handling.
 
-The reviewer-facing boundary is workload denominator clarity, not deployment evidence. The formula prevents terminal safety blocks from inflating review load and prevents unresolved defer decisions from disappearing from workload accounting, but operational throughput, review-cost savings, and staffing claims still require released prediction files, workflow policy, manual-review capacity, and deferral budget.
+The reviewer-facing boundary is workload denominator clarity, not deployment evidence. The Method net-benefit paragraph now mirrors this distinction in prose: terminal cannot-link blocks remain safety stops, while unresolved blocks or deferrals contribute to manual handling. The formula prevents terminal safety blocks from inflating review load and prevents unresolved defer decisions from disappearing from workload accounting, but operational throughput, review-cost savings, and staffing claims still require released prediction files, workflow policy, manual-review capacity, and deferral budget.
 
 ## Readiness Gate 106: FMR-HNFMR Stratum Gate
 
