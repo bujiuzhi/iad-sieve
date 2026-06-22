@@ -5624,6 +5624,8 @@ def check_mechanism_evidence_boundary(manuscript_text: str, supplementary_text: 
     required_main_markers = [
         r"\section{Mechanism and Error Analysis}",
         "full mechanism-evidence boundary table is reported in the supplementary material",
+        "mechanism reading is triangulated rather than component-causal",
+        "ablation-artifact requirement",
         "topical relatedness creates merge risk",
         "explicit risk gating supports the reported Open-v2 contract",
         "component-causality claims require ablations",

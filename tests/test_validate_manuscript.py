@@ -3243,6 +3243,8 @@ def test_check_mechanism_evidence_boundary_accepts_supplementary_table() -> None
         [
             r"\section{Mechanism and Error Analysis}",
             "The full mechanism-evidence boundary table is reported in the supplementary material.",
+            "The mechanism reading is triangulated rather than component-causal.",
+            "Isolating each relation head remains an ablation-artifact requirement.",
             "The prose states that topical relatedness creates merge risk only as a targeted claim.",
             "It states that explicit risk gating supports the reported Open-v2 contract.",
             "It states that component-causality claims require ablations.",
@@ -3278,6 +3280,8 @@ def test_check_mechanism_evidence_boundary_rejects_missing_supplementary_table()
         [
             r"\section{Mechanism and Error Analysis}",
             "The full mechanism-evidence boundary table is reported in the supplementary material.",
+            "The mechanism reading is triangulated rather than component-causal.",
+            "Isolating each relation head remains an ablation-artifact requirement.",
             "The prose states that topical relatedness creates merge risk only as a targeted claim.",
             "It states that explicit risk gating supports the reported Open-v2 contract.",
             "It states that component-causality claims require ablations.",
