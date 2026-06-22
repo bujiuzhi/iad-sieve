@@ -483,7 +483,7 @@ The complete row-family artifact crosswalk is reported in the supplementary mate
 \subsection{Main Open-v2 Results}
 
 \begin{table}[H]
-\caption{Open-v2 evidence snapshot. Lower false-merge rate is better. Rows are reported only when supported by current output summaries; the scope type column marks whether a row uses the full available Open-v2 scope or the held-out Open-v2 test scope. The Denom. audit column means that same-work F1, FMR, and HNFMR denominators must be present in the corresponding \texttt{open\_v2\_main\_results} artifact row before numerical audit.}
+\caption{Open-v2 evidence snapshot. Lower false-merge rate is better. Rows are reported only when supported by current output summaries; the scope type column marks whether a row uses the full available Open-v2 scope or the held-out Open-v2 test scope, so rows with different scopes support mechanism interpretation rather than a cross-row ranking. The Denom. audit column means that same-work F1, FMR, and HNFMR denominators must be present in the corresponding \texttt{open\_v2\_main\_results} artifact row before numerical audit.}
 \label{tab:openv2-results}
 \centering
 \footnotesize
@@ -548,7 +548,7 @@ Figure~\ref{fig:openv2-safety-profile} visualizes the same Open-v2 evidence as T
 \node[value] at (8.11,-3.65) {0.000};
 \end{tikzpicture}
 }
-\caption{Open-v2 mechanism-evidence profile. The bars visualize Table~\ref{tab:openv2-results} without changing its interpretation boundary: full Open-v2 rows and held-out test rows remain scope-labeled, and the figure supports the false-merge-control reading rather than a same-scope comparative ranking.}
+\caption{Open-v2 mechanism-evidence profile. The bars visualize Table~\ref{tab:openv2-results} without changing its interpretation boundary: full Open-v2 rows and held-out test rows remain scope-labeled, the dashed separator marks that scope transition, and the figure supports the false-merge-control reading rather than a same-scope comparative ranking.}
 \label{fig:openv2-safety-profile}
 \end{figure}
 
