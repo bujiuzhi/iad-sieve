@@ -125,6 +125,8 @@ For each author, provide the final Author order, name, affiliation, email, ORCID
 
 For the DKE/Elsevier route, provide a short biography and a passport-type photograph for each author when requested by the live submission system. Each DKE biography must have a maximum 100 words. The biography file must use an editable format such as `.doc`, `.docx`, `.rtf`, `.txt`, `.md`, or `.tex`, and must not be PDF. The passport-type photograph is a separate image file.
 
+Each listed author must have one editable biography file and one passport-type photograph file. Final-upload metadata validation rejects biography_files or photograph_files counts that differ from the number of author rows.
+
 | Author order | Biography text ready | Biography word count <=100 | Editable biography file path, non-PDF | Photograph file path |
 | --- | --- | --- | --- | --- |
 | 1 |  |  |  |  |

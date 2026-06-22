@@ -854,6 +854,35 @@ def check_editable_biography_file_paths(metadata_text: str) -> list[str]:
     return errors
 
 
+def check_author_identity_material_counts(metadata_text: str) -> list[str]:
+    """Check whether DKE biography and photograph file counts match authors.
+
+    参数:
+        metadata_text: Submission metadata YAML text.
+
+    返回:
+        list[str]: Error messages for author-material count mismatches.
+    """
+    author_count = len(parse_author_rows(metadata_text))
+    if author_count == 0:
+        return []
+
+    biography_files = parse_section_sequence_values(metadata_text, "author_identity_materials", "biography_files")
+    photograph_files = parse_section_sequence_values(metadata_text, "author_identity_materials", "photograph_files")
+    errors: list[str] = []
+    if biography_files and len(biography_files) != author_count:
+        errors.append(
+            "author biography file count must match author count: "
+            f"expected {author_count}, found {len(biography_files)}"
+        )
+    if photograph_files and len(photograph_files) != author_count:
+        errors.append(
+            "author photograph file count must match author count: "
+            f"expected {author_count}, found {len(photograph_files)}"
+        )
+    return errors
+
+
 def check_author_identity_materials(metadata_text: str) -> list[str]:
     """Check DKE/Elsevier author biography and photograph material records.
 
@@ -883,6 +912,7 @@ def check_author_identity_materials(metadata_text: str) -> list[str]:
         errors.extend(check_editable_biography_file_paths(metadata_text))
     if not section_key_has_value(metadata_text, "author_identity_materials", "photograph_files"):
         errors.append("author photograph file list is missing")
+    errors.extend(check_author_identity_material_counts(metadata_text))
     return errors
 
 
