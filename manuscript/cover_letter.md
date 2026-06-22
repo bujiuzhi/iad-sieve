@@ -6,7 +6,7 @@ We submit the manuscript titled "IAD-Risk: Risk-Aware Identity-Agenda Disentangl
 
 This work studies a practical failure mode in scholarly entity matching: semantically related papers can share a research agenda without describing the same scholarly work. Such identity-agenda confusion can create false merges in digital libraries, literature review systems, citation graphs, and recommendation pipelines. The manuscript proposes IAD-Risk, a risk-aware framework motivated by the ambiguity of single-score matching: it exposes identity, agenda, and agenda-non-identity signals separately and gates automatic merges by false-merge risk.
 
-The manuscript contributes a provenance-aware evaluation contract, IAD-Bench, and reports stratified evidence over gold, proxy, and silver labels.
+The manuscript also contributes IAD-Bench as a provenance-aware pair contract: it keeps gold identity labels, proxy agenda evidence, silver hard negatives, and human-review targets separate so that label strength, provenance, split, and hard-negative status remain visible during training, evaluation, and claim interpretation.
 
 In the Open-v2 evidence snapshot, the result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking: single-space scientific representation baselines show HNFMR 0.790--0.999 on the full pair scope, whereas transformer-backed IAD-Risk variants report same-work F1=0.980 and zero observed HNFMR on the held-out test scope, with ordinary FMR still reported separately as 0.001.
 
