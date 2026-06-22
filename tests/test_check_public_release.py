@@ -78,6 +78,17 @@ def test_scan_document_traces_flags_auxiliary_model_terms(tmp_path: Path) -> Non
     assert findings[0].category == "document_ai_trace_tool"
 
 
+def test_scan_document_traces_flags_assistant_trace_terms(tmp_path: Path) -> None:
+    """验证公开文档中的助手痕迹会被识别。"""
+
+    _write_text(tmp_path / "docs" / "notes.md", "助手工作记录：整理投稿材料。\n")
+
+    findings = scan_document_traces(tmp_path, DOCUMENT_TRACE_PATTERNS)
+
+    assert any(finding.category == "document_ai_trace_tool" and finding.snippet == "助手" for finding in findings)
+    assert any(finding.category == "document_work_record" and finding.snippet == "工作记录" for finding in findings)
+
+
 def test_scan_document_traces_flags_placeholder_email(tmp_path: Path) -> None:
     """验证公开文档中的示例邮箱会被识别。"""
 
@@ -262,12 +273,13 @@ def test_check_public_claim_boundaries_rejects_risk_calibrated_overclaim(tmp_pat
 
     _write_text(tmp_path / "README.md", "Risk-Calibrated Scientific Entity Matching under Agenda-Level Confounders.\n")
     _write_text(tmp_path / "pyproject.toml", 'description = "well-calibrated risk model."\n')
+    _write_text(tmp_path / "docs" / "method-design.md", "论文主张为风险校准实体匹配。\n")
     _write_text(tmp_path / "src" / "cli.py", 'command = "run-risk-calibrated-protocol"\n')
 
     findings = check_public_claim_boundaries(tmp_path)
 
     assert {finding.category for finding in findings} == {"public_claim_risk_calibrated_overclaim"}
-    assert {finding.snippet for finding in findings} == {"Risk-Calibrated", "well-calibrated"}
+    assert {finding.snippet for finding in findings} == {"Risk-Calibrated", "well-calibrated", "风险校准"}
 
 
 def test_check_required_gitignore_patterns_requires_texput_outputs(tmp_path: Path) -> None:

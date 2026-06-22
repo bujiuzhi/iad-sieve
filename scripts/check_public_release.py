@@ -245,7 +245,7 @@ HIGH_RISK_PATTERNS: tuple[RiskPattern, ...] = (
 DOCUMENT_TRACE_PATTERNS: tuple[RiskPattern, ...] = (
     RiskPattern(
         name="document_ai_trace_tool",
-        regex=re.compile(r"(?i)\b(?:codex|chatgpt|claude|openai|gpt|llm)\b"),
+        regex=re.compile(r"(?i)\b(?:codex|chatgpt|claude|openai|gpt|llm|assistant)\b|助手"),
         message="公开文档包含 AI 工具或辅助生成痕迹",
     ),
     RiskPattern(
@@ -276,7 +276,10 @@ DOCUMENT_TRACE_PATTERNS: tuple[RiskPattern, ...] = (
 PUBLIC_CLAIM_BOUNDARY_PATTERNS: tuple[RiskPattern, ...] = (
     RiskPattern(
         name="public_claim_risk_calibrated_overclaim",
-        regex=re.compile(r"\b(?:Risk-Calibrated|risk-calibrated|risk\s+calibrated|calibrated\s+risk|well-calibrated)\b"),
+        regex=re.compile(
+            r"\b(?:Risk-Calibrated|risk-calibrated|risk\s+calibrated|calibrated\s+risk|well-calibrated)\b"
+            r"|(?:风险\s*校准|已校准风险|校准(?:化)?风险)"
+        ),
         message="公开说明包含风险校准强表述；当前论文边界应使用 risk-aware 或 risk-constrained",
     ),
 )
