@@ -190,6 +190,7 @@ UNSUPPORTED_ABSTRACT_CLUSTER_PATTERNS = [
     re.compile(r"\bprevent\w*\b.{0,120}\bautomatic\s+merge\s+clusters\b", re.IGNORECASE),
     re.compile(r"\beliminat\w*\b.{0,120}\bcluster[-\s]?level\s+contamination\b", re.IGNORECASE),
     re.compile(r"\bguarantee\w*\b.{0,120}\bcluster[-\s]?level\b", re.IGNORECASE),
+    re.compile(r"\bbefore\s+clustering\b", re.IGNORECASE),
 ]
 UNSUPPORTED_METHOD_CLUSTER_PATTERNS = [
     re.compile(r"\bcannot-link\s+evidence\s+prevents\s+transitive\s+false\s+merges\b", re.IGNORECASE),
@@ -5079,8 +5080,8 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "check_editable_biography_file_paths",
         "passport-type photograph",
         "author-material completion",
-        "current abstract is 220 words",
-        "30-word buffer",
+        "current abstract is 221 words",
+        "29-word buffer",
         "250-word DKE preflight limit",
         "abstract-length compliance",
         "not writing quality or scientific evidence",

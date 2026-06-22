@@ -889,7 +889,7 @@ The reviewer-facing boundary is metadata fit, not stronger evidence. The keyword
 
 Outcome: pass for abstract-length compliance; blocked for final upload until any selected-journal template edit is rechecked against the live submission-system abstract field.
 
-This gate checks whether the current abstract remains within the DKE front-matter limit. The current abstract is 220 words under the 250-word DKE preflight limit, leaving a 30-word buffer, and `validate_manuscript.py --strict-latex` checks the abstract length before submission-package validation. The DKE/Elsevier preflight source copies the same abstract into the `elsarticle` front matter, so abstract edits must be followed by a source rebuild and package validation.
+This gate checks whether the current abstract remains within the DKE front-matter limit. The current abstract is 221 words under the 250-word DKE preflight limit, leaving a 29-word buffer, and `validate_manuscript.py --strict-latex` checks the abstract length before submission-package validation. The DKE/Elsevier preflight source copies the same abstract into the `elsarticle` front matter, so abstract edits must be followed by a source rebuild and package validation.
 
 The reviewer-facing boundary is abstract-length compliance, not writing quality or scientific evidence. A passing length gate does not strengthen the Open-v2 evidence, does not finalize the target journal, and does not replace the live submission-system preview. After any abstract, template, or journal-route edit, recompute the word count, rerun the manuscript validator, rebuild the affected PDF/source files, and regenerate the submission package.
 
@@ -1243,7 +1243,7 @@ The reviewer-facing boundary is abstract first-screen fairness, not new empirica
 
 Outcome: pass for abstract word-budget buffer coverage; must be rerun after any abstract, keyword, template, or Elsevier front-matter edit.
 
-This gate checks whether the abstract has enough space below the 250-word DKE/Elsevier front-matter limit to survive minor target-specific edits. The current abstract has 220 words, preserving a 30-word buffer and exceeding the minimum 15-word buffer enforced by `validate_manuscript.py --strict-latex`. The same gate covers the generated Elsevier draft source because it copies the manuscript abstract into the front matter.
+This gate checks whether the abstract has enough space below the 250-word DKE/Elsevier front-matter limit to survive minor target-specific edits. The current abstract has 221 words, preserving a 29-word buffer and exceeding the minimum 15-word buffer enforced by `validate_manuscript.py --strict-latex`. The same gate covers the generated Elsevier draft source because it copies the manuscript abstract into the front matter.
 
 The reviewer-facing boundary is word-budget buffer, not stronger scientific evidence. This change improves editorial-upload robustness only; it does not alter the Open-v2 evidence, create same-scope comparison, or finalize the target-journal template. Future abstract edits must keep at least a 15-word DKE/Elsevier word-budget buffer or explicitly rerun the abstract-length and package validation gates before upload.
 

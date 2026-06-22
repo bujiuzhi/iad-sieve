@@ -1614,7 +1614,7 @@ def test_check_abstract_cluster_overclaim_accepts_pair_stage_boundary() -> None:
     assert callable(checker)
     manuscript_text = (
         r"\begin{abstract}"
-        "IAD-Risk uses false-merge risk gating to block risky automatic pair merges before clustering. "
+        "IAD-Risk uses false-merge risk gating to block risky automatic pair merges before automatic merging. "
         "The manuscript keeps pair-level quality claims separated from cluster-level quality claims. "
         "Cluster-level quality claims remain conditional on cluster artifacts."
         r"\end{abstract}"
@@ -1677,6 +1677,25 @@ def test_check_abstract_cluster_overclaim_rejects_cluster_prevention_claim() -> 
     assert any("automatic merge clusters" in error for error in errors)
 
 
+def test_check_abstract_cluster_overclaim_rejects_before_clustering_wording() -> None:
+    """验证摘要不得用 before clustering 暗示首屏聚类级效果。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_abstract_cluster_overclaim", None)
+    assert callable(checker)
+    manuscript_text = (
+        r"\begin{abstract}"
+        "IAD-Risk applies false-merge risk gating before clustering. "
+        "The pair-level conclusion is bounded by cluster artifacts."
+        r"\end{abstract}"
+    )
+
+    errors = checker(manuscript_text)
+
+    assert any("unsupported abstract cluster-level claim" in error for error in errors)
+    assert any("before clustering" in error for error in errors)
+
+
 def test_check_abstract_cluster_overclaim_rejects_missing_pair_level_boundary() -> None:
     """验证摘要结论必须说明 pair-level 与 cluster artifact 边界。"""
 
@@ -1685,7 +1704,7 @@ def test_check_abstract_cluster_overclaim_rejects_missing_pair_level_boundary() 
     assert callable(checker)
     manuscript_text = (
         r"\begin{abstract}"
-        "IAD-Risk uses false-merge risk gating to block risky automatic pair merges before clustering. "
+        "IAD-Risk uses false-merge risk gating to block risky automatic pair merges before automatic merging. "
         "The results support a conservative conclusion: identity-agenda disentanglement is a practical "
         "mechanism for safer scholarly deduplication."
         r"\end{abstract}"
@@ -8470,8 +8489,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "metadata fit",
             "not stronger evidence",
             "## Readiness Gate 96: DKE Abstract-Length Gate",
-            "current abstract is 220 words",
-            "30-word buffer",
+            "current abstract is 221 words",
+            "29-word buffer",
             "250-word DKE preflight limit",
             "abstract-length compliance",
             "not writing quality or scientific evidence",
@@ -10237,7 +10256,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_abstract_word_budget_buf
         "Readiness Gate 140: Abstract Word-Budget Buffer Gate",
         "abstract word-budget buffer drift",
         "abstract word-budget buffer coverage",
-        "30-word buffer",
+        "29-word buffer",
         "15-word buffer",
         "word-budget buffer, not stronger scientific evidence",
         "The abstract keeps at least a 15-word DKE/Elsevier word-budget buffer",
