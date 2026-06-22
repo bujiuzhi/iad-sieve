@@ -4420,7 +4420,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "L2 public-source rebuild chain-of-custody gap",
         "selective-decision workload evidence",
         "selective workload denominator ambiguity",
-        "anonymous cover-letter declaration confirmation",
+        "pre-submission cover-letter declaration boundary",
         "preflight metadata declaration placeholders",
         "anonymous review-file declaration boundary",
         "introduction row-scope comparison overread",
