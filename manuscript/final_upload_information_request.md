@@ -241,6 +241,13 @@ For each author, select the applicable CRediT roles and then draft the final aut
 - Artifact URL or DOI embedded in research data statement:
 - Raw third-party data redistribution boundary included:
 
+For the DKE/Elsevier route, the research data statement must either link to the public artifact release or explain why research data cannot be shared. For this manuscript, use the artifact release route once the release URL or DOI exists; do not describe the Git repository alone as the full research data record.
+
+- DKE/Elsevier research data statement option selected:
+- Research data statement includes public artifact URL or DOI:
+- Research data statement preserves raw third-party data redistribution boundary:
+- Research data statement matches live submission-system data statement field:
+
 ## Artifact release
 
 - Artifact release URL or DOI:

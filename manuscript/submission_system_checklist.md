@@ -121,9 +121,10 @@ Before upload, verify:
 11. The generative AI declaration statement is complete and matches the selected journal's live submission field.
 12. Author biographies and photographs are ready when the selected DKE/Elsevier route requests them, each biography has a maximum 100 words, each biography file uses an editable format and must not be PDF, and `author_identity_materials.biography_files`, `author_identity_materials.photograph_files`, and `author_identity_materials.author_identity_materials_verified` record the external materials.
 13. The competing-interest statement, Elsevier competing-interest declaration file, data/code availability statement, and ethics statement are consistent across the manuscript and system fields.
-14. The artifact release URL or DOI resolves publicly or according to the journal's access policy, the artifact release URL is a public non-placeholder HTTP/HTTPS URL when a URL is used, and the artifact manifest `publication.public_access_status` records that public access state.
-15. `live_submission_system_verified` and `final_upload_package_verified_against_system` are true only after the live submission system preview and final package contents match the current source package.
-16. The manuscript does not claim human gold labels, broad method superiority, or threshold stability unless the corresponding artifact evidence exists.
+14. The DKE/Elsevier research data statement field includes the same artifact URL or DOI as `submission_metadata.yml`, preserves the raw third-party data redistribution boundary, and is not replaced by a Git-only repository statement.
+15. The artifact release URL or DOI resolves publicly or according to the journal's access policy, the artifact release URL is a public non-placeholder HTTP/HTTPS URL when a URL is used, and the artifact manifest `publication.public_access_status` records that public access state.
+16. `live_submission_system_verified` and `final_upload_package_verified_against_system` are true only after the live submission system preview and final package contents match the current source package.
+17. The manuscript does not claim human gold labels, broad method superiority, or threshold stability unless the corresponding artifact evidence exists.
 
 ## Live Submission Text Checks
 
