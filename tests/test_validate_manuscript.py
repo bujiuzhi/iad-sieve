@@ -10782,7 +10782,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
             "The results support a conservative pair-level conclusion.",
             "The result includes HNFMR 0.790--0.999 and zero observed HNFMR in the held-out hard-negative stratum, with ordinary FMR still reported separately as 0.001.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
-            "The contribution includes a reproducible benchmark contract.",
+            "The contribution includes a provenance-aware benchmark contract for reproducibility review.",
             "It does not claim cluster-level deployment quality without cluster artifacts.",
             "Additional validation is needed before broad method ranking.",
         ]
@@ -10902,7 +10902,7 @@ def test_check_editorial_claim_alignment_rejects_abstract_without_scope_ranking_
             "The results support a conservative pair-level conclusion.",
             "The result includes HNFMR 0.790--0.999 and zero observed HNFMR, with ordinary FMR still reported separately as 0.001.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
-            "The contribution includes a reproducible benchmark contract.",
+            "The contribution includes a provenance-aware benchmark contract for reproducibility review.",
             "It does not claim cluster-level deployment quality without cluster artifacts.",
             "Additional validation is needed before broad method ranking.",
         ]
@@ -10960,7 +10960,7 @@ def test_check_editorial_claim_alignment_rejects_abstract_without_pair_cluster_b
             "The results support a conservative pair-level conclusion.",
             "The result includes HNFMR 0.790--0.999 and zero observed HNFMR, with ordinary FMR still reported separately as 0.001.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
-            "The contribution includes a reproducible benchmark contract.",
+            "The contribution includes a provenance-aware benchmark contract for reproducibility review.",
             "It does not claim cluster-level deployment quality without cluster artifacts.",
             "Additional validation is needed before broad method ranking.",
         ]
@@ -11030,7 +11030,7 @@ def test_check_editorial_claim_alignment_rejects_conclusion_without_cluster_boun
             "The results support a conservative pair-level conclusion.",
             "The result includes HNFMR 0.790--0.999 and zero observed HNFMR, with ordinary FMR still reported separately as 0.001.",
             "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
-            "The contribution includes a reproducible benchmark contract.",
+            "The contribution includes a provenance-aware benchmark contract for reproducibility review.",
             "Additional validation is needed before broad method ranking.",
         ]
     )
@@ -11076,6 +11076,88 @@ def test_check_editorial_claim_alignment_rejects_conclusion_without_cluster_boun
 
     assert any("main conclusion" in error for error in errors)
     assert any("cluster-level deployment quality" in error for error in errors)
+
+
+def test_check_editorial_claim_alignment_rejects_overbroad_reproducible_benchmark_contract() -> None:
+    """验证结论不能把 provenance-aware benchmark contract 写成完整可复现基准。"""
+
+    module = _load_validate_manuscript_module()
+    title = "IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication"
+    manuscript_text = "\n".join(
+        [
+            rf"\title{{{title}}}",
+            r"\begin{abstract}",
+            "This paper studies scholarly data integration.",
+            "This paper studies identity-agenda confusion and proposes IAD-Risk.",
+            "A single match score does not reveal whether the evidence reflects identity or agenda relatedness.",
+            "It exposes identity, agenda, and agenda-non-identity signals.",
+            "It evaluates IAD-Bench under an Open-v2 evidence snapshot.",
+            "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
+            "The RoBERTa pair-classifier row remains a strong supervised comparator and is not broad-superiority evidence.",
+            "The results include HNFMR 0.790--0.999 and zero observed HNFMR in the held-out hard-negative stratum, with ordinary FMR still reported separately as 0.001.",
+            "The results support a conservative pair-level conclusion.",
+            "Cluster-level quality claims require cluster artifacts before broad method-ranking claims.",
+            r"\end{abstract}",
+            r"\section{Conclusion}",
+            "IAD-Risk addresses a specific failure mode by separating identity and agenda evidence.",
+            "It uses false-merge risk and supports targeted false-merge suppression.",
+            "The results support a conservative pair-level conclusion.",
+            "The result includes HNFMR 0.790--0.999 and zero observed HNFMR in the held-out hard-negative stratum, with ordinary FMR still reported separately as 0.001.",
+            "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
+            "The contribution includes a provenance-aware benchmark contract for reproducibility review.",
+            "The contribution includes a reproducible benchmark contract.",
+            "It does not claim cluster-level deployment quality without cluster artifacts.",
+            "Additional validation is needed before broad method ranking.",
+        ]
+    )
+    cover_letter_text = "\n".join(
+        [
+            title,
+            "The paper studies identity-agenda confusion and proposes IAD-Risk.",
+            "The framework is motivated by single-score matching.",
+            "It exposes identity, agenda, and agenda-non-identity signals.",
+            "The manuscript contributes IAD-Bench and reports an Open-v2 evidence snapshot.",
+            "The result includes HNFMR 0.790--0.999 and zero observed HNFMR in the held-out hard-negative stratum, with ordinary FMR still reported separately as 0.001.",
+            "The manuscript does not claim broad method superiority.",
+            "RoBERTa pair classification is treated as a strong supervised baseline.",
+            "IAD-Risk is presented as an auditable relation-role design rather than a broad superiority claim.",
+            "raw third-party data and full experimental outputs are not redistributed in Git.",
+            "The manuscript is positioned for a data and knowledge engineering venue.",
+            "It covers database-oriented scholarly data integration and reproducible data-processing contracts.",
+        ]
+    )
+    highlights_text = "\n".join(
+        [
+            "- Identity-agenda confusion creates data/knowledge-engineering merge risk.",
+            "- IAD-Risk separates identity, agenda, and ANI evidence.",
+            "- IAD-Bench keeps gold, proxy, and silver labels separate.",
+            "- Open-v2 held-out hard-negative scope: zero observed HNFMR; ordinary FMR=0.001.",
+            "- Cluster-level claims require artifact-backed audits.",
+        ]
+    )
+    keywords_text = (
+        "scholarly entity matching; work deduplication; identity-agenda disentanglement; "
+        "false-merge risk; provenance-aware evaluation; scholarly data integration"
+    )
+    metadata_text = "\n".join(
+        [
+            f'title: "{title}"',
+            "broad_method_ranking_claimed: false",
+            "silver_labels_claimed_as_human_gold: false",
+            "artifact_release_required_before_final_upload: true",
+        ]
+    )
+
+    errors = module.check_editorial_claim_alignment(
+        manuscript_text,
+        cover_letter_text,
+        highlights_text,
+        keywords_text,
+        metadata_text,
+    )
+
+    assert any("overbroad reproducibility wording" in error for error in errors)
+    assert any("reproducible benchmark contract" in error for error in errors)
 
 
 def test_check_editorial_claim_alignment_rejects_drifted_submission_materials() -> None:

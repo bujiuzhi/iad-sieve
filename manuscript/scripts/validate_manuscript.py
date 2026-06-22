@@ -6805,7 +6805,8 @@ def check_editorial_claim_alignment(
                 "ordinary FMR still reported separately as 0.001",
                 "scope-bounded mechanism evidence",
                 "same-scope comparative ranking",
-                "reproducible benchmark contract",
+                "provenance-aware benchmark contract",
+                "reproducibility review",
                 "does not claim cluster-level deployment quality without cluster artifacts",
                 "Additional validation",
                 "broad method ranking",
@@ -6882,6 +6883,12 @@ def check_editorial_claim_alignment(
         for phrase in unsafe_zero_hnfmr_scope_phrases:
             if phrase.lower() in document_text.lower():
                 errors.append(f"editorial claim alignment uses over-broad HNFMR scope in {document_name}: {phrase}")
+    overbroad_reproducibility_phrases = [
+        "reproducible benchmark contract",
+    ]
+    for phrase in overbroad_reproducibility_phrases:
+        if phrase.lower() in conclusion_text.lower():
+            errors.append(f"editorial claim alignment uses overbroad reproducibility wording in main conclusion: {phrase}")
     return errors
 
 
