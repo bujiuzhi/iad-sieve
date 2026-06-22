@@ -7698,8 +7698,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Readiness Summary",
-            "Readiness gates covered: 146.",
-            "Highest current reviewer-facing risks are tracked as a risk inventory rather than a claim that every gate is currently failing: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, target-route reviewer response drift, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, DKE author identity material cardinality drift, DKE photograph file-format drift, Git-only CLI discovery drift, DKE research-data statement drift, data-processing command implementation-map drift, manuscript product-boundary table drift, Elsevier competing-interest declaration file traceability, introduction contribution first-screen alignment, conclusion first-screen boundary alignment, main-result strong-baseline interpretation drift, abstract strong-baseline interpretation drift, submission-day official-source drift, processing-run-log schema bypass, process-note vocabulary bypass, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, reviewer workload-transfer response drift, rule-based baseline omission response drift, pre-submission cover-letter declaration boundary, preflight metadata declaration placeholders, anonymous review-file declaration boundary, introduction row-scope comparison overread, main-result operating-point overread, figure metric-scope overread, cover-letter Git-only reproduction boundary, Q2/B ranking evidence packet traceability, public documentation index drift, local submission-package artifact tracking drift, DKE/Elsevier draft abstract-length drift, abstract word-budget buffer drift, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, ANI threshold notation drift, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final cover-letter preflight wording gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, latex-engine panic diagnostic gap, and stronger evidence gates.",
+            "Readiness gates covered: 147.",
+            "Highest current reviewer-facing risks are tracked as a risk inventory rather than a claim that every gate is currently failing: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, target-route reviewer response drift, live final-package system verification gap, data-processing Git-only boundary drift, DKE author biography and photograph materials, DKE biography format and word-limit drift, DKE author identity material cardinality drift, DKE photograph file-format drift, Git-only CLI discovery drift, DKE research-data statement drift, data-processing command implementation-map drift, manuscript product-boundary table drift, Elsevier competing-interest declaration file traceability, introduction contribution first-screen alignment, conclusion first-screen boundary alignment, main-result strong-baseline interpretation drift, abstract strong-baseline interpretation drift, submission-day official-source drift, processing-run-log schema bypass, process-note vocabulary bypass, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, reviewer workload-transfer response drift, rule-based baseline omission response drift, pre-submission cover-letter declaration boundary, preflight metadata declaration placeholders, anonymous review-file declaration boundary, introduction row-scope comparison overread, main-result operating-point overread, figure metric-scope overread, cover-letter Git-only reproduction boundary, Q2/B ranking evidence packet traceability, public documentation index drift, local submission-package artifact tracking drift, DKE/Elsevier draft abstract-length drift, abstract word-budget buffer drift, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, ANI threshold notation drift, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final cover-letter preflight wording gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, latex-engine panic diagnostic gap, and stronger evidence gates.",
             "artifact-link claim-upgrade response drift",
             "public-source temporal drift reviewer response drift",
             "final cover-letter sentence-map drift",
@@ -8969,6 +8969,14 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "`submission.target_journal`, `submission.article_type`, `target_preparation`, `artifact_boundary.artifact_release_url` or `artifact_boundary.artifact_release_doi`, declaration fields, and `corresponding_author.name`",
             "anonymous pre-submission cover letter separate from the final target-specific cover letter",
             "`Dear Editor`, `Anonymous Authors`, Git-only preflight wording, or unsupported Q2/B-complete language",
+            "## Readiness Gate 147: Data-Processing Git-Only Reproduction Boundary Gate",
+            "public data-processing reproduction-boundary coverage",
+            "Git-only review confirms L0 code check and L1 fixture rebuild",
+            "cannot verify Open-v2/Open-v3 main-table numbers",
+            "Full result audit requires L2 public-source rebuild or L3 result audit evidence",
+            "`configs/source_input_manifest.json`, `logs/processing_run_log.jsonl`, `checksums.sha256`, and the external artifact release",
+            "data-processing documentation discipline, not new numerical evidence",
+            "does not provide raw third-party data, freeze public API responses, publish prediction files, or validate the missing L2/L3 artifacts",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             r"Method threshold notation uses `\tau_n` for the agenda-non-identity risk-head threshold",
@@ -8993,6 +9001,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "Reviewer-response wording treats an artifact URL or DOI as access/provenance binding only",
             "Reviewer-response wording treats public-source commands as reconstruction code paths rather than frozen source snapshots",
             "Final cover-letter assembly uses the sentence map and keeps the anonymous pre-submission cover letter separate from the final target-specific cover letter",
+            "`docs/data-processing-pipeline.md` states that Git-only review confirms L0 code check and L1 fixture rebuild only",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
         ]
     )
@@ -9009,7 +9018,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Readiness Summary",
-        "Readiness gates covered: 146",
+        "Readiness gates covered: 147",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -9033,7 +9042,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Readiness Summary" in error for error in errors)
-    assert any("Readiness gates covered: 146" in error for error in errors)
+    assert any("Readiness gates covered: 147" in error for error in errors)
     assert any("Adversarial Review Round Ledger" in error for error in errors)
     assert any("Q2/B upgrade audit" in error for error in errors)
     assert any("source-heldout package" in error for error in errors)
@@ -10527,6 +10536,32 @@ def test_check_reviewer_readiness_audit_rejects_missing_final_cover_letter_sente
     assert any("Final Cover-Letter Sentence Map Gate" in error for error in errors)
     assert any("final cover-letter sentence-map drift" in error for error in errors)
     assert any("concrete sentence map" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_data_processing_git_only_boundary_gate() -> None:
+    """验证审稿准备度审计必须覆盖数据处理 Git-only 复现边界。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Readiness Gate 147: Data-Processing Git-Only Reproduction Boundary Gate",
+        "data-processing Git-only boundary drift",
+        "public data-processing reproduction-boundary coverage",
+        "Git-only review confirms L0 code check and L1 fixture rebuild",
+        "cannot verify Open-v2/Open-v3 main-table numbers",
+        "Full result audit requires L2 public-source rebuild or L3 result audit evidence",
+        "`configs/source_input_manifest.json`, `logs/processing_run_log.jsonl`, `checksums.sha256`, and the external artifact release",
+        "data-processing documentation discipline, not new numerical evidence",
+        "does not provide raw third-party data, freeze public API responses, publish prediction files, or validate the missing L2/L3 artifacts",
+        "`docs/data-processing-pipeline.md` states that Git-only review confirms L0 code check and L1 fixture rebuild only",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Data-Processing Git-Only Reproduction Boundary Gate" in error for error in errors)
+    assert any("data-processing Git-only boundary drift" in error for error in errors)
+    assert any("cannot verify Open-v2/Open-v3 main-table numbers" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_fixture_evidence_isolation_gate() -> None:
