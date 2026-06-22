@@ -5668,7 +5668,7 @@ def check_cover_letter(cover_letter_text: str) -> list[str]:
     required_markers = [
         "Dear Editor",
         "IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication",
-        "anonymous preflight cover letter",
+        "anonymous draft cover letter",
         "does not treat author declarations as finalized",
         "author-provided metadata must confirm originality",
         "author approval",
@@ -5686,7 +5686,7 @@ def check_cover_letter(cover_letter_text: str) -> list[str]:
         "database-oriented scholarly data integration",
         "knowledge engineering for scholarly records",
         "reproducible data-processing contracts",
-        "does not finalize the target journal",
+        "must be replaced after author confirmation of the target journal",
     ]
     errors = [f"cover letter missing required statement: {marker}" for marker in required_markers if marker not in cover_letter_text]
     subjective_fit_markers = [
@@ -5836,7 +5836,7 @@ def check_editorial_claim_alignment(
                 "does not claim broad method superiority",
                 "raw third-party data and full experimental outputs are not redistributed in Git",
                 "DKE-style data and knowledge engineering editorial screen",
-                "does not finalize the target journal",
+                "must be replaced after author confirmation of the target journal",
             ],
         ),
         "highlights": (

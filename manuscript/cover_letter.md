@@ -14,9 +14,9 @@ The claims are intentionally conservative: OpenAlex and OpenCitations labels are
 
 We also include supplementary material that documents the reproduction levels, fixture rebuild commands, public-source rebuild commands, artifact package requirements, and claim boundaries.
 
-For a DKE-style data and knowledge engineering editorial screen, the scope-fit claim is limited to database-oriented scholarly data integration, knowledge engineering for scholarly records, entity matching, benchmark construction, and reproducible data-processing contracts; this preflight wording does not finalize the target journal or replace author confirmation.
+For a DKE-style data and knowledge engineering editorial screen, the scope-fit claim is limited to database-oriented scholarly data integration, knowledge engineering for scholarly records, entity matching, benchmark construction, and reproducible data-processing contracts; this scope-fit note is preparatory and must be replaced after author confirmation of the target journal.
 
-This anonymous preflight cover letter does not treat author declarations as finalized. Before final upload, the author-provided metadata must confirm originality, author approval, competing-interest status, funding, author contribution, permission, and generative AI declarations.
+This anonymous draft cover letter records only submission-planning boundaries and does not treat author declarations as finalized. Before final upload, the author-provided metadata must confirm originality, author approval, competing-interest status, funding, author contribution, permission, and generative AI declarations.
 
 The repository provides source code, small public fixtures, schema contracts, build scripts, and artifact-release instructions; raw third-party data and full experimental outputs are not redistributed in Git and should be obtained from their original sources or from a separate artifact release with manifests and checksums.
 

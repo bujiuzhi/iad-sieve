@@ -8192,7 +8192,7 @@ def test_check_cover_letter_accepts_preflight_declaration_boundary() -> None:
         [
             "Dear Editor,",
             "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication.",
-            "This anonymous preflight cover letter does not treat author declarations as finalized.",
+            "This anonymous draft cover letter does not treat author declarations as finalized.",
             "Before final upload, the author-provided metadata must confirm originality, author approval, "
             "competing-interest status, funding, author contribution, permission, and generative AI declarations.",
             "The repository does not redistribute raw third-party data.",
@@ -8204,7 +8204,7 @@ def test_check_cover_letter_accepts_preflight_declaration_boundary() -> None:
             "It covers database-oriented scholarly data integration.",
             "It covers knowledge engineering for scholarly records.",
             "It covers reproducible data-processing contracts.",
-            "The preflight wording does not finalize the target journal.",
+            "The scope-fit note must be replaced after author confirmation of the target journal.",
         ]
     )
 
@@ -8221,7 +8221,7 @@ def test_check_cover_letter_rejects_missing_preflight_declaration_boundary() -> 
 
     errors = module.check_cover_letter(cover_letter_text)
 
-    assert any("anonymous preflight cover letter" in error for error in errors)
+    assert any("anonymous draft cover letter" in error for error in errors)
     assert any("author-provided metadata must confirm originality" in error for error in errors)
     assert any("generative AI declarations" in error for error in errors)
     assert any("DKE-style data and knowledge engineering editorial screen" in error for error in errors)
@@ -8235,7 +8235,7 @@ def test_check_cover_letter_rejects_premature_final_declarations() -> None:
         [
             "Dear Editor,",
             "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication.",
-            "This anonymous preflight cover letter does not treat author declarations as finalized.",
+            "This anonymous draft cover letter does not treat author declarations as finalized.",
             "Before final upload, the author-provided metadata must confirm originality, author approval, "
             "competing-interest status, funding, author contribution, permission, and generative AI declarations.",
             "All listed authors have approved the submitted version.",
@@ -8263,7 +8263,7 @@ def test_check_cover_letter_rejects_missing_artifact_release_boundary() -> None:
         [
             "Dear Editor,",
             "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication.",
-            "This anonymous preflight cover letter does not treat author declarations as finalized.",
+            "This anonymous draft cover letter does not treat author declarations as finalized.",
             "Before final upload, the author-provided metadata must confirm originality, author approval, "
             "competing-interest status, funding, author contribution, permission, and generative AI declarations.",
             "The repository does not redistribute raw third-party data.",
@@ -8285,7 +8285,7 @@ def test_check_cover_letter_rejects_missing_cluster_claim_boundary() -> None:
         [
             "Dear Editor,",
             "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication.",
-            "This anonymous preflight cover letter does not treat author declarations as finalized.",
+            "This anonymous draft cover letter does not treat author declarations as finalized.",
             "Before final upload, the author-provided metadata must confirm originality, author approval, "
             "competing-interest status, funding, author contribution, permission, and generative AI declarations.",
             "The repository does not redistribute raw third-party data.",
@@ -8309,7 +8309,7 @@ def test_check_cover_letter_rejects_subjective_fit_language() -> None:
         [
             "Dear Editor,",
             "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication.",
-            "This anonymous preflight cover letter does not treat author declarations as finalized.",
+            "This anonymous draft cover letter does not treat author declarations as finalized.",
             "Before final upload, the author-provided metadata must confirm originality, author approval, "
             "competing-interest status, funding, author contribution, permission, and generative AI declarations.",
             "The repository does not redistribute raw third-party data.",
@@ -8434,7 +8434,7 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
             "The manuscript does not claim broad method superiority.",
             "raw third-party data and full experimental outputs are not redistributed in Git.",
             "The cover letter supports a DKE-style data and knowledge engineering editorial screen.",
-            "The preflight wording does not finalize the target journal.",
+            "The scope-fit note must be replaced after author confirmation of the target journal.",
         ]
     )
     highlights_text = "\n".join(
