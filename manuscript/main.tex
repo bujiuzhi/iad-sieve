@@ -286,7 +286,9 @@ Z &= \sum_{(i,j)}(m^w_{ij}+m^a_{ij}+m^n_{ij}),\\
 \bigr],
 \end{aligned}
 \]
-where $\mathrm{CE}$ is binary cross-entropy and $\lambda_w,\lambda_a,\lambda_n$ control the contribution of each supervision channel. Missing labels therefore do not create negative examples for unrelated heads. A mini-batch with $Z=0$ is skipped before the optimizer update, and each reported relation head requires positive mask coverage in the declared training split. DeepMatcher pairs supervise same-work identity, whereas OpenAlex/OpenCitations silver hard negatives supervise agenda-non-identity risk without being promoted to human gold identity labels. The false-merge risk score is not directly supervised; it is derived after the relation heads are estimated.
+where $\mathrm{CE}$ is binary cross-entropy and $\lambda_w,\lambda_a,\lambda_n$ control the contribution of each supervision channel. Missing labels therefore do not create negative examples for unrelated heads. A mini-batch with $Z=0$ is skipped before the optimizer update, and each reported relation head requires positive mask coverage in the declared training split.
+
+The supervision sources remain label-strength aware. DeepMatcher pairs supervise same-work identity, whereas OpenAlex/OpenCitations silver hard negatives supervise agenda-non-identity risk without being promoted to human gold identity labels. The false-merge risk score is not directly supervised; it is derived after the relation heads are estimated.
 
 \subsection{Training and Inference Trace}
 
