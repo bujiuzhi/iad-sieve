@@ -105,6 +105,30 @@ RESEARCH_DATA_STATEMENT_REQUIRED_TARGETS = {
     "data & knowledge engineering": "Data & Knowledge Engineering",
     "information systems": "Information Systems",
 }
+RESEARCH_DATA_STATEMENT_RAW_DATA_TERMS = (
+    "raw third-party data",
+    "raw third party data",
+)
+RESEARCH_DATA_STATEMENT_REDISTRIBUTION_BOUNDARY_TERMS = (
+    "not redistributed",
+    "not distributed",
+    "not included",
+    "not provided",
+    "not shared",
+    "not committed",
+    "excluded",
+    "original provider",
+    "provider license",
+    "provider licenses",
+    "provider terms",
+    "license boundary",
+)
+RESEARCH_DATA_STATEMENT_REPOSITORY_ONLY_TERMS = (
+    "git",
+    "git-only",
+    "github",
+    "repository",
+)
 DKE_ELSEVIER_FILE_REQUIREMENT_ERROR = "DKE/Elsevier final upload requires DKE/Elsevier source and PDF files"
 FINAL_UPLOAD_REPOSITORY_BRANCH = "main"
 FINAL_UPLOAD_TRUE_FIELDS = {
@@ -1102,6 +1126,24 @@ def check_research_data_statement(metadata_text: str) -> list[str]:
         if artifact_values and not any(value in research_data_statement for value in artifact_values):
             errors.append(
                 f"research data statement missing artifact release URL or DOI value for {target_journal_label}"
+            )
+        normalized_statement = research_data_statement.lower()
+        includes_raw_data = any(term in normalized_statement for term in RESEARCH_DATA_STATEMENT_RAW_DATA_TERMS)
+        includes_redistribution_boundary = any(
+            term in normalized_statement for term in RESEARCH_DATA_STATEMENT_REDISTRIBUTION_BOUNDARY_TERMS
+        )
+        if not includes_raw_data or not includes_redistribution_boundary:
+            errors.append(
+                "research data statement missing raw third-party data redistribution "
+                f"boundary for {target_journal_label}"
+            )
+        mentions_repository = any(
+            term in normalized_statement for term in RESEARCH_DATA_STATEMENT_REPOSITORY_ONLY_TERMS
+        )
+        contains_artifact_value = any(value.lower() in normalized_statement for value in artifact_values)
+        if artifact_values and mentions_repository and not contains_artifact_value:
+            errors.append(
+                f"research data statement must not be a Git-only repository statement for {target_journal_label}"
             )
     return errors
 

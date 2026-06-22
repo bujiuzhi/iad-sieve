@@ -9082,9 +9082,11 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "does not download raw third-party data, reproduce Open-v2 numerical rows, or replace the L2/L3 artifact release",
             "## Readiness Gate 135: DKE Research Data Statement Gate",
             "DKE research-data statement validator coverage",
-            "`statements.research_data_statement` is empty, points only to the Git repository, or omits the public artifact URL or DOI",
+            "`statements.research_data_statement` is empty, points only to the Git repository, omits the public artifact URL or DOI, or omits the raw third-party data redistribution boundary",
             "rejects missing DKE research data statements",
+            "rejects missing DKE research data statements, Git-only repository statements",
             "same artifact URL or DOI recorded under `artifact_boundary`",
+            "preserve the raw third-party data redistribution boundary",
             "journal-system data-statement compliance, not full numerical reproduction",
             "data be deposited, linked, or explained in the submission statement",
             "does not publish the external artifact",
@@ -10461,9 +10463,11 @@ def test_check_reviewer_readiness_audit_rejects_missing_dke_research_data_statem
         "Readiness Gate 135: DKE Research Data Statement Gate",
         "DKE research-data statement drift",
         "DKE research-data statement validator coverage",
-        "`statements.research_data_statement` is empty, points only to the Git repository, or omits the public artifact URL or DOI",
+        "`statements.research_data_statement` is empty, points only to the Git repository, omits the public artifact URL or DOI, or omits the raw third-party data redistribution boundary",
         "rejects missing DKE research data statements",
+        "rejects missing DKE research data statements, Git-only repository statements",
         "same artifact URL or DOI recorded under `artifact_boundary`",
+        "preserve the raw third-party data redistribution boundary",
         "journal-system data-statement compliance, not full numerical reproduction",
         "data be deposited, linked, or explained in the submission statement",
         "does not publish the external artifact",
@@ -12170,6 +12174,69 @@ def _build_filled_final_upload_metadata_text(
     return "\n".join(metadata_lines)
 
 
+def _build_filled_dke_final_upload_metadata_text(
+    research_data_statement: str = (
+        "Source code and small fixtures are available in the repository; "
+        "the full result artifact is available at https://doi.org/10.0000/example. "
+        "Raw third-party data are not redistributed in Git."
+    ),
+) -> str:
+    """构建包含 DKE/Elsevier final-upload 必填字段的测试元数据。
+
+    参数:
+        research_data_statement: 写入 statements.research_data_statement 的声明文本。
+
+    返回:
+        str: 可传入 check_final_upload_metadata 的 DKE final-upload YAML 文本。
+    """
+
+    metadata_text = _build_filled_final_upload_metadata_text()
+    metadata_text = metadata_text.replace(
+        'target_journal: "Journal of Scholarly Data"',
+        'target_journal: "Data & Knowledge Engineering"',
+    )
+    metadata_text = metadata_text.replace(
+        'review_mode: "journal_system_confirmed"',
+        'review_mode: "single_anonymized_with_final_author_identities"',
+    )
+    metadata_text = metadata_text.replace(
+        "  author_biography_and_photo_required_before_upload: false",
+        "  author_biography_and_photo_required_before_upload: true",
+    )
+    metadata_text = metadata_text.replace(
+        "  biography_files: []",
+        '  biography_files: ["author-materials/example-author-biography.md"]',
+    )
+    metadata_text = metadata_text.replace(
+        "  photograph_files: []",
+        '  photograph_files: ["author-materials/example-author-photo.jpg"]',
+    )
+    metadata_text = metadata_text.replace(
+        "  author_identity_materials_verified: true",
+        "\n".join(
+            [
+                "  author_identity_materials_verified: true",
+                "publisher_declaration_files:",
+                "  elsevier_declarations_tool_required_before_upload: true",
+                '  competing_interest_declaration_file: "author-materials/competing-interest-declaration.docx"',
+                "  competing_interest_declaration_file_verified: true",
+            ]
+        ),
+    )
+    availability_line = (
+        '  data_code_availability: "Source code and fixtures are available at '
+        "https://github.com/bujiuzhi/iad-sieve.git commit abcdef1234567890; "
+        "full result artifacts are available at https://doi.org/10.0000/example. "
+        'Raw third-party data are not redistributed in Git."'
+    )
+    safe_statement = research_data_statement.replace('"', "'")
+    metadata_text = metadata_text.replace(
+        availability_line,
+        f'{availability_line}\n  research_data_statement: "{safe_statement}"',
+    )
+    return metadata_text
+
+
 def test_check_final_upload_metadata_rejects_placeholders() -> None:
     """验证 final-upload 门禁会拒绝未填写的投稿元数据。"""
 
@@ -13438,6 +13505,11 @@ def test_check_final_upload_metadata_rejects_research_data_statement_without_art
         "research data statement missing artifact release URL or DOI value for Data & Knowledge Engineering" in error
         for error in errors
     )
+    assert any(
+        "research data statement must not be a Git-only repository statement for Data & Knowledge Engineering"
+        in error
+        for error in errors
+    )
 
 
 def test_check_final_upload_metadata_accepts_dke_research_data_statement_with_artifact_link() -> None:
@@ -13544,6 +13616,41 @@ def test_check_final_upload_metadata_accepts_dke_research_data_statement_with_ar
     errors = module.check_final_upload_metadata(metadata_text)
 
     assert errors == []
+
+
+def test_check_final_upload_metadata_rejects_research_data_statement_without_raw_data_boundary() -> None:
+    """验证 DKE research data statement 必须保留原始第三方数据边界。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = _build_filled_dke_final_upload_metadata_text(
+        "The full result artifact is available at https://doi.org/10.0000/example."
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any(
+        "research data statement missing raw third-party data redistribution boundary "
+        "for Data & Knowledge Engineering" in error
+        for error in errors
+    )
+
+
+def test_check_final_upload_metadata_rejects_git_only_research_data_statement() -> None:
+    """验证 DKE research data statement 不能退化为 Git-only 仓库声明。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = _build_filled_dke_final_upload_metadata_text(
+        "Source code and research data are described in the public GitHub repository. "
+        "Raw third-party data are not redistributed in Git."
+    )
+
+    errors = module.check_final_upload_metadata(metadata_text)
+
+    assert any(
+        "research data statement must not be a Git-only repository statement "
+        "for Data & Knowledge Engineering" in error
+        for error in errors
+    )
 
 
 def test_check_final_upload_metadata_rejects_missing_author_contribution_statement() -> None:
