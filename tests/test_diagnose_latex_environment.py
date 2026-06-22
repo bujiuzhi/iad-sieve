@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import subprocess
 from pathlib import Path
 
 
@@ -95,3 +96,69 @@ def test_check_engine_availability_rejects_missing_engines() -> None:
 
     assert any("definitely_missing_latex_engine: missing" in warning for warning in warnings)
     assert any("no supported LaTeX engine found" in error for error in errors)
+
+
+def test_check_tectonic_smoke_test_rejects_runtime_panic(monkeypatch) -> None:
+    """验证最小 Tectonic 烟测能识别版本可用但运行即崩溃的环境。"""
+
+    module = _load_latex_diagnostic_module()
+    panic_output = "\n".join(
+        [
+            "thread 'reqwest-internal-sync-runtime' panicked at system-configuration/src/dynamic_store.rs:154:1:",
+            "Attempted to create a NULL object.",
+            "thread 'main' panicked at reqwest/src/blocking/client.rs:1397:5:",
+            "event loop thread panicked",
+        ]
+    )
+
+    def fake_run(command, check, capture_output, text, timeout):
+        """Return a synthetic Tectonic runtime panic."""
+        return subprocess.CompletedProcess(command, 101, stdout="", stderr=panic_output)
+
+    monkeypatch.setattr(module.shutil, "which", lambda command_name: "/usr/bin/tectonic")
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+
+    warnings, errors = module.check_tectonic_smoke_test("")
+
+    assert warnings == []
+    assert any("tectonic smoke test contains a Tectonic/Rust runtime panic" in error for error in errors)
+    assert any("Attempted to create a NULL object" in error for error in errors)
+    assert any("event loop thread panicked" in error for error in errors)
+
+
+def test_diagnose_latex_environment_can_skip_smoke_test(tmp_path: Path, monkeypatch) -> None:
+    """验证只检查历史日志时可以显式跳过 Tectonic 烟测。"""
+
+    module = _load_latex_diagnostic_module()
+    clean_log = tmp_path / "main.log"
+    clean_log.write_text("note: Writing `main.pdf`\n", encoding="utf-8")
+    monkeypatch.setattr(module, "check_engine_availability", lambda: (["tectonic: mocked"], []))
+    monkeypatch.setattr(
+        module,
+        "check_tectonic_smoke_test",
+        lambda bundle_dir: (_ for _ in ()).throw(AssertionError("smoke test should be skipped")),
+    )
+
+    warnings, errors = module.diagnose_latex_environment([clean_log], "", run_smoke_test=False)
+
+    assert any("TECTONIC_BUNDLE_DIR is not set" in warning for warning in warnings)
+    assert errors == []
+
+
+def test_diagnose_latex_environment_reports_smoke_test_errors(tmp_path: Path, monkeypatch) -> None:
+    """验证诊断入口会汇总最小 Tectonic 烟测错误。"""
+
+    module = _load_latex_diagnostic_module()
+    clean_log = tmp_path / "main.log"
+    clean_log.write_text("note: Writing `main.pdf`\n", encoding="utf-8")
+    monkeypatch.setattr(module, "check_engine_availability", lambda: (["tectonic: mocked"], []))
+    monkeypatch.setattr(
+        module,
+        "check_tectonic_smoke_test",
+        lambda bundle_dir: ([], ["tectonic smoke test contains a Tectonic/Rust runtime panic"]),
+    )
+
+    warnings, errors = module.diagnose_latex_environment([clean_log], "", run_smoke_test=True)
+
+    assert any("TECTONIC_BUNDLE_DIR is not set" in warning for warning in warnings)
+    assert any("Tectonic/Rust runtime panic" in error for error in errors)

@@ -3833,8 +3833,12 @@ def check_latex_environment_diagnostic_script(script_text: str) -> list[str]:
         "event loop thread panicked",
         "check_engine_availability",
         "check_bundle_directory",
+        "check_tectonic_smoke_test",
         "analyze_log_text",
         "analyze_log_files",
+        "--skip-smoke-test",
+        "Tectonic smoke test",
+        "minimal Tectonic compile smoke test",
         "does not rebuild manuscript PDFs",
     ]
     return [

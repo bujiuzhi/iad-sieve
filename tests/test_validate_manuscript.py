@@ -5383,8 +5383,12 @@ def test_check_latex_environment_diagnostic_script_accepts_required_markers() ->
             "event loop thread panicked",
             "check_engine_availability",
             "check_bundle_directory",
+            "check_tectonic_smoke_test",
             "analyze_log_text",
             "analyze_log_files",
+            "--skip-smoke-test",
+            "Tectonic smoke test",
+            "minimal Tectonic compile smoke test",
             "does not rebuild manuscript PDFs",
         ]
     )
@@ -5405,6 +5409,8 @@ def test_check_latex_environment_diagnostic_script_rejects_missing_runtime_marke
     assert any("Tectonic/Rust runtime panic" in error for error in errors)
     assert any("Attempted to create a NULL object" in error for error in errors)
     assert any("event loop thread panicked" in error for error in errors)
+    assert any("check_tectonic_smoke_test" in error for error in errors)
+    assert any("--skip-smoke-test" in error for error in errors)
 
 
 def test_check_related_work_positioning_accepts_main_text_and_supplementary_matrix() -> None:

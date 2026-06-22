@@ -13,6 +13,7 @@ import os
 import re
 import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 
 
@@ -50,6 +51,11 @@ def parse_arguments() -> argparse.Namespace:
         "--bundle-dir",
         default=os.environ.get("TECTONIC_BUNDLE_DIR", ""),
         help="Local Tectonic bundle directory. Defaults to TECTONIC_BUNDLE_DIR.",
+    )
+    parser.add_argument(
+        "--skip-smoke-test",
+        action="store_true",
+        help="Skip the minimal Tectonic compile smoke test and inspect only installed commands, bundle path, and logs.",
     )
     parser.add_argument("--log-level", default="INFO", help="Logging level.")
     return parser.parse_args()
@@ -165,12 +171,55 @@ def analyze_log_files(log_paths: list[Path]) -> list[str]:
     return errors
 
 
-def diagnose_latex_environment(log_paths: list[Path], bundle_dir: str) -> tuple[list[str], list[str]]:
+def check_tectonic_smoke_test(bundle_dir: str, timeout_seconds: int = 15) -> tuple[list[str], list[str]]:
+    """Compile a minimal document to detect runtime failures before manuscript builds.
+
+    Args:
+        bundle_dir: Optional Tectonic bundle directory.
+        timeout_seconds: Maximum seconds to wait for the smoke compile.
+
+    Returns:
+        tuple[list[str], list[str]]: Warnings and errors from the smoke test.
+    """
+    if shutil.which("tectonic") is None:
+        return ["Tectonic smoke test skipped because tectonic is missing."], []
+    with tempfile.TemporaryDirectory(prefix="iad-sieve-tectonic-smoke-") as temporary_directory:
+        smoke_tex = Path(temporary_directory) / "smoke.tex"
+        smoke_tex.write_text(
+            "\\documentclass{article}\n\\begin{document}\nIAD-Sieve LaTeX smoke test.\n\\end{document}\n",
+            encoding="utf-8",
+        )
+        command = ["tectonic", "-C"]
+        if bundle_dir.strip():
+            command.extend(["--bundle", str(Path(bundle_dir).expanduser())])
+        command.append(str(smoke_tex))
+        try:
+            completed = subprocess.run(command, check=False, capture_output=True, text=True, timeout=timeout_seconds)
+        except subprocess.TimeoutExpired as exc:
+            return [], [f"Tectonic smoke test timed out after {timeout_seconds} seconds: {exc}"]
+        except OSError as exc:
+            return [], [f"Tectonic smoke test failed to start: {exc}"]
+    combined_output = "\n".join(part for part in [completed.stdout, completed.stderr] if part)
+    runtime_errors = analyze_log_text(combined_output, "tectonic smoke test")
+    errors = list(runtime_errors)
+    if completed.returncode != 0 and not runtime_errors:
+        errors.append(f"Tectonic smoke test failed with exit code {completed.returncode}")
+    if errors:
+        return [], errors
+    return ["Tectonic smoke test completed without runtime panic."], []
+
+
+def diagnose_latex_environment(
+    log_paths: list[Path],
+    bundle_dir: str,
+    run_smoke_test: bool = True,
+) -> tuple[list[str], list[str]]:
     """Diagnose local LaTeX engine, bundle, and recent build logs.
 
     Args:
         log_paths: Log paths to inspect.
         bundle_dir: Optional Tectonic bundle directory.
+        run_smoke_test: Whether to run a minimal Tectonic compile smoke test.
 
     Returns:
         tuple[list[str], list[str]]: Warnings and errors.
@@ -180,6 +229,10 @@ def diagnose_latex_environment(log_paths: list[Path], bundle_dir: str) -> tuple[
     warnings.extend(bundle_warnings)
     errors.extend(bundle_errors)
     errors.extend(analyze_log_files(log_paths))
+    if run_smoke_test:
+        smoke_warnings, smoke_errors = check_tectonic_smoke_test(bundle_dir)
+        warnings.extend(smoke_warnings)
+        errors.extend(smoke_errors)
     return warnings, errors
 
 
@@ -192,7 +245,7 @@ def main() -> int:
     args = parse_arguments()
     logging.basicConfig(level=getattr(logging, str(args.log_level).upper(), logging.INFO), format="%(levelname)s %(message)s")
     log_paths = [Path(log_path).resolve() for log_path in args.log] if args.log else DEFAULT_LOGS
-    warnings, errors = diagnose_latex_environment(log_paths, args.bundle_dir)
+    warnings, errors = diagnose_latex_environment(log_paths, args.bundle_dir, not args.skip_smoke_test)
     for warning in warnings:
         LOGGER.warning(warning)
     if errors:
