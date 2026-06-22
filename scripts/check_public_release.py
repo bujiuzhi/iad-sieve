@@ -105,12 +105,15 @@ ROOT_README_REPRODUCTION_REQUIRED_MARKERS = (
     "L0/L1 只能证明公开仓库代码路径和小型样本处理契约可运行",
     "L2/L3 才能支持 Open-v2 数值表的结果级审计",
     "不存在单独的 L4 Git 仓库复现等级",
+    "Open-v2/Open-v3 是带有公开构造流程、复现分级和 artifact 审计边界的衍生压力评测框架",
+    "主数值复核仍依赖 L2/L3 产物",
 )
 
 ROOT_README_REPRODUCTION_FORBIDDEN_MARKERS = (
     "| L2 | 小样本开发实验 |",
     "| L3 | 论文主实验 |",
     "| L4 | 第三方复验 |",
+    "Open-v2/Open-v3 是可复验的衍生压力评测框架",
 )
 
 
