@@ -6273,6 +6273,27 @@ def test_check_data_artifact_release_document_rejects_missing_source_artifact_co
     assert any("--preflight-only" in error for error in errors)
 
 
+def test_check_data_artifact_release_document_rejects_obsolete_reproduction_levels() -> None:
+    """验证数据发布文档不能继续使用旧版 L2/L3/L4 复现等级。"""
+
+    module = _load_validate_manuscript_module()
+    document_text = Path("docs/data-and-artifact-release.md").read_text(encoding="utf-8")
+    document_text = document_text.replace(
+        "| L2 public-source rebuild | 从独立获取的公开原始文件重建派生 eval source 和 IAD-Bench 包 | 本地 `data/raw/` 中的公开来源文件、`source_input_manifest` 和 `processing_run_log` | 小时级，取决于来源规模 | 审计公开输入、处理命令、输出摘要和 checksum 的 chain of custody |",
+        "| L2 | 小样本开发实验 | arXiv 小样本 | 分钟到小时级 | 验证端到端流程 |",
+    )
+    document_text = document_text.replace(
+        "| L3 result audit | 审计已发布的表格、预测、阈值日志、配置、运行日志、manifest 和 checksum | 外部 artifact release | 取决于 artifact 规模 | 复核论文主结果、阈值、分母和逐行预测边界 |",
+        "| L3 | 论文主实验 | 完整公开数据与外部 baseline | 小时到天级 | 生成投稿表格和补充材料 |\n| L4 | 第三方复验 | 固定 artifact release | 取决于硬件 | 独立读者复现 |",
+    )
+
+    errors = module.check_data_artifact_release_document(document_text)
+
+    assert any("| L2 | 小样本开发实验 |" in error for error in errors)
+    assert any("| L3 | 论文主实验 |" in error for error in errors)
+    assert any("| L4 | 第三方复验 |" in error for error in errors)
+
+
 def test_check_artifact_release_skeleton_builder_accepts_required_markers() -> None:
     """验证 artifact release 骨架生成脚本包含必要入口和安全边界。"""
 

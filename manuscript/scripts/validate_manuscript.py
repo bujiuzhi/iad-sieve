@@ -4255,10 +4255,19 @@ def check_data_artifact_release_document(document_text: str) -> list[str]:
         "# 数据集与实验产物发布说明",
         "远程仓库不提交原始数据",
         "`outputs/` 下的实验输出",
+        "L0 code check",
+        "L1 fixture rebuild",
+        "L2 public-source rebuild",
+        "L3 result audit",
+        "L0/L1 只能证明公开仓库代码路径和小型样本处理契约可运行",
+        "L2/L3 才能支持 Open-v2 数值表的结果级审计",
+        "不存在单独的 L4 Git 仓库复现等级",
         "## L3 source artifact 目录契约",
         "`/path/to/source-artifacts`",
         "不是 Git 仓库的 `outputs/` 根目录",
         "不是 PDF 构建目录",
+        "L2 public-source rebuild 或离线主实验流程",
+        "predictions/",
         "tables/open_v2_main_results.csv",
         "predictions/iad_risk_transformer_predictions.jsonl",
         "predictions/representation_baseline_scores.jsonl",
@@ -4276,11 +4285,22 @@ def check_data_artifact_release_document(document_text: str) -> list[str]:
         "manuscript/build/",
     ]
     lowered_text = document_text.lower()
-    return [
+    errors = [
         f"data and artifact release document missing marker: {marker}"
         for marker in required_markers
         if marker.lower() not in lowered_text
     ]
+    forbidden_markers = [
+        "| L2 | 小样本开发实验 |",
+        "| L3 | 论文主实验 |",
+        "| L4 | 第三方复验 |",
+    ]
+    errors.extend(
+        f"data and artifact release document uses obsolete reproduction-level marker: {marker}"
+        for marker in forbidden_markers
+        if marker.lower() in lowered_text
+    )
+    return errors
 
 
 def check_artifact_release_skeleton_builder(script_text: str) -> list[str]:
