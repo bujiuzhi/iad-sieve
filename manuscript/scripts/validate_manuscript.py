@@ -1916,6 +1916,11 @@ def check_method_pipeline_figure(manuscript_text: str) -> list[str]:
     """
     required_markers = [
         r"\subsection{Overview}",
+        "IAD-Bench pair row joined to two normalized document records",
+        "Predictive inputs are identity and agenda features",
+        "Label source, label strength, provenance, split, and hard-negative level remain audit fields",
+        "they are not direct predictors",
+        "relation scores, a false-merge risk score, a merge/block/defer decision, and an audit row",
         r"\ref{fig:iad-risk-pipeline}",
         r"\begin{figure}",
         "Candidate",
@@ -5366,6 +5371,10 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "formatting and submission-policy traceability",
         "training-trace table-density reduction",
         "full training and inference trace table",
+        "input-output contract",
+        "IAD-Bench pair row is joined to two normalized document records",
+        "audit fields stay out of direct prediction",
+        "relation scores, the false-merge risk score, a merge/block/defer decision, and a checksum-bound audit row",
         "schema loading preserves pair IDs and split fields",
         "supervised fitting uses the masked objective",
         "threshold fixation records",

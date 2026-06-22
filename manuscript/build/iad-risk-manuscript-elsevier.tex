@@ -220,6 +220,8 @@ Open-v2 combined pair scope & 10,415 & Provides the shared pair contract for the
 
 IAD-Risk converts scholarly deduplication into selective risk-aware matching. Given a candidate pair, the model estimates identity, agenda, and agenda-non-identity signals, then derives a false-merge risk score. The final merge decision is made only when identity evidence exceeds a same-work threshold and risk evidence remains below blocking thresholds. Figure~\ref{fig:iad-risk-pipeline} summarizes the workflow. The method section follows the same execution order: it first defines identity and agenda signals, then introduces the relation heads and risk score, then specifies the training and inference trace, merge gate, algorithmic audit trail, operational boundary, and implementation details.
 
+The method input is an IAD-Bench pair row joined to two normalized document records, not an unstructured text pair alone. Predictive inputs are identity and agenda features derived from record content and metadata. Label source, label strength, provenance, split, and hard-negative level remain audit fields for masking, threshold selection, evaluation, and release checks; they are not direct predictors. The method output is a set of relation scores, a false-merge risk score, a merge/block/defer decision, and an audit row that binds thresholds, row scope, denominators, and checksums.
+
 \begin{figure}[H]
 \centering
 \small
