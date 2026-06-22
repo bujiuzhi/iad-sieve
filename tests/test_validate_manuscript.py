@@ -9013,10 +9013,14 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "fixture rebuild validation",
             "public-release boundary checks",
             "full numerical audit of the Open-v2 table requires the L2/L3 public-source rebuild or a released external artifact package",
+            "public-source commands are reconstruction code paths rather than frozen source snapshots",
+            "exact Open-v2 numerical reproduction requires recorded acquisition dates or versions",
+            "input checksums, processing logs, and released derived artifacts",
+            "live API calls or changed public dumps",
             "cover-letter reproduction boundary, not new empirical evidence",
             "does not make the Open-v2 numerical table reproducible from Git alone",
             "artifact release URL or DOI, checksum-bound prediction files, threshold logs, source manifests, and processing logs",
-            "The pre-submission cover letter preserves the Git-only review boundary",
+            "The pre-submission cover letter preserves both the Git-only review boundary and public-source temporal boundary",
             "## Readiness Gate 128: Q2/B Ranking Evidence Packet Checklist Gate",
             "Q2/B ranking evidence packet traceability",
             "selected journal ISSN or eISSN",
@@ -9189,7 +9193,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "The Q2/B acceptance gate is either fully ready.",
             r"Method threshold notation uses `\tau_n` for the agenda-non-identity risk-head threshold",
             "The final-upload cover letter contains no anonymous preflight wording",
-            "The pre-submission cover letter preserves the Git-only review boundary",
+            "The pre-submission cover letter preserves the Git-only review boundary and public-source temporal boundary",
             "The Q2/B ranking evidence packet records selected journal ISSN or eISSN",
             "`docs/README.md` remains within the public documentation index contract",
             "Generated submission-package directories and archives remain ignored and untracked",
@@ -10244,10 +10248,14 @@ def test_check_reviewer_readiness_audit_rejects_missing_cover_letter_git_only_bo
         "fixture rebuild validation",
         "public-release boundary checks",
         "full numerical audit of the Open-v2 table requires the L2/L3 public-source rebuild or a released external artifact package",
+        "public-source commands are reconstruction code paths rather than frozen source snapshots",
+        "exact Open-v2 numerical reproduction requires recorded acquisition dates or versions",
+        "input checksums, processing logs, and released derived artifacts",
+        "live API calls or changed public dumps",
         "cover-letter reproduction boundary, not new empirical evidence",
         "does not make the Open-v2 numerical table reproducible from Git alone",
         "artifact release URL or DOI, checksum-bound prediction files, threshold logs, source manifests, and processing logs",
-        "The pre-submission cover letter preserves the Git-only review boundary",
+        "The pre-submission cover letter preserves both the Git-only review boundary and public-source temporal boundary",
     ]:
         audit_text = audit_text.replace(marker, "")
 
@@ -11083,6 +11091,9 @@ def test_check_cover_letter_accepts_clean_pre_submission_letter() -> None:
             "without released bootstrap, test, and same-scope prediction artifacts.",
             "For a Git-only review, the repository supports fixture rebuild validation.",
             "full numerical audit of the Open-v2 table requires the L2/L3 public-source rebuild or a released external artifact package.",
+            "Public-source commands are reconstruction code paths rather than frozen source snapshots.",
+            "exact Open-v2 numerical reproduction requires recorded acquisition dates or versions, "
+            "input checksums, processing logs, and released derived artifacts rather than live API calls or changed public dumps.",
         ]
     )
 
@@ -11252,6 +11263,42 @@ def test_check_cover_letter_rejects_missing_git_only_reproduction_boundary() -> 
     assert any("Git-only review" in error for error in errors)
     assert any("fixture rebuild validation" in error for error in errors)
     assert any("full numerical audit of the Open-v2 table" in error for error in errors)
+
+
+def test_check_cover_letter_rejects_missing_public_source_temporal_boundary() -> None:
+    """验证投稿信必须说明公共源重跑不是冻结数据快照。"""
+
+    module = _load_validate_manuscript_module()
+    cover_letter_text = "\n".join(
+        [
+            "Dear Editor,",
+            "We submit IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication "
+            "for consideration as a research article.",
+            "The paper studies identity-agenda confusion and is motivated by the ambiguity of single-score matching.",
+            "It exposes identity, agenda, and agenda-non-identity signals separately.",
+            "The repository does not redistribute raw third-party data.",
+            "full experimental outputs are not redistributed in Git.",
+            "The repository includes artifact-release instructions.",
+            "Released artifacts should include manifests and checksums.",
+            "The manuscript does not claim cluster-level deployment quality without cluster artifacts.",
+            "The manuscript is positioned for a data and knowledge engineering venue.",
+            "It covers database-oriented scholarly data integration, knowledge engineering for scholarly records, "
+            "and reproducible data-processing contracts.",
+            "RoBERTa pair classification is treated as a strong supervised baseline.",
+            "IAD-Risk is presented as an auditable relation-role design rather than a broad superiority claim.",
+            "The Open-v2 numbers are point estimates for a fixed evidence snapshot.",
+            "This cover letter does not present confidence intervals, statistical significance, or model-ranking claims "
+            "without released bootstrap, test, and same-scope prediction artifacts.",
+            "For a Git-only review, the repository supports fixture rebuild validation.",
+            "full numerical audit of the Open-v2 table requires the L2/L3 public-source rebuild or a released external artifact package.",
+        ]
+    )
+
+    errors = module.check_cover_letter(cover_letter_text)
+
+    assert any("frozen source snapshots" in error for error in errors)
+    assert any("recorded acquisition dates or versions" in error for error in errors)
+    assert any("live API calls or changed public dumps" in error for error in errors)
 
 
 def test_check_submission_material_quantitative_summary_accepts_scoped_highlights() -> None:

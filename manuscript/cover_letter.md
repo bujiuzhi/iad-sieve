@@ -18,7 +18,7 @@ The manuscript is positioned for a data and knowledge engineering venue because 
 
 The repository provides source code, small public fixtures, schema contracts, build scripts, and artifact-release instructions; raw third-party data and full experimental outputs are not redistributed in Git and should be obtained from their original sources or from a separate artifact release with manifests and checksums.
 
-For a Git-only review, the repository supports installation checks, fixture rebuild validation, public-release boundary checks, and manuscript builds; full numerical audit of the Open-v2 table requires the L2/L3 public-source rebuild or a released external artifact package.
+For a Git-only review, the repository supports installation checks, fixture rebuild validation, public-release boundary checks, and manuscript builds; full numerical audit of the Open-v2 table requires the L2/L3 public-source rebuild or a released external artifact package. Public-source commands are reconstruction code paths rather than frozen source snapshots, and exact Open-v2 numerical reproduction requires recorded acquisition dates or versions, input checksums, processing logs, and released derived artifacts rather than live API calls or changed public dumps.
 
 Sincerely,
 
