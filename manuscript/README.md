@@ -4,6 +4,14 @@
 
 本目录保存期刊稿件源码、参考文献、构建脚本和编译后的 PDF。该目录与项目技术文档、数据目录和实验输出目录分离。
 
+## 目录边界
+
+`manuscript/` 是唯一纳入 Git 跟踪的稿件产物目录。期刊写作、匿名预投稿检查、DKE/Elsevier 预转换、投稿包构建脚本、投稿系统元数据和外部 artifact release 模板均在本目录维护。
+
+仓库根目录的 `docs/` 保存项目技术文档，不保存期刊上传材料；`data/` 保存本地数据边界，不作为投稿产物；`outputs/` 保存本地实验输出、PDF 构建缓存或离线 Tectonic bundle，不作为投稿产物。生成的投稿检查包仅位于 `manuscript/build/`，其中 `manuscript/build/submission_package/`、`manuscript/build/dke_preflight_package/` 和对应 zip 文件是本地构建产物，不纳入 Git 跟踪。
+
+本目录只保留与本课题投稿直接相关的材料，不保存内部过程材料、编辑日志或与课题无关的文档。
+
 ## 文件清单
 
 ```text
