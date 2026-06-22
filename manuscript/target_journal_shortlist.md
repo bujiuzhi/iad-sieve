@@ -1,6 +1,6 @@
 # Target Journal Shortlist
 
-Status date: 2026-06-19
+Status date: 2026-06-22
 
 ## Selection Boundary
 
@@ -26,7 +26,7 @@ Rationale: Scientometrics is a strong thematic fit for scholarly metadata and sc
 
 Status: provisional preparation only; final upload metadata remains incomplete until author confirmation.
 
-Official guide rechecked: 2026-06-19.
+Official guide rechecked: 2026-06-22.
 
 | Requirement area | DKE preparation status | Remaining action before final upload |
 | --- | --- | --- |
@@ -45,14 +45,14 @@ Official guide rechecked: 2026-06-19.
 
 This audit records the publisher-facing constraints that determine the next manuscript pass. It does not replace author confirmation of institutional rankings, journal class, or final submission-system fields.
 
-Official source snapshot date: 2026-06-19.
+DKE official source snapshot date: 2026-06-22.
 
-- DKE guide verified: 2026-06-19.
+- DKE guide verified: 2026-06-22.
 - DKE guide source URL: https://www.sciencedirect.com/journal/data-and-knowledge-engineering/publish/guide-for-authors.
-- Information Systems guide verified: 2026-06-19.
-- Scientometrics guide verified: 2026-06-19.
+- Information Systems guide verified: 2026-06-19; not rechecked in this DKE-focused pass.
+- Scientometrics guide verified: 2026-06-19; not rechecked in this DKE-focused pass.
 
-All publisher-page facts in this shortlist were rechecked on 2026-06-19 from the official source links listed below. These checks support manuscript-preparation decisions only; JCR quartile, Chinese Academy of Sciences zone, CCF class, and local institutional category must still be rechecked in the authors' authorized ranking systems before final upload.
+DKE publisher-page facts in this shortlist were rechecked on 2026-06-22 from the official source links listed below, specifically the DKE source link. Information Systems and Scientometrics entries remain planning records from 2026-06-19 and must be rechecked before either route is selected. These checks support manuscript-preparation decisions only; JCR quartile, Chinese Academy of Sciences zone, CCF class, and local institutional category must still be rechecked in the authors' authorized ranking systems before final upload.
 
 ### DKE Official Guide Evidence
 

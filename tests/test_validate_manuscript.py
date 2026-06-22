@@ -4372,9 +4372,9 @@ def test_check_target_journal_shortlist_accepts_complete_shortlist() -> None:
             "## Template and File Implications",
             "## Data & Knowledge Engineering Preflight",
             "## Source-to-Decision Audit",
-            "Official guide rechecked: 2026-06-19",
-            "Official source snapshot date: 2026-06-19",
-            "DKE guide verified: 2026-06-19",
+            "Official guide rechecked: 2026-06-22",
+            "DKE official source snapshot date: 2026-06-22",
+            "DKE guide verified: 2026-06-22",
             "DKE guide source URL: https://www.sciencedirect.com/journal/data-and-knowledge-engineering/publish/guide-for-authors.",
             "## DKE Official Guide Evidence",
             "This is an official-guide preflight record.",
@@ -4382,9 +4382,10 @@ def test_check_target_journal_shortlist_accepts_complete_shortlist() -> None:
             "`selected_author_guide_source_url` remains incomplete.",
             "`selected_author_guide_rechecked_date` remains incomplete.",
             "`selected_target_author_confirmed` remains incomplete.",
-            "Information Systems guide verified: 2026-06-19",
-            "Scientometrics guide verified: 2026-06-19",
-            "All publisher-page facts in this shortlist were rechecked on 2026-06-19.",
+            "Information Systems guide verified: 2026-06-19; not rechecked in this DKE-focused pass.",
+            "Scientometrics guide verified: 2026-06-19; not rechecked in this DKE-focused pass.",
+            "DKE publisher-page facts in this shortlist were rechecked on 2026-06-22.",
+            "Information Systems and Scientometrics entries remain planning records from 2026-06-19.",
             "The official source links are listed below.",
             "JCR quartile and CCF class must be rechecked in the authors' authorized ranking systems.",
             "Status: provisional preparation only.",
@@ -4449,7 +4450,7 @@ def test_check_target_journal_shortlist_rejects_missing_current_source_snapshot(
             "## Template and File Implications",
             "## Data & Knowledge Engineering Preflight",
             "## Source-to-Decision Audit",
-            "Official guide rechecked: 2026-06-19",
+            "Official guide rechecked: 2026-06-22",
             "Status: provisional preparation only.",
             "The current anonymous author placeholder is compatible with single anonymized review preparation.",
             "The current abstract is checked against a 250-word limit.",
@@ -4466,7 +4467,7 @@ def test_check_target_journal_shortlist_rejects_missing_current_source_snapshot(
 
     errors = module.check_target_journal_shortlist(shortlist_text)
 
-    assert any("Official source snapshot date: 2026-06-19" in error for error in errors)
+    assert any("DKE official source snapshot date: 2026-06-22" in error for error in errors)
     assert any("Information Systems data statement is required" in error for error in errors)
     assert any("CRediT author contribution statement" in error for error in errors)
     assert any("generative AI declaration" in error for error in errors)
@@ -4511,7 +4512,7 @@ def test_check_target_journal_shortlist_rejects_missing_source_decision_audit() 
             "## Candidate Matrix",
             "## Template and File Implications",
             "## Data & Knowledge Engineering Preflight",
-            "Official guide rechecked: 2026-06-19",
+            "Official guide rechecked: 2026-06-22",
             "Status: provisional preparation only.",
             "The current anonymous author placeholder is compatible with single anonymized review preparation.",
             "The current abstract is checked against a 250-word limit.",
