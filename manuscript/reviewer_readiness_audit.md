@@ -865,7 +865,7 @@ The reviewer-facing boundary is metadata fit, not stronger evidence. The keyword
 
 Outcome: pass for abstract-length compliance; blocked for final upload until any selected-journal template edit is rechecked against the live submission-system abstract field.
 
-This gate checks whether the current abstract remains within the DKE front-matter limit. The current abstract is 209 words under the 250-word DKE preflight limit, and `validate_manuscript.py --strict-latex` checks the abstract length before submission-package validation. The DKE/Elsevier preflight source copies the same abstract into the `elsarticle` front matter, so abstract edits must be followed by a source rebuild and package validation.
+This gate checks whether the current abstract remains within the DKE front-matter limit. The current abstract is 225 words under the 250-word DKE preflight limit, and `validate_manuscript.py --strict-latex` checks the abstract length before submission-package validation. The DKE/Elsevier preflight source copies the same abstract into the `elsarticle` front matter, so abstract edits must be followed by a source rebuild and package validation.
 
 The reviewer-facing boundary is abstract-length compliance, not writing quality or scientific evidence. A passing length gate does not strengthen the Open-v2 evidence, does not finalize the target journal, and does not replace the live submission-system preview. After any abstract, template, or journal-route edit, recompute the word count, rerun the manuscript validator, rebuild the affected PDF/source files, and regenerate the submission package.
 

@@ -4329,7 +4329,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "check_editable_biography_file_paths",
         "passport-type photograph",
         "author-material completion",
-        "current abstract is 209 words",
+        "current abstract is 225 words",
         "250-word DKE preflight limit",
         "abstract-length compliance",
         "not writing quality or scientific evidence",
