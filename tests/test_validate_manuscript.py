@@ -2464,6 +2464,9 @@ def test_check_scoring_merge_algorithm_accepts_complete_contract() -> None:
             "It builds feature groups without using audit metadata as predictors.",
             r"The heads output $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, and $p_{\mathrm{ani}}$.",
             r"The derived risk score is $p_{\mathrm{risk}}=\max\{p_{\mathrm{ani}},p_{\mathrm{agenda}}(1-p_{\mathrm{work}})\}$.",
+            r"Here $\tau_n$ denotes the agenda-non-identity risk-head threshold.",
+            r"The merge condition includes p_{\mathrm{ani}}<\tau_n.",
+            r"The merge gate combines $\tau_w$, $\tau_n$, $\tau_r$.",
             "The gate uses a cannot-link flag and emits merge, block, or defer.",
             "The artifact rows include decision, row scope, denominators, thresholds, and checksum-bound artifact rows.",
             "The artifact supports same-work F1, FMR, HNFMR, coverage, and defer-rate audits.",
@@ -2524,6 +2527,21 @@ def test_check_scoring_merge_algorithm_rejects_missing_execution_order() -> None
     assert any("training-inference-trace" in error for error in errors)
     assert any("p_{\\mathrm{risk}}" in error for error in errors)
     assert any("merge, block, or defer" in error for error in errors)
+
+
+def test_check_scoring_merge_algorithm_rejects_ambiguous_ani_threshold_notation() -> None:
+    """验证 ANI 风险阈值不能使用易混淆的 tau_a 记号。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = Path("manuscript/main.tex").read_text(encoding="utf-8").replace(r"\tau_n", r"\tau_a")
+    supplementary_text = Path("manuscript/supplementary_material.tex").read_text(encoding="utf-8").replace(
+        r"\tau_n",
+        r"\tau_a",
+    )
+
+    errors = module.check_scoring_merge_algorithm(manuscript_text, supplementary_text)
+
+    assert any("ambiguous ANI threshold notation" in error for error in errors)
 
 
 def test_check_design_alternative_boundaries_accepts_supplementary_table() -> None:
@@ -2669,7 +2687,7 @@ def test_check_operating_point_disclosure_accepts_supplementary_table() -> None:
             "Representation cosine baselines use a fixed score threshold.",
             "RoBERTa pair classifier uses a pair probability threshold.",
             "IAD-Risk transformer variants use a risk gate.",
-            r"The default $\tau_w=\tau_a=\tau_r=0.5$ applies unless overridden.",
+            r"The default $\tau_w=\tau_n=\tau_r=0.5$ applies unless overridden.",
             "A score file, metric summary, and threshold entry are required.",
             "A prediction file, metric summary, and model log are required.",
             "A prediction file, model JSON, thresholds, and checksums are required.",
@@ -2725,7 +2743,7 @@ def test_check_operating_point_disclosure_rejects_missing_supplementary_table() 
             "Representation cosine baselines use a fixed score threshold.",
             "RoBERTa pair classifier uses a pair probability threshold.",
             "IAD-Risk transformer variants use a risk gate.",
-            r"The default $\tau_w=\tau_a=\tau_r=0.5$ applies unless overridden.",
+            r"The default $\tau_w=\tau_n=\tau_r=0.5$ applies unless overridden.",
             "A score file, metric summary, and threshold entry are required.",
             "A prediction file, metric summary, and model log are required.",
             "A prediction file, model JSON, thresholds, and checksums are required.",

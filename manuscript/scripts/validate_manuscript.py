@@ -1804,6 +1804,9 @@ def check_scoring_merge_algorithm(manuscript_text: str, supplementary_text: str 
         r"$p_{\mathrm{agenda}}$",
         r"$p_{\mathrm{ani}}$",
         r"$p_{\mathrm{risk}}=\max\{p_{\mathrm{ani}},p_{\mathrm{agenda}}(1-p_{\mathrm{work}})\}$",
+        r"$\tau_n$ denotes the agenda-non-identity risk-head threshold",
+        r"p_{\mathrm{ani}}<\tau_n",
+        r"combines $\tau_w$, $\tau_n$, $\tau_r$",
         "cannot-link flag",
         "merge, block, or defer",
         "decision, row scope, denominators, thresholds, and checksum-bound artifact rows",
@@ -1855,6 +1858,12 @@ def check_scoring_merge_algorithm(manuscript_text: str, supplementary_text: str 
         for marker in required_supplement_markers
         if marker not in evidence_text
     )
+    for document_name, document_text in {
+        "main manuscript": manuscript_text,
+        "supplementary material": supplementary_text,
+    }.items():
+        if r"\tau_a" in document_text:
+            errors.append(f"{document_name} uses ambiguous ANI threshold notation: \\tau_a")
     return errors
 
 
@@ -1977,7 +1986,7 @@ def check_operating_point_disclosure(manuscript_text: str, supplementary_text: s
         "Representation cosine baselines",
         "RoBERTa pair classifier",
         "IAD-Risk transformer variants",
-        r"default $\tau_w=\tau_a=\tau_r=0.5$",
+        r"default $\tau_w=\tau_n=\tau_r=0.5$",
         "score file, metric summary, and threshold entry",
         "prediction file, metric summary, and model log",
         "prediction file, model JSON, thresholds, and checksums",

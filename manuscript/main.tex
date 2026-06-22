@@ -294,7 +294,7 @@ The supervision sources remain label-strength aware. DeepMatcher pairs supervise
 
 The implementation keeps training, threshold fixation, inference, and metric export in one auditable trace. The full training and inference trace table is reported in the supplementary material. This trace is needed for auditability because IAD-Risk is a selective decision system: the same row-level decisions that produce same-work F1 also determine FMR, HNFMR, automatic merge coverage, block rate, and defer rate.
 
-The main execution contract is that schema loading preserves pair IDs and split fields, supervised fitting uses the masked objective without converting gold, proxy, or silver labels into unrelated supervision, threshold fixation records $\tau_w$, $\tau_a$, $\tau_r$, threshold source, selection split, and selection metric before held-out reporting, pair scoring writes $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, $p_{\mathrm{ani}}$, and $p_{\mathrm{risk}}$, decision emission records merge, block, or defer with cannot-link status, and metric export binds denominators and checksums to the same prediction artifact.
+The main execution contract is that schema loading preserves pair IDs and split fields, supervised fitting uses the masked objective without converting gold, proxy, or silver labels into unrelated supervision, threshold fixation records $\tau_w$, $\tau_n$, $\tau_r$, threshold source, selection split, and selection metric before held-out reporting, pair scoring writes $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, $p_{\mathrm{ani}}$, and $p_{\mathrm{risk}}$, decision emission records merge, block, or defer with cannot-link status, and metric export binds denominators and checksums to the same prediction artifact. Here $\tau_n$ denotes the agenda-non-identity risk-head threshold, not an agenda-relatedness threshold.
 
 \subsection{Risk-Aware Merge Decision}
 
@@ -302,7 +302,7 @@ The merge policy is:
 \[
 \hat{m}_{ij}=1 \quad \mathrm{iff}\quad
 p_{\mathrm{work}}\geq \tau_w,\quad
-p_{\mathrm{ani}}<\tau_a,\quad
+p_{\mathrm{ani}}<\tau_n,\quad
 p_{\mathrm{risk}}<\tau_r,\quad
 \mathrm{cannot\_link}_{ij}=0.
 \]
@@ -314,7 +314,7 @@ Operationally, the three outputs have different meanings. A pair is merged only 
 
 The executable method follows a fixed scoring and merge order. The full scoring and merge algorithm table is reported in the supplementary material. For each candidate pair, IAD-Risk first loads pair ID, document IDs, label strength, provenance, split, and hard-negative level from the pair schema. It then builds identity, agenda, ANI, and audit fields, including cannot-link feature groups, without using audit metadata as predictors. The relation heads output $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, and $p_{\mathrm{ani}}$; the derived risk score is $p_{\mathrm{risk}}=\max\{p_{\mathrm{ani}},p_{\mathrm{agenda}}(1-p_{\mathrm{work}})\}$.
 
-The merge gate combines $\tau_w$, $\tau_a$, $\tau_r$, the cannot-link flag, and threshold source to emit merge, block, or defer under a fixed operating point. The implementation then writes prediction and metric audit fields, including decision, row scope, denominators, thresholds, and checksum-bound artifact rows, so that same-work F1, FMR, HNFMR, coverage, and defer-rate audits all refer to the same decision file.
+The merge gate combines $\tau_w$, $\tau_n$, $\tau_r$, the cannot-link flag, and threshold source to emit merge, block, or defer under a fixed operating point. The implementation then writes prediction and metric audit fields, including decision, row scope, denominators, thresholds, and checksum-bound artifact rows, so that same-work F1, FMR, HNFMR, coverage, and defer-rate audits all refer to the same decision file.
 
 \subsection{Operational Complexity and Net Benefit}
 
@@ -346,7 +346,7 @@ Using provenance as a model feature is rejected because source or split identifi
 
 \subsection{Implementation Details}
 
-The reported transformer variants use frozen scientific document encoders rather than end-to-end fine-tuning. For each candidate pair, the implementation builds three feature groups: identity features combine transformer distances with identifiers, author overlap, venue, and year signals; agenda features combine semantic similarity with topic and citation overlap; agenda-non-identity features add conflict indicators such as different identifiers and year conflict. The three relation heads are trained on the training split, and the merge policy exposes $\tau_w$, $\tau_a$, and $\tau_r$ as configurable thresholds. Unless a validation protocol overrides them, the implementation uses 0.5 for all three thresholds.
+The reported transformer variants use frozen scientific document encoders rather than end-to-end fine-tuning. For each candidate pair, the implementation builds three feature groups: identity features combine transformer distances with identifiers, author overlap, venue, and year signals; agenda features combine semantic similarity with topic and citation overlap; agenda-non-identity features add conflict indicators such as different identifiers and year conflict. The three relation heads are trained on the training split, and the merge policy exposes $\tau_w$, $\tau_n$, and $\tau_r$ as configurable thresholds. Unless a validation protocol overrides them, the implementation uses 0.5 for all three thresholds.
 
 \subsection{Feature and Head Specification}
 
@@ -409,9 +409,9 @@ Confidence-interval claims require \path{bootstrap_intervals} generated from the
 
 \subsection{Operating Point Disclosure}
 
-The main result table reports fixed operating points rather than post-hoc best test thresholds. The full operating-point disclosure table is reported in the supplementary material. The main text keeps the operating-point rule as prose: Representation cosine baselines use cosine score thresholds and require a score file, metric summary, and threshold entry; the RoBERTa pair classifier uses a pair match probability threshold and requires a prediction file, metric summary, and model log; and IAD-Risk transformer variants use $p_{\mathrm{work}}$, $p_{\mathrm{ani}}$, and $p_{\mathrm{risk}}$ under the risk gate, with default $\tau_w=\tau_a=\tau_r=0.5$ unless the artifact config records an override. Exact threshold values, selected validation sources, command logs, prediction file, model JSON, thresholds, and checksums must be verified from the released artifact manifest before using the table for numerical reproduction.
+The main result table reports fixed operating points rather than post-hoc best test thresholds. The full operating-point disclosure table is reported in the supplementary material. The main text keeps the operating-point rule as prose: Representation cosine baselines use cosine score thresholds and require a score file, metric summary, and threshold entry; the RoBERTa pair classifier uses a pair match probability threshold and requires a prediction file, metric summary, and model log; and IAD-Risk transformer variants use $p_{\mathrm{work}}$, $p_{\mathrm{ani}}$, and $p_{\mathrm{risk}}$ under the risk gate, with default $\tau_w=\tau_n=\tau_r=0.5$ unless the artifact config records an override. Exact threshold values, selected validation sources, command logs, prediction file, model JSON, thresholds, and checksums must be verified from the released artifact manifest before using the table for numerical reproduction.
 
-Default-threshold rows have a narrower interpretation. A row that uses $\tau_w=\tau_a=\tau_r=0.5$ must expose \texttt{threshold\_source=predeclared\_default}, a pre-run configuration checksum, a configuration timestamp or run identifier, and evidence that the threshold values were fixed before held-out scoring. Such rows cannot be described as validation-selected, optimized, or threshold-stable unless \path{threshold_selection_logs} and \path{threshold_sensitivity_grid} are released from the same prediction file.
+Default-threshold rows have a narrower interpretation. A row that uses $\tau_w=\tau_n=\tau_r=0.5$ must expose \texttt{threshold\_source=predeclared\_default}, a pre-run configuration checksum, a configuration timestamp or run identifier, and evidence that the threshold values were fixed before held-out scoring. Such rows cannot be described as validation-selected, optimized, or threshold-stable unless \path{threshold_selection_logs} and \path{threshold_sensitivity_grid} are released from the same prediction file.
 
 \subsection{Selective Decision Coverage Boundary}
 

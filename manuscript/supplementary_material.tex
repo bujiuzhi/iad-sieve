@@ -173,7 +173,7 @@ Head or stage & Main input fields & Supervision or calculation & Output role \\
 Identity head & Transformer distances, title similarity, author overlap, first-author match, venue similarity, year match, DOI/arXiv/OpenAlex identifier agreement. & Same-work labels from valid identity evidence, with provenance-aware masking. & Estimates $p_{\mathrm{work}}$ as positive merge evidence. \\
 Agenda head & Transformer cosine, title and venue similarity, OpenAlex-style topic overlap, reference Jaccard similarity, year-distance score. & Same-agenda proxy or silver evidence when the source supports agenda relatedness. & Estimates $p_{\mathrm{agenda}}$ as relatedness evidence, not direct merge evidence. \\
 ANI risk head & Transformer distances, title and author signals, topic overlap, reference overlap, year conflict, identifier agreement, and different-identifier conflicts. & Agenda-non-identity hard negatives from valid hard-negative sources. & Estimates $p_{\mathrm{ani}}$ as direct blocking evidence. \\
-Risk gate & $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, $p_{\mathrm{ani}}$, $\tau_w$, $\tau_a$, $\tau_r$, and cannot-link flags. & Computes $p_{\mathrm{risk}}=\max\{p_{\mathrm{ani}},p_{\mathrm{agenda}}(1-p_{\mathrm{work}})\}$. & Emits merge, block, or defer decisions. \\
+Risk gate & $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, $p_{\mathrm{ani}}$, $\tau_w$, $\tau_n$, $\tau_r$, and cannot-link flags. & Computes $p_{\mathrm{risk}}=\max\{p_{\mathrm{ani}},p_{\mathrm{agenda}}(1-p_{\mathrm{work}})\}$. & Emits merge, block, or defer decisions. \\
 Audit metadata & Pair ID, source pair ID, label strength, label source, provenance, split, and hard-negative level. & Copied from pair records and result artifacts. & Supports artifact review; it is not a training feature. \\
 \bottomrule
 \end{tabular}
@@ -191,7 +191,7 @@ Phase & Required operation & Auditable output or invariant \\
 \midrule
 Schema loading & Load pair records with relation labels, label strength, provenance, split, and hard-negative fields. & Pair IDs and split fields remain unchanged from input to prediction output. \\
 Supervised fitting & Optimize the masked objective only where the relevant supervision mask is valid. & Gold, proxy, and silver labels are not silently converted into labels for unrelated heads. \\
-Threshold fixation & Select or record $\tau_w$, $\tau_a$, and $\tau_r$ before held-out reporting. & Threshold source, value, selection split, and selection metric are written to the threshold log. \\
+Threshold fixation & Select or record $\tau_w$, $\tau_n$, and $\tau_r$ before held-out reporting. & Threshold source, value, selection split, and selection metric are written to the threshold log. \\
 Pair scoring & Predict $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, and $p_{\mathrm{ani}}$, then derive $p_{\mathrm{risk}}$. & Prediction rows expose relation scores and the derived risk value for each pair. \\
 Decision emission & Apply cannot-link evidence and the risk-aware merge gate to emit merge, block, or defer. & Decision rows record threshold values, threshold source, and cannot-link status. \\
 Metric export & Count same-work F1, FMR, HNFMR, coverage, block rate, and defer rate from the same decision file. & Metric summaries and checksums bind denominators to the prediction artifact. \\
@@ -213,7 +213,7 @@ Step & Operation & Required inputs or outputs & Audit role \\
 2 & Build feature groups without using audit metadata as predictors. & Identity, agenda, ANI, and cannot-link feature groups. & Prevents provenance or split leakage. \\
 3 & Predict relation heads. & $p_{\mathrm{work}}$, $p_{\mathrm{agenda}}$, and $p_{\mathrm{ani}}$. & Records interpretable relation evidence. \\
 4 & Compute derived false-merge risk. & $p_{\mathrm{risk}}=\max\{p_{\mathrm{ani}},p_{\mathrm{agenda}}(1-p_{\mathrm{work}})\}$. & Makes the blocking score reproducible. \\
-5 & Apply the merge gate and cannot-link evidence. & $\tau_w$, $\tau_a$, $\tau_r$, cannot-link flag, and threshold source. & Emits merge, block, or defer under a fixed operating point. \\
+5 & Apply the merge gate and cannot-link evidence. & $\tau_w$, $\tau_n$, $\tau_r$, cannot-link flag, and threshold source. & Emits merge, block, or defer under a fixed operating point. \\
 6 & Write prediction and metric audit fields. & Decision, row scope, denominators, thresholds, and checksum-bound artifact row. & Supports same-work F1, FMR, HNFMR, coverage, and defer-rate audits. \\
 \bottomrule
 \end{tabular}
@@ -699,7 +699,7 @@ Future stronger comparison & Same released prediction scope plus manual-validati
 \toprule
 Item & Reporting purpose & Interpretation role \\
 \midrule
-Merge thresholds & Record $\tau_w$, $\tau_a$, $\tau_r$, validation source, and fixed operating point. & Prevents post-hoc threshold selection on the test set. \\
+Merge thresholds & Record $\tau_w$, $\tau_n$, $\tau_r$, validation source, and fixed operating point. & Prevents post-hoc threshold selection on the test set. \\
 Metric uncertainty & Report bootstrap intervals when prediction files and resampling logs are present in the artifact package. & Distinguishes stable effects from small numerical differences. \\
 Risk metrics & Always report FMR and HNFMR with same-work F1. & Prevents a high F1 score from hiding unsafe hard-negative merges. \\
 Ablation claims & Claim component causality only when protocol-variant outputs for no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold are present. & Separates mechanism-consistent evidence from complete causal ablation evidence. \\
@@ -804,7 +804,7 @@ Row family & Decision field & Operating point source & Audit requirement \\
 \midrule
 Representation cosine baselines & Cosine score threshold on scientific document embeddings. & Fixed baseline metric summary; threshold chosen before final test reporting. & Score file, metric summary, and threshold entry. \\
 RoBERTa pair classifier & Pair match probability threshold. & Fixed pair-classifier metric summary under the same pair schema. & Prediction file, metric summary, and model log. \\
-IAD-Risk transformer variants & $p_{\mathrm{work}}$, $p_{\mathrm{ani}}$, and $p_{\mathrm{risk}}$ under the risk gate. & Model configuration; default $\tau_w=\tau_a=\tau_r=0.5$ unless the artifact config records an override. & Prediction file, model JSON, thresholds, and checksums. \\
+IAD-Risk transformer variants & $p_{\mathrm{work}}$, $p_{\mathrm{ani}}$, and $p_{\mathrm{risk}}$ under the risk gate. & Model configuration; default $\tau_w=\tau_n=\tau_r=0.5$ unless the artifact config records an override. & Prediction file, model JSON, thresholds, and checksums. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -825,7 +825,7 @@ The main manuscript summarizes the threshold-sensitivity evidence status in pros
 \toprule
 Audit item & Current manuscript status & Required artifact before stronger claim \\
 \midrule
-Fixed operating point & Reported through the operating-point disclosure table and tied to validation or default thresholds. & Configuration file recording $\tau_w$, $\tau_a$, $\tau_r$, baseline thresholds, and selection source. \\
+Fixed operating point & Reported through the operating-point disclosure table and tied to validation or default thresholds. & Configuration file recording $\tau_w$, $\tau_n$, $\tau_r$, baseline thresholds, and selection source. \\
 Threshold grid & The threshold grid is not reported as primary evidence in the current manuscript. & Sensitivity table generated from the same prediction files over predefined threshold ranges. \\
 Metric stability & Interpreted only for the reported operating points. & Per-threshold F1, FMR, HNFMR, pair counts, random seeds, and command logs. \\
 Artifact manifest & Required for numerical audit but not included in Git. & Manifest and checksums that bind prediction files, summaries, thresholds, and code commit. \\
