@@ -954,7 +954,7 @@ The reviewer-facing boundary is workload denominator clarity, not deployment evi
 
 Outcome: pass for FMR/HNFMR stratum separation; blocked for zero-risk claims until broader artifacts and validation are released.
 
-This gate checks whether zero observed HNFMR can be mistaken for zero ordinary false-merge rate. The result interpretation now states that IAD-Risk rows still report FMR=0.001 and that zero observed HNFMR means no observed false merge in the agenda-hard-negative stratum, not absence of all non-identity false merges.
+This gate checks whether zero observed HNFMR can be mistaken for zero ordinary false-merge rate. The main result narrative now places the ordinary FMR boundary in the same paragraph as the zero observed HNFMR statement: IAD-Risk rows show zero observed HNFMR in the agenda-hard-negative stratum, while ordinary FMR=0.001 is still reported for all non-identity rows. The result interpretation also states that zero observed HNFMR means no observed false merge in the agenda-hard-negative stratum, not absence of all non-identity false merges.
 
 The reviewer-facing boundary is metric-stratum interpretation, not stronger empirical evidence. HNFMR measures identity-agenda hard negatives, while FMR measures all non-identity rows in the evaluated scope; both require released denominators, thresholds, prediction files, and checksums before numerical audit or stronger zero-risk wording.
 

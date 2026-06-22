@@ -3976,6 +3976,7 @@ def test_check_result_interpretation_guardrails_accepts_complete_boundaries() ->
             "The RoBERTa row is a strong supervised comparator.",
             "The IAD-Risk rows test split-held-out risk gating.",
             "The IAD-Risk rows still report FMR=0.001.",
+            "The ordinary FMR=0.001 is still reported for all non-identity rows.",
             "The zero observed HNFMR should be read as no observed false merge in the agenda-hard-negative stratum.",
             "This should be understood not as absence of all non-identity false merges.",
             "The result is not a claim of broad method superiority.",
