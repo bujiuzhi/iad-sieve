@@ -158,6 +158,17 @@ Before upload, verify:
 5. The supplementary PDF opens correctly and has no stale text relative to `supplementary_material.tex`.
 6. The checksums in the artifact release validate before citing artifact files in the manuscript.
 
+## Hard Stop Rules Before Final Upload
+
+Do not upload the manuscript package until all hard-stop conditions are cleared:
+
+1. Target journal, selected author-guide source, template requirements, review mode, article type, and Q2/B or institutional ranking evidence are author-confirmed and recorded in `submission_metadata.yml`.
+2. Final author identities, affiliations, corresponding author, CRediT contribution roles, funding statement, permissions statement, competing-interest declaration, generative AI declaration, and DKE/Elsevier biography and photograph materials are complete when the selected route requires them.
+3. The selected journal source and PDF files are rebuilt from the current source tree, and the final source-control package records `repository_url`, `repository_commit`, and `repository_branch` with `repository_branch` equal to `main`.
+4. A public artifact URL or DOI resolves, the external artifact release validates, and the artifact manifest `publication` object matches the final-upload metadata.
+5. The live submission system preview has been checked against the current title, abstract, keywords, highlights, uploaded files, declaration fields, and final package contents.
+6. No first-screen material, cover letter, metadata field, or live-system text claims Q2/B completion, final-upload readiness, broad method superiority, fixed-number reproducibility from Git alone, threshold stability, statistical superiority, human-gold validation, cluster-level deployment quality, or workload reduction unless the corresponding evidence package validates.
+
 ## Current Blocking Items
 
 - Target journal has not been author-confirmed.

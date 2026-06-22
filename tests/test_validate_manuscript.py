@@ -7033,6 +7033,17 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
             "## File Hygiene Checks",
             "No `data/`, `outputs/`, cache, local connection, credential, or raw third-party file.",
             "Anonymous packages contain no author email addresses, ORCID values, personal account URLs, local absolute paths, or development process notes.",
+            "## Hard Stop Rules Before Final Upload",
+            "Do not upload the manuscript package until all hard-stop conditions are cleared.",
+            "Target journal, selected author-guide source, template requirements, review mode, article type, and Q2/B or institutional ranking evidence are author-confirmed and recorded in `submission_metadata.yml`.",
+            "Final author identities, affiliations, corresponding author, CRediT contribution roles, funding statement, permissions statement, competing-interest declaration, generative AI declaration, and DKE/Elsevier biography and photograph materials are complete.",
+            "The selected journal source and PDF files are rebuilt from the current source tree.",
+            "`repository_branch` equal to `main`.",
+            "A public artifact URL or DOI resolves.",
+            "The artifact manifest `publication` object matches the final-upload metadata.",
+            "The live submission system preview has been checked against the current title, abstract, keywords, highlights, uploaded files, declaration fields, and final package contents.",
+            "No first-screen material claims fixed-number reproducibility from Git alone.",
+            "No first-screen material claims workload reduction unless the corresponding evidence package validates.",
             "## Current Blocking Items",
             "Target journal has not been author-confirmed.",
             "Artifact release URL or DOI has not been created.",
@@ -7057,6 +7068,28 @@ def test_check_submission_system_checklist_accepts_complete_checklist() -> None:
     errors = module.check_submission_system_checklist(checklist_text)
 
     assert errors == []
+
+
+def test_check_submission_system_checklist_rejects_missing_hard_stop_rules() -> None:
+    """验证投稿系统清单必须保留最终上传硬停止规则。"""
+
+    module = _load_validate_manuscript_module()
+    checklist_text = Path("manuscript/submission_system_checklist.md").read_text(encoding="utf-8")
+    for marker in [
+        "Hard Stop Rules Before Final Upload",
+        "Do not upload the manuscript package until all hard-stop conditions are cleared",
+        "Target journal, selected author-guide source, template requirements, review mode, article type, and Q2/B or institutional ranking evidence",
+        "fixed-number reproducibility from Git alone",
+        "workload reduction unless the corresponding evidence package validates",
+    ]:
+        checklist_text = checklist_text.replace(marker, "")
+
+    errors = module.check_submission_system_checklist(checklist_text)
+
+    assert any("Hard Stop Rules Before Final Upload" in error for error in errors)
+    assert any("hard-stop conditions" in error for error in errors)
+    assert any("fixed-number reproducibility from Git alone" in error for error in errors)
+    assert any("workload reduction" in error for error in errors)
 
 
 def test_check_submission_system_checklist_rejects_missing_dke_research_data_statement_gate() -> None:
