@@ -81,8 +81,10 @@ Before upload, verify:
 2. The cover letter states the final article type.
 3. The corresponding author name appears in the cover letter.
 4. The artifact URL or DOI appears in the cover letter when available.
-5. The cover letter no longer uses the generic Dear Editor greeting.
-6. The cover letter no longer uses an anonymous author signature.
+5. The cover letter keeps the Open-v2 evidence as scope-bounded mechanism evidence rather than a same-scope comparative ranking.
+6. The cover letter does not present confidence intervals, statistical significance, or model-ranking claims unless the validated artifact package supports them.
+7. The cover letter no longer uses the generic Dear Editor greeting.
+8. The cover letter no longer uses an anonymous author signature.
 
 ## Source Archive Assembly Checks
 

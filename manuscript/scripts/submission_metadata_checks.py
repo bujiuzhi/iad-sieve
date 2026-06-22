@@ -143,6 +143,14 @@ FINAL_UPLOAD_COVER_LETTER_UNRESOLVED_MARKERS = {
     "scope-fit note is preparatory": "cover letter still contains a preparatory scope-fit note",
     "must be replaced after author confirmation": "cover letter still contains replacement instructions",
 }
+FINAL_UPLOAD_COVER_LETTER_EVIDENCE_BOUNDARY_MARKERS = {
+    "open-v2": "cover letter missing Open-v2 evidence boundary",
+    "scope-bounded mechanism evidence": "cover letter missing scope-bounded mechanism wording",
+    "same-scope comparative ranking": "cover letter missing same-scope ranking boundary",
+    "confidence intervals": "cover letter missing confidence-interval boundary",
+    "statistical significance": "cover letter missing statistical-significance boundary",
+    "model-ranking claims": "cover letter missing model-ranking claim boundary",
+}
 
 
 def strip_yaml_value(value: str) -> str:
@@ -1229,6 +1237,9 @@ def check_final_upload_cover_letter_text(cover_letter_text: str, metadata_text: 
             errors.append(f"final upload cover letter unresolved: {message}")
     if "artifact release" not in lowered_text and "artifact url" not in lowered_text and "artifact doi" not in lowered_text:
         errors.append("final upload cover letter unresolved: cover letter missing artifact release boundary")
+    for marker, message in FINAL_UPLOAD_COVER_LETTER_EVIDENCE_BOUNDARY_MARKERS.items():
+        if marker not in lowered_text:
+            errors.append(f"final upload cover letter unresolved: {message}")
     artifact_row = parse_mapping_section(metadata_text, "artifact_boundary")
     artifact_values = [
         value

@@ -14438,6 +14438,8 @@ def test_check_final_upload_cover_letter_accepts_complete_targeted_letter() -> N
         [
             "Dear Data & Knowledge Engineering Editors,",
             "We submit the manuscript as a research article in Data & Knowledge Engineering.",
+            "The Open-v2 evidence remains scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
+            "The letter does not present confidence intervals, statistical significance, or model-ranking claims without validated artifacts.",
             "The artifact release is available at https://doi.org/10.0000/iad-risk-artifact.",
             "Corresponding Author is the corresponding author for this submission.",
             "Sincerely,",
@@ -14448,6 +14450,39 @@ def test_check_final_upload_cover_letter_accepts_complete_targeted_letter() -> N
     errors = module.check_final_upload_cover_letter(cover_letter_text, metadata_text)
 
     assert errors == []
+
+
+def test_check_final_upload_cover_letter_rejects_missing_evidence_boundary() -> None:
+    """验证 final-upload 投稿信必须保留 Open-v2 证据边界。"""
+
+    module = _load_validate_manuscript_module()
+    metadata_text = "\n".join(
+        [
+            'target_journal: "Data & Knowledge Engineering"',
+            'article_type: "research_article"',
+            "corresponding_author:",
+            '  name: "Corresponding Author"',
+            "artifact_boundary:",
+            '  artifact_release_url: "https://doi.org/10.0000/iad-risk-artifact"',
+            '  artifact_release_doi: "10.0000/iad-risk-artifact"',
+        ]
+    )
+    cover_letter_text = "\n".join(
+        [
+            "Dear Data & Knowledge Engineering Editors,",
+            "We submit the manuscript as a research article in Data & Knowledge Engineering.",
+            "The artifact release is available at https://doi.org/10.0000/iad-risk-artifact.",
+            "Corresponding Author is the corresponding author for this submission.",
+            "Sincerely,",
+            "Corresponding Author",
+        ]
+    )
+
+    errors = module.check_final_upload_cover_letter(cover_letter_text, metadata_text)
+
+    assert any("Open-v2 evidence boundary" in error for error in errors)
+    assert any("scope-bounded mechanism wording" in error for error in errors)
+    assert any("statistical-significance boundary" in error for error in errors)
 
 
 def test_check_final_upload_cover_letter_rejects_missing_artifact_link_value() -> None:

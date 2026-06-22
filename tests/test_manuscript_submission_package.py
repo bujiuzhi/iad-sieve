@@ -351,6 +351,8 @@ def _write_final_upload_cover_letter(manuscript_root: Path) -> None:
                 '"IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication" '
                 "for consideration as a research article in Journal of Scholarly Data.",
                 "The final-upload manuscript uses the selected journal template and the author metadata in the submission system.",
+                "The Open-v2 evidence remains scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
+                "The letter does not present confidence intervals, statistical significance, or model-ranking claims without validated artifacts.",
                 "The artifact release is available at https://doi.org/10.0000/example "
                 "with DOI 10.0000/example and supports result-level review.",
                 "",
@@ -546,6 +548,8 @@ def _write_dke_final_upload_cover_letter(manuscript_root: Path) -> None:
                 '"IAD-Risk: Risk-Aware Identity-Agenda Disentanglement for Scholarly Work Deduplication" '
                 "for consideration as a research article in Data & Knowledge Engineering.",
                 "The final-upload manuscript uses the selected Elsevier template and author-visible title page.",
+                "The Open-v2 evidence remains scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
+                "The letter does not present confidence intervals, statistical significance, or model-ranking claims without validated artifacts.",
                 "The artifact release is available at https://doi.org/10.0000/example "
                 "with DOI 10.0000/example and supports result-level review.",
                 "",
