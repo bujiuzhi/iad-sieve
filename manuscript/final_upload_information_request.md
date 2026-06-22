@@ -61,7 +61,7 @@ The DKE official-guide preflight source is already recorded in `submission_metad
 
 - DKE official guide source recorded: ScienceDirect Data & Knowledge Engineering guide for authors
 - DKE official guide source URL: https://www.sciencedirect.com/journal/data-and-knowledge-engineering/publish/guide-for-authors
-- DKE official guide rechecked date: 2026-06-22
+- DKE official guide rechecked date: 2026-06-23
 - DKE official guide constraints verified: true
 - DKE primary practical candidate recorded: Data & Knowledge Engineering
 - DKE provisional target status recorded: dke_preflight_ready_pending_author_confirmation

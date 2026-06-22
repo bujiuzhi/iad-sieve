@@ -14,7 +14,7 @@ target_preparation:
   provisional_target_status: "dke_preflight_ready_pending_author_confirmation"
   dke_official_guide_source: "ScienceDirect Data & Knowledge Engineering guide for authors"
   dke_official_guide_source_url: "https://www.sciencedirect.com/journal/data-and-knowledge-engineering/publish/guide-for-authors"
-  dke_official_guide_rechecked: "2026-06-22"
+  dke_official_guide_rechecked: "2026-06-23"
   dke_official_guide_constraints_verified: true
   selected_author_guide_source: ""
   selected_author_guide_source_url: ""

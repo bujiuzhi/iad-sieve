@@ -1,6 +1,6 @@
 # Target Journal Shortlist
 
-Status date: 2026-06-22
+Status date: 2026-06-23
 
 ## Selection Boundary
 
@@ -26,7 +26,7 @@ Rationale: Scientometrics is a strong thematic fit for scholarly metadata and sc
 
 Status: provisional preparation only; final upload metadata remains incomplete until author confirmation.
 
-Official guide rechecked: 2026-06-22.
+Official guide rechecked: 2026-06-23.
 
 | Requirement area | DKE preparation status | Remaining action before final upload |
 | --- | --- | --- |
@@ -45,14 +45,14 @@ Official guide rechecked: 2026-06-22.
 
 This audit records the publisher-facing constraints that determine the next manuscript pass. It does not replace author confirmation of institutional rankings, journal class, or final submission-system fields.
 
-DKE official source snapshot date: 2026-06-22.
+DKE official source snapshot date: 2026-06-23.
 
-- DKE guide verified: 2026-06-22.
+- DKE guide verified: 2026-06-23.
 - DKE guide source URL: https://www.sciencedirect.com/journal/data-and-knowledge-engineering/publish/guide-for-authors.
 - Information Systems guide verified: 2026-06-19; not rechecked in this DKE-focused pass.
 - Scientometrics guide verified: 2026-06-19; not rechecked in this DKE-focused pass.
 
-DKE publisher-page facts in this shortlist were rechecked on 2026-06-22 from the official source links listed below, specifically the DKE source link. Information Systems and Scientometrics entries remain planning records from 2026-06-19 and must be rechecked before either route is selected. These checks support manuscript-preparation decisions only; JCR quartile, Chinese Academy of Sciences zone, CCF class, and local institutional category must still be rechecked in the authors' authorized ranking systems before final upload.
+DKE publisher-page facts in this shortlist were rechecked on 2026-06-23 from the official source links listed below, specifically the DKE source link. Information Systems and Scientometrics entries remain planning records from 2026-06-19 and must be rechecked before either route is selected. These checks support manuscript-preparation decisions only; JCR quartile, Chinese Academy of Sciences zone, CCF class, and local institutional category must still be rechecked in the authors' authorized ranking systems before final upload.
 
 For Q2/B decision-making, the final record must match the selected journal's ISSN or eISSN to the authors' accepted ranking source and record the subject category used by that source. Acceptable evidence may include JCR quartile, Chinese Academy of Sciences zone, CCF class when applicable, or a local institutional list; publisher CiteScore, Impact Factor, aims-and-scope text, and this shortlist are screening evidence only. Do not mark `ranking_confirmation_completed` true until the source URL or institutional system URL, access date, evidence export or screenshot path, and responsible author confirmation are recorded in the final-upload information packet.
 
