@@ -8,7 +8,7 @@ This work studies a practical failure mode in scholarly entity matching: semanti
 
 The manuscript also contributes IAD-Bench as a provenance-aware pair contract: it keeps gold identity labels, proxy agenda evidence, silver hard negatives, and human-review targets separate so that label strength, provenance, split, and hard-negative status remain visible during training, evaluation, and claim interpretation.
 
-In the Open-v2 evidence snapshot, the result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking: single-space scientific representation baselines show HNFMR 0.790--0.999 on the full pair scope, whereas transformer-backed IAD-Risk variants report same-work F1=0.980 and zero observed HNFMR on the held-out test scope, with ordinary FMR still reported separately as 0.001.
+In the Open-v2 evidence snapshot, the result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking: single-space scientific representation baselines show HNFMR 0.790--0.999 on the full pair scope, whereas transformer-backed IAD-Risk variants report same-work F1=0.980 and zero observed HNFMR on the held-out test scope, with ordinary FMR still reported separately as 0.001. RoBERTa pair classification is treated as a strong supervised baseline, and IAD-Risk is presented as an auditable relation-role design rather than a broad superiority claim.
 
 The claims are intentionally conservative: OpenAlex and OpenCitations labels are treated as silver hard-negative evidence, not as human gold, the manuscript does not claim broad method superiority, and it does not claim cluster-level deployment quality without cluster artifacts or workload reduction without coverage and review-capacity evidence.
 
