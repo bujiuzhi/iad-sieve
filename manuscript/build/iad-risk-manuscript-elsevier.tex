@@ -508,7 +508,7 @@ IAD-Risk (SPECTER2) & Held-out test & 1042 & Artifact row & 0.980 & 0.001 & 0.00
 \end{tabular}
 \end{table}
 
-Figure~\ref{fig:openv2-safety-profile} visualizes the same Open-v2 evidence as Table~\ref{tab:openv2-results}. The figure is intended as a mechanism-evidence profile: it makes the hard-negative false-merge exposure of single-space representation baselines visible while keeping the full-scope and held-out test rows separated.
+Figure~\ref{fig:openv2-safety-profile} visualizes two selected dimensions from Table~\ref{tab:openv2-results}: same-work F1 and HNFMR. The figure is intended as a mechanism-evidence profile rather than as a complete metric replacement for the table: it makes the hard-negative false-merge exposure of single-space representation baselines visible while keeping the full-scope and held-out test rows separated. Ordinary FMR, pair counts, and denominator-audit status remain table-level evidence and should be read directly from Table~\ref{tab:openv2-results}.
 
 \begin{figure}[H]
 \centering
@@ -555,7 +555,7 @@ Figure~\ref{fig:openv2-safety-profile} visualizes the same Open-v2 evidence as T
 \node[value] at (8.11,-3.65) {0.000};
 \end{tikzpicture}
 }
-\caption{Open-v2 mechanism-evidence profile. The bars visualize Table~\ref{tab:openv2-results} without changing its interpretation boundary: full Open-v2 rows and held-out test rows remain scope-labeled, the dashed separator marks that scope transition, and the figure supports the false-merge-control reading rather than a same-scope comparative ranking.}
+\caption{Open-v2 mechanism-evidence profile for selected metrics. The bars visualize same-work F1 and HNFMR from Table~\ref{tab:openv2-results}; ordinary FMR, pair counts, and denominator-audit status remain in the table. Full Open-v2 rows and held-out test rows remain scope-labeled, the dashed separator marks that scope transition, and the figure supports the false-merge-control reading rather than a same-scope comparative ranking.}
 \label{fig:openv2-safety-profile}
 \end{figure}
 
