@@ -5218,6 +5218,9 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
         "Corresponding author",
         "Funding statement",
         "Artifact release URL or DOI",
+        "TECTONIC_BUNDLE_DIR",
+        "本地 Tectonic bundle",
+        "PDF rendering 检查",
     ]:
         readme_text = readme_text.replace(marker, "")
         manifest_text = manifest_text.replace(marker, "")
@@ -5241,6 +5244,48 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
     assert any("Corresponding author" in error for error in errors)
     assert any("Funding statement" in error for error in errors)
     assert any("Artifact release URL or DOI" in error for error in errors)
+    assert any("TECTONIC_BUNDLE_DIR" in error for error in errors)
+    assert any("本地 Tectonic bundle" in error for error in errors)
+    assert any("PDF rendering 检查" in error for error in errors)
+
+
+def test_check_latex_build_scripts_accepts_offline_bundle_controls() -> None:
+    """验证 LaTeX 构建脚本保留离线 Tectonic bundle 入口。"""
+
+    module = _load_validate_manuscript_module()
+    build_script_text = "\n".join(
+        [
+            "run_tectonic() {",
+            'if [[ -n "${TECTONIC_BUNDLE_DIR:-}" ]]; then',
+            'tectonic --bundle "$TECTONIC_BUNDLE_DIR" "$input_path"',
+            "fi",
+            "scripts/check_latex_warnings.py",
+            "scripts/check_pdf_rendering.py",
+        ]
+    )
+    elsevier_builder_text = "\n".join(
+        [
+            "bundle_dir = os.environ.get(\"TECTONIC_BUNDLE_DIR\")",
+            "command.extend([\"--bundle\", bundle_dir])",
+            "subprocess.run(command, cwd=output_tex.parent, check=True)",
+        ]
+    )
+
+    errors = module.check_latex_build_scripts(build_script_text, elsevier_builder_text)
+
+    assert errors == []
+
+
+def test_check_latex_build_scripts_rejects_missing_offline_bundle_controls() -> None:
+    """验证 LaTeX 构建脚本缺少离线 bundle 控制时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+
+    errors = module.check_latex_build_scripts("tectonic main.tex", "subprocess.run(['tectonic'])")
+
+    assert any("TECTONIC_BUNDLE_DIR" in error for error in errors)
+    assert any("--bundle" in error for error in errors)
+    assert any("check_pdf_rendering.py" in error for error in errors)
 
 
 def test_check_related_work_positioning_accepts_main_text_and_supplementary_matrix() -> None:

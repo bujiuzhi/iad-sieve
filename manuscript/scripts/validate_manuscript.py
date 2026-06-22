@@ -3705,6 +3705,9 @@ def check_manuscript_package_docs(readme_text: str, manifest_text: str) -> list[
         "repository_branch",
         "source_control.repository_branch",
         "分支必须为 `main`",
+        "TECTONIC_BUNDLE_DIR",
+        "本地 Tectonic bundle",
+        "PDF rendering 检查",
     ]
     errors: list[str] = []
     for document_name, document_text in {
@@ -3714,6 +3717,42 @@ def check_manuscript_package_docs(readme_text: str, manifest_text: str) -> list[
         for marker in required_markers:
             if marker not in document_text:
                 errors.append(f"{document_name} missing package artifact schema marker: {marker}")
+    return errors
+
+
+def check_latex_build_scripts(build_script_text: str, elsevier_builder_text: str) -> list[str]:
+    """Check whether LaTeX build scripts preserve offline bundle reproducibility.
+
+    参数:
+        build_script_text: Shell script source for full PDF builds.
+        elsevier_builder_text: Python source for Elsevier preview builds.
+
+    返回:
+        list[str]: Error messages for missing offline bundle controls.
+    """
+    required_build_markers = [
+        "TECTONIC_BUNDLE_DIR",
+        "--bundle",
+        "run_tectonic",
+        "scripts/check_latex_warnings.py",
+        "scripts/check_pdf_rendering.py",
+    ]
+    required_elsevier_markers = [
+        "TECTONIC_BUNDLE_DIR",
+        "--bundle",
+        "os.environ.get",
+        "subprocess.run(command",
+    ]
+    errors = [
+        f"build_latex_pdf.sh missing offline bundle marker: {marker}"
+        for marker in required_build_markers
+        if marker not in build_script_text
+    ]
+    errors.extend(
+        f"build_elsevier_draft.py missing offline bundle marker: {marker}"
+        for marker in required_elsevier_markers
+        if marker not in elsevier_builder_text
+    )
     return errors
 
 
@@ -6206,6 +6245,12 @@ def main() -> int:
     artifact_release_finalizer_text = (
         artifact_release_finalizer_path.read_text(encoding="utf-8") if artifact_release_finalizer_path.exists() else ""
     )
+    latex_build_script_path = ROOT / "scripts" / "build_latex_pdf.sh"
+    latex_build_script_text = (
+        latex_build_script_path.read_text(encoding="utf-8") if latex_build_script_path.exists() else ""
+    )
+    elsevier_builder_path = ROOT / "scripts" / "build_elsevier_draft.py"
+    elsevier_builder_text = elsevier_builder_path.read_text(encoding="utf-8") if elsevier_builder_path.exists() else ""
     submission_system_checklist_path = ROOT / "submission_system_checklist.md"
     submission_system_checklist_text = (
         submission_system_checklist_path.read_text(encoding="utf-8") if submission_system_checklist_path.exists() else ""
@@ -6336,6 +6381,7 @@ def main() -> int:
     errors.extend(check_artifact_release_skeleton_builder(artifact_release_skeleton_builder_text))
     errors.extend(check_artifact_release_populator(artifact_release_populator_text))
     errors.extend(check_artifact_release_finalizer(artifact_release_finalizer_text))
+    errors.extend(check_latex_build_scripts(latex_build_script_text, elsevier_builder_text))
     errors.extend(check_submission_system_checklist(submission_system_checklist_text))
     errors.extend(check_reviewer_readiness_audit(reviewer_readiness_audit_text))
     errors.extend(check_manual_validation_protocol(supplementary_text))

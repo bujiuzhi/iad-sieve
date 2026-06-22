@@ -55,6 +55,8 @@ python manuscript/scripts/build_submission_package.py --dke-preflight
 python manuscript/scripts/validate_submission_package.py --dke-preflight
 ```
 
+若默认 Tectonic bundle 无法访问，可使用 `TECTONIC_BUNDLE_DIR=/path/to/tectonic-bundle ./manuscript/scripts/build_latex_pdf.sh` 指定本地 Tectonic bundle。该路径用于离线 PDF 构建，不应作为 Git 跟踪文件；构建完成后仍必须通过 LaTeX warning 检查、PDF rendering 检查和投稿包 PDF 新鲜度校验。
+
 ## 投稿边界
 
 该材料包当前不绑定具体期刊模板。正式上传前，应按目标期刊要求调整 `main.tex` 文档类并补充作者元数据。
