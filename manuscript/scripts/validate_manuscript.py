@@ -3954,6 +3954,18 @@ def check_manuscript_package_docs(readme_text: str, manifest_text: str) -> list[
         "`manuscript/build/dke_preflight_package/`",
         "本地构建产物，不纳入 Git 跟踪",
         "不保存内部过程材料、编辑日志或与课题无关的文档",
+        "`/path/to/source-artifacts`",
+        "不是 `outputs/` 根目录",
+        "不是 PDF 构建目录",
+        "tables/open_v2_main_results.csv",
+        "predictions/iad_risk_transformer_predictions.jsonl",
+        "predictions/representation_baseline_scores.jsonl",
+        "predictions/roberta_pair_classifier_predictions.jsonl",
+        "logs/threshold_selection_logs.jsonl",
+        "reports/iad_bench_split_summary.jsonl",
+        "configs/source_input_manifest.json",
+        "logs/processing_run_log.jsonl",
+        "L3 artifact release",
     ]
     errors: list[str] = []
     for document_name, document_text in {
@@ -4092,6 +4104,47 @@ def check_data_processing_pipeline_document(document_text: str) -> list[str]:
     lowered_text = document_text.lower()
     return [
         f"data processing pipeline document missing marker: {marker}"
+        for marker in required_markers
+        if marker.lower() not in lowered_text
+    ]
+
+
+def check_data_artifact_release_document(document_text: str) -> list[str]:
+    """Check whether the data release document separates Git, output, and artifact boundaries.
+
+    参数:
+        document_text: Data and artifact release Markdown text.
+
+    返回:
+        list[str]: Error messages for missing source-artifact release markers.
+    """
+    required_markers = [
+        "# 数据集与实验产物发布说明",
+        "远程仓库不提交原始数据",
+        "`outputs/` 下的实验输出",
+        "## L3 source artifact 目录契约",
+        "`/path/to/source-artifacts`",
+        "不是 Git 仓库的 `outputs/` 根目录",
+        "不是 PDF 构建目录",
+        "tables/open_v2_main_results.csv",
+        "predictions/iad_risk_transformer_predictions.jsonl",
+        "predictions/representation_baseline_scores.jsonl",
+        "predictions/roberta_pair_classifier_predictions.jsonl",
+        "logs/threshold_selection_logs.jsonl",
+        "reports/iad_bench_split_summary.jsonl",
+        "configs/source_input_manifest.json",
+        "logs/processing_run_log.jsonl",
+        "python manuscript/scripts/populate_artifact_release.py",
+        "--source-dir /path/to/source-artifacts",
+        "--preflight-only",
+        "复制、记录或定稿前只读检查必需 source artifact 文件",
+        "不能声称已有可发布的 L3 artifact release",
+        "outputs/pdf_build/",
+        "manuscript/build/",
+    ]
+    lowered_text = document_text.lower()
+    return [
+        f"data and artifact release document missing marker: {marker}"
         for marker in required_markers
         if marker.lower() not in lowered_text
     ]
@@ -6725,6 +6778,10 @@ def main() -> int:
     data_processing_pipeline_text = (
         data_processing_pipeline_path.read_text(encoding="utf-8") if data_processing_pipeline_path.exists() else ""
     )
+    data_artifact_release_path = PROJECT_ROOT / "docs" / "data-and-artifact-release.md"
+    data_artifact_release_text = (
+        data_artifact_release_path.read_text(encoding="utf-8") if data_artifact_release_path.exists() else ""
+    )
     artifact_release_skeleton_builder_path = ROOT / "scripts" / "build_artifact_release_skeleton.py"
     artifact_release_skeleton_builder_text = (
         artifact_release_skeleton_builder_path.read_text(encoding="utf-8")
@@ -6881,6 +6938,7 @@ def main() -> int:
     manifest_text = manifest_path.read_text(encoding="utf-8") if manifest_path.exists() else ""
     errors.extend(check_manuscript_package_docs(readme_text, manifest_text))
     errors.extend(check_data_processing_pipeline_document(data_processing_pipeline_text))
+    errors.extend(check_data_artifact_release_document(data_artifact_release_text))
     errors.extend(check_artifact_release_skeleton_builder(artifact_release_skeleton_builder_text))
     errors.extend(check_artifact_release_populator(artifact_release_populator_text))
     errors.extend(check_artifact_release_finalizer(artifact_release_finalizer_text))

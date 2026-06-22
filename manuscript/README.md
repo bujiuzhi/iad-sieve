@@ -102,6 +102,8 @@ python manuscript/scripts/finalize_artifact_release.py --artifact-dir /path/to/r
 python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release
 ```
 
+`/path/to/source-artifacts` 必须是完成 L3 实验后生成的独立只读源目录，不是 `outputs/` 根目录，也不是 PDF 构建目录。最小结构必须包含 `tables/open_v2_main_results.csv`、`predictions/iad_risk_transformer_predictions.jsonl`、`predictions/representation_baseline_scores.jsonl`、`predictions/roberta_pair_classifier_predictions.jsonl`、`logs/threshold_selection_logs.jsonl`、`reports/iad_bench_split_summary.jsonl`、`configs/source_input_manifest.json` 和 `logs/processing_run_log.jsonl`。`--preflight-only` 通过前，不应声明已有可发布的 L3 artifact release。
+
 Elsevier/DKE 预转换稿构建：
 
 ```bash

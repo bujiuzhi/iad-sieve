@@ -8,6 +8,8 @@
 
 `IAD-Bench-Open-v2` 和 `IAD-Bench-Open-v3` 是项目构建的数据集变体；它们不是第三方原封不动发布的数据集。论文中应称为“derived benchmark packages”或“project-built benchmark variants from public sources”。
 
+远程仓库不提交原始数据、模型权重或完整实验输出；仓库责任是保留可运行代码、数据处理入口、fixture、schema、manifest 模板和 artifact 校验脚本。
+
 Git 仓库只提交 `data/README.md` 和 `outputs/README.md` 作为目录说明。真实数据、远程回传结果、模型权重和论文产物应通过 artifact release 或受控对象存储分发，并用 manifest 与 checksum 固定版本。
 
 ## 数据层次
@@ -73,6 +75,51 @@ paper-artifacts/
   logs/
   checksums.sha256
 ```
+
+## L3 source artifact 目录契约
+
+`/path/to/source-artifacts` 是 `manuscript/scripts/populate_artifact_release.py` 的只读输入目录，不是 Git 仓库的 `outputs/` 根目录，不是 PDF 构建目录，也不是 Tectonic bundle。该目录应由完整 L3 实验流程在仓库外或 Git 忽略目录中生成，只包含可再分发的派生表格、预测、日志和配置。
+
+最小必需结构如下：
+
+```text
+source-artifacts/
+  tables/
+    open_v2_main_results.csv
+  predictions/
+    iad_risk_transformer_predictions.jsonl
+    representation_baseline_scores.jsonl
+    roberta_pair_classifier_predictions.jsonl
+  logs/
+    threshold_selection_logs.jsonl
+    processing_run_log.jsonl
+  reports/
+    iad_bench_split_summary.jsonl
+  configs/
+    source_input_manifest.json
+```
+
+必需文件的完整相对路径为：
+
+- `tables/open_v2_main_results.csv`
+- `predictions/iad_risk_transformer_predictions.jsonl`
+- `predictions/representation_baseline_scores.jsonl`
+- `predictions/roberta_pair_classifier_predictions.jsonl`
+- `logs/threshold_selection_logs.jsonl`
+- `reports/iad_bench_split_summary.jsonl`
+- `configs/source_input_manifest.json`
+- `logs/processing_run_log.jsonl`
+
+正式发布前应先运行只读预检查：
+
+```bash
+python manuscript/scripts/populate_artifact_release.py \
+  --artifact-dir /path/to/release \
+  --source-dir /path/to/source-artifacts \
+  --preflight-only
+```
+
+该命令会在复制、记录或定稿前只读检查必需 source artifact 文件是否齐全。缺少任一必需文件时，只能说明仓库代码和小型 fixture 可复现，不能声称已有可发布的 L3 artifact release；PDF 构建输出、`outputs/pdf_build/`、`manuscript/build/` 和离线 Tectonic bundle 均不能替代上述 source artifact。
 
 `manifest.json` 建议记录：
 

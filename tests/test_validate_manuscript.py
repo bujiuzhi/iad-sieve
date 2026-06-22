@@ -5628,6 +5628,18 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
         "`manuscript/build/dke_preflight_package/`",
         "本地构建产物，不纳入 Git 跟踪",
         "不保存内部过程材料、编辑日志或与课题无关的文档",
+        "`/path/to/source-artifacts`",
+        "不是 `outputs/` 根目录",
+        "不是 PDF 构建目录",
+        "tables/open_v2_main_results.csv",
+        "predictions/iad_risk_transformer_predictions.jsonl",
+        "predictions/representation_baseline_scores.jsonl",
+        "predictions/roberta_pair_classifier_predictions.jsonl",
+        "logs/threshold_selection_logs.jsonl",
+        "reports/iad_bench_split_summary.jsonl",
+        "configs/source_input_manifest.json",
+        "logs/processing_run_log.jsonl",
+        "L3 artifact release",
     ]:
         readme_text = readme_text.replace(marker, "")
         manifest_text = manifest_text.replace(marker, "")
@@ -5668,6 +5680,12 @@ def test_check_manuscript_package_docs_rejects_missing_result_row_schema() -> No
     assert any("missing TeX resource" in error for error in errors)
     assert any("output excerpt" in error for error in errors)
     assert any("PDF rendering 检查" in error for error in errors)
+    assert any("/path/to/source-artifacts" in error for error in errors)
+    assert any("不是 `outputs/` 根目录" in error for error in errors)
+    assert any("不是 PDF 构建目录" in error for error in errors)
+    assert any("tables/open_v2_main_results.csv" in error for error in errors)
+    assert any("predictions/iad_risk_transformer_predictions.jsonl" in error for error in errors)
+    assert any("logs/processing_run_log.jsonl" in error for error in errors)
 
 
 def test_check_latex_build_scripts_accepts_offline_bundle_controls() -> None:
@@ -5915,6 +5933,39 @@ def test_check_data_processing_pipeline_document_rejects_missing_cli_and_artifac
     assert any("PYTHONPATH=src python -m iad_sieve.cli --help" in error for error in errors)
     assert any("prepare-deepmatcher" in error for error in errors)
     assert any("Artifact release" in error for error in errors)
+
+
+def test_check_data_artifact_release_document_accepts_source_artifact_contract() -> None:
+    """验证数据发布文档区分 Git 目录、输出目录和 L3 source artifact 目录。"""
+
+    module = _load_validate_manuscript_module()
+    document_text = Path("docs/data-and-artifact-release.md").read_text(encoding="utf-8")
+
+    errors = module.check_data_artifact_release_document(document_text)
+
+    assert errors == []
+
+
+def test_check_data_artifact_release_document_rejects_missing_source_artifact_contract() -> None:
+    """验证数据发布文档缺少 source artifact 最小目录契约时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    document_text = "\n".join(
+        [
+            "# 数据集与实验产物发布说明",
+            "远程仓库不提交原始数据。",
+            "`outputs/` 下的实验输出不进入 Git。",
+        ]
+    )
+
+    errors = module.check_data_artifact_release_document(document_text)
+
+    assert any("L3 source artifact 目录契约" in error for error in errors)
+    assert any("/path/to/source-artifacts" in error for error in errors)
+    assert any("tables/open_v2_main_results.csv" in error for error in errors)
+    assert any("predictions/iad_risk_transformer_predictions.jsonl" in error for error in errors)
+    assert any("logs/processing_run_log.jsonl" in error for error in errors)
+    assert any("--preflight-only" in error for error in errors)
 
 
 def test_check_artifact_release_skeleton_builder_accepts_required_markers() -> None:
