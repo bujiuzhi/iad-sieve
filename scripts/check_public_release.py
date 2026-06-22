@@ -6,6 +6,7 @@ import argparse
 import logging
 import os
 import re
+import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -79,6 +80,18 @@ REQUIRED_GITIGNORE_PATTERNS = (
     "/manuscript/build/submission_package/",
     "/manuscript/build/dke_preflight_package/",
 )
+
+ALLOWED_TRACKED_LOCAL_BOUNDARY_FILES = {
+    "data/README.md",
+    "outputs/README.md",
+}
+
+ALLOWED_TRACKED_MANUSCRIPT_BUILD_FILES = {
+    "manuscript/build/iad-risk-manuscript-latex.pdf",
+    "manuscript/build/iad-risk-manuscript-elsevier.tex",
+    "manuscript/build/iad-risk-manuscript-elsevier.pdf",
+    "manuscript/build/iad-risk-supplementary-material.pdf",
+}
 
 ALLOWED_DOCS_FILES = {
     "docs/README.md",
@@ -655,6 +668,109 @@ def check_required_gitignore_patterns(project_root: Path) -> list[Finding]:
     return findings
 
 
+def load_tracked_files(project_root: Path) -> list[str]:
+    """读取 Git 已跟踪文件清单。
+
+    参数:
+        project_root: 项目根目录。
+
+    返回:
+        POSIX 风格相对路径列表；无法读取 Git 信息时返回空列表。
+    """
+
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(project_root), "ls-files", "-z"],
+            check=False,
+            capture_output=True,
+            text=False,
+        )
+    except OSError as exc:
+        LOGGER.warning("无法执行 git ls-files，跳过跟踪文件范围检查: %s", exc)
+        return []
+
+    if result.returncode != 0:
+        stderr = result.stderr.decode("utf-8", errors="replace").strip()
+        LOGGER.warning("git ls-files 失败，跳过跟踪文件范围检查: %s", stderr)
+        return []
+
+    return [entry for entry in result.stdout.decode("utf-8", errors="replace").split("\0") if entry]
+
+
+def check_tracked_release_scope(project_root: Path, tracked_files: Sequence[str] | None = None) -> list[Finding]:
+    """检查 Git 跟踪文件是否越过公开仓库边界。
+
+    参数:
+        project_root: 项目根目录。
+        tracked_files: 可选的已跟踪文件列表；为 None 时从 Git 读取。
+
+    返回:
+        跟踪范围越界发现项列表。
+    """
+
+    tracked = list(tracked_files) if tracked_files is not None else load_tracked_files(project_root)
+    findings: list[Finding] = []
+    for relative_path in tracked:
+        normalized_path = relative_path.replace("\\", "/")
+        if normalized_path.startswith("data/") and normalized_path not in ALLOWED_TRACKED_LOCAL_BOUNDARY_FILES:
+            findings.append(
+                Finding(
+                    path=project_root / normalized_path,
+                    line_number=0,
+                    category="tracked_data_file",
+                    message="Git 不应跟踪真实数据目录中的文件，只允许 data/README.md",
+                    snippet=normalized_path,
+                )
+            )
+            continue
+        if normalized_path.startswith("outputs/") and normalized_path not in ALLOWED_TRACKED_LOCAL_BOUNDARY_FILES:
+            findings.append(
+                Finding(
+                    path=project_root / normalized_path,
+                    line_number=0,
+                    category="tracked_output_file",
+                    message="Git 不应跟踪本地实验输出目录中的文件，只允许 outputs/README.md",
+                    snippet=normalized_path,
+                )
+            )
+            continue
+        if normalized_path.startswith("models/"):
+            findings.append(
+                Finding(
+                    path=project_root / normalized_path,
+                    line_number=0,
+                    category="tracked_model_file",
+                    message="Git 不应跟踪模型权重或模型缓存目录",
+                    snippet=normalized_path,
+                )
+            )
+            continue
+        if normalized_path.startswith("manuscript/build/"):
+            if normalized_path in ALLOWED_TRACKED_MANUSCRIPT_BUILD_FILES:
+                continue
+            findings.append(
+                Finding(
+                    path=project_root / normalized_path,
+                    line_number=0,
+                    category="tracked_submission_build_artifact",
+                    message="Git 只应跟踪稿件 PDF/LaTeX 预览，不应跟踪投稿包目录、zip 或本地构建产物",
+                    snippet=normalized_path,
+                )
+            )
+            continue
+        if normalized_path.endswith(".zip"):
+            findings.append(
+                Finding(
+                    path=project_root / normalized_path,
+                    line_number=0,
+                    category="tracked_zip_artifact",
+                    message="Git 不应跟踪 zip 构建产物",
+                    snippet=normalized_path,
+                )
+            )
+    return findings
+
+
 def find_large_files(project_root: Path, max_size_mb: float) -> list[Finding]:
     """查找公开范围内的大文件。
 
@@ -746,6 +862,7 @@ def run_public_release_check(project_root: Path, max_size_mb: float) -> int:
     docs_index_findings = check_docs_index_consistency(resolved_root)
     root_readme_reproduction_findings = check_root_readme_reproduction_levels(resolved_root)
     gitignore_findings = check_required_gitignore_patterns(resolved_root)
+    tracked_scope_findings = check_tracked_release_scope(resolved_root)
     large_file_findings = find_large_files(resolved_root, max_size_mb)
     high_risk_findings = (
         sensitive_findings
@@ -755,6 +872,7 @@ def run_public_release_check(project_root: Path, max_size_mb: float) -> int:
         + docs_index_findings
         + root_readme_reproduction_findings
         + gitignore_findings
+        + tracked_scope_findings
         + large_file_findings
     )
 

@@ -11,6 +11,7 @@ from scripts.check_public_release import (
     check_required_gitignore_patterns,
     check_required_documentation,
     check_root_readme_reproduction_levels,
+    check_tracked_release_scope,
     run_public_release_check,
     scan_document_traces,
 )
@@ -240,6 +241,53 @@ def test_check_required_gitignore_patterns_accepts_submission_package_rules(tmp_
     findings = check_required_gitignore_patterns(tmp_path)
 
     assert findings == []
+
+
+def test_check_tracked_release_scope_accepts_boundary_readmes_and_pdf_previews(tmp_path: Path) -> None:
+    """验证允许跟踪数据/输出说明文件和稿件预览产物。"""
+
+    tracked_files = [
+        "README.md",
+        "data/README.md",
+        "outputs/README.md",
+        "manuscript/build/iad-risk-manuscript-latex.pdf",
+        "manuscript/build/iad-risk-manuscript-elsevier.tex",
+        "manuscript/build/iad-risk-manuscript-elsevier.pdf",
+        "manuscript/build/iad-risk-supplementary-material.pdf",
+    ]
+
+    findings = check_tracked_release_scope(tmp_path, tracked_files=tracked_files)
+
+    assert findings == []
+
+
+def test_check_tracked_release_scope_rejects_data_outputs_and_package_artifacts(tmp_path: Path) -> None:
+    """验证 Git 已跟踪的大数据、输出、模型和投稿包产物会被拦截。"""
+
+    tracked_files = [
+        "data/raw/openalex.jsonl",
+        "outputs/main_run/results.csv",
+        "models/checkpoint.bin",
+        "manuscript/build/submission_package/submission_manifest.json",
+        "manuscript/build/iad-risk-submission-package.zip",
+        "release.zip",
+    ]
+
+    findings = check_tracked_release_scope(tmp_path, tracked_files=tracked_files)
+
+    assert {finding.category for finding in findings} == {
+        "tracked_data_file",
+        "tracked_output_file",
+        "tracked_model_file",
+        "tracked_submission_build_artifact",
+        "tracked_zip_artifact",
+    }
+    assert any(finding.snippet == "data/raw/openalex.jsonl" for finding in findings)
+    assert any(finding.snippet == "outputs/main_run/results.csv" for finding in findings)
+    assert any(finding.snippet == "models/checkpoint.bin" for finding in findings)
+    assert any(finding.snippet == "manuscript/build/submission_package/submission_manifest.json" for finding in findings)
+    assert any(finding.snippet == "manuscript/build/iad-risk-submission-package.zip" for finding in findings)
+    assert any(finding.snippet == "release.zip" for finding in findings)
 
 
 def test_run_public_release_check_fails_on_document_trace(tmp_path: Path) -> None:
