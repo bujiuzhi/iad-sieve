@@ -1240,6 +1240,40 @@ def test_check_abstract_cluster_overclaim_accepts_pair_stage_boundary() -> None:
     assert errors == []
 
 
+def test_check_abstract_mechanism_claim_boundary_accepts_single_score_boundary() -> None:
+    """验证摘要用单一匹配分数边界说明机制动机时可通过。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = (
+        r"\begin{abstract}"
+        "This distinction is fragile when semantic relatedness is converted into merge evidence: "
+        "scientific representation models can assign high similarity to distinct papers, "
+        "while a single match score does not reveal whether the evidence reflects identity or agenda relatedness."
+        r"\end{abstract}"
+    )
+
+    errors = module.check_abstract_mechanism_claim_boundary(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_abstract_mechanism_claim_boundary_rejects_pair_classifier_overclaim() -> None:
+    """验证摘要不能把未支撑的 pair-classifier 高分说成首屏失败原因。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = (
+        r"\begin{abstract}"
+        "Scientific representation models can assign high semantic similarity to distinct papers, "
+        "and pair classifiers can assign high merge scores to the same kinds of pairs."
+        r"\end{abstract}"
+    )
+
+    errors = module.check_abstract_mechanism_claim_boundary(manuscript_text)
+
+    assert any("pair classifiers can assign high merge scores" in error for error in errors)
+    assert any("single match score" in error for error in errors)
+
+
 def test_check_abstract_cluster_overclaim_rejects_cluster_prevention_claim() -> None:
     """验证摘要不得把 pair-level 风险控制写成 cluster-level 防止声明。"""
 
@@ -7446,6 +7480,9 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "## Readiness Gate 107: Abstract FMR-HNFMR First-Screen Gate",
             "abstract and cover-letter FMR/HNFMR first-screen separation",
             "ordinary FMR still reported separately as 0.001",
+            "first-screen method-evidence alignment",
+            "single match score",
+            "RoBERTa is reported as a strong supervised comparator",
             "first-screen metric separation",
             "same-scope comparative-ranking limits",
             "## Readiness Gate 108: Highlights FMR-HNFMR First-Screen Gate",

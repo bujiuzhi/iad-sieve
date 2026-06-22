@@ -982,6 +982,37 @@ def check_abstract_quantitative_evidence(manuscript_text: str) -> list[str]:
     return [f"abstract missing bounded quantitative evidence marker: {marker}" for marker in required_markers if marker not in abstract_text]
 
 
+def check_abstract_mechanism_claim_boundary(manuscript_text: str) -> list[str]:
+    """Check whether the abstract keeps mechanism motivation aligned with evidence.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for unsupported first-screen mechanism wording.
+    """
+    begin_marker = r"\begin{abstract}"
+    end_marker = r"\end{abstract}"
+    if begin_marker not in manuscript_text or end_marker not in manuscript_text:
+        return ["abstract mechanism claim check could not locate abstract environment"]
+    abstract_text = manuscript_text.split(begin_marker, 1)[1].split(end_marker, 1)[0]
+    errors: list[str] = []
+    unsupported_markers = [
+        "pair classifiers can assign high merge scores",
+    ]
+    for marker in unsupported_markers:
+        if marker in abstract_text:
+            errors.append(f"abstract contains unsupported mechanism wording: {marker}")
+    required_markers = [
+        "semantic relatedness is converted into merge evidence",
+        "single match score does not reveal whether the evidence reflects identity or agenda relatedness",
+    ]
+    for marker in required_markers:
+        if marker not in abstract_text:
+            errors.append(f"abstract missing mechanism claim-boundary marker: {marker}")
+    return errors
+
+
 def check_abstract_length(manuscript_text: str, max_words: int = 250) -> list[str]:
     """Check whether the abstract stays within common journal word limits.
 
@@ -4681,6 +4712,9 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "metric-stratum interpretation",
         "abstract and cover-letter FMR/HNFMR first-screen separation",
         "ordinary FMR still reported separately as 0.001",
+        "first-screen method-evidence alignment",
+        "single match score",
+        "RoBERTa is reported as a strong supervised comparator",
         "first-screen metric separation",
         "same-scope comparative-ranking limits",
         "highlights FMR/HNFMR first-screen separation",
@@ -6646,6 +6680,7 @@ def main() -> int:
     errors.extend(check_formal_manuscript_review_language(manuscript_text, "main manuscript"))
     errors.extend(check_formal_manuscript_review_language(supplementary_text, "supplementary material"))
     errors.extend(check_abstract_quantitative_evidence(manuscript_text))
+    errors.extend(check_abstract_mechanism_claim_boundary(manuscript_text))
     errors.extend(check_abstract_length(manuscript_text))
     errors.extend(check_abstract_cluster_overclaim(manuscript_text))
     errors.extend(check_contribution_evidence_summary(manuscript_text))
