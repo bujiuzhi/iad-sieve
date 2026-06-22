@@ -953,7 +953,7 @@ The reviewer-facing boundary is repository traceability, not proof that the exte
 
 Outcome: pass for method shortcut wording refinement; blocked for stronger evidence claims until the rejected alternatives are backed by same-scope artifacts where required.
 
-This gate checks whether the main-method discussion of rejected shortcuts reads as complete academic reasoning rather than as terse development notes. The updated Design Alternatives and Rejected Shortcuts paragraph now makes rejected alternatives read as auditable design choices, including threshold-only representation scoring, single-score shortcuts, provenance-as-feature leakage, forced binary decisions, and post-hoc threshold selection with explicit rejection reasons.
+This gate checks whether the main-method discussion of rejected shortcuts reads as complete academic reasoning rather than as terse development notes. The updated Design Alternatives and Rejected Shortcuts paragraph now makes rejected alternatives read as auditable design choices, including threshold-only representation scoring, single-score shortcuts, cascaded single-score gates without explicit relation roles, provenance-as-feature leakage, forced binary decisions, and post-hoc threshold selection with explicit rejection reasons.
 
 The reviewer-facing boundary is writing clarity, not new empirical evidence. The wording makes the method rationale easier to review and keeps the rejected alternatives aligned with the supplementary design-alternatives table, but it does not upgrade ablation, threshold-stability, same-scope ranking, or deployment claims without released artifacts.
 

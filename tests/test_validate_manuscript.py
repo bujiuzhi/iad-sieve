@@ -3138,6 +3138,8 @@ def test_check_design_alternative_boundaries_accepts_supplementary_table() -> No
             "Selecting thresholds after test results.",
             "RoBERTa remains a strong baseline.",
             "The paper states broad superiority is not claimed.",
+            "Cascading several single-score gates.",
+            "The method uses explicit identity, agenda, and agenda-non-identity relation roles.",
             "threshold stability needs a released grid and checksums.",
         ]
     )
@@ -3156,6 +3158,9 @@ def test_check_design_alternative_boundaries_accepts_supplementary_table() -> No
             "Select thresholds after test results.",
             "RoBERTa remains a strong baseline.",
             "The paper states broad superiority is not claimed.",
+            "Cascade several single-score gates.",
+            "Each gate input has an explicit relation role.",
+            "This is not a completed component-causality ablation.",
             "Threshold stability needs a released grid and checksums.",
         ]
     )
@@ -3180,6 +3185,8 @@ def test_check_design_alternative_boundaries_rejects_missing_supplementary_table
             "Selecting thresholds after test results.",
             "RoBERTa remains a strong baseline.",
             "The paper states broad superiority is not claimed.",
+            "Cascading several single-score gates.",
+            "The method uses explicit identity, agenda, and agenda-non-identity relation roles.",
             "threshold stability needs a released grid and checksums.",
         ]
     )
@@ -8492,6 +8499,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "method shortcut wording refinement",
             "threshold-only representation scoring",
             "single-score shortcuts",
+            "cascaded single-score gates without explicit relation roles",
             "post-hoc threshold selection",
             "rejected alternatives read as auditable design choices",
             "## Readiness Gate 105: Selective Workload Denominator Gate",

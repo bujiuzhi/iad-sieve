@@ -2102,6 +2102,8 @@ def check_design_alternative_boundaries(manuscript_text: str, supplementary_text
         "Selecting thresholds after test results",
         "RoBERTa remains a strong baseline",
         "broad superiority is not claimed",
+        "Cascading several single-score gates",
+        "explicit identity, agenda, and agenda-non-identity relation roles",
         "threshold stability needs a released grid and checksums",
     ]
     required_supplement_markers = [
@@ -2118,6 +2120,9 @@ def check_design_alternative_boundaries(manuscript_text: str, supplementary_text
         "Select thresholds after test results",
         "RoBERTa remains a strong baseline",
         "broad superiority is not claimed",
+        "Cascade several single-score gates",
+        "explicit relation role",
+        "completed component-causality ablation",
         "Threshold stability needs a released grid and checksums",
     ]
     errors = [
@@ -5268,6 +5273,7 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "method shortcut wording refinement",
         "threshold-only representation scoring",
         "single-score shortcuts",
+        "cascaded single-score gates without explicit relation roles",
         "post-hoc threshold selection",
         "rejected alternatives read as auditable design choices",
         "selective workload denominator clarification",
