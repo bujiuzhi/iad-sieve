@@ -1,6 +1,6 @@
 # Reviewer Readiness Audit
 
-Updated: 2026-06-19
+Status date: 2026-06-19
 
 ## Scope
 
@@ -8,9 +8,9 @@ This audit evaluates whether the template-independent manuscript package is read
 
 Current decision: conditionally ready for target-journal selection; not ready for final upload.
 
-## Audit Iteration Summary
+## Readiness Summary
 
-Completed audit cycles: 115.
+Readiness gates covered: 115.
 
 Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, and stronger evidence gates.
 
@@ -88,19 +88,19 @@ This matrix anticipates likely reviewer questions and maps each answer to manusc
 | Is the mechanism causal without full ablation output? | State that current evidence is mechanism-consistent and that causal ablation claims require artifacts. | Mechanism evidence table and supplementary uncertainty and ablation requirements. | Do not claim completed component causality before no-risk-gate, no-ANI-head, single-space, no-cannot-link, and post-hoc-threshold protocol variants are released with accepted artifacts. |
 | Can readers reproduce the reported numbers without raw data in Git? | Separate fixture-level code reproduction from L2/L3 result-level artifact reproduction. | Data and Code Availability, supplementary reproduction levels, artifact manifest template, and checksums policy. | Do not imply full numerical audit without external artifact release. |
 
-## Audit Cycle 1: Claim Discipline
+## Readiness Gate 1: Claim Discipline
 
 Outcome: pass with residual artifact requirements.
 
 The manuscript avoids unsupported broad-superiority, human-gold, and threshold-stability claims. The remaining risk is not wording but evidence availability: full numerical audit still depends on external artifacts with predictions, logs, tables, and checksums.
 
-## Audit Cycle 2: Submission Readiness
+## Readiness Gate 2: Submission Readiness
 
 Outcome: blocked for final upload.
 
 The template-independent package is internally consistent, but final upload remains blocked until the target journal, journal template, author metadata, corresponding-author metadata, funding statement, author contribution statement, third-party material permission statement, generative AI declaration, final template-specific PDFs, live submission-system fields, and artifact release link are completed.
 
-## Audit Cycle 3: Q2/B Acceptance Gate
+## Readiness Gate 3: Q2/B Acceptance Gate
 
 Outcome: blocked for Q2/B completion; acceptable for conservative target-journal selection.
 
@@ -108,23 +108,23 @@ From a skeptical reviewer perspective, the manuscript can be considered for a co
 
 The current manuscript therefore keeps its strongest claims limited to identity-agenda false-merge control under stratified evidence. It does not claim SOTA performance, complete threshold stability, complete human gold validation, or broad source-heldout generalization.
 
-## Audit Cycle 4: Final Package Hygiene
+## Readiness Gate 4: Final Package Hygiene
 
 Outcome: pass for anonymous pre-submission package hygiene; blocked for final upload metadata.
 
 The anonymous package hygiene gate checks that generated submission packages exclude raw data, experiment outputs, local caches, credentials, author email addresses, ORCID values, personal account URLs, local absolute paths, and development process notes. This closes a common desk-check risk for anonymous review, but it does not replace the final-upload metadata gate because the target journal, authors, corresponding author, final template-specific PDFs, and artifact release URL or DOI remain unresolved.
 
-## Audit Cycle 5: Editorial Desk Check
+## Readiness Gate 5: Editorial Desk Check
 
 Outcome: pass for template-independent first-screen claim alignment; must be repeated after journal-specific edits.
 
 The editorial desk check compares the title, abstract, conclusion, cover letter, highlights, and keywords against the same core story: IAD-Risk addresses identity-agenda confusion in scholarly work deduplication; IAD-Bench separates gold, proxy, and silver evidence; the Open-v2 evidence snapshot supports targeted false-merge suppression; and the paper does not claim broad method ranking, statistical superiority, threshold stability, cluster-level deployment quality, or human-gold validation. This keeps the editorial claim alignment consistent before the manuscript reaches external review.
 
-## Audit Cycle 6: Reviewer Rebuttal Boundary
+## Readiness Gate 6: Reviewer Rebuttal Boundary
 
 Outcome: pass for conservative response planning; blocked for stronger evidence claims.
 
-This cycle separates reviewer questions that can be answered from the current manuscript from questions that require additional artifact-backed evidence. The status labels are: `ready_to_answer` when the manuscript already contains direct evidence, `limited_answer` when the response must stay within the present Open-v2 evidence snapshot, and `do_not_answer_as_claim` when the answer would require new experiments, public artifact files, author declarations, permission declarations, or target-journal confirmation before it can appear as a manuscript claim.
+This gate separates reviewer questions that can be answered from the current manuscript from questions that require additional artifact-backed evidence. The status labels are: `ready_to_answer` when the manuscript already contains direct evidence, `limited_answer` when the response must stay within the present Open-v2 evidence snapshot, and `do_not_answer_as_claim` when the answer would require new experiments, public artifact files, author declarations, permission declarations, or target-journal confirmation before it can appear as a manuscript claim.
 
 | Reviewer challenge | Response status | safe response scope | must-not-claim boundary |
 | --- | --- | --- | --- |
@@ -147,15 +147,15 @@ This register converts likely reviewer pressure into mandatory edits. Each revie
 | Evaluation completeness trigger: reviewers request ablations, threshold sensitivity, or manual validation. | Move unsupported mechanism statements to limitations or add the missing experiment artifacts. | Ablation suite, threshold sensitivity grid, manual validation slice, adjudication log, and agreement report. | Do not claim component causality, threshold stability, or human-gold validation without these files. |
 | Method design soundness trigger: reviewers argue the gate adds complexity or unrealistic assumptions. | Clarify deployment assumptions, cannot-link behavior, risk thresholds, and the net benefit of false-merge control. | Source-heldout checks, topic-heldout checks, realistic operating points, and failure-case analysis. | Do not claim robust cross-source transfer before split-readiness and source-heldout evidence are defensible. |
 
-## Audit Cycle 7: Journal Fit and Novelty Desk Check
+## Readiness Gate 7: Journal Fit and Novelty Desk Check
 
 Outcome: pass for a conservative Data & Knowledge Engineering route; blocked for a stronger Information Systems or broad Q2/B claim until artifact-backed evidence is complete.
 
-This cycle checks desk-rejection risk before final template binding. The current target-journal scope fit is strongest for Data & Knowledge Engineering because the manuscript is framed around data engineering, knowledge engineering, entity matching, benchmark contracts, and reproducible data-processing. Information Systems remains a stretch route because it would require a stronger same-scope experimental package, released prediction files, threshold logs, and broader systems-oriented evidence. Scientometrics remains a domain backup because it would require stronger science-of-science interpretation and manual-validation evidence.
+This gate checks desk-rejection risk before final template binding. The current target-journal scope fit is strongest for Data & Knowledge Engineering because the manuscript is framed around data engineering, knowledge engineering, entity matching, benchmark contracts, and reproducible data-processing. Information Systems remains a stretch route because it would require a stronger same-scope experimental package, released prediction files, threshold logs, and broader systems-oriented evidence. Scientometrics remains a domain backup because it would require stronger science-of-science interpretation and manual-validation evidence.
 
 The novelty beyond ordinary entity matching should be stated as a bounded combination of identity-agenda confusion, HNFMR, label-strength-aware IAD-Bench construction, and risk-aware merge gating. This positioning is stronger than presenting another similarity scorer, but it must not be inflated into broad method superiority, SOTA ranking, or universal scholarly deduplication coverage. The practical decision is therefore to keep the DKE route active, treat Information Systems as blocked until the L3 artifact package and stronger baselines are complete, and treat Scientometrics as a backup that would need a domain-facing rewrite.
 
-## Audit Cycle 8: Pair-to-Cluster Claim Lockdown
+## Readiness Gate 8: Pair-to-Cluster Claim Lockdown
 
 Outcome: pass for template-independent first-screen claim lockdown; blocked for cluster-level deployment claims until artifact-backed audits are released.
 
@@ -163,193 +163,193 @@ The pair-to-cluster lockdown prevents pair-level metrics from being read as clus
 
 The first-screen materials carry the same boundary. The cover letter states that the manuscript does not claim cluster-level deployment quality without cluster artifacts. The highlights state that cluster-level claims require artifact-backed audits. The conclusion states that cluster-level artifact audits are future validation requirements before broad method ranking. This keeps cover letter, highlights, and conclusion aligned with the pair-to-cluster evidence boundary in the main manuscript.
 
-## Audit Cycle 9: Artifact Row-Level Result Audit
+## Readiness Gate 9: Artifact Row-Level Result Audit
 
 Outcome: pass for release-template and validator coverage; blocked for final numerical audit until the external artifact release is populated and linked.
 
-This cycle checks whether the external result package can support a row-by-row reviewer audit of the main Open-v2 result table. The release validator treats `open_v2_main_results` as a schema-bearing artifact rather than a generic file: `tables/open_v2_main_results.csv` must include per-row denominator counts, per-row threshold source, scope label used in the main table, automatic merge count, block count, defer count, automatic merge coverage, defer rate, and capacity-normalized review load. This prevents a release from passing only because the CSV exists and has a matching checksum.
+This gate checks whether the external result package can support a row-by-row reviewer audit of the main Open-v2 result table. The release validator treats `open_v2_main_results` as a schema-bearing artifact rather than a generic file: `tables/open_v2_main_results.csv` must include per-row denominator counts, per-row threshold source, scope label used in the main table, automatic merge count, block count, defer count, automatic merge coverage, defer rate, and capacity-normalized review load. This prevents a release from passing only because the CSV exists and has a matching checksum.
 
 The reviewer-facing interpretation is narrow. A valid `open_v2_main_results` file lets reviewers trace each reported row to its denominator, operating-point source, evaluated scope, and selective-decision coverage. It does not by itself establish broad method ranking, confidence intervals, threshold stability, component causality, human-gold validation, or cluster-level deployment quality. Those stronger claims remain gated by the optional artifact rows and their checksums.
 
 The mandatory command for this gate is `python manuscript/scripts/validate_artifact_release.py --artifact-dir /path/to/release`. The gate should be run after `populate_artifact_release.py` and `finalize_artifact_release.py`, because the finalizer refreshes manifest SHA256 values and `validate_artifact_release.py` checks both checksums and the `open_v2_main_results` row-level schema.
 
-## Audit Cycle 10: Final Template Binding and System Metadata Gate
+## Readiness Gate 10: Final Template Binding and System Metadata Gate
 
 Outcome: pass for validator coverage; blocked for final upload until the selected journal template is bound to the final manuscript source.
 
-This cycle checks whether final-upload readiness is coupled to the selected journal template rather than only to a generated PDF. The submission metadata, final-upload checklist, and submission-system checklist require `target_journal_template_bound`, `target_journal_template_applied`, rebuilt main and supplementary PDFs after template conversion, and a source archive rebuilt after template conversion. The gate prevents a template-independent PDF or DKE/Elsevier preflight package from being treated as final upload evidence.
+This gate checks whether final-upload readiness is coupled to the selected journal template rather than only to a generated PDF. The submission metadata, final-upload checklist, and submission-system checklist require `target_journal_template_bound`, `target_journal_template_applied`, rebuilt main and supplementary PDFs after template conversion, and a source archive rebuilt after template conversion. The gate prevents a template-independent PDF or DKE/Elsevier preflight package from being treated as final upload evidence.
 
 The reviewer-facing boundary is narrow. Template binding is a publication-format and submission-system consistency gate; it does not strengthen the scientific evidence. The manuscript should not be uploaded until the selected journal template matches the final manuscript source, `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, and the cover letter, metadata, and availability statements all name the same target journal and artifact release.
 
-## Audit Cycle 11: Live Submission Text Consistency Gate
+## Readiness Gate 11: Live Submission Text Consistency Gate
 
 Outcome: pass for checklist and validator coverage; blocked for final upload until the live submission-system preview is checked.
 
-This cycle checks whether the text entered into the journal system remains synchronized with the repository sources after template conversion and metadata insertion. The final-upload information request now requires the title and abstract to be checked against `main.tex`, keywords to be copied exactly from `keywords.md`, highlights to be copied exactly from `highlights.md`, and the live submission system preview to show the same title, abstract, keywords, and highlights.
+This gate checks whether the text entered into the journal system remains synchronized with the repository sources after template conversion and metadata insertion. The final-upload information request now requires the title and abstract to be checked against `main.tex`, keywords to be copied exactly from `keywords.md`, highlights to be copied exactly from `highlights.md`, and the live submission system preview to show the same title, abstract, keywords, and highlights.
 
 The reviewer-facing boundary is practical rather than scientific. A clean PDF is not enough if the submission system displays stale or manually edited first-screen text. Therefore `submission_system_files_verified` should remain false until title, abstract, keywords, highlights, uploaded files, and live system preview all match the final source package.
 
-## Audit Cycle 12: Git-Only Fixture Reproducibility Gate
+## Readiness Gate 12: Git-Only Fixture Reproducibility Gate
 
 Outcome: pass for no-network code-path evidence; blocked for full numerical reproduction until the external artifact release is populated and linked.
 
-This cycle checks whether the public repository can demonstrate executable data-processing paths without committing raw third-party data or full experiment outputs. The required command is `python manuscript/scripts/verify_fixture_rebuild.py`, which rebuilds DeepMatcher, SciRepEval-style, OpenAlex/OpenCitations, and assembled IAD-Bench fixture outputs in a temporary directory. The companion public-release command is `python scripts/check_public_release.py`, which verifies that `data/`, `outputs/`, caches, credentials, and large local artifacts remain outside the public package.
+This gate checks whether the public repository can demonstrate executable data-processing paths without committing raw third-party data or full experiment outputs. The required command is `python manuscript/scripts/verify_fixture_rebuild.py`, which rebuilds DeepMatcher, SciRepEval-style, OpenAlex/OpenCitations, and assembled IAD-Bench fixture outputs in a temporary directory. The companion public-release command is `python scripts/check_public_release.py`, which verifies that `data/`, `outputs/`, caches, credentials, and large local artifacts remain outside the public package.
 
 The reviewer-facing boundary is explicit. Passing the fixture rebuild proves that the data adapters, CLI entry points, schema contracts, and IAD-Bench assembly path execute on small public fixtures. It does not prove the Open-v2 numerical table, threshold choices, model predictions, or bootstrap intervals. Those result-level claims remain tied to the L2/L3 public-source rebuild or external artifact release with manifests and checksums.
 
-## Audit Cycle 13: Submission Package Source-PDF Consistency Gate
+## Readiness Gate 13: Submission Package Source-PDF Consistency Gate
 
 Outcome: pass for package-level validator coverage; blocked for final upload until the selected journal source and PDFs are rebuilt after all final source edits.
 
-This cycle checks whether the generated submission package can detect stale compiled files rather than relying on manual rebuild discipline. The package validator now compares packaged PDFs against their packaged source dependencies: the main PDF is checked against `main.tex` and `references.bib`, the supplementary PDF is checked against `supplementary_material.tex`, and the DKE/Elsevier preflight PDF is checked against `iad-risk-manuscript-elsevier.tex`, `keywords.md`, and `references.bib`. If a packaged PDF is older than any required source dependency, the package must be rejected with the action boundary: rebuild PDF before packaging.
+This gate checks whether the generated submission package can detect stale compiled files rather than relying on manual rebuild discipline. The package validator now compares packaged PDFs against their packaged source dependencies: the main PDF is checked against `main.tex` and `references.bib`, the supplementary PDF is checked against `supplementary_material.tex`, and the DKE/Elsevier preflight PDF is checked against `iad-risk-manuscript-elsevier.tex`, `keywords.md`, and `references.bib`. If a packaged PDF is older than any required source dependency, the package must be rejected with the action boundary: rebuild PDF before packaging.
 
 The reviewer-facing boundary is procedural but important. A passing package validation shows that the packaged PDFs are not older than the included source files and bibliography. It does not prove final journal-template correctness, author metadata completeness, external artifact availability, or stronger empirical evidence. Those remain gated by template binding, final-upload metadata, artifact release validation, and the Q2/B evidence checks.
 
-## Audit Cycle 14: Source-Control Manifest Binding Gate
+## Readiness Gate 14: Source-Control Manifest Binding Gate
 
 Outcome: pass for manifest-level commit traceability; blocked for final upload until the final package is rebuilt from the submitted repository commit.
 
-This cycle checks whether a submission package can be traced back to the exact source revision used to build it. The submission package manifest records a `source_control` object with `repository_commit`, `repository_branch`, `worktree_dirty`, and `tracked_state`. This gives reviewers and editors a concrete commit anchor for the LaTeX source, package checksums, and data-processing code without embedding local absolute paths or author-identifying repository URLs in anonymous packages.
+This gate checks whether a submission package can be traced back to the exact source revision used to build it. The submission package manifest records a `source_control` object with `repository_commit`, `repository_branch`, `worktree_dirty`, and `tracked_state`. This gives reviewers and editors a concrete commit anchor for the LaTeX source, package checksums, and data-processing code without embedding local absolute paths or author-identifying repository URLs in anonymous packages.
 
 The final-upload boundary is stricter than anonymous preflight. When source-control metadata is available, final-upload validation checks that the manifest `repository_commit` matches `submission_metadata.yml` and that `worktree_dirty` is false. A mismatch means the package was not rebuilt from the committed source state named in the availability statement, and the final upload must be regenerated before submission.
 
-## Audit Cycle 15: Artifact Release Commit Validity Gate
+## Readiness Gate 15: Artifact Release Commit Validity Gate
 
 Outcome: pass for commit-format validator coverage; blocked for final upload until the external artifact release names the same committed source revision as the final manuscript package.
 
-This cycle checks whether the external result release can be tied to a real source revision rather than a placeholder or free-form label. The artifact release skeleton builder and validator require `repository.commit` to be a 7 to 40 character hexadecimal Git commit. This applies both when creating a release scaffold and when validating a populated release directory.
+This gate checks whether the external result release can be tied to a real source revision rather than a placeholder or free-form label. The artifact release skeleton builder and validator require `repository.commit` to be a 7 to 40 character hexadecimal Git commit. This applies both when creating a release scaffold and when validating a populated release directory.
 
 The reviewer-facing boundary is narrow. A syntactically valid commit makes the artifact manifest auditable, but it does not prove that all result files were generated from that commit. That stronger guarantee still requires checksums, command logs, prediction files, threshold logs, and the final manuscript metadata to reference the same repository commit and artifact URL or DOI.
 
-## Audit Cycle 16: Artifact Release README Reproducibility Gate
+## Readiness Gate 16: Artifact Release README Reproducibility Gate
 
 Outcome: pass for README validator coverage; blocked for final upload until the external artifact release is populated, finalized, validated, and linked.
 
-This cycle checks whether the release README preserves the minimum instructions a reviewer needs before auditing external results. The artifact release validator now requires `README.md` to retain the data policy, `manifest.json`, `checksums.sha256`, the checksum command, the `validate_artifact_release.py` command, the repository commit field, reproduction levels, and claim boundaries. The same gate keeps raw third-party data exclusions visible in the release package rather than only in repository-side documentation.
+This gate checks whether the release README preserves the minimum instructions a reviewer needs before auditing external results. The artifact release validator now requires `README.md` to retain the data policy, `manifest.json`, `checksums.sha256`, the checksum command, the `validate_artifact_release.py` command, the repository commit field, reproduction levels, and claim boundaries. The same gate keeps raw third-party data exclusions visible in the release package rather than only in repository-side documentation.
 
 The reviewer-facing boundary is procedural. A complete README improves auditability, but it does not replace artifact checksums, result files, threshold logs, command logs, or the final artifact URL or DOI. It only ensures that the external release cannot pass validation after its reproduction instructions have been reduced to an uninformative file.
 
-## Audit Cycle 17: Final-Upload Source-Control Package Binding Gate
+## Readiness Gate 17: Final-Upload Source-Control Package Binding Gate
 
 Outcome: pass for package-builder coverage; blocked for final upload until target-journal metadata, author metadata, declarations, and artifact URL or DOI are complete.
 
-This cycle closes a source-control binding edge case in the final-upload workflow. A tracked `submission_metadata.yml` file cannot reliably contain the Git commit of the commit that contains itself, because changing the file changes the commit hash. The final-upload package builder therefore keeps the source metadata eligible for anonymous pre-submission, reads `git remote origin`, `git rev-parse HEAD`, and the current branch during `--final-upload`, and writes `repository_url`, `repository_commit`, `repository_branch`, and the matching data/code availability statement into the package copy of `submission_metadata.yml`.
+This gate closes a source-control binding edge case in the final-upload workflow. A tracked `submission_metadata.yml` file cannot reliably contain the Git commit of the commit that contains itself, because changing the file changes the commit hash. The final-upload package builder therefore keeps the source metadata eligible for anonymous pre-submission, reads `git remote origin`, `git rev-parse HEAD`, and the current branch during `--final-upload`, and writes `repository_url`, `repository_commit`, `repository_branch`, and the matching data/code availability statement into the package copy of `submission_metadata.yml`.
 
 The reviewer-facing boundary is traceability rather than new evidence. This gate ensures that the final package metadata and `submission_manifest.json` agree on the committed source revision used for upload. It does not solve the remaining external blockers: the package still needs confirmed author metadata, target-journal template binding, funding and contribution declarations, permissions wording, generative AI declaration wording, live submission-system verification, and an artifact release URL or DOI before final upload can pass.
 
-## Audit Cycle 18: Prediction Artifact Schema Gate
+## Readiness Gate 18: Prediction Artifact Schema Gate
 
 Outcome: pass for checklist and validator coverage; blocked for final numerical audit until the external artifact release is populated, finalized, validated, and linked.
 
-This cycle checks whether final-upload review instructions match the row-level prediction schema enforced by `validate_artifact_release.py`. The final upload checklist now requires `iad_risk_predictions`, `representation_baseline_scores`, and `supervised_baseline_predictions` JSONL files to expose `pair_id`, `source_document_id`, `target_document_id`, expected labels, label strength, hard-negative level, split identifiers, score or probability fields, `threshold_value` where applicable, threshold source, and `merge_prediction`. It also requires `threshold_selection_logs` to expose system, threshold_name, `threshold_value`, selection_split, selection_metric, selection_rule, applied_scope, and `score_field`.
+This gate checks whether final-upload review instructions match the row-level prediction schema enforced by `validate_artifact_release.py`. The final upload checklist now requires `iad_risk_predictions`, `representation_baseline_scores`, and `supervised_baseline_predictions` JSONL files to expose `pair_id`, `source_document_id`, `target_document_id`, expected labels, label strength, hard-negative level, split identifiers, score or probability fields, `threshold_value` where applicable, threshold source, and `merge_prediction`. It also requires `threshold_selection_logs` to expose system, threshold_name, `threshold_value`, selection_split, selection_metric, selection_rule, applied_scope, and `score_field`.
 
 The reviewer-facing boundary is auditability rather than new empirical strength. A schema-complete prediction artifact lets reviewers recompute row-level decisions, denominators, and fixed operating points from the released files. It does not by itself establish threshold stability, statistical superiority, ablation causality, human-gold validation, or cluster-level quality; those remain gated by the optional artifacts and claim flags.
 
-## Audit Cycle 19: Generative AI Declaration Gate
+## Readiness Gate 19: Generative AI Declaration Gate
 
 Outcome: pass for checklist and metadata validator coverage; blocked for final upload until the selected journal's live declaration wording is completed.
 
-This cycle separates publisher-required AI-tool disclosure from removable process notes. Formal manuscript files, cover-letter text, highlights, keywords, and submission packages must not contain development logs, development work summaries, or unexplained process traces. At the same time, the final upload workflow must record the actual AI-tool use status required by the selected publisher, confirm author review and responsibility, confirm that AI tools are not listed as authors, and confirm whether machine-generated figures, images, or artwork are included.
+This gate separates publisher-required AI-tool disclosure from removable process notes. Formal manuscript files, cover-letter text, highlights, keywords, and submission packages must not contain development logs, development work summaries, or unexplained process traces. At the same time, the final upload workflow must record the actual AI-tool use status required by the selected publisher, confirm author review and responsibility, confirm that AI tools are not listed as authors, and confirm whether machine-generated figures, images, or artwork are included.
 
 The reviewer-facing boundary is compliance rather than scientific evidence. A completed generative AI declaration does not strengthen the method or experiments, but a missing or inconsistent declaration can trigger desk-check or production-stage issues. The declaration must therefore match `submission_metadata.yml`, `final_upload_information_request.md`, the manuscript declaration section if required by the target journal, and the live submission-system field before `generative_ai_declaration_complete` can be set to true.
 
-## Audit Cycle 20: Fixture Evidence Isolation Gate
+## Readiness Gate 20: Fixture Evidence Isolation Gate
 
 Outcome: pass for documentation and validator coverage; blocked for Q2/B completion until live artifacts replace example fixture evidence.
 
-This cycle prevents test fixtures from being mistaken for current manuscript evidence. Unit-test fixtures, example JSONL summaries, and generated fixture reports verify that audit builders, validators, and CLI paths behave correctly. They do not prove that the current manuscript has completed the external artifact release, live submission-system checks, same-scope prediction package, author metadata, target-journal template binding, or Q2/B completion gate.
+This gate prevents test fixtures from being mistaken for current manuscript evidence. Unit-test fixtures, example JSONL summaries, and generated fixture reports verify that audit builders, validators, and CLI paths behave correctly. They do not prove that the current manuscript has completed the external artifact release, live submission-system checks, same-scope prediction package, author metadata, target-journal template binding, or Q2/B completion gate.
 
 The reviewer-facing boundary is strict: fixture rows can support software reliability and reproducibility-path claims, but they cannot be cited as scientific result evidence or final-upload readiness evidence. A Q2/B or final-upload claim requires live outputs regenerated from the current repository commit, tied to the selected target-journal route, and linked to the external artifact release and final `submission_metadata.yml`.
 
-## Audit Cycle 21: DKE Author Biography and Photograph Gate
+## Readiness Gate 21: DKE Author Biography and Photograph Gate
 
 Outcome: pass for checklist and metadata-validator coverage; blocked for final upload until author-approved biography text and photograph files are collected when the DKE route is selected.
 
-This cycle checks a non-scientific but submission-critical DKE requirement. The publisher guide requests a short biography for each author and a passport-type photograph as a separate figure. The current anonymous preflight package must not include these identity-bearing files, but the final-upload workflow must collect them after author order and corresponding-author details are confirmed.
+This gate checks a non-scientific but submission-critical DKE requirement. The publisher guide requests a short biography for each author and a passport-type photograph as a separate figure. The current anonymous preflight package must not include these identity-bearing files, but the final-upload workflow must collect them after author order and corresponding-author details are confirmed.
 
 The reviewer-facing boundary is administrative rather than evidential. Author biographies and photographs do not strengthen the method, experiments, or reproducibility claims. They are tracked because missing author-material files can block or delay journal-system upload even when the manuscript PDF, source archive, and artifact release are otherwise ready.
 
-## Audit Cycle 22: Method Execution Traceability Gate
+## Readiness Gate 22: Method Execution Traceability Gate
 
 Outcome: pass for method-writing clarity; blocked for result-level audit until external prediction, threshold, metric, and checksum artifacts are populated and linked.
 
-This cycle checks whether the Method section gives reviewers a reproducible execution path rather than only a conceptual model description. The manuscript now states the training and inference trace from schema loading through masked supervision, threshold fixation, pair scoring, decision emission, and metric export. This closes a writing-clarity risk: reviewers can see how relation-head predictions, fixed thresholds, cannot-link evidence, merge/block/defer decisions, and metric denominators should align in a result artifact.
+This gate checks whether the Method section gives reviewers a reproducible execution path rather than only a conceptual model description. The manuscript now states the training and inference trace from schema loading through masked supervision, threshold fixation, pair scoring, decision emission, and metric export. This closes a writing-clarity risk: reviewers can see how relation-head predictions, fixed thresholds, cannot-link evidence, merge/block/defer decisions, and metric denominators should align in a result artifact.
 
 The reviewer-facing boundary remains unchanged. A clear execution trace improves method reproducibility from the manuscript text, but it does not by itself prove the Open-v2 numbers. Result-level audit still requires populated prediction files, threshold logs, metric summaries, manifests, checksums, and the external artifact URL or DOI.
 
-## Audit Cycle 23: First-Screen Claim Lockdown Gate
+## Readiness Gate 23: First-Screen Claim Lockdown Gate
 
 Outcome: pass for final-upload checklist coverage; blocked for final upload until target-journal wording edits, artifact links, and live system fields are checked against the same source package.
 
-This cycle checks the materials that editors and submission systems see before a reviewer reads the PDF. The submission checklist now requires `cover_letter.md`, `highlights.md`, `keywords.md`, the abstract, and the conclusion to describe the same problem, method, Open-v2 evidence snapshot, and claim boundary. It also blocks first-screen upgrades to broad method superiority, SOTA ranking, statistical superiority, threshold stability, human-gold validation, Q2/B completion, final-upload readiness, or cluster-level deployment quality.
+This gate checks the materials that editors and submission systems see before a reviewer reads the PDF. The submission checklist now requires `cover_letter.md`, `highlights.md`, `keywords.md`, the abstract, and the conclusion to describe the same problem, method, Open-v2 evidence snapshot, and claim boundary. It also blocks first-screen upgrades to broad method superiority, SOTA ranking, statistical superiority, threshold stability, human-gold validation, Q2/B completion, final-upload readiness, or cluster-level deployment quality.
 
 The reviewer-facing boundary is practical. A consistent first screen reduces desk-check and scope-drift risk, but it does not add empirical evidence. Artifact URL or DOI insertion must remain a traceability update unless the released artifact validates the optional evidence needed for stronger claims, such as bootstrap intervals, threshold grids, ablations, manual-validation slice, or cluster artifacts.
 
-## Audit Cycle 24: Final-Upload Claim-Lock Metadata Gate
+## Readiness Gate 24: Final-Upload Claim-Lock Metadata Gate
 
 Outcome: pass for metadata-validator coverage; blocked for final upload until `first_screen_claim_lockdown_confirmed` is true after live system preview.
 
-This cycle turns the first-screen claim lockdown from a checklist instruction into a final-upload metadata gate. The tracked `submission_metadata.yml` now keeps `final_upload_checklist.first_screen_claim_lockdown_confirmed` false by default, and the final-upload metadata validator requires it to be true before upload. The final-upload information request also asks authors to confirm that the cover letter, highlights, keywords, abstract, and conclusion preserve the same Open-v2 evidence boundary and avoid unsupported first-screen upgrades.
+This gate turns the first-screen claim lockdown from a checklist instruction into a final-upload metadata gate. The tracked `submission_metadata.yml` now keeps `final_upload_checklist.first_screen_claim_lockdown_confirmed` false by default, and the final-upload metadata validator requires it to be true before upload. The final-upload information request also asks authors to confirm that the cover letter, highlights, keywords, abstract, and conclusion preserve the same Open-v2 evidence boundary and avoid unsupported first-screen upgrades.
 
 The reviewer-facing boundary remains conservative. Setting this field to true confirms text consistency and claim discipline; it does not confirm target-journal acceptance, Q2/B completion, artifact evidence, or stronger empirical claims.
 
-## Audit Cycle 25: Artifact README-Manifest Commit Consistency Gate
+## Readiness Gate 25: Artifact README-Manifest Commit Consistency Gate
 
 Outcome: pass for artifact-validator and commit-consistency coverage; blocked for final numerical audit until the external artifact release is populated, finalized, validated, and linked.
 
-This cycle closes a traceability gap in the external artifact release. The artifact release validator now requires `README.md` to record a parseable `Repository commit` value and requires that value to match `manifest.json` field `repository.commit`. The README template also states that the repository commit must match the manifest and the final manuscript package commit.
+This gate closes a traceability gap in the external artifact release. The artifact release validator now requires `README.md` to record a parseable `Repository commit` value and requires that value to match `manifest.json` field `repository.commit`. The README template also states that the repository commit must match the manifest and the final manuscript package commit.
 
 The reviewer-facing boundary is source traceability. A matching README and manifest commit prevents reviewers from receiving two different source anchors for the same artifact release. It does not prove that the result files were generated from that commit; that stronger guarantee still depends on command logs, checksums, prediction files, threshold logs, and the final package metadata naming the same source revision.
 
-## Audit Cycle 26: Final Package-Artifact Commit Binding Gate
+## Readiness Gate 26: Final Package-Artifact Commit Binding Gate
 
 Outcome: pass for submission-package validator coverage; blocked for final upload until the external artifact release is populated, finalized, validated, and checked with `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release`.
 
-This cycle links the final manuscript package to the external result release. The submission package validator now accepts an optional artifact release directory in final-upload mode, reads the artifact `manifest.json`, and checks that artifact manifest `repository.commit` matches `submission_metadata.yml` field `repository_commit` and, when available, `submission_manifest.json` source-control commit. This prevents a final-upload package from naming one source revision while the external artifact release names another.
+This gate links the final manuscript package to the external result release. The submission package validator now accepts an optional artifact release directory in final-upload mode, reads the artifact `manifest.json`, and checks that artifact manifest `repository.commit` matches `submission_metadata.yml` field `repository_commit` and, when available, `submission_manifest.json` source-control commit. This prevents a final-upload package from naming one source revision while the external artifact release names another.
 
 The reviewer-facing boundary remains traceability. Passing the package-artifact commit gate means the final source package and external result release share the same source anchor; it does not prove numerical correctness unless the artifact release itself validates, its checksums pass, and the prediction, threshold, metric, and command-log artifacts were generated from the same final source revision.
 
-## Audit Cycle 27: Final-Upload Artifact-Dir Instruction Consistency Gate
+## Readiness Gate 27: Final-Upload Artifact-Dir Instruction Consistency Gate
 
 Outcome: pass for final-upload instruction coverage; blocked for final upload until the real artifact release directory is available.
 
-This cycle removes a workflow inconsistency introduced by the stronger package-artifact binding gate. The final-upload information request and submission-system checklist now both instruct authors to run `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release`, and the final-upload information request collects the artifact release directory path used for that validation. The manuscript validator also rejects these documents if they revert to the older command without `--artifact-dir`.
+This gate removes a workflow inconsistency introduced by the stronger package-artifact binding gate. The final-upload information request and submission-system checklist now both instruct authors to run `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release`, and the final-upload information request collects the artifact release directory path used for that validation. The manuscript validator also rejects these documents if they revert to the older command without `--artifact-dir`.
 
 The reviewer-facing boundary is procedural. This gate ensures that authors do not accidentally validate only the manuscript package while skipping the external artifact commit binding. It does not replace artifact release validation, target-journal template binding, live submission-system checks, or the external artifact URL or DOI.
 
-## Audit Cycle 28: Final-Upload Artifact Release Validation Gate
+## Readiness Gate 28: Final-Upload Artifact Release Validation Gate
 
 Outcome: pass for integrated artifact-release validation coverage; blocked for final upload until the real artifact release validates.
 
-This cycle closes the remaining `--artifact-dir` gap. The submission package validator now calls the artifact release validator whenever final-upload validation receives an artifact release directory, so the final upload gate checks release file membership, checksums, README markers, manifest policy, required artifact IDs, Open-v2 row-level audit columns, prediction JSONL fields, and claim-dependent artifact requirements before applying package-artifact commit binding.
+This gate closes the remaining `--artifact-dir` gap. The submission package validator now calls the artifact release validator whenever final-upload validation receives an artifact release directory, so the final upload gate checks release file membership, checksums, README markers, manifest policy, required artifact IDs, Open-v2 row-level audit columns, prediction JSONL fields, and claim-dependent artifact requirements before applying package-artifact commit binding.
 
 The reviewer-facing boundary is stronger but still procedural. Passing this integrated gate means the manuscript package names an artifact release that is structurally valid and source-bound to the final package; it still does not make stronger empirical claims unless the released files contain the required bootstrap, ablation, manual-validation, threshold-grid, or cluster-level evidence.
 
-## Audit Cycle 29: Final-Upload Artifact-Dir Required Gate
+## Readiness Gate 29: Final-Upload Artifact-Dir Required Gate
 
 Outcome: pass for missing artifact-directory rejection; blocked for final upload until a real finalized artifact release directory is supplied.
 
-This cycle closes the last command-line bypass in the final-upload validator. In final-upload mode, `validate_submission_package.py` now rejects validation runs that omit `--artifact-dir`, even when the package metadata already contains an artifact URL or DOI and the final-upload checklist marks the release as linked. This prevents a package from passing final validation with only manuscript metadata while skipping local checksum, manifest, row-schema, prediction-schema, and package-artifact commit checks.
+This gate closes the last command-line bypass in the final-upload validator. In final-upload mode, `validate_submission_package.py` now rejects validation runs that omit `--artifact-dir`, even when the package metadata already contains an artifact URL or DOI and the final-upload checklist marks the release as linked. This prevents a package from passing final validation with only manuscript metadata while skipping local checksum, manifest, row-schema, prediction-schema, and package-artifact commit checks.
 
 The reviewer-facing boundary remains reproducibility discipline rather than new result evidence. The gate proves that the final validation workflow cannot bypass the external release directory; it still requires the real release to be populated, finalized, checksum-verified, publicly linked, and source-bound to the submitted manuscript commit before any final-upload readiness claim is allowed.
 
-## Audit Cycle 30: Main-Manuscript Artifact Validation Text Gate
+## Readiness Gate 30: Main-Manuscript Artifact Validation Text Gate
 
 Outcome: pass for manuscript-level reproducibility wording; blocked for final upload until the real artifact URL or DOI and finalized release directory are available.
 
-This cycle moves the artifact validation requirement into the main manuscript's Data and Code Availability section. The text now states that an external result release supports the Open-v2 numerical table only after `validate_artifact_release.py --artifact-dir /path/to/release` passes and the final manuscript package also passes `validate_submission_package.py --final-upload --artifact-dir /path/to/release`. The paragraph names the release manifest, checksums, result identifiers, row-level schemas, prediction schemas, claim-boundary flags, raw-data exclusions, source-control commit, submission metadata, and artifact manifest as the binding checks.
+This gate moves the artifact validation requirement into the main manuscript's Data and Code Availability section. The text now states that an external result release supports the Open-v2 numerical table only after `validate_artifact_release.py --artifact-dir /path/to/release` passes and the final manuscript package also passes `validate_submission_package.py --final-upload --artifact-dir /path/to/release`. The paragraph names the release manifest, checksums, result identifiers, row-level schemas, prediction schemas, claim-boundary flags, raw-data exclusions, source-control commit, submission metadata, and artifact manifest as the binding checks.
 
 The reviewer-facing boundary is claim-evidence alignment. The manuscript no longer relies only on supplemental instructions or repository scripts to describe result-level auditability; the main text tells reviewers that a failed artifact or package-binding validation means the external release should not be used to support the Open-v2 numerical table or stronger claims.
 
-## Audit Cycle 31: Zero-Observed HNFMR Wording Gate
+## Readiness Gate 31: Zero-Observed HNFMR Wording Gate
 
 Outcome: pass for first-screen zero-risk overread control; blocked for stronger risk claims until broader source-heldout and manual-validation evidence are released.
 
-This cycle revises the abstract, contribution-evidence summary, result interpretation paragraph, cover letter, and highlights so that the IAD-Risk held-out result is described as zero observed HNFMR rather than as wording that can be read as absolute zero risk. The numerical result table still reports the measured HNFMR value, but the first-screen prose now keeps the observational scope visible.
+This gate revises the abstract, contribution-evidence summary, result interpretation paragraph, cover letter, and highlights so that the IAD-Risk held-out result is described as zero observed HNFMR rather than as wording that can be read as absolute zero risk. The numerical result table still reports the measured HNFMR value, but the first-screen prose now keeps the observational scope visible.
 
 The reviewer-facing boundary is statistical interpretation. The current evidence means no hard-negative false merge was observed under the reported Open-v2 held-out scope and operating point; it does not prove zero risk under all scholarly sources, thresholds, version policies, or cluster-level merge workflows.
 
-## Audit Cycle 32: L2 Public-Source Rebuild Traceability Gate
+## Readiness Gate 32: L2 Public-Source Rebuild Traceability Gate
 
 Outcome: pass for L2 public-source rebuild traceability wording and release-template coverage; blocked for full numerical reproduction until a populated external artifact release records real public input manifests, processing logs, derived-output summaries, and checksums.
 
@@ -357,7 +357,7 @@ This gate checks whether a reader can understand how the project remains reprodu
 
 The reviewer-facing boundary is chain of custody. The repository can prove that adapters, CLI entry points, fixture rebuilds, schema checks, and release validators are executable; it cannot by itself prove the Open-v2 numerical table without real public-source inputs or an L3 artifact release. Therefore the artifact release template and validator now require `source_input_manifest` and `processing_run_log` alongside result tables, predictions, threshold logs, and split summaries.
 
-## Audit Cycle 33: Main-Text L2 Provenance Alignment Gate
+## Readiness Gate 33: Main-Text L2 Provenance Alignment Gate
 
 Outcome: pass for main-text L2 provenance alignment; blocked for final numerical reproduction until the real release contains populated `source_input_manifest`, `processing_run_log`, prediction files, threshold logs, metric summaries, and checksums.
 
@@ -365,7 +365,7 @@ This gate checks whether the main manuscript itself names the L2 provenance arti
 
 The reviewer-facing boundary is source-to-result alignment. Main text, supplementary material, artifact release template, validator, and tests now use the same provenance vocabulary, reducing the risk that reviewers see the artifact rules as supplemental-only instructions. This alignment still does not create the artifact release; it only ensures the submitted manuscript points to the evidence that must exist before full numerical reproduction or final-upload readiness can be claimed.
 
-## Audit Cycle 34: Selective Decision Workload Boundary Gate
+## Readiness Gate 34: Selective Decision Workload Boundary Gate
 
 Outcome: pass for selective-decision workload wording and validator coverage; blocked for operational throughput or cost-saving claims until the external artifact reports automatic merge coverage, block rate, defer rate, review-load counts, and capacity-normalized review load from the same prediction files.
 
@@ -373,7 +373,7 @@ This gate checks whether low false-merge rates can be overread as evidence that 
 
 The reviewer-facing boundary is workload attribution. The current manuscript can argue safety-oriented false-merge control under fixed operating points, but it should not claim throughput reduction, review-cost savings, or all-pair automatic resolution until the workload evidence is released and validated.
 
-## Audit Cycle 35: Anonymous Cover-Letter Declaration Boundary Gate
+## Readiness Gate 35: Anonymous Cover-Letter Declaration Boundary Gate
 
 Outcome: pass for anonymous preflight cover-letter boundary; blocked for final upload until author-provided metadata confirms originality, author approval, competing-interest status, funding, author contribution, permission, and generative AI declarations.
 
@@ -381,7 +381,7 @@ This gate checks whether the anonymous cover letter prematurely asserts final au
 
 The reviewer-facing boundary is compliance discipline. The current package can be used to review the manuscript story, scope, and reproducibility boundaries, but it should not be treated as final-upload-ready until the selected journal, author identities, corresponding author, declarations, artifact release, and live system fields are confirmed.
 
-## Audit Cycle 36: Preflight Metadata Declaration Placeholder Gate
+## Readiness Gate 36: Preflight Metadata Declaration Placeholder Gate
 
 Outcome: pass for tracked metadata declaration placeholders; blocked for final upload until `submission_metadata.yml` is populated with author-confirmed originality, author approval, and competing-interest statements.
 
@@ -389,7 +389,7 @@ This gate checks whether the tracked source metadata prematurely records final a
 
 The reviewer-facing boundary is structured metadata integrity. The tracked metadata file remains useful for package construction and final-upload gating, but it does not assert unconfirmed author declarations before the final journal route and live submission metadata are available.
 
-## Audit Cycle 37: Preflight Manuscript Declaration Boundary Gate
+## Readiness Gate 37: Preflight Manuscript Declaration Boundary Gate
 
 Outcome: pass for anonymous preflight manuscript declaration boundary; blocked for final upload until the listed authors confirm the competing-interest status and the final statement is synchronized with `submission_metadata.yml` and the live submission system.
 
@@ -397,7 +397,7 @@ This gate checks whether the main manuscript prematurely asserts a final competi
 
 The reviewer-facing boundary is declaration authority. The current source package can support scientific review and template preparation, but it must not be treated as an author-approved final declaration package until the selected journal route, author list, competing-interest status, metadata file, and live submission-system fields are synchronized.
 
-## Audit Cycle 38: Introduction Row-Scope Comparison Boundary Gate
+## Readiness Gate 38: Introduction Row-Scope Comparison Boundary Gate
 
 Outcome: pass for introduction-level row-scope comparison wording; blocked for same-scope ranking claims until all row families share released prediction scopes, threshold logs, metric summaries, and checksums.
 
@@ -405,7 +405,7 @@ This gate checks whether the contribution paragraph can be misread as claiming t
 
 The reviewer-facing boundary is ranking interpretation. A shared schema supports auditable row construction and relation semantics, but it does not remove the full-scope versus held-out test distinction or authorize a same-scope ranking implication before the external artifact release supplies matched prediction files and threshold records.
 
-## Audit Cycle 39: Installable CLI Entry-Point Traceability Gate
+## Readiness Gate 39: Installable CLI Entry-Point Traceability Gate
 
 Outcome: pass for Git-only command discovery and source entry-point binding; blocked for full numerical audit until the external artifact release is populated, finalized, validated, and linked.
 
@@ -413,7 +413,7 @@ This gate checks whether a reviewer can locate the executable project entry poin
 
 The reviewer-facing boundary is executable traceability. This gate proves that Git-only reviewers can discover the CLI, inspect the package entry point, and run fixture-level rebuild commands without raw third-party data. It does not prove the Open-v2 numerical table, threshold choices, prediction files, bootstrap intervals, workload metrics, ablations, or cluster-level artifacts; those remain tied to the L2/L3 public-source rebuild or the external artifact release with manifests and checksums.
 
-## Audit Cycle 40: Artifact Source Preflight Gate
+## Readiness Gate 40: Artifact Source Preflight Gate
 
 Outcome: pass for source artifact completeness preflight coverage; blocked for final numerical audit until the source artifacts are populated, copied, finalized, checksum-validated, and publicly linked.
 
@@ -421,7 +421,7 @@ This gate checks whether the artifact workflow can fail early before copying inc
 
 The reviewer-facing boundary is source-package readiness. A passing preflight means the source artifact directory contains the required files named by the release manifest and that path mappings are safe. It does not prove row-level schemas, checksums, source-control commit binding, public accessibility, or numerical correctness; those remain enforced by `finalize_artifact_release.py`, `validate_artifact_release.py`, `validate_submission_package.py --final-upload --artifact-dir /path/to/release`, and the final artifact URL or DOI.
 
-## Audit Cycle 41: Main-Text Schema Density Gate
+## Readiness Gate 41: Main-Text Schema Density Gate
 
 Outcome: pass for main-text schema-density reduction; blocked for final numerical audit until the external artifact release remains populated, finalized, checksum-validated, and publicly linked.
 
@@ -429,7 +429,7 @@ This gate checks whether schema-contract details make the main manuscript harder
 
 The reviewer-facing boundary is readability without loss of reproducibility. Moving the detailed schema tables out of the main text reduces table density and improves first-pass readability, but it does not relax the schema contract. The validator now checks both the main-text field summary and the supplementary schema tables so that reviewers can still audit fixture rebuilding, public-source rebuilding, and artifact validation against the same required fields.
 
-## Audit Cycle 42: Related-Work Positioning Density Gate
+## Readiness Gate 42: Related-Work Positioning Density Gate
 
 Outcome: pass for Related Work table-density reduction; blocked for final numerical audit until the external artifact release remains populated, finalized, checksum-validated, and publicly linked.
 
@@ -437,7 +437,7 @@ This gate checks whether the closest-work positioning matrix interrupts the Rela
 
 The reviewer-facing boundary is novelty clarity without table overload. The edit keeps the Related Work section focused on mechanism differences rather than table scanning, while the validator still requires both the main-text novelty boundary and the supplementary positioning matrix.
 
-## Audit Cycle 43: Method Design Boundary Density Gate
+## Readiness Gate 43: Method Design Boundary Density Gate
 
 Outcome: pass for Method table-density reduction; blocked for final numerical audit until the external artifact release remains populated, finalized, checksum-validated, and publicly linked.
 
@@ -445,7 +445,7 @@ This gate checks whether operational net-benefit and version-identifier policy t
 
 The reviewer-facing boundary is design soundness without table overload. The edit keeps the Method section focused on the algorithm and decision policy, while the validator still requires both main-text boundary statements and supplementary method-design tables.
 
-## Audit Cycle 44: Experiment Reporting Boundary Density Gate
+## Readiness Gate 44: Experiment Reporting Boundary Density Gate
 
 Outcome: pass for Experiments table-density reduction; blocked for final numerical audit until the external artifact release remains populated, finalized, checksum-validated, and publicly linked.
 
@@ -453,7 +453,7 @@ This gate checks whether threshold-governance and statistical-interpretation mat
 
 The reviewer-facing boundary is experimental interpretability without table overload. The edit keeps the Experiments section focused on what the reported Open-v2 snapshot can and cannot support, while the validator still requires the main-text boundary statements and both supplementary experiment-reporting tables.
 
-## Audit Cycle 45: Result Artifact Crosswalk Density Gate
+## Readiness Gate 45: Result Artifact Crosswalk Density Gate
 
 Outcome: pass for result-audit table-density reduction; blocked for final numerical audit until the external artifact release remains populated, finalized, checksum-validated, and publicly linked.
 
@@ -461,7 +461,7 @@ This gate checks whether the Open-v2 result artifact crosswalk belongs in the ma
 
 The reviewer-facing boundary is numerical-audit traceability without main-text table overload. The edit keeps the main result section focused on the Open-v2 evidence snapshot and its interpretation boundary, while the validator still requires the complete supplementary crosswalk and its required artifact IDs.
 
-## Audit Cycle 46: Manual Validation Boundary Density Gate
+## Readiness Gate 46: Manual Validation Boundary Density Gate
 
 Outcome: pass for manual-validation table-density reduction; blocked for final label-precision claims until a reviewed slice, adjudication log, agreement report, pair-level notes, and checksums are released.
 
@@ -469,7 +469,7 @@ This gate checks whether the manual-validation boundary matrix is needed in the 
 
 The reviewer-facing boundary is label-evidence clarity without main-text table overload. The edit keeps the Open-v2 result section focused on the reported evidence snapshot while the validator still requires the supplementary manual-validation boundary, protocol, reviewer process, adjudication artifacts, and human-gold wording limits.
 
-## Audit Cycle 47: Scope Compatibility Matrix Density Gate
+## Readiness Gate 47: Scope Compatibility Matrix Density Gate
 
 Outcome: pass for mixed-scope comparison table-density reduction; blocked for broad ranking claims until all row families share released prediction scopes, threshold logs, checksums, interval estimates, and a manual-validation slice.
 
@@ -477,7 +477,7 @@ This gate checks whether the Open-v2 scope compatibility matrix belongs in the m
 
 The reviewer-facing boundary is mixed-scope interpretation clarity without main-text table overload. The edit keeps the main result section focused on the conservative false-merge-control claim while the validator still requires the supplementary scope compatibility matrix and the explicit stronger-comparison boundary.
 
-## Audit Cycle 48: Result Interpretation Guardrails Density Gate
+## Readiness Gate 48: Result Interpretation Guardrails Density Gate
 
 Outcome: pass for result-interpretation table-density reduction; blocked for stronger result readings until same-scope prediction files, interval estimates, threshold-stability evidence, and artifact checksums are released.
 
@@ -485,7 +485,7 @@ This gate checks whether the Open-v2 result interpretation guardrails matrix is 
 
 The reviewer-facing boundary is result-reading clarity without main-text table overload. The edit keeps the main result section focused on the Open-v2 evidence snapshot while the validator still requires the supplementary guardrails table, unsupported-reading boundary, scope labels, and threshold-stability or zero-risk limits.
 
-## Audit Cycle 49: Claim-Evidence Boundary Density Gate
+## Readiness Gate 49: Claim-Evidence Boundary Density Gate
 
 Outcome: pass for claim-evidence table-density reduction; blocked for final numerical audit until same-scope prediction files, interval estimates, manual-validation evidence, and artifact checksums are released.
 
@@ -493,7 +493,7 @@ This gate checks whether the claim-evidence boundary table is needed in the main
 
 The reviewer-facing boundary is claim-evidence clarity without main-text table overload. The edit keeps the main result section focused on the reported evidence snapshot while the validator still requires the supplementary claim-evidence boundary, including identity-agenda confusion, IAD-Risk support, IAD-Bench evidence, and repository-level reproduction limits.
 
-## Audit Cycle 50: Validity Threats Density Gate
+## Readiness Gate 50: Validity Threats Density Gate
 
 Outcome: pass for validity-threat table-density reduction; blocked for final numerical audit until source-heldout evidence, causal ablations, cluster-level artifacts, and external artifact checksums are released.
 
@@ -501,7 +501,7 @@ This gate checks whether the threats-to-validity matrix is needed in the main ma
 
 The reviewer-facing boundary is validity-threat clarity without main-text table overload. The edit keeps the main threats section readable while the validator still requires the supplementary validity-threat boundary, including construct validity, internal validity, external validity, conclusion validity, reproducibility, operational validity, and the explicit rule that mitigations do not turn proxy or silver evidence into human-adjudicated truth.
 
-## Audit Cycle 51: Claim Interpretation Boundary Density Gate
+## Readiness Gate 51: Claim Interpretation Boundary Density Gate
 
 Outcome: pass for claim-interpretation table-density reduction; blocked for final numerical audit until same-scope predictions, threshold logs, ablations, manual-validation evidence, and artifact checksums are released.
 
@@ -509,7 +509,7 @@ This gate checks whether the claim-interpretation boundary table is needed in th
 
 The reviewer-facing boundary is claim-interpretation clarity without main-text table overload. The edit keeps the end of the main manuscript closer to an ordinary journal narrative while the validator still requires the supplementary claim-interpretation boundary, including contribution clarity, writing reproducibility, experimental strength, evaluation completeness, method design soundness, and the explicit stronger-evidence requirements.
 
-## Audit Cycle 52: Data and Code Availability Density Gate
+## Readiness Gate 52: Data and Code Availability Density Gate
 
 Outcome: pass for data/code availability table-density reduction; blocked for final numerical audit until the external artifact release is populated, checksum-validated, and publicly linked.
 
@@ -517,7 +517,7 @@ This gate checks whether the data/code availability matrix is needed in the main
 
 The reviewer-facing boundary is data/code availability clarity without main-text table overload. The edit keeps the journal data availability statement readable while the validator still requires the supplementary data/code availability boundary, including source code and CLI entry points, public fixtures, raw third-party source files, derived evaluation artifacts, data-processing path, manifests, checksums, and commit identifiers.
 
-## Audit Cycle 53: Error Taxonomy Density Gate
+## Readiness Gate 53: Error Taxonomy Density Gate
 
 Outcome: pass for error-taxonomy table-density reduction; blocked for measured error-distribution claims until per-category annotations, adjudication logs, and checksum-fixed error artifacts are released.
 
@@ -525,7 +525,7 @@ This gate checks whether the qualitative error taxonomy table is needed in the m
 
 The reviewer-facing boundary is error-taxonomy clarity without main-text table overload. The edit keeps the mechanism section focused on evidence interpretation while the validator still requires the supplementary error taxonomy boundary, including same task, different contribution, citation-neighborhood neighbors, version or extension boundaries, identifier conflicts, sparse metadata cases, and the explicit rule that the taxonomy is diagnostic rather than a measured error distribution.
 
-## Audit Cycle 54: Mechanism Evidence Boundary Density Gate
+## Readiness Gate 54: Mechanism Evidence Boundary Density Gate
 
 Outcome: pass for mechanism-evidence table-density reduction; blocked for full causal-mechanism claims until ablations removing risk gating, ANI supervision, and single-space separation are released with checksum-fixed artifacts.
 
@@ -533,7 +533,7 @@ This gate checks whether the mechanism-evidence table is needed in the main manu
 
 The reviewer-facing boundary is mechanism-evidence clarity without main-text table overload. The edit keeps the mechanism section closer to a journal narrative while the validator still requires the supplementary mechanism-evidence boundary, including topical relatedness, explicit risk gating, component-causality claims, cluster-level contamination claims, and the explicit boundary that stronger causal or deployment claims require additional artifact-backed evidence.
 
-## Audit Cycle 55: Pair-to-Cluster Evidence Boundary Density Gate
+## Readiness Gate 55: Pair-to-Cluster Evidence Boundary Density Gate
 
 Outcome: pass for pair-to-cluster table-density reduction; blocked for cluster-level deployment claims until cluster assignments, cannot-link audits, cluster metric summaries, pair-to-cluster trace files, and checksum-fixed cluster artifacts are released.
 
@@ -541,7 +541,7 @@ This gate checks whether the pair-to-cluster evidence boundary table is needed i
 
 The reviewer-facing boundary is pair-to-cluster clarity without main-text table overload. The edit keeps the experiments section focused on reported pair-level evidence while the validator still requires the supplementary pair-to-cluster evidence boundary, including cluster assignments, cannot-link violations, `cannot_link_audit`, `cluster_metric_summary`, pair-to-cluster trace files, cluster contamination rate, and the explicit rule that the paper does not claim cluster-level contamination is eliminated.
 
-## Audit Cycle 56: Selective Decision Coverage Boundary Density Gate
+## Readiness Gate 56: Selective Decision Coverage Boundary Density Gate
 
 Outcome: pass for selective-decision coverage table-density reduction; blocked for operational throughput or review-cost claims until automatic merge coverage, block rate, defer rate, review-load counts, and capacity-normalized review load are released from the same prediction files.
 
@@ -549,7 +549,7 @@ This gate checks whether the selective-decision coverage table is needed in the 
 
 The reviewer-facing boundary is selective-decision coverage clarity without main-text table overload. The edit keeps the experiments section focused on reported false-merge evidence while the validator still requires the supplementary selective-decision coverage boundary, including automatic merge coverage, block rate, defer rate, review load, capacity-normalized review load, and the explicit rule that the paper does not claim throughput reduction or all-pair automatic resolution.
 
-## Audit Cycle 57: Threshold Sensitivity Evidence Status Density Gate
+## Readiness Gate 57: Threshold Sensitivity Evidence Status Density Gate
 
 Outcome: pass for threshold-sensitivity table-density reduction; blocked for threshold-stability claims until a released threshold grid reports predefined ranges, selected operating points, per-threshold metrics, command logs, manifests, and checksums from the same prediction files.
 
@@ -557,7 +557,7 @@ This gate checks whether the threshold-sensitivity evidence table is needed in t
 
 The reviewer-facing boundary is threshold-sensitivity clarity without main-text table overload. The edit keeps the experiments section focused on the Open-v2 evidence snapshot while the validator still requires the supplementary threshold-sensitivity evidence boundary, including fixed operating points, threshold grid requirements, metric stability requirements, artifact manifest requirements, and the explicit rule that the paper does not claim threshold-stable ranking across all operating points.
 
-## Audit Cycle 58: Operating Point Disclosure Density Gate
+## Readiness Gate 58: Operating Point Disclosure Density Gate
 
 Outcome: pass for operating-point table-density reduction; blocked for full numerical threshold audit until released artifacts bind row family decision fields, threshold sources, command logs, manifests, and checksums to the reported Open-v2 rows.
 
@@ -565,7 +565,7 @@ This gate checks whether the operating-point disclosure table is needed in the m
 
 The reviewer-facing boundary is operating-point clarity without main-text table overload. The edit keeps the experiments section focused on result interpretation while the validator still requires the supplementary operating-point disclosure, including fixed operating points, post-hoc best test thresholds, row family decision fields, default threshold contract, score-file requirements, prediction-file requirements, model JSON, thresholds, and checksums.
 
-## Audit Cycle 59: Metric Formula Boundary Density Gate
+## Readiness Gate 59: Metric Formula Boundary Density Gate
 
 Outcome: pass for metric-formula table-density reduction; blocked for any metric reinterpretation until released artifacts preserve label strata, denominators, missing-label exclusions, and selective-decision outputs for every reported row.
 
@@ -573,7 +573,7 @@ This gate checks whether the metric-formula boundary table is needed in the main
 
 The reviewer-facing boundary is metric-formula clarity without main-text table overload. The edit keeps the evaluation section readable while the validator still requires the supplementary metric-formula boundary, including TP, FP, FN, the same-work F1 formula, FMR denominator, HNFMR denominator, missing-label denominator rule, and the distinction between unsafe automatic merges and manual-review workload.
 
-## Audit Cycle 60: Decision-to-Metric Mapping Density Gate
+## Readiness Gate 60: Decision-to-Metric Mapping Density Gate
 
 Outcome: pass for decision-to-metric table-density reduction; blocked for operational automation claims until coverage and defer-rate artifacts are released with the same prediction files.
 
@@ -581,7 +581,7 @@ This gate checks whether the decision-to-metric mapping table is needed in the m
 
 The reviewer-facing boundary is decision-to-metric clarity without main-text table overload. The validator still requires the supplementary decision-to-metric mapping, including decision outputs, metric treatment, interpretation boundary, merge, block, defer, and the rule that coverage and defer rate must be reported separately before operational automation claims.
 
-## Audit Cycle 61: Split and Leakage Controls Density Gate
+## Readiness Gate 61: Split and Leakage Controls Density Gate
 
 Outcome: pass for split-control table-density reduction; blocked for broad held-out or source-generalization claims until released split summaries, leakage audits, label-stratum coverage, and prediction artifacts are available for the same evaluated rows.
 
@@ -589,7 +589,7 @@ This gate checks whether the split and leakage controls table is needed in the m
 
 The reviewer-facing boundary is split-control clarity without main-text table overload. The validator still requires the supplementary split and leakage controls table, including the train/dev/test split field, Unordered pair leakage guard, Label-stratum coverage audit, Source-heldout readiness audit, Topic-heldout readiness audit, and the rule that cross-topic stability should not be claimed when topic coverage is insufficient.
 
-## Audit Cycle 62: Feature and Head Specification Density Gate
+## Readiness Gate 62: Feature and Head Specification Density Gate
 
 Outcome: pass for feature-head table-density reduction; blocked for implementation-equivalence claims until released prediction artifacts expose the feature schema, relation-head outputs, threshold values, cannot-link flags, and audit metadata for the same evaluated rows.
 
@@ -597,7 +597,7 @@ This gate checks whether the feature and head specification table is needed in t
 
 The reviewer-facing boundary is feature-head clarity without main-text table overload. The validator still requires the supplementary feature and head specification table, including Identity head, Agenda head, ANI risk head, Risk gate, Audit metadata, the direct statement that metadata fields are retained for auditing but are not used as model features, and the rule that audit metadata is not a training feature.
 
-## Audit Cycle 63: Risk Score Design Rationale Density Gate
+## Readiness Gate 63: Risk Score Design Rationale Density Gate
 
 Outcome: pass for risk-score rationale table-density reduction; blocked for calibrated-risk or threshold-transfer claims until held-out calibration artifacts, threshold grids, and checksum-fixed prediction files are released for the same evaluated rows.
 
@@ -605,7 +605,7 @@ This gate checks whether the risk score design rationale table is needed in the 
 
 The reviewer-facing boundary is risk-score clarity without main-text table overload. The validator still requires the supplementary risk score design rationale table, including the $p_{\mathrm{ani}}$ term, the $p_{\mathrm{agenda}}(1-p_{\mathrm{work}})$ term, Max operator, Threshold gate, the non-calibration boundary, and the threshold-transfer boundary.
 
-## Audit Cycle 64: Design Alternatives Density Gate
+## Readiness Gate 64: Design Alternatives Density Gate
 
 Outcome: pass for design-alternatives table-density reduction; blocked for broad method-superiority claims until same-scope baseline predictions, threshold logs, interval estimates, and checksum-fixed artifacts are released.
 
@@ -613,7 +613,7 @@ This gate checks whether the design alternatives table is needed in the main man
 
 The reviewer-facing boundary is design-alternative clarity without main-text table overload. The validator still requires the supplementary design-alternatives table, including all five rejected shortcuts, the explicit RoBERTa baseline boundary, the broad-superiority boundary, and the threshold-stability artifact boundary.
 
-## Audit Cycle 65: Failure-Control Rationale Density Gate
+## Readiness Gate 65: Failure-Control Rationale Density Gate
 
 Outcome: pass for failure-control table-density reduction; blocked for complete failure-mode coverage claims until released artifacts include hard-negative coverage, label-strength preservation checks, cannot-link coverage, threshold-transfer evidence, and proxy-label stratum audits.
 
@@ -621,7 +621,7 @@ This gate checks whether the failure-control rationale table is needed in the ma
 
 The reviewer-facing boundary is failure-control clarity without main-text table overload. The validator still requires the supplementary failure-control rationale table, including all five failure pathways, cluster-level cannot-link coverage, threshold-transfer evidence, and the rule that proxy rows remain non-human evidence even when reproducible.
 
-## Audit Cycle 66: Reproduction Levels Density Gate
+## Readiness Gate 66: Reproduction Levels Density Gate
 
 Outcome: pass for reproduction-level table-density reduction; blocked for full numerical reproduction claims until L2 public-source inputs or an L3 artifact release provide source manifests, processing logs, prediction files, metric summaries, threshold logs, checksums, and commit identifiers.
 
@@ -629,7 +629,7 @@ This gate checks whether the reproduction-level table is needed in the main manu
 
 The reviewer-facing boundary is reproduction-level clarity without main-text table overload. The validator still requires the supplementary reproduction-level table and the explicit rule that a Git-only reviewer cannot verify model predictions, threshold choices, or row-level Open-v2 numbers without the L2/L3 artifact chain.
 
-## Audit Cycle 67: Evaluation Protocol Density Gate
+## Readiness Gate 67: Evaluation Protocol Density Gate
 
 Outcome: pass for evaluation-protocol table-density reduction; blocked for broad evaluation-completeness claims until released artifacts provide same-scope predictions, threshold logs, interval estimates, manual-validation evidence, and checksum-fixed result files.
 
@@ -637,7 +637,7 @@ This gate checks whether the evaluation-protocol table is needed in the main man
 
 The reviewer-facing boundary is evaluation-protocol clarity without main-text table overload. The validator still requires the supplementary evaluation-protocol table and the explicit rule that gold, proxy, and silver evidence are not mixed into one undifferentiated score.
 
-## Audit Cycle 68: Training and Inference Trace Density Gate
+## Readiness Gate 68: Training and Inference Trace Density Gate
 
 Outcome: pass for training-trace table-density reduction; blocked for implementation-equivalence claims until released prediction artifacts expose relation-head outputs, threshold values, cannot-link flags, metric denominators, and checksum-bound decision files for the same evaluated rows.
 
@@ -645,7 +645,7 @@ This gate checks whether the training and inference trace table is needed in the
 
 The reviewer-facing boundary is training-trace clarity without main-text table overload. The validator still requires the supplementary training-inference trace table and the explicit rule that gold, proxy, and silver labels are not silently converted into unrelated supervision.
 
-## Audit Cycle 69: Scoring and Merge Algorithm Density Gate
+## Readiness Gate 69: Scoring and Merge Algorithm Density Gate
 
 Outcome: pass for scoring-algorithm table-density reduction; blocked for implementation-equivalence claims until released artifacts expose pair inputs, relation-head outputs, derived risk scores, threshold values, cannot-link flags, decisions, denominators, and checksum-bound artifact rows for the same evaluated scope.
 
@@ -653,7 +653,7 @@ This gate checks whether the scoring and merge algorithm table is needed in the 
 
 The reviewer-facing boundary is scoring-algorithm clarity without main-text table overload. The validator still requires the supplementary scoring-merge algorithm table and the explicit rule that same-work F1, FMR, HNFMR, coverage, and defer-rate audits refer to the same decision file.
 
-## Audit Cycle 70: Artifact Publication Binding Gate
+## Readiness Gate 70: Artifact Publication Binding Gate
 
 Outcome: pass for final-upload artifact publication binding; blocked for final upload until the external artifact release has a public URL or DOI, the artifact manifest publication object records the same public URL or DOI as `submission_metadata.yml`, and the manifest public access status is no longer pending.
 
@@ -661,7 +661,7 @@ This gate checks whether final-upload validation can be satisfied by a local art
 
 The reviewer-facing boundary is artifact-publication traceability, not stronger empirical evidence. A passing final-upload validation shows that the manuscript package, submission metadata, cover letter, artifact manifest, checksums, row schemas, prediction schemas, repository commit, and public artifact link are aligned. It does not by itself create the external artifact release, confirm the live journal-system data statement, or upgrade Q2/B evidence.
 
-## Audit Cycle 71: Target Ranking and Author Confirmation Gate
+## Readiness Gate 71: Target Ranking and Author Confirmation Gate
 
 Outcome: pass for final-upload target-ranking gate implementation; blocked for Q2/B or final-upload claims until authors confirm the selected target journal and ranking/category status in an authorized institutional ranking source.
 
@@ -669,7 +669,7 @@ This gate checks whether Q2/B language can be inferred from the target-journal s
 
 The reviewer-facing boundary is rank/category traceability, not evidence strengthening. A passing final-upload metadata gate shows that the authors confirmed the selected route and recorded the ranking source/date; it does not by itself improve the empirical evidence or permit broad superiority claims.
 
-## Audit Cycle 72: Live System Final Package Verification Gate
+## Readiness Gate 72: Live System Final Package Verification Gate
 
 Outcome: pass for final-upload live-system verification gate implementation; blocked for final upload until the authors verify the live submission-system preview and final package contents against the current source package.
 
@@ -677,7 +677,7 @@ This gate checks whether `submission_system_files_verified` alone is enough to p
 
 The reviewer-facing boundary is operational traceability, not scientific evidence strengthening. A passing live-system verification gate shows that the uploaded materials and live submission preview match the source package; it does not create author declarations, target-ranking confirmation, artifact release access, or stronger empirical evidence.
 
-## Audit Cycle 73: Author Guide and Template Requirement Confirmation Gate
+## Readiness Gate 73: Author Guide and Template Requirement Confirmation Gate
 
 Outcome: pass for final-upload author-guide and template-requirement gate implementation; blocked for final upload until the authors record the selected journal's author-guide source, author-guide recheck date, and template-requirement confirmation.
 
@@ -685,7 +685,7 @@ This gate checks whether `target_journal_template_bound` and `target_journal_tem
 
 The reviewer-facing boundary is formatting and submission-policy traceability. A passing author-guide gate shows that the authors checked the selected journal's current instructions before final upload; it does not prove institutional ranking status, author declarations, live submission-system consistency, artifact access, or stronger scientific evidence.
 
-## Audit Cycle 74: Author Identity Material Traceability Gate
+## Readiness Gate 74: Author Identity Material Traceability Gate
 
 Outcome: pass for final-upload author identity material traceability gate implementation; blocked for DKE final upload until author-approved biography files and photograph files are recorded outside the anonymous preflight package.
 
@@ -693,7 +693,7 @@ This gate checks whether `author_biographies_and_photos_ready` alone is enough f
 
 The reviewer-facing boundary is author-material traceability, not scientific evidence strengthening. A passing author identity material gate shows that required external biography and photograph records exist for the final author-visible upload route; it does not place those identity-bearing files into the anonymous DKE/Elsevier preflight package and does not remove the need for author confirmation, live submission-system verification, or artifact release validation.
 
-## Audit Cycle 75: Closest-Work Decision-Semantics Gate
+## Readiness Gate 75: Closest-Work Decision-Semantics Gate
 
 Outcome: pass for Related Work decision-semantics clarification; blocked for stronger novelty claims until same-scope artifacts and manual validation support broader comparisons.
 
@@ -701,7 +701,7 @@ This gate checks whether the Related Work section makes the novelty boundary vis
 
 The reviewer-facing boundary is contribution clarity, not a stronger empirical claim. The edit explains why the paper is not merely a new encoder or a new threshold over existing embeddings: the merge gate treats high relatedness as an auditable input whose role can be positive, negative, or deferred, not as a direct merge decision. This connects IAD-Bench to HNFMR while preserving the existing limits on broad method ranking, same-scope superiority, and human-gold label claims.
 
-## Audit Cycle 76: Mechanism Ablation Acceptance Protocol Gate
+## Readiness Gate 76: Mechanism Ablation Acceptance Protocol Gate
 
 Outcome: pass for Mechanism ablation acceptance protocol; blocked for component-causality claims until the accepted ablation artifacts are released with checksum-bound prediction rows and logs.
 
@@ -709,7 +709,7 @@ This gate checks whether the manuscript defines what counts as acceptable ablati
 
 The reviewer-facing boundary is evaluation completeness discipline, not new empirical evidence. A future ablation run can support component-causality statements only if it releases prediction rows, threshold logs, same-work F1/FMR/HNFMR denominators, merge/block/defer decisions, configuration, command log, code commit, manifest entry, and checksums. Any result with a changed pair universe, threshold-selection source, or prediction schema remains exploratory diagnostic evidence rather than an accepted ablation for causal interpretation.
 
-## Audit Cycle 77: Ablation CLI Protocol-Variant Alignment Gate
+## Readiness Gate 77: Ablation CLI Protocol-Variant Alignment Gate
 
 Outcome: pass for ablation CLI protocol-variant alignment; blocked for completed causal ablation claims until real same-scope ablation artifacts are released.
 
@@ -717,7 +717,7 @@ This gate checks whether the executable ablation command can emit the same manus
 
 The reviewer-facing boundary is code-to-manuscript traceability, not new experimental strength. The post-hoc-threshold row is flagged with `post_hoc_labeled_sweep` and is retained as a threshold-overfitting diagnostic, not as standalone causal evidence. A future causal interpretation still requires same-scope prediction rows, threshold logs, denominators, merge/block/defer decisions, command logs, commit identifiers, manifests, and checksums.
 
-## Audit Cycle 78: Ablation Artifact Release Schema Gate
+## Readiness Gate 78: Ablation Artifact Release Schema Gate
 
 Outcome: pass for ablation artifact release schema validation; blocked for completed causal ablation claims until a real external artifact release passes the strengthened schema.
 
@@ -725,7 +725,7 @@ This gate checks whether an external artifact release can pass `component_causal
 
 The reviewer-facing boundary is artifact-level auditability, not a new result. The validator rejects an ablation suite with missing protocol variants, missing audit columns, or a post-hoc-threshold row marked as component-causality evidence. This makes the external artifact release consistent with the manuscript's ablation acceptance boundary while preserving the current claim limit: component-causality remains unclaimed until the real same-scope ablation files, prediction rows, threshold logs, denominators, command logs, commit identifiers, manifests, and checksums are released.
 
-## Audit Cycle 79: Manual Validation Artifact Release Schema Gate
+## Readiness Gate 79: Manual Validation Artifact Release Schema Gate
 
 Outcome: pass for manual-validation artifact release schema validation; blocked for human-validation claims until a real external artifact release passes the strengthened schema.
 
@@ -733,7 +733,7 @@ This gate checks whether an external artifact release can pass `human_validation
 
 The reviewer-facing boundary is human-evidence auditability, not a new completed annotation result. The validator rejects a manual-validation slice with missing required strata, fewer than 500 or more than 1000 reviewed rows, non-blinded reviewer rows, reused reviewer codes, invalid label values, missing adjudication rationale, or missing pair-level notes. This preserves the current claim limit: human label precision remains unclaimed until the reviewed slice, adjudication log, agreement report, command logs, commit identifiers, manifests, and checksums are released.
 
-## Audit Cycle 80: Threshold Sensitivity Artifact Release Schema Gate
+## Readiness Gate 80: Threshold Sensitivity Artifact Release Schema Gate
 
 Outcome: pass for threshold-sensitivity artifact release schema validation; blocked for threshold-stability claims until a real external artifact release passes the strengthened schema.
 
@@ -741,7 +741,7 @@ This gate checks whether an external artifact release can pass `threshold_stabil
 
 The reviewer-facing boundary is threshold-stability auditability, not a new robustness result. The validator rejects a threshold grid with only one row, mixed prediction-file checksums, missing selected operating point, selection/evaluation split leakage, invalid threshold or metric ranges, missing pair-count denominators, or missing command provenance. This preserves the current claim limit: the manuscript supports fixed-threshold false-merge control, not threshold-stable ranking across operating points, until the real threshold grid, prediction files, threshold-selection logs, command logs, commit identifiers, manifests, and checksums are released.
 
-## Audit Cycle 81: Cluster-Level Artifact Release Schema Gate
+## Readiness Gate 81: Cluster-Level Artifact Release Schema Gate
 
 Outcome: pass for cluster-level artifact release schema validation; blocked for cluster-level quality claims until a real external artifact release passes the strengthened schema.
 
@@ -749,7 +749,7 @@ This gate checks whether an external artifact release can pass `cluster_level_qu
 
 The reviewer-facing boundary is cluster-level auditability, not a new deployment result. The validator rejects cluster artifacts with missing pair-to-cluster trace references, mixed cluster runs or merge policies, mixed prediction checksums, invalid contamination or coverage rates, unparseable cannot-link booleans, missing conflict rules, or missing command provenance. This preserves the current claim limit: pair-level FMR and HNFMR support false-merge control, but they do not prove cluster-level contamination reduction until the real cluster assignments, cannot-link audit, pair-to-cluster trace, command logs, commit identifiers, manifests, and checksums are released.
 
-## Audit Cycle 82: Bootstrap Interval Artifact Release Schema Gate
+## Readiness Gate 82: Bootstrap Interval Artifact Release Schema Gate
 
 Outcome: pass for bootstrap-interval artifact release schema validation; blocked for confidence-interval claims until a real external artifact release passes the strengthened schema.
 
@@ -757,7 +757,7 @@ This gate checks whether an external artifact release can pass `confidence_inter
 
 The reviewer-facing boundary is interval auditability, not a new statistical result. The validator rejects bootstrap artifacts with missing core metrics, invalid prediction checksums, too few resamples, missing denominators, invalid confidence or alpha values, point estimates outside [0,1], intervals outside [0,1], intervals that do not contain the point estimate, or missing command provenance. This preserves the current claim limit: Open-v2 values remain point estimates until the real bootstrap interval table, exact prediction files, resampling logs, random seeds, command logs, commit identifiers, manifests, and checksums are released.
 
-## Audit Cycle 83: Artifact Release CLI Discovery Command Consistency Gate
+## Readiness Gate 83: Artifact Release CLI Discovery Command Consistency Gate
 
 Outcome: pass for artifact release CLI discovery command consistency; blocked for final artifact publication until a real release directory passes the updated release validator.
 
@@ -765,7 +765,7 @@ This gate checks whether the artifact release README command block and manifest 
 
 The reviewer-facing boundary is command discoverability, not new empirical evidence. This gate only proves that Git-only reviewers can verify CLI discovery before artifact validation; it does not prove the Open-v2 numerical table, external prediction files, bootstrap intervals, or final artifact URL/DOI. Those remain gated by the populated external artifact release, checksums, command logs, publication metadata, and final-upload package validation.
 
-## Audit Cycle 84: Submission Checklist Artifact CLI Discovery Gate
+## Readiness Gate 84: Submission Checklist Artifact CLI Discovery Gate
 
 Outcome: pass for submission-system checklist alignment; blocked for final upload until the live journal system and real artifact release are verified.
 
@@ -773,7 +773,7 @@ This gate checks whether the final-upload checklist can omit the CLI discovery c
 
 The reviewer-facing boundary is final-upload procedure consistency, not new evidence. The checklist alignment helps prevent a manual submission workflow from skipping installable CLI discovery, but it does not validate the external artifact URL or DOI, author metadata, selected journal template, or live submission-system preview. Those remain required before upload.
 
-## Audit Cycle 85: Target Confirmation Date Validity Gate
+## Readiness Gate 85: Target Confirmation Date Validity Gate
 
 Outcome: pass for target-confirmation date validation; blocked for final upload until real author-guide and ranking/category sources are supplied.
 
@@ -781,7 +781,7 @@ This gate checks whether a final-upload package can use syntactically valid but 
 
 The reviewer-facing boundary is source traceability, not target-journal completion. This gate prevents impossible or placeholder confirmation dates from passing final-upload validation, but it does not supply the selected journal, official author-guide source, institutional ranking/category source, or author confirmation. Those still require external author-provided evidence before final upload.
 
-## Audit Cycle 86: Target Confirmation Source URL Gate
+## Readiness Gate 86: Target Confirmation Source URL Gate
 
 Outcome: pass for target-confirmation source URL validation; blocked for final upload until real source URLs are supplied.
 
@@ -789,7 +789,7 @@ This gate checks whether final-upload metadata can treat generic source labels a
 
 The reviewer-facing boundary is source auditability, not target-journal completion. This gate ensures that the author-guide and ranking/category confirmations point to inspectable source records, but it does not verify the live content of those sources, complete the selected-journal decision, or replace author confirmation. Those external checks remain required before final upload.
 
-## Audit Cycle 87: Target Source Placeholder URL Gate
+## Readiness Gate 87: Target Source Placeholder URL Gate
 
 Outcome: pass for target source placeholder URL validation; blocked for final upload until real source URLs are supplied.
 
@@ -797,7 +797,7 @@ This gate checks whether final-upload metadata can pass with syntactically valid
 
 The reviewer-facing boundary is source URL realism, not live-source verification. This gate prevents placeholder domains from being treated as inspectable journal or ranking evidence, but it does not verify the live content of the selected author guide, complete ranking/category confirmation, or replace author confirmation. Those external checks remain required before final upload.
 
-## Audit Cycle 88: Selective Coverage Formula Gate
+## Readiness Gate 88: Selective Coverage Formula Gate
 
 Outcome: pass for selective coverage formula disclosure; blocked for operational throughput claims until same-artifact workload evidence is released.
 
@@ -805,7 +805,7 @@ This gate checks whether the manuscript defines the workload quantities needed t
 
 The reviewer-facing boundary is workload interpretation, not deployment readiness. The formulas prevent low false-merge metrics from being read as review-cost savings when unresolved cases are shifted to block or defer decisions, but they do not supply the external workload evidence, manual-review capacity, or deferral budget needed for operational throughput claims.
 
-## Audit Cycle 89: Source-Heldout Readiness Gate
+## Readiness Gate 89: Source-Heldout Readiness Gate
 
 Outcome: pass for source-heldout readiness wording; blocked for source-generalization claims until source-heldout artifacts are released.
 
@@ -813,7 +813,7 @@ This gate checks whether the manuscript implies completed source-heldout evidenc
 
 The reviewer-facing boundary is source-generalization readiness, not current cross-source proof. Missing gold, proxy, or silver label strata in a held-out source partition must be reported as a coverage gap or exploratory diagnostic. The current package therefore treats source-heldout as a readiness protocol rather than evidence of broad source generalization.
 
-## Audit Cycle 90: Zero-HNFMR Numerator-Denominator Gate
+## Readiness Gate 90: Zero-HNFMR Numerator-Denominator Gate
 
 Outcome: pass for zero-HNFMR numerator-denominator wording; blocked for zero-risk or interval-supported claims until the external artifact rows are released.
 
@@ -821,7 +821,7 @@ This gate checks whether a rounded HNFMR value of 0.000 can be treated as indepe
 
 The reviewer-facing boundary is zero-observed auditability, not zero-risk proof. A rounded 0.000 value without those fields remains a manuscript summary, and zero observed HNFMR does not remove the separately reported ordinary FMR; broader zero-risk, threshold-stability, or interval-supported superiority wording still requires released source-heldout evidence, manual validation, bootstrap intervals, and same-scope prediction files.
 
-## Audit Cycle 91: Default-Threshold Provenance Gate
+## Readiness Gate 91: Default-Threshold Provenance Gate
 
 Outcome: pass for default-threshold provenance wording; blocked for threshold-optimization claims until threshold-selection and sensitivity artifacts are released.
 
@@ -829,7 +829,7 @@ This gate checks whether the default IAD-Risk operating point can be treated as 
 
 The reviewer-facing boundary is default-rule auditability, not threshold optimality. Default-threshold rows are fixed-rule evidence, not evidence of validation-selected, optimized, or threshold-stable performance without `threshold_selection_logs` and `threshold_sensitivity_grid` from the same prediction file.
 
-## Audit Cycle 92: DKE Official Guide Source Gate
+## Readiness Gate 92: DKE Official Guide Source Gate
 
 Outcome: pass for DKE official-guide source traceability; blocked for final target selection until authors confirm the selected journal, ranking/category source, author-guide source, and live submission route.
 
@@ -837,7 +837,7 @@ This gate checks whether the DKE preflight route has an inspectable official gui
 
 The reviewer-facing boundary is source traceability for preflight preparation, not final author confirmation. The selected-author-guide fields, selected target author confirmation, ranking/category confirmation, author metadata, artifact URL or DOI, and live submission-system verification remain unresolved until the authors complete the final-upload record.
 
-## Audit Cycle 93: Final-Upload Information Request Specificity Gate
+## Readiness Gate 93: Final-Upload Information Request Specificity Gate
 
 Outcome: pass for DKE final-upload information-request specificity; blocked for final upload until the requested external values are supplied and synchronized into metadata, cover letter, source package, and live submission system.
 
@@ -845,7 +845,7 @@ This gate checks whether the information request could let authors mistake the r
 
 The reviewer-facing boundary is request specificity, not completed metadata. The form tells authors exactly which values remain external, but the manuscript package is still not final-upload ready until those values are filled into `submission_metadata.yml`, `cover_letter.md`, the selected journal source package, the artifact release, and the live submission system.
 
-## Audit Cycle 94: DKE First-Screen Scope-Fit Gate
+## Readiness Gate 94: DKE First-Screen Scope-Fit Gate
 
 Outcome: pass for DKE first-screen scope-fit wording; blocked for final target confirmation until authors confirm the selected journal route and final live-system fields.
 
@@ -853,7 +853,7 @@ This gate checks whether the first-screen submission materials state a concrete 
 
 The reviewer-facing boundary is scope-fit precision, not final journal selection. The wording supports DKE/Elsevier preflight review while preserving the requirement that authors later confirm the selected target journal, author-guide source, ranking/category status, template, artifact URL or DOI, and live submission-system fields.
 
-## Audit Cycle 95: Keyword Scope-Fit Gate
+## Readiness Gate 95: Keyword Scope-Fit Gate
 
 Outcome: pass for keyword-level DKE scope fit; blocked for final upload until the selected journal route and live submission-system keyword field are author-confirmed.
 
@@ -861,7 +861,7 @@ This gate checks whether the submission keywords support the same data and knowl
 
 The reviewer-facing boundary is metadata fit, not stronger evidence. The keyword edit does not change the Open-v2 evidence scope, does not claim final target-journal selection, and must be copied exactly into the live submission system only after the authors confirm the final route.
 
-## Audit Cycle 96: DKE Abstract-Length Gate
+## Readiness Gate 96: DKE Abstract-Length Gate
 
 Outcome: pass for abstract-length compliance; blocked for final upload until any selected-journal template edit is rechecked against the live submission-system abstract field.
 
@@ -869,7 +869,7 @@ This gate checks whether the current abstract remains within the DKE front-matte
 
 The reviewer-facing boundary is abstract-length compliance, not writing quality or scientific evidence. A passing length gate does not strengthen the Open-v2 evidence, does not finalize the target journal, and does not replace the live submission-system preview. After any abstract, template, or journal-route edit, recompute the word count, rerun the manuscript validator, rebuild the affected PDF/source files, and regenerate the submission package.
 
-## Audit Cycle 97: Final Cover-Letter Pass-Path Gate
+## Readiness Gate 97: Final Cover-Letter Pass-Path Gate
 
 Outcome: pass for final cover-letter gate coverage; blocked for final upload until author-confirmed metadata, artifact publication, and live submission-system fields are available.
 
@@ -877,7 +877,7 @@ This gate checks that the final-upload cover-letter validator has a positive pas
 
 The reviewer-facing boundary is final-upload consistency, not final-upload completion. The current `cover_letter.md` remains an anonymous preflight letter and must not be uploaded as the final cover letter. The pass path shows what the final version must contain after target-journal confirmation, author metadata, and artifact publication are complete.
 
-## Audit Cycle 98: Final Cover-Letter Generic-Variant Gate
+## Readiness Gate 98: Final Cover-Letter Generic-Variant Gate
 
 Outcome: pass for generic-variant rejection coverage; blocked for final upload until the final cover letter is customized in the live submission system.
 
@@ -885,7 +885,7 @@ This gate checks whether a final-upload cover letter can bypass the customizatio
 
 The reviewer-facing boundary is upload-text hygiene, not author confirmation. This gate prevents a common manual editing slip, but the final cover letter still requires the confirmed target journal, article type, corresponding author, artifact release URL or DOI, and live submission-system preview before upload.
 
-## Audit Cycle 99: Final Review-Mode Vocabulary Gate
+## Readiness Gate 99: Final Review-Mode Vocabulary Gate
 
 Outcome: pass for unsupported review-mode rejection coverage; blocked for final upload until the selected journal route and live submission-system review setting are author-confirmed.
 
@@ -893,7 +893,7 @@ This gate checks whether a DKE, Information Systems, or Scientometrics final-upl
 
 The reviewer-facing boundary is controlled metadata vocabulary, not final journal confirmation. This gate prevents the final-upload checklist from treating an ambiguous review-mode string as sufficient evidence, but authors still need to confirm the live system review route, title page, author identities, selected template, and artifact URL or DOI before upload.
 
-## Audit Cycle 100: Final Article-Type Vocabulary Gate
+## Readiness Gate 100: Final Article-Type Vocabulary Gate
 
 Outcome: pass for article-type rejection coverage; blocked for final upload until the final article type is author-confirmed in the live submission system.
 
@@ -901,7 +901,7 @@ This gate checks whether final-upload metadata can pass merely because `article_
 
 The reviewer-facing boundary is submission-category consistency, not journal acceptance. This gate prevents the final package, cover letter, and live submission system from drifting on article category, but authors still need to confirm the selected journal, target template, final author metadata, artifact release URL or DOI, and live system preview before upload.
 
-## Audit Cycle 101: Final Public-Link Placeholder Gate
+## Readiness Gate 101: Final Public-Link Placeholder Gate
 
 Outcome: pass for public-link placeholder rejection coverage; blocked for final upload until the final repository URL, artifact release URL or DOI, and artifact manifest publication link are real public records.
 
@@ -909,7 +909,7 @@ This gate checks whether final-upload metadata can pass with syntactically valid
 
 The reviewer-facing boundary is public-link realism, not live publication proof. This gate prevents repository URL, artifact release URL, and `publication.artifact_release_url` fields from being filled with demonstration links, but authors still need to publish or archive the artifact, verify public access, confirm the final target journal, and preview the live submission system before upload.
 
-## Audit Cycle 102: Final Review-Mode Presence Gate
+## Readiness Gate 102: Final Review-Mode Presence Gate
 
 Outcome: pass for review-mode presence rejection coverage; blocked for final upload until the live submission-system review setting is author-confirmed.
 
@@ -917,7 +917,7 @@ This gate checks whether final-upload metadata can pass merely because `review_m
 
 The reviewer-facing boundary is metadata completeness, not live journal-policy verification. This gate prevents the final package from treating a checklist tick as a recorded review setting, but authors still need to confirm the selected journal's live review route, title-page treatment, author-identity visibility, and uploaded file set before final submission.
 
-## Audit Cycle 103: Final Source-Control Branch Gate
+## Readiness Gate 103: Final Source-Control Branch Gate
 
 Outcome: pass for final source-control branch rejection coverage; blocked for final upload until the package is built from the pushed `main` branch.
 
@@ -925,7 +925,7 @@ This gate checks whether final-upload metadata and `submission_manifest.json` ca
 
 The reviewer-facing boundary is repository traceability, not proof that the external artifact has been published. This gate prevents a final package from being generated from a temporary or detached branch while the public instructions point readers to `main`, but authors still need to push the final commit, publish or archive the artifact, and verify the live submission-system preview before upload.
 
-## Audit Cycle 104: Method Shortcut Wording Gate
+## Readiness Gate 104: Method Shortcut Wording Gate
 
 Outcome: pass for method shortcut wording refinement; blocked for stronger evidence claims until the rejected alternatives are backed by same-scope artifacts where required.
 
@@ -933,7 +933,7 @@ This gate checks whether the main-method discussion of rejected shortcuts reads 
 
 The reviewer-facing boundary is writing clarity, not new empirical evidence. The wording makes the method rationale easier to review and keeps the rejected alternatives aligned with the supplementary design-alternatives table, but it does not upgrade ablation, threshold-stability, same-scope ranking, or deployment claims without released artifacts.
 
-## Audit Cycle 105: Selective Workload Denominator Gate
+## Readiness Gate 105: Selective Workload Denominator Gate
 
 Outcome: pass for selective workload denominator clarification; blocked for operational throughput claims until same-artifact workload evidence is released.
 
@@ -941,7 +941,7 @@ This gate checks whether capacity-normalized review load could be overread as al
 
 The reviewer-facing boundary is workload denominator clarity, not deployment evidence. The formula prevents terminal safety blocks from inflating review load and prevents unresolved defer decisions from disappearing from workload accounting, but operational throughput, review-cost savings, and staffing claims still require released prediction files, workflow policy, manual-review capacity, and deferral budget.
 
-## Audit Cycle 106: FMR-HNFMR Stratum Gate
+## Readiness Gate 106: FMR-HNFMR Stratum Gate
 
 Outcome: pass for FMR/HNFMR stratum separation; blocked for zero-risk claims until broader artifacts and validation are released.
 
@@ -949,7 +949,7 @@ This gate checks whether zero observed HNFMR can be mistaken for zero ordinary f
 
 The reviewer-facing boundary is metric-stratum interpretation, not stronger empirical evidence. HNFMR measures identity-agenda hard negatives, while FMR measures all non-identity rows in the evaluated scope; both require released denominators, thresholds, prediction files, and checksums before numerical audit or stronger zero-risk wording.
 
-## Audit Cycle 107: Abstract FMR-HNFMR First-Screen Gate
+## Readiness Gate 107: Abstract FMR-HNFMR First-Screen Gate
 
 Outcome: pass for abstract and cover-letter FMR/HNFMR first-screen separation; blocked for zero-risk claims until external artifact release and broader validation are complete.
 
@@ -957,7 +957,7 @@ This gate checks whether the first-screen abstract and preflight cover letter co
 
 The reviewer-facing boundary is first-screen metric separation, not stronger empirical evidence. The new sentence prevents readers from treating zero observed hard-negative false merges as zero ordinary false-merge rate, while preserving the existing scope-bounded mechanism-evidence and same-scope comparative-ranking limits.
 
-## Audit Cycle 108: Highlights FMR-HNFMR First-Screen Gate
+## Readiness Gate 108: Highlights FMR-HNFMR First-Screen Gate
 
 Outcome: pass for highlights FMR/HNFMR first-screen separation; blocked for zero-risk claims until external artifact release and broader validation are complete.
 
@@ -965,7 +965,7 @@ This gate checks whether the submission highlights could still expose the zero-H
 
 The reviewer-facing boundary is highlight-level metric separation, not stronger empirical evidence. The highlight remains within the concise submission limit while making ordinary FMR visible beside zero observed HNFMR, so first-screen materials no longer isolate the hard-negative stratum from the separately reported ordinary false-merge rate.
 
-## Audit Cycle 109: Document-Cluster Split Overread Gate
+## Readiness Gate 109: Document-Cluster Split Overread Gate
 
 Outcome: pass for document/cluster split-overread wording; blocked for document-disjoint, cluster-disjoint, or unseen-source generalization claims until grouped split artifacts are released.
 
@@ -973,7 +973,7 @@ This gate checks whether pair-record held-out evidence can be mistaken for docum
 
 The reviewer-facing boundary is split-grain interpretation, not stronger empirical evidence. A pair-level held-out split can support the reported Open-v2 mechanism result, but it cannot by itself prove generalization to unseen documents, unseen clusters, or unseen sources without the grouped split artifacts.
 
-## Audit Cycle 110: Current Package Source Freshness Gate
+## Readiness Gate 110: Current Package Source Freshness Gate
 
 Outcome: pass for source-root freshness validation; blocked for final upload until the final package is rebuilt from the committed source revision and checked against the live submission system.
 
@@ -981,7 +981,7 @@ This gate checks whether a generated preflight package can pass validation after
 
 The reviewer-facing boundary is package freshness, not final-upload readiness. The gate prevents preflight packages from passing validation when generated from an older checkout, but it does not replace the final-upload requirement that `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes after the artifact URL or DOI, author metadata, selected journal, and live submission-system preview are complete.
 
-## Audit Cycle 111: Strict Validation Package Freshness Gate
+## Readiness Gate 111: Strict Validation Package Freshness Gate
 
 Outcome: pass for strict-manuscript package freshness integration; blocked for final upload until the same strict validation is rerun after the final package and artifact release are complete.
 
@@ -989,7 +989,7 @@ This gate checks whether stale generated packages could be missed when authors r
 
 The reviewer-facing boundary is validation coverage, not new empirical evidence. The integrated gate reduces the chance of sending a stale preflight package, but it does not replace final-upload validation with `--final-upload --artifact-dir`, live submission-system preview, real artifact URL or DOI, selected journal metadata, author declarations, or final author identity materials.
 
-## Audit Cycle 112: Reproduction Command Chain Gate
+## Readiness Gate 112: Reproduction Command Chain Gate
 
 Outcome: pass for Git-only command chain validation; blocked for full numerical reproduction until L2/L3 artifact evidence is released and linked.
 
@@ -997,7 +997,7 @@ This gate checks whether the Data and Code Availability section preserves the ex
 
 The reviewer-facing boundary is command-chain clarity, not result-level evidence. The gate ensures that Git-only reviewers can see which commands verify source code, fixtures, schema boundaries, artifact completeness, and package-artifact commit binding. It does not make the Open-v2 numerical table reproducible from Git alone, and it does not replace the final artifact release URL or DOI, checksum-bound prediction files, threshold logs, source manifests, processing logs, live submission-system preview, or selected journal metadata.
 
-## Audit Cycle 113: Strict PDF Visual-Quality Gate
+## Readiness Gate 113: Strict PDF Visual-Quality Gate
 
 Outcome: pass for strict PDF visual-quality integration; blocked for final upload until the final journal-template PDFs are rebuilt and rechecked after author metadata and artifact links are inserted.
 
@@ -1005,7 +1005,7 @@ This gate checks whether `python manuscript/scripts/validate_manuscript.py --str
 
 The reviewer-facing boundary is first-screen PDF reliability, not stronger scientific evidence. A passing strict visual-quality gate shows that the current generated PDFs render and that their build logs do not contain blocking warnings. It does not replace target-journal template binding, final author metadata, artifact URL or DOI insertion, live submission-system preview, or the final package validation that must run after the final source files are rebuilt.
 
-## Audit Cycle 114: DKE Biography Format and Word-Limit Gate
+## Readiness Gate 114: DKE Biography Format and Word-Limit Gate
 
 Outcome: pass for DKE biography format gate coverage; blocked for final upload until author-approved biography files and passport-type photographs are provided.
 
@@ -1013,7 +1013,7 @@ This gate checks whether a DKE final-upload package can pass with a biography fi
 
 The reviewer-facing boundary is author-material completion, not scientific evidence strengthening. A passing format gate means the recorded biography files have acceptable editable extensions and the workflow asks authors to enforce the word limit; it does not create the missing author-approved biography text, passport-type photograph files, author declarations, live submission-system verification, or artifact release URL or DOI.
 
-## Audit Cycle 115: Third-Party Data License and Redistribution Boundary Gate
+## Readiness Gate 115: Third-Party Data License and Redistribution Boundary Gate
 
 Outcome: pass for third-party data license and redistribution boundary wording; blocked for final numerical audit until source-provider records and the external artifact release are complete.
 

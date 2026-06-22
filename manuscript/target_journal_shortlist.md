@@ -1,6 +1,6 @@
 # Target Journal Shortlist
 
-Updated: 2026-06-19
+Status date: 2026-06-19
 
 ## Selection Boundary
 
