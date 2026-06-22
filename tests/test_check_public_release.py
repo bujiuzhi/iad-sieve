@@ -154,15 +154,39 @@ def test_check_docs_index_consistency_rejects_stale_iad_sieve_method_line(tmp_pa
 
 
 def test_check_required_gitignore_patterns_requires_texput_outputs(tmp_path: Path) -> None:
-    """验证临时 Tectonic stdin 输出必须在 .gitignore 中排除。"""
+    """验证临时 Tectonic stdin 输出和投稿包产物必须在 .gitignore 中排除。"""
 
     _write_text(tmp_path / ".gitignore", "*.log\n")
 
     findings = check_required_gitignore_patterns(tmp_path)
 
-    assert len(findings) == 1
-    assert findings[0].category == "missing_gitignore_rule"
-    assert findings[0].snippet == "texput.*"
+    assert {finding.category for finding in findings} == {"missing_gitignore_rule"}
+    assert {finding.snippet for finding in findings} == {
+        "texput.*",
+        "*.zip",
+        "/manuscript/build/submission_package/",
+        "/manuscript/build/dke_preflight_package/",
+    }
+
+
+def test_check_required_gitignore_patterns_accepts_submission_package_rules(tmp_path: Path) -> None:
+    """验证投稿包 zip 和本地构建目录已被排除时可通过检查。"""
+
+    _write_text(
+        tmp_path / ".gitignore",
+        "\n".join(
+            [
+                "texput.*",
+                "*.zip",
+                "/manuscript/build/submission_package/",
+                "/manuscript/build/dke_preflight_package/",
+            ]
+        ),
+    )
+
+    findings = check_required_gitignore_patterns(tmp_path)
+
+    assert findings == []
 
 
 def test_run_public_release_check_fails_on_document_trace(tmp_path: Path) -> None:

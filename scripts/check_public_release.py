@@ -75,6 +75,9 @@ LOCAL_ONLY_PATHS = (
 
 REQUIRED_GITIGNORE_PATTERNS = (
     "texput.*",
+    "*.zip",
+    "/manuscript/build/submission_package/",
+    "/manuscript/build/dke_preflight_package/",
 )
 
 ALLOWED_DOCS_FILES = {
