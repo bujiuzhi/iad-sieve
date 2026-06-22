@@ -3525,7 +3525,7 @@ def test_check_mechanism_evidence_boundary_accepts_supplementary_table() -> None
             "Interpretation boundary",
             "Does topical relatedness create merge risk?",
             "Does explicit risk gating suppress hard-negative merges?",
-            "Is the gain caused by each IAD-Risk component?",
+            "Are component-specific effects established by accepted ablations?",
             "What artifacts are needed for cluster-level contamination claims?",
         ]
     )
@@ -3557,6 +3557,45 @@ def test_check_mechanism_evidence_boundary_rejects_missing_supplementary_table()
 
     assert any("tab:mechanism-evidence" in error for error in errors)
     assert any("Mechanism Evidence Boundary" in error for error in errors)
+
+
+def test_check_mechanism_evidence_boundary_rejects_gain_causality_question() -> None:
+    """验证机制证据边界不能使用暗示组件收益已可追因的问题句。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = "\n".join(
+        [
+            r"\section{Mechanism and Error Analysis}",
+            "The full mechanism-evidence boundary table is reported in the supplementary material.",
+            "The mechanism reading is triangulated rather than component-causal.",
+            "Isolating each relation head remains an ablation-artifact requirement.",
+            "The prose states that topical relatedness creates merge risk only as a targeted claim.",
+            "It states that explicit risk gating supports the reported Open-v2 contract.",
+            "It states that component-causality claims require ablations.",
+            "It states that cluster-level contamination claims require sufficient cannot-link coverage.",
+            "It requires cluster-level artifact audits before deployment-level claims.",
+        ]
+    )
+    supplementary_text = "\n".join(
+        [
+            r"\section{Mechanism Evidence Boundary}",
+            r"\label{tab:mechanism-evidence}",
+            "Mechanism evidence and interpretation boundary.",
+            "Mechanism question",
+            "Current evidence",
+            "Interpretation boundary",
+            "Does topical relatedness create merge risk?",
+            "Does explicit risk gating suppress hard-negative merges?",
+            "Are component-specific effects established by accepted ablations?",
+            "What artifacts are needed for cluster-level contamination claims?",
+            "Is the gain caused by each IAD-Risk component?",
+        ]
+    )
+
+    errors = module.check_mechanism_evidence_boundary(manuscript_text, supplementary_text)
+
+    assert any("overcausal supplementary marker" in error for error in errors)
+    assert any("Is the gain caused by each IAD-Risk component" in error for error in errors)
 
 
 def test_check_validity_threats_accepts_supplementary_matrix() -> None:

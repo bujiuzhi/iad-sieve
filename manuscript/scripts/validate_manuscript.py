@@ -6160,7 +6160,7 @@ def check_mechanism_evidence_boundary(manuscript_text: str, supplementary_text: 
         "Interpretation boundary",
         "Does topical relatedness create merge risk?",
         "Does explicit risk gating suppress hard-negative merges?",
-        "Is the gain caused by each IAD-Risk component?",
+        "Are component-specific effects established by accepted ablations?",
         "What artifacts are needed for cluster-level contamination claims?",
     ]
     errors = [
@@ -6173,6 +6173,14 @@ def check_mechanism_evidence_boundary(manuscript_text: str, supplementary_text: 
         f"mechanism evidence boundary missing supplementary marker: {marker}"
         for marker in required_supplement_markers
         if marker not in evidence_text
+    )
+    forbidden_supplement_markers = [
+        "Is the gain caused by each IAD-Risk component?",
+    ]
+    errors.extend(
+        f"mechanism evidence boundary uses overcausal supplementary marker: {marker}"
+        for marker in forbidden_supplement_markers
+        if marker in evidence_text
     )
     return errors
 
