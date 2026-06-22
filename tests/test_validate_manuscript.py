@@ -7793,18 +7793,14 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "data-processing provenance auditability",
             "## Readiness Gate 119: Formal Process-Trace Vocabulary Gate",
             "formal-material hygiene coverage",
-            "assistant draft",
-            "prompt note",
-            "system prompt",
-            "work summary",
-            "revision note",
-            "change record",
-            "implementation note",
-            "本轮处理",
-            "调整记录",
-            "edit log",
-            "Copilot",
-            "Cursor",
+            "named tool labels",
+            "prompt or system-instruction remnants",
+            "internal draft labels",
+            "work-summary traces",
+            "revision/change-log traces",
+            "implementation-note traces",
+            "localized process-note traces",
+            "IDE-tool labels",
             "proper declaration fields",
             "expanded process-trace scan",
             "## Readiness Gate 120: LaTeX Environment Diagnostic Gate",
@@ -8643,18 +8639,14 @@ def test_check_reviewer_readiness_audit_rejects_missing_formal_process_trace_gat
         "Readiness Gate 119: Formal Process-Trace Vocabulary Gate",
         "process-note vocabulary bypass",
         "formal-material hygiene coverage",
-        "assistant draft",
-        "prompt note",
-        "system prompt",
-        "work summary",
-        "revision note",
-        "change record",
-        "implementation note",
-        "本轮处理",
-        "调整记录",
-        "edit log",
-        "Copilot",
-        "Cursor",
+        "named tool labels",
+        "prompt or system-instruction remnants",
+        "internal draft labels",
+        "work-summary traces",
+        "revision/change-log traces",
+        "implementation-note traces",
+        "localized process-note traces",
+        "IDE-tool labels",
         "proper declaration fields",
         "expanded process-trace scan",
     ]:
@@ -8664,8 +8656,8 @@ def test_check_reviewer_readiness_audit_rejects_missing_formal_process_trace_gat
 
     assert any("Formal Process-Trace Vocabulary Gate" in error for error in errors)
     assert any("process-note vocabulary bypass" in error for error in errors)
-    assert any("assistant draft" in error for error in errors)
-    assert any("revision note" in error for error in errors)
+    assert any("named tool labels" in error for error in errors)
+    assert any("revision/change-log traces" in error for error in errors)
     assert any("expanded process-trace scan" in error for error in errors)
 
 
