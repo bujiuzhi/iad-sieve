@@ -2856,6 +2856,32 @@ def check_openv2_result_table_scope_labels(manuscript_text: str) -> list[str]:
     return errors
 
 
+def check_openv2_figure_metric_scope(manuscript_text: str) -> list[str]:
+    """Check whether the Open-v2 result figure states its metric scope.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+
+    返回:
+        list[str]: Error messages for missing Open-v2 figure metric-scope markers.
+    """
+    if r"\label{fig:openv2-safety-profile}" not in manuscript_text:
+        return []
+    required_markers = [
+        "visualizes two selected dimensions from Table~\\ref{tab:openv2-results}: same-work F1 and HNFMR",
+        "mechanism-evidence profile rather than as a complete metric replacement for the table",
+        "Ordinary FMR, pair counts, and denominator-audit status remain table-level evidence",
+        r"\caption{Open-v2 mechanism-evidence profile for selected metrics.",
+        "The bars visualize same-work F1 and HNFMR from Table~\\ref{tab:openv2-results}; ordinary FMR, pair counts, and denominator-audit status remain in the table.",
+        "false-merge-control reading rather than a same-scope comparative ranking",
+    ]
+    return [
+        f"Open-v2 figure metric-scope boundary missing marker: {marker}"
+        for marker in required_markers
+        if marker not in manuscript_text
+    ]
+
+
 def check_manual_validation_boundary(manuscript_text: str) -> list[str]:
     """Check whether the main manuscript states manual-validation limits for silver labels.
 
@@ -6820,6 +6846,7 @@ def main() -> int:
     errors.extend(check_baseline_supplementary_tables(supplementary_text))
     errors.extend(check_result_interpretation_guardrails(manuscript_text, supplementary_text))
     errors.extend(check_openv2_result_table_scope_labels(manuscript_text))
+    errors.extend(check_openv2_figure_metric_scope(manuscript_text))
     errors.extend(check_manual_validation_boundary(manuscript_text))
     errors.extend(check_split_leakage_controls(manuscript_text, supplementary_text))
     errors.extend(check_scope_compatibility(manuscript_text, supplementary_text))

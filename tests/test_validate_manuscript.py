@@ -4249,6 +4249,49 @@ IAD-Risk (SPECTER2) & Held-out test & 1042 & Artifact row & 0.980 & 0.001 & 0.00
     assert any("IAD-Risk (SciNCL)" in error and "Artifact row" in error for error in errors)
 
 
+def test_check_openv2_figure_metric_scope_accepts_complete_boundary() -> None:
+    """验证 Open-v2 结果图明确说明只展示选定指标时可通过。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_openv2_figure_metric_scope", None)
+    assert callable(checker)
+    manuscript_text = r"""
+Figure~\ref{fig:openv2-safety-profile} visualizes two selected dimensions from Table~\ref{tab:openv2-results}: same-work F1 and HNFMR. The figure is intended as a mechanism-evidence profile rather than as a complete metric replacement for the table: it makes the hard-negative false-merge exposure visible. Ordinary FMR, pair counts, and denominator-audit status remain table-level evidence and should be read directly from Table~\ref{tab:openv2-results}.
+
+\begin{figure}[H]
+\caption{Open-v2 mechanism-evidence profile for selected metrics. The bars visualize same-work F1 and HNFMR from Table~\ref{tab:openv2-results}; ordinary FMR, pair counts, and denominator-audit status remain in the table. Full Open-v2 rows and held-out test rows remain scope-labeled, and the figure supports the false-merge-control reading rather than a same-scope comparative ranking.}
+\label{fig:openv2-safety-profile}
+\end{figure}
+"""
+
+    errors = checker(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_openv2_figure_metric_scope_rejects_complete_table_replacement_wording() -> None:
+    """验证 Open-v2 结果图缺少普通 FMR 和表格边界时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    checker = getattr(module, "check_openv2_figure_metric_scope", None)
+    assert callable(checker)
+    manuscript_text = r"""
+Figure~\ref{fig:openv2-safety-profile} visualizes the same Open-v2 evidence as Table~\ref{tab:openv2-results}.
+
+\begin{figure}[H]
+\caption{Open-v2 mechanism-evidence profile. The bars visualize Table~\ref{tab:openv2-results} and support the false-merge-control reading.}
+\label{fig:openv2-safety-profile}
+\end{figure}
+"""
+
+    errors = checker(manuscript_text)
+
+    assert any("selected dimensions" in error for error in errors)
+    assert any("complete metric replacement" in error for error in errors)
+    assert any("Ordinary FMR, pair counts" in error for error in errors)
+    assert any("selected metrics" in error for error in errors)
+
+
 def test_check_manual_validation_boundary_accepts_complete_boundary() -> None:
     """验证主文人工验证边界完整时可通过检查。"""
 
