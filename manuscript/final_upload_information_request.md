@@ -11,7 +11,7 @@ Do not start final-upload package generation until this packet is complete and s
 | Target route confirmation | Selected target journal, article type, review mode, author-guide URL, author-guide recheck date, template requirement confirmation, ranking/category source, ranking/category URL, and ranking/category checked date. | `submission_metadata.yml`, selected journal template source, cover letter, and live submission system. |
 | Author identity materials | Final author order, affiliations, emails, ORCID values if used, corresponding author, DKE biography files, and photograph files when required. | Title page, `authors`, `corresponding_author`, `author_identity_materials`, cover letter, and live submission system. |
 | Author-approved declarations | Funding statement, CRediT contribution statement, competing-interest statement, permissions statement, generative AI declaration, and Elsevier declaration-tool file when required. | Manuscript declaration sections, `submission_metadata.yml`, publisher declaration files, and live submission system. |
-| Artifact publication record | Public artifact URL or DOI, publication access status, finalized release manifest, checksums, and source artifact preflight result. | `artifact_boundary`, research-data statement, cover letter, artifact manifest publication object, and live submission system. |
+| Artifact publication record | Public artifact URL or DOI, publication access status, finalized release manifest, checksums, source artifact preflight result, source input manifest, and processing run log. | `artifact_boundary`, research-data statement, cover letter, artifact manifest publication object, and live submission system. |
 | Final cover letter replacement values | Target-specific greeting, article type sentence, corresponding-author signature name, artifact URL or DOI sentence, declaration-status sentence, and confirmation that generic `Dear Editor`, anonymous signature, and anonymous preflight wording are removed. | `cover_letter.md`, `submission_metadata.yml`, and live submission system. |
 | Live-system verification | Previewed title, abstract, keywords, highlights, uploaded files, source archive, final package, and first-screen claim boundary. | `upload_preparation`, `final_upload_checklist`, submission-system checklist, and final package validation. |
 
@@ -37,6 +37,17 @@ Repository URL and commit binding: keep the source `repository_reference` fields
 | Final cover letter | `submission.target_journal`, `submission.article_type`, `corresponding_author`, `artifact_boundary`, `statements`, `funding`, `author_contributions`, `permissions`, and `generative_ai` | `cover_letter.md` and live submission system |
 | PDF and system checks | `final_upload_checklist.manuscript_pdf_rebuilt_after_template`, `final_upload_checklist.supplementary_pdf_rebuilt_after_template`, `final_upload_checklist.submission_system_files_verified`, `final_upload_checklist.first_screen_claim_lockdown_confirmed`, `upload_preparation.live_submission_system_verified`, `upload_preparation.final_upload_package_verified_against_system` | Rebuilt PDFs, first-screen claim lockdown, and live submission system |
 | Submission text consistency | `final_upload_checklist.submission_system_files_verified`, `upload_preparation.live_submission_system_verified`, `upload_preparation.final_upload_package_verified_against_system` | Title, abstract, keywords, highlights, uploaded files, and final package checked in the live submission system |
+
+### Author confirmation and synchronization ledger
+
+Before final-upload validation, maintain one ledger row per external value so the upload package can be audited without relying on memory or informal notes.
+
+| External value | Confirmed value | Evidence source | Responsible author confirmation | YYYY-MM-DD confirmation date | Synchronization target | Validation evidence |
+| --- | --- | --- | --- | --- | --- | --- |
+| Selected target journal, article type, and review mode |  | Author decision record, author-guide URL, and ranking/category source |  |  | `submission_metadata.yml`, selected journal source package, and live submission-system field checked | `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` |
+| Author order, affiliations, emails, ORCID values, and corresponding author |  | Author-provided metadata record |  |  | `submission_metadata.yml`, title page, cover letter, and live submission-system field checked | Final package preview and metadata validation |
+| Funding, competing-interest, permissions, CRediT, and generative AI declarations |  | Author-approved declaration text and publisher declaration files when required |  |  | `submission_metadata.yml`, manuscript declaration sections, `cover_letter.md`, and live submission-system field checked | Final-upload package validation and publisher declaration-file check |
+| Artifact URL or DOI and public access status |  | Public release page, DOI landing page, or archive record |  |  | `submission_metadata.yml`, artifact manifest publication object, research-data statement, `cover_letter.md`, and live submission-system field checked | Artifact release validation plus final-upload package validation |
 
 ## Target journal
 
@@ -219,6 +230,14 @@ For each author, select the applicable CRediT roles and then draft the final aut
 - `checksums.sha256` validation status:
 - `open_v2_main_results` row-level schema validated:
 - Public access status:
+
+### Artifact processing provenance
+
+- `configs/source_input_manifest.json` completed with source acquisition date or version, original provider, local file boundary, license boundary, safe relative local file names, and SHA256 checksums:
+- `logs/processing_run_log.jsonl` completed with command line, environment summary, random seed or not_applicable, started_at, finished_at, input_manifest_reference, output_path, and exit_status:
+- `python -m iad_sieve.cli --help` run from final source checkout:
+- Processing code path and release manifest commit match the final repository commit:
+- Raw third-party data is not redistributed unless provider terms allow redistribution:
 
 ## Live submission-system fields
 

@@ -291,7 +291,9 @@ def test_check_final_upload_information_request_rejects_missing_required_fields(
     assert any("Live submission-system fields" in error for error in errors)
     assert any("Submission text consistency" in error for error in errors)
     assert any("Submission metadata mapping" in error for error in errors)
+    assert any("Author confirmation and synchronization ledger" in error for error in errors)
     assert any("DKE preflight source status" in error for error in errors)
+    assert any("Artifact processing provenance" in error for error in errors)
 
 
 def test_check_final_upload_information_request_rejects_missing_credit_roles() -> None:
@@ -607,6 +609,31 @@ def test_check_final_upload_information_request_rejects_missing_minimal_packet()
     assert any("Live-system verification" in error for error in errors)
 
 
+def test_check_final_upload_information_request_rejects_missing_confirmation_ledger() -> None:
+    """验证最终上传信息表必须记录作者确认与同步台账。"""
+
+    module = _load_validate_manuscript_module()
+    request_text = Path("manuscript/final_upload_information_request.md").read_text(encoding="utf-8")
+    for marker in [
+        "Author confirmation and synchronization ledger",
+        "External value",
+        "Confirmed value",
+        "Evidence source",
+        "Responsible author confirmation",
+        "YYYY-MM-DD confirmation date",
+        "Synchronization target",
+        "Validation evidence",
+        "live submission-system field checked",
+    ]:
+        request_text = request_text.replace(marker, "")
+
+    errors = module.check_final_upload_information_request(request_text)
+
+    assert any("Author confirmation and synchronization ledger" in error for error in errors)
+    assert any("Responsible author confirmation" in error for error in errors)
+    assert any("live submission-system field checked" in error for error in errors)
+
+
 def test_check_final_upload_information_request_rejects_legacy_checklist_names() -> None:
     """验证最终上传信息表不得使用与机器门禁不一致的旧字段名。"""
 
@@ -664,6 +691,40 @@ def test_check_final_upload_information_request_rejects_missing_source_artifact_
 
     assert any("Source artifact directory path for preflight" in error for error in errors)
     assert any("Source artifact preflight command passed" in error for error in errors)
+
+
+def test_check_final_upload_information_request_rejects_missing_artifact_processing_provenance() -> None:
+    """验证最终上传信息表必须记录 artifact 数据处理来源与运行链路。"""
+
+    module = _load_validate_manuscript_module()
+    request_text = Path("manuscript/final_upload_information_request.md").read_text(encoding="utf-8")
+    for marker in [
+        "Artifact processing provenance",
+        "`configs/source_input_manifest.json`",
+        "source acquisition date or version",
+        "original provider",
+        "local file boundary",
+        "license boundary",
+        "safe relative local file names",
+        "SHA256 checksums",
+        "`logs/processing_run_log.jsonl`",
+        "command line",
+        "environment summary",
+        "random seed or not_applicable",
+        "input_manifest_reference",
+        "output_path",
+        "exit_status",
+        "`python -m iad_sieve.cli --help`",
+        "Processing code path and release manifest commit match the final repository commit",
+        "Raw third-party data is not redistributed unless provider terms allow redistribution",
+    ]:
+        request_text = request_text.replace(marker, "")
+
+    errors = module.check_final_upload_information_request(request_text)
+
+    assert any("Artifact processing provenance" in error for error in errors)
+    assert any("configs/source_input_manifest.json" in error for error in errors)
+    assert any("logs/processing_run_log.jsonl" in error for error in errors)
 
 
 def test_check_final_upload_information_request_rejects_missing_text_consistency() -> None:
