@@ -183,6 +183,14 @@ DOCUMENT_TRACE_PATTERNS: tuple[RiskPattern, ...] = (
         regex=re.compile(r"(?i)\b(?:TODO|FIXME)\b|(?:待补|占位)"),
         message="公开文档包含未清理的编辑标记",
     ),
+    RiskPattern(
+        name="document_placeholder_email",
+        regex=re.compile(
+            r"\b(?:your[_-]?email|your\.name|user|name)@example\.(?:com|org|net)\b",
+            re.IGNORECASE,
+        ),
+        message="公开文档包含示例邮箱；应改为环境变量或作者确认的联系邮箱",
+    ),
 )
 
 

@@ -171,7 +171,7 @@ python -m iad_sieve.cli prepare-scirepeval-proximity \
 
 ## OpenAlex / OpenCitations weak label 数据
 
-OpenAlex Works 可通过 API 拉取，也可以从已下载的公开 dump 转换。若需要 polite pool，应提供 `--mailto`；API key 只应通过本地环境变量传入，不写入仓库。
+OpenAlex Works 可通过 API 拉取，也可以从已下载的公开 dump 转换。若需要 polite pool，应提供 `--mailto`；运行前将 `OPENALEX_MAILTO` 设置为作者可联系邮箱，但不要把实际邮箱写入仓库。API key 只应通过本地环境变量传入，不写入仓库。
 
 ```bash
 python -m iad_sieve.cli fetch-openalex-works \
@@ -181,7 +181,7 @@ python -m iad_sieve.cli fetch-openalex-works \
   --select "id,doi,title,publication_year,authorships,primary_topic,referenced_works,abstract_inverted_index" \
   --max-records 1000 \
   --seed 42 \
-  --mailto your_email@example.com
+  --mailto "${OPENALEX_MAILTO:?set OpenAlex contact email}"
 ```
 
 转换为 weak-label eval set：
