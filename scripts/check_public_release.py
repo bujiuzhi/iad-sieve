@@ -73,6 +73,10 @@ LOCAL_ONLY_PATHS = (
     "outputs/remote_connection_profile.local.json",
 )
 
+REQUIRED_GITIGNORE_PATTERNS = (
+    "texput.*",
+)
+
 ALLOWED_DOCS_FILES = {
     "docs/README.md",
     "docs/method-design.md",
@@ -495,6 +499,34 @@ def check_document_directory_scope(project_root: Path) -> list[Finding]:
     return findings
 
 
+def check_required_gitignore_patterns(project_root: Path) -> list[Finding]:
+    """检查临时构建产物是否被 .gitignore 明确排除。
+
+    参数:
+        project_root: 项目根目录。
+
+    返回:
+        缺失 ignore 规则发现项列表。
+    """
+
+    gitignore_path = project_root / ".gitignore"
+    gitignore_text = "\n".join(safe_read_lines(gitignore_path)) if gitignore_path.exists() else ""
+    findings: list[Finding] = []
+    for pattern in REQUIRED_GITIGNORE_PATTERNS:
+        if pattern in gitignore_text:
+            continue
+        findings.append(
+            Finding(
+                path=gitignore_path,
+                line_number=0,
+                category="missing_gitignore_rule",
+                message="缺少临时构建产物忽略规则",
+                snippet=pattern,
+            )
+        )
+    return findings
+
+
 def find_large_files(project_root: Path, max_size_mb: float) -> list[Finding]:
     """查找公开范围内的大文件。
 
@@ -583,12 +615,14 @@ def run_public_release_check(project_root: Path, max_size_mb: float) -> int:
     document_trace_findings = scan_document_traces(resolved_root, DOCUMENT_TRACE_PATTERNS)
     missing_document_findings = check_required_documentation(resolved_root)
     unexpected_document_findings = check_document_directory_scope(resolved_root)
+    gitignore_findings = check_required_gitignore_patterns(resolved_root)
     large_file_findings = find_large_files(resolved_root, max_size_mb)
     high_risk_findings = (
         sensitive_findings
         + document_trace_findings
         + missing_document_findings
         + unexpected_document_findings
+        + gitignore_findings
         + large_file_findings
     )
 

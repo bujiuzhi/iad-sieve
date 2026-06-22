@@ -7,6 +7,7 @@ from pathlib import Path
 from scripts.check_public_release import (
     DOCUMENT_TRACE_PATTERNS,
     check_document_directory_scope,
+    check_required_gitignore_patterns,
     check_required_documentation,
     run_public_release_check,
     scan_document_traces,
@@ -47,6 +48,7 @@ def _write_required_documentation(project_root: Path) -> None:
         "manuscript/MANIFEST.md",
     ):
         _write_text(project_root / relative_path, "# Public Documentation\n")
+    _write_text(project_root / ".gitignore", "texput.*\n")
 
 
 def test_scan_document_traces_flags_work_record_text(tmp_path: Path) -> None:
@@ -107,6 +109,18 @@ def test_check_document_directory_scope_flags_unlisted_docs_file(tmp_path: Path)
     assert len(findings) == 1
     assert findings[0].category == "unexpected_documentation_file"
     assert findings[0].snippet == "docs/codex-work-record.md"
+
+
+def test_check_required_gitignore_patterns_requires_texput_outputs(tmp_path: Path) -> None:
+    """验证临时 Tectonic stdin 输出必须在 .gitignore 中排除。"""
+
+    _write_text(tmp_path / ".gitignore", "*.log\n")
+
+    findings = check_required_gitignore_patterns(tmp_path)
+
+    assert len(findings) == 1
+    assert findings[0].category == "missing_gitignore_rule"
+    assert findings[0].snippet == "texput.*"
 
 
 def test_run_public_release_check_fails_on_document_trace(tmp_path: Path) -> None:

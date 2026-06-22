@@ -39,6 +39,7 @@ remote_connection_profile*.json
 *.zip
 *.jsonl.tmp
 *.log
+texput.*
 *.egg-info/
 dist/
 build/
