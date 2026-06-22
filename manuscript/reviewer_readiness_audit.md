@@ -1076,7 +1076,7 @@ The reviewer-facing boundary is build-environment diagnosis, not PDF freshness o
 
 Outcome: pass for conclusion first-screen claim-boundary coverage; must be rerun after any conclusion, abstract, cover-letter, or highlight edit.
 
-This gate checks whether the conclusion preserves the same bounded claim as the abstract and first-screen submission materials. The conclusion now states a conservative pair-level conclusion, repeats that the Open-v2 rows are scope-bounded mechanism evidence rather than as a same-scope comparative ranking, and keeps ordinary FMR still reported separately as 0.001 alongside zero observed HNFMR.
+This gate checks whether the conclusion preserves the same bounded claim as the abstract and first-screen submission materials. The conclusion now states a conservative pair-level conclusion, repeats that the Open-v2 rows are scope-bounded mechanism evidence rather than as a same-scope comparative ranking, and keeps ordinary FMR still reported separately as 0.001 alongside zero observed HNFMR. The closing paragraph now separates the current contribution from the evidence required to upgrade the claim, so manual validation, source-heldout partitions, threshold grids, ablations, and cluster audits read as future validation paths rather than completed evidence.
 
 The reviewer-facing boundary is conclusion claim boundary, not new empirical evidence. The conclusion explicitly keeps cluster-level deployment quality, broad method ranking, and source-heldout generalization outside the current evidence unless their corresponding artifacts are released. Conclusion preserves the same first-screen claim boundary as the abstract, cover letter, and highlights.
 
