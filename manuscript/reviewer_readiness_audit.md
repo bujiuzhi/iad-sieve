@@ -1309,7 +1309,7 @@ This gate checks whether the final-upload information request gives authors a co
 
 The same final-upload cover-letter validator requires public-source commands are reconstruction code paths rather than frozen source snapshots, and exact Open-v2 numerical reproduction requires recorded acquisition dates or versions, input checksums, processing logs, and released derived artifacts rather than live API calls or changed public dumps.
 
-The validator also requires the declaration-status sentence to cover funding, competing-interest, permissions, and generative AI declarations before the final cover letter can pass.
+The validator also requires the declaration-status sentence to cover funding, competing-interest, permissions, generative AI, data availability, and research data declarations before the final cover letter can pass.
 
 The reviewer-facing boundary is final-upload assembly discipline, not new scientific evidence. The map keeps the anonymous pre-submission cover letter separate from the final target-specific cover letter and prevents copying `Dear Editor`, `Anonymous Authors`, Git-only preflight wording, or unsupported Q2/B-complete language into the live submission system. It also prevents public-source fixed-number wording and artifact-link wording that upgrades the Open-v2 evidence into interval-supported model ranking.
 

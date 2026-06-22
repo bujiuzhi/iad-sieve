@@ -173,7 +173,7 @@ Use this section to replace the anonymous preflight cover letter only after the 
 - Public-source temporal-boundary sentence stating that public-source commands are reconstruction code paths rather than frozen source snapshots, and that exact Open-v2 numerical reproduction requires recorded acquisition dates or versions, input checksums, processing logs, and released derived artifacts rather than live API calls or changed public dumps:
 - Corresponding author name used for signature:
 - Artifact URL or DOI sentence:
-- Declaration-status sentence covering funding, competing-interest, permissions, and generative AI declarations and aligned with `submission_metadata.yml`:
+- Declaration-status sentence covering funding, competing-interest, permissions, generative AI, data availability, and research data declarations and aligned with `submission_metadata.yml`:
 - Generic `Dear Editor` greeting removed:
 - Anonymous author signature removed:
 - Anonymous preflight wording removed:

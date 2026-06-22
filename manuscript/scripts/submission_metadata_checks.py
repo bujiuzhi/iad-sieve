@@ -190,6 +190,8 @@ FINAL_UPLOAD_COVER_LETTER_DECLARATION_MARKERS = {
     "funding": "cover letter missing funding declaration boundary",
     "permission": "cover letter missing permissions declaration boundary",
     "generative ai": "cover letter missing generative AI declaration boundary",
+    "data availability": "cover letter missing data-availability declaration boundary",
+    "research data": "cover letter missing research-data declaration boundary",
     "declaration": "cover letter missing declaration-status sentence",
 }
 
