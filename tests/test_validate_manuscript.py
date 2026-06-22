@@ -726,6 +726,38 @@ def test_check_data_code_availability_boundary_accepts_complete_boundary() -> No
     assert errors == []
 
 
+def test_check_data_code_availability_density_accepts_compact_statement() -> None:
+    """验证主稿数据与代码可用性声明保持正文级密度。"""
+
+    module = _load_validate_manuscript_module()
+    manuscript_text = Path("manuscript/main.tex").read_text(encoding="utf-8")
+
+    errors = module.check_data_code_availability_density(manuscript_text)
+
+    assert errors == []
+
+
+def test_check_data_code_availability_density_rejects_overloaded_statement() -> None:
+    """验证主稿数据与代码可用性声明过长时会被拒绝。"""
+
+    module = _load_validate_manuscript_module()
+    paragraphs = [
+        " ".join(["availability"] * 60)
+        for _ in range(9)
+    ]
+    manuscript_text = (
+        r"\section*{Data and Code Availability}"
+        + "\n\n".join(paragraphs)
+        + "\n\n"
+        r"\section*{Ethics Statement}"
+    )
+
+    errors = module.check_data_code_availability_density(manuscript_text)
+
+    assert any("expected at most 500" in error for error in errors)
+    assert any("expected at most 8" in error for error in errors)
+
+
 def test_check_cli_entrypoint_contract_accepts_source_contract() -> None:
     """验证可安装 CLI 入口在 pyproject 和源码中一致时可通过检查。"""
 
@@ -6930,14 +6962,20 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "supplementary claim-interpretation boundary",
             "## Readiness Gate 52: Data and Code Availability Density Gate",
             "data/code availability table-density reduction",
+            "prose-density reduction",
             "full data and code availability boundary table",
+            "long runbook-style data statement",
+            "compact prose statement",
             "L0/L1 code-level reproduction",
             "L2/L3 result-level audit",
             "data-processing commands",
             "data-processing path",
             "raw third-party source files",
             "derived evaluation artifacts",
+            "artifact preflight and validation chain",
             "data/code availability clarity without main-text table overload",
+            "without main-text table or runbook overload",
+            "word and paragraph cap",
             "supplementary data/code availability boundary",
             "## Readiness Gate 53: Error Taxonomy Density Gate",
             "error-taxonomy table-density reduction",

@@ -628,6 +628,41 @@ def check_data_code_availability_boundary(manuscript_text: str, supplementary_te
     return errors
 
 
+def check_data_code_availability_density(
+    manuscript_text: str,
+    max_words: int = 500,
+    max_paragraphs: int = 8,
+) -> list[str]:
+    """Check whether the main data/code statement stays concise.
+
+    参数:
+        manuscript_text: Main LaTeX manuscript source.
+        max_words: Maximum allowed word-like tokens in the section body.
+        max_paragraphs: Maximum allowed prose paragraphs in the section body.
+
+    返回:
+        list[str]: Error messages for an overloaded main-text availability section.
+    """
+    section_text = extract_latex_section_body(manuscript_text, r"\section*{Data and Code Availability}")
+    if not section_text.strip():
+        return ["data/code availability density check could not locate section body"]
+    word_count = len(re.findall(r"[A-Za-z0-9]+(?:[-_/][A-Za-z0-9]+)*", section_text))
+    paragraphs = [
+        paragraph.strip()
+        for paragraph in re.split(r"\n\s*\n", section_text)
+        if paragraph.strip() and not paragraph.strip().startswith((r"\begin", r"\end"))
+    ]
+    errors: list[str] = []
+    if word_count > max_words:
+        errors.append(f"data/code availability section has {word_count} words; expected at most {max_words}")
+    if len(paragraphs) > max_paragraphs:
+        errors.append(
+            "data/code availability section has "
+            f"{len(paragraphs)} paragraphs; expected at most {max_paragraphs}"
+        )
+    return errors
+
+
 def check_reproduction_command_chain(manuscript_text: str) -> list[str]:
     """Check whether the manuscript preserves the executable reproduction command chain.
 
@@ -5092,14 +5127,20 @@ def check_reviewer_readiness_audit(audit_text: str) -> list[str]:
         "claim-interpretation clarity without main-text table overload",
         "supplementary claim-interpretation boundary",
         "data/code availability table-density reduction",
+        "prose-density reduction",
         "full data and code availability boundary table",
+        "long runbook-style data statement",
+        "compact prose statement",
         "L0/L1 code-level reproduction",
         "L2/L3 result-level audit",
         "data-processing commands",
         "data-processing path",
         "raw third-party source files",
         "derived evaluation artifacts",
+        "artifact preflight and validation chain",
         "data/code availability clarity without main-text table overload",
+        "without main-text table or runbook overload",
+        "word and paragraph cap",
         "supplementary data/code availability boundary",
         "error-taxonomy table-density reduction",
         "full error taxonomy table",
@@ -6630,6 +6671,7 @@ def main() -> int:
     errors.extend(check_claim_interpretation_boundary(manuscript_text, supplementary_text))
     errors.extend(check_declaration_statements(manuscript_text))
     errors.extend(check_data_code_availability_boundary(manuscript_text, supplementary_text))
+    errors.extend(check_data_code_availability_density(manuscript_text))
     errors.extend(check_reproduction_command_chain(manuscript_text))
     errors.extend(check_reproduction_levels_boundary(manuscript_text, supplementary_text))
     errors.extend(check_evaluation_protocol_boundary(manuscript_text, supplementary_text))
