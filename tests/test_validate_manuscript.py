@@ -431,6 +431,22 @@ def test_check_final_upload_information_request_rejects_missing_cover_letter_rep
         "Anonymous author signature removed",
         "Anonymous preflight wording removed",
         "Final cover letter checked by `check_final_upload_cover_letter`",
+        "Final cover letter sentence map",
+        "Greeting line",
+        "Submission sentence",
+        "Scope-fit sentence",
+        "Evidence-boundary sentence",
+        "Artifact sentence",
+        "Declaration sentence",
+        "Signature line",
+        "Use the confirmed `submission.target_journal` value",
+        "Use `submission.title`, `submission.article_type`, and `submission.target_journal`",
+        "Use `target_preparation.selected_author_guide_source`, target scope notes",
+        "Use `artifact_boundary.artifact_release_url` or `artifact_boundary.artifact_release_doi`",
+        "Use `corresponding_author.name` and confirmed author metadata",
+        "do not copy the anonymous pre-submission cover letter into the live system",
+        "Do not claim broad superiority, Q2/B completion, or final-upload readiness",
+        "The sentence must match the live submission system and publisher declaration files",
     ]:
         request_text = request_text.replace(marker, "")
 
@@ -440,6 +456,8 @@ def test_check_final_upload_information_request_rejects_missing_cover_letter_rep
     assert any("Target-specific greeting line" in error for error in errors)
     assert any("Corresponding author name used for signature" in error for error in errors)
     assert any("Artifact URL or DOI sentence" in error for error in errors)
+    assert any("Final cover letter sentence map" in error for error in errors)
+    assert any("Evidence-boundary sentence" in error for error in errors)
     assert any("check_final_upload_cover_letter" in error for error in errors)
 
 
@@ -7640,10 +7658,11 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Readiness Summary",
-            "Readiness gates covered: 145.",
+            "Readiness gates covered: 146.",
             "Highest current reviewer-facing risks are tracked as a risk inventory rather than a claim that every gate is currently failing: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, target-route reviewer response drift, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, DKE author identity material cardinality drift, DKE photograph file-format drift, Git-only CLI discovery drift, DKE research-data statement drift, data-processing command implementation-map drift, manuscript product-boundary table drift, Elsevier competing-interest declaration file traceability, introduction contribution first-screen alignment, conclusion first-screen boundary alignment, main-result strong-baseline interpretation drift, abstract strong-baseline interpretation drift, submission-day official-source drift, processing-run-log schema bypass, process-note vocabulary bypass, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, reviewer workload-transfer response drift, rule-based baseline omission response drift, pre-submission cover-letter declaration boundary, preflight metadata declaration placeholders, anonymous review-file declaration boundary, introduction row-scope comparison overread, main-result operating-point overread, figure metric-scope overread, cover-letter Git-only reproduction boundary, Q2/B ranking evidence packet traceability, public documentation index drift, local submission-package artifact tracking drift, DKE/Elsevier draft abstract-length drift, abstract word-budget buffer drift, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, ANI threshold notation drift, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final cover-letter preflight wording gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, latex-engine panic diagnostic gap, and stronger evidence gates.",
             "artifact-link claim-upgrade response drift",
             "public-source temporal drift reviewer response drift",
+            "final cover-letter sentence-map drift",
             "External final-upload blockers cannot be resolved from the repository alone.",
             "Local gates currently controlled by validators must still be rerun after source or package edits.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
@@ -8883,6 +8902,13 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "public-source temporal drift response coverage",
             "temporal-source discipline, not a weaker reproducibility standard",
             "must not claim fixed-source or fixed-number reproducibility from live public-source calls",
+            "## Readiness Gate 146: Final Cover-Letter Sentence Map Gate",
+            "final cover-letter sentence-map specificity",
+            "concrete sentence map",
+            "greeting line, submission sentence, scope-fit sentence, evidence-boundary sentence, artifact sentence, declaration sentence, and signature line",
+            "`submission.target_journal`, `submission.article_type`, `target_preparation`, `artifact_boundary.artifact_release_url` or `artifact_boundary.artifact_release_doi`, declaration fields, and `corresponding_author.name`",
+            "anonymous pre-submission cover letter separate from the final target-specific cover letter",
+            "`Dear Editor`, `Anonymous Authors`, Git-only preflight wording, or unsupported Q2/B-complete language",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             r"Method threshold notation uses `\tau_n` for the agenda-non-identity risk-head threshold",
@@ -8906,6 +8932,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "Reviewer-response wording treats the DKE-style route as scope-fit preparation",
             "Reviewer-response wording treats an artifact URL or DOI as access/provenance binding only",
             "Reviewer-response wording treats public-source commands as reconstruction code paths rather than frozen source snapshots",
+            "Final cover-letter assembly uses the sentence map and keeps the anonymous pre-submission cover letter separate from the final target-specific cover letter",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
         ]
     )
@@ -8922,7 +8949,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Readiness Summary",
-        "Readiness gates covered: 145",
+        "Readiness gates covered: 146",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -8933,7 +8960,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Readiness Summary" in error for error in errors)
-    assert any("Readiness gates covered: 145" in error for error in errors)
+    assert any("Readiness gates covered: 146" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -10399,6 +10426,31 @@ def test_check_reviewer_readiness_audit_rejects_missing_public_source_temporal_d
     assert any("Public-Source Temporal Drift Response Gate" in error for error in errors)
     assert any("public-source temporal drift reviewer response drift" in error for error in errors)
     assert any("frozen source snapshots" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_final_cover_letter_sentence_map_gate() -> None:
+    """验证审稿准备度审计必须覆盖最终投稿信句级映射边界。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Readiness Gate 146: Final Cover-Letter Sentence Map Gate",
+        "final cover-letter sentence-map drift",
+        "final cover-letter sentence-map specificity",
+        "concrete sentence map",
+        "greeting line, submission sentence, scope-fit sentence, evidence-boundary sentence, artifact sentence, declaration sentence, and signature line",
+        "`submission.target_journal`, `submission.article_type`, `target_preparation`, `artifact_boundary.artifact_release_url` or `artifact_boundary.artifact_release_doi`, declaration fields, and `corresponding_author.name`",
+        "anonymous pre-submission cover letter separate from the final target-specific cover letter",
+        "`Dear Editor`, `Anonymous Authors`, Git-only preflight wording, or unsupported Q2/B-complete language",
+        "Final cover-letter assembly uses the sentence map and keeps the anonymous pre-submission cover letter separate from the final target-specific cover letter",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Final Cover-Letter Sentence Map Gate" in error for error in errors)
+    assert any("final cover-letter sentence-map drift" in error for error in errors)
+    assert any("concrete sentence map" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_fixture_evidence_isolation_gate() -> None:
