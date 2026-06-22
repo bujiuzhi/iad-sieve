@@ -6077,6 +6077,23 @@ def test_check_data_processing_pipeline_document_accepts_reproducible_pipeline()
             "python -m iad_sieve.cli --help",
             "PYTHONPATH=src python -m iad_sieve.cli --help",
             "正式复现、fixture 重建和 artifact 校验应使用安装后的环境",
+            "命令到实现映射",
+            "CLI 命令",
+            "CLI 处理函数",
+            "源码实现",
+            "command_prepare_deepmatcher",
+            "prepare_deepmatcher_evaluation_set",
+            "command_prepare_scirepeval_proximity",
+            "prepare_scirepeval_proximity_evaluation_set",
+            "command_fetch_openalex_works",
+            "fetch_openalex_works",
+            "command_prepare_openalex_weak_labels",
+            "prepare_openalex_weak_label_evaluation_set",
+            "command_build_iad_bench",
+            "build_iad_bench",
+            "输入文件不进入 Git",
+            "输出文件必须在正式复验时进入 manifest 或 `checksums.sha256`",
+            "Git-only 复现边界",
             "tests/fixtures/",
             "outputs/repro_fixture",
             "data/raw/",
@@ -6114,6 +6131,35 @@ def test_check_data_processing_pipeline_document_rejects_missing_cli_and_artifac
     assert any("PYTHONPATH=src python -m iad_sieve.cli --help" in error for error in errors)
     assert any("prepare-deepmatcher" in error for error in errors)
     assert any("Artifact release" in error for error in errors)
+
+
+def test_check_data_processing_pipeline_document_rejects_missing_command_implementation_map() -> None:
+    """验证数据处理文档必须保留命令到源码实现的映射。"""
+
+    module = _load_validate_manuscript_module()
+    document_text = Path("docs/data-processing-pipeline.md").read_text(encoding="utf-8")
+    for marker in [
+        "命令到实现映射",
+        "CLI 处理函数",
+        "源码实现",
+        "command_prepare_deepmatcher",
+        "prepare_deepmatcher_evaluation_set",
+        "command_fetch_openalex_works",
+        "fetch_openalex_works",
+        "command_build_iad_bench",
+        "build_iad_bench",
+        "输入文件不进入 Git",
+        "输出文件必须在正式复验时进入 manifest 或 `checksums.sha256`",
+        "Git-only 复现边界",
+    ]:
+        document_text = document_text.replace(marker, "")
+
+    errors = module.check_data_processing_pipeline_document(document_text)
+
+    assert any("命令到实现映射" in error for error in errors)
+    assert any("command_prepare_deepmatcher" in error for error in errors)
+    assert any("fetch_openalex_works" in error for error in errors)
+    assert any("Git-only 复现边界" in error for error in errors)
 
 
 def test_check_data_artifact_release_document_accepts_source_artifact_contract() -> None:
@@ -7100,8 +7146,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Readiness Summary",
-            "Readiness gates covered: 135.",
-            "Highest current reviewer-facing risks are tracked as a risk inventory rather than a claim that every gate is currently failing: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, DKE author identity material cardinality drift, DKE photograph file-format drift, Git-only CLI discovery drift, DKE research-data statement drift, Elsevier competing-interest declaration file traceability, introduction contribution first-screen alignment, conclusion first-screen boundary alignment, submission-day official-source drift, processing-run-log schema bypass, process-note vocabulary bypass, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, pre-submission cover-letter declaration boundary, preflight metadata declaration placeholders, anonymous review-file declaration boundary, introduction row-scope comparison overread, main-result operating-point overread, figure metric-scope overread, cover-letter Git-only reproduction boundary, Q2/B ranking evidence packet traceability, public documentation index drift, local submission-package artifact tracking drift, DKE/Elsevier draft abstract-length drift, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, ANI threshold notation drift, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final cover-letter preflight wording gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, latex-engine panic diagnostic gap, and stronger evidence gates.",
+            "Readiness gates covered: 136.",
+            "Highest current reviewer-facing risks are tracked as a risk inventory rather than a claim that every gate is currently failing: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, DKE author identity material cardinality drift, DKE photograph file-format drift, Git-only CLI discovery drift, DKE research-data statement drift, data-processing command implementation-map drift, Elsevier competing-interest declaration file traceability, introduction contribution first-screen alignment, conclusion first-screen boundary alignment, submission-day official-source drift, processing-run-log schema bypass, process-note vocabulary bypass, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, pre-submission cover-letter declaration boundary, preflight metadata declaration placeholders, anonymous review-file declaration boundary, introduction row-scope comparison overread, main-result operating-point overread, figure metric-scope overread, cover-letter Git-only reproduction boundary, Q2/B ranking evidence packet traceability, public documentation index drift, local submission-package artifact tracking drift, DKE/Elsevier draft abstract-length drift, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, ANI threshold notation drift, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final cover-letter preflight wording gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, latex-engine panic diagnostic gap, and stronger evidence gates.",
             "External final-upload blockers cannot be resolved from the repository alone.",
             "Local gates currently controlled by validators must still be rerun after source or package edits.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
@@ -8254,6 +8300,13 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "journal-system data-statement compliance, not full numerical reproduction",
             "data be deposited, linked, or explained in the submission statement",
             "does not publish the external artifact",
+            "## Readiness Gate 136: Data-Processing Command Implementation Map Gate",
+            "public data-processing command-map coverage",
+            "requires `docs/data-processing-pipeline.md` to include a command-to-source map",
+            "CLI handler functions, implementation modules, main inputs, and main outputs",
+            "code traceability, not full numerical reproduction",
+            "does not provide raw third-party files",
+            "freeze API responses",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             r"Method threshold notation uses `\tau_n` for the ANI risk-head threshold",
@@ -8267,6 +8320,7 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "DKE/Elsevier final-upload metadata records passport-type photograph paths with image extensions",
             "Git-only fixture rebuild validation starts with `python -m iad_sieve.cli --help`",
             "DKE/Elsevier final-upload metadata includes a `statements.research_data_statement`",
+            "`docs/data-processing-pipeline.md` keeps a command-to-source map",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
         ]
     )
@@ -8283,7 +8337,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Readiness Summary",
-        "Readiness gates covered: 135",
+        "Readiness gates covered: 136",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -8294,7 +8348,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Readiness Summary" in error for error in errors)
-    assert any("Readiness gates covered: 135" in error for error in errors)
+    assert any("Readiness gates covered: 136" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -9500,6 +9554,32 @@ def test_check_reviewer_readiness_audit_rejects_missing_dke_research_data_statem
     assert any("DKE research-data statement drift" in error for error in errors)
     assert any("statements.research_data_statement" in error for error in errors)
     assert any("artifact URL or DOI" in error for error in errors)
+
+
+def test_check_reviewer_readiness_audit_rejects_missing_data_processing_command_map_gate() -> None:
+    """验证审稿准备度审计必须覆盖数据处理命令到源码实现映射门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Readiness Gate 136: Data-Processing Command Implementation Map Gate",
+        "data-processing command implementation-map drift",
+        "public data-processing command-map coverage",
+        "requires `docs/data-processing-pipeline.md` to include a command-to-source map",
+        "CLI handler functions, implementation modules, main inputs, and main outputs",
+        "code traceability, not full numerical reproduction",
+        "does not provide raw third-party files",
+        "freeze API responses",
+        "`docs/data-processing-pipeline.md` keeps a command-to-source map",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Data-Processing Command Implementation Map Gate" in error for error in errors)
+    assert any("data-processing command implementation-map drift" in error for error in errors)
+    assert any("command-to-source map" in error for error in errors)
+    assert any("CLI handler functions" in error for error in errors)
 
 
 def test_check_reviewer_readiness_audit_rejects_missing_fixture_evidence_isolation_gate() -> None:

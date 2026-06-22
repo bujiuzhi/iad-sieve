@@ -37,6 +37,20 @@ PYTHONPATH=src python -m iad_sieve.cli --help
 
 正式复现、fixture 重建和 artifact 校验应使用安装后的环境，以保证 console script、依赖解析和 `pyproject.toml` 声明一致。
 
+## 命令到实现映射
+
+公开仓库的复现声明必须能从命令追溯到源码实现。下表列出从公开来源构建 IAD-Bench 所需的核心命令、CLI 处理函数、源码实现和主要输出；输入文件不进入 Git，输出文件必须在正式复验时进入 manifest 或 `checksums.sha256`。
+
+| CLI 命令 | CLI 处理函数 | 源码实现 | 主要输入 | 主要输出 |
+| --- | --- | --- | --- | --- |
+| `prepare-deepmatcher` | `command_prepare_deepmatcher` | `src/iad_sieve/evaluation/deepmatcher_adapter.py::prepare_deepmatcher_evaluation_set` | DeepMatcher / py_entitymatching `tableA.csv`、`tableB.csv`、pair CSV | `eval_documents.jsonl`、`eval_pairs.jsonl`、`dataset_summary.jsonl` |
+| `prepare-scirepeval-proximity` | `command_prepare_scirepeval_proximity` | `src/iad_sieve/evaluation/scirepeval_adapter.py::prepare_scirepeval_proximity_evaluation_set` | SciRepEval / SciDocs metadata 与 proximity pair 文件 | `eval_documents.jsonl`、`eval_pairs.jsonl`、`dataset_summary.jsonl` |
+| `fetch-openalex-works` | `command_fetch_openalex_works` | `src/iad_sieve/evaluation/openalex_api_ingestion.py::fetch_openalex_works` | OpenAlex Works API 查询参数、本地环境变量中的可选 API key | Works JSONL、ingestion summary JSONL |
+| `prepare-openalex-weak-labels` | `command_prepare_openalex_weak_labels` | `src/iad_sieve/evaluation/openalex_adapter.py::prepare_openalex_weak_label_evaluation_set` | OpenAlex Works JSONL、可选 OpenCitations COCI CSV | `eval_documents.jsonl`、`eval_pairs.jsonl`、`dataset_summary.jsonl` |
+| `build-iad-bench` | `command_build_iad_bench` | `src/iad_sieve/evaluation/iad_bench_builder.py::build_iad_bench` | 多个 eval source 目录 | `iad_bench_documents.jsonl`、`iad_bench_pairs.jsonl`、`iad_bench_splits.jsonl`、`iad_bench_summary.jsonl` |
+
+这张映射表是 Git-only 复现边界的一部分：它证明数据处理入口和实现代码在仓库中可定位，但不证明第三方原始数据、API 响应或论文主实验输出已经随 Git 一并发布。
+
 ## 无网络最小复现
 
 `tests/fixtures/` 保留极小样本，用于验证数据处理代码路径和输出契约。该流程不依赖外部网络，也不代表论文主实验规模。
