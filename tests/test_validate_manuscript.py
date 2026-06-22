@@ -6390,8 +6390,8 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "# Reviewer Readiness Audit",
             "Current decision: conditionally ready for target-journal selection; not ready for final upload.",
             "## Readiness Summary",
-            "Readiness gates covered: 120.",
-            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, Elsevier competing-interest declaration file traceability, introduction contribution first-screen alignment, processing-run-log schema bypass, process-note vocabulary bypass, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, latex-engine panic diagnostic gap, and stronger evidence gates.",
+            "Readiness gates covered: 121.",
+            "Highest current reviewer-facing risks: final-upload metadata, target-journal template binding, author-guide/template confirmation gap, target ranking confirmation gap, live final-package system verification gap, DKE author biography and photograph materials, DKE biography format and word-limit drift, Elsevier competing-interest declaration file traceability, introduction contribution first-screen alignment, conclusion first-screen boundary alignment, processing-run-log schema bypass, process-note vocabulary bypass, third-party data license and redistribution drift, author identity material traceability, external artifact release, artifact source directory completeness, artifact release validation bypass, final-upload artifact-dir omission bypass, artifact publication link mismatch, zero-observed HNFMR overread, FMR/HNFMR stratum conflation, abstract FMR/HNFMR first-screen conflation, highlights FMR/HNFMR first-screen conflation, document/cluster split overread, preflight package source freshness, strict validation package freshness bypass, reproduction command-chain drift, strict PDF visual-quality validation bypass, L2 public-source rebuild chain-of-custody gap, selective-decision workload evidence, selective workload denominator ambiguity, anonymous cover-letter declaration confirmation, preflight metadata declaration placeholders, preflight manuscript declaration boundary, introduction row-scope comparison overread, artifact release README completeness, artifact release commit validity, artifact README/manifest commit mismatch, final package/artifact commit mismatch, final-upload artifact-dir instruction drift, prediction artifact schema drift, generative AI declaration consistency, fixture/live evidence confusion, live submission-system text consistency, Git-only full-numerical audit overread, source-to-PDF package consistency, final-upload source-control package binding, final-upload source-control branch drift, final-upload artifact publication binding, default-threshold provenance gap, DKE official-guide source traceability, DKE first-screen scope-fit drift, keyword DKE scope-fit drift, DKE abstract-length drift, final article-type vocabulary gap, final public-link placeholder gap, final review-mode presence gap, final cover-letter pass-path gap, final cover-letter generic-variant gap, final review-mode vocabulary gap, method shortcut wording precision, final-upload information request specificity, latex-engine panic diagnostic gap, and stronger evidence gates.",
             "Current stopping rule: do not claim Q2/B completion or final-upload readiness until `python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release` passes, a real artifact URL or DOI is recorded, the selected target journal, author-guide source, template requirements, and ranking/category status are author-confirmed from authorized sources, the live submission system and final package preview are verified against the source package, and the artifact manifest publication object records the same URL or DOI with public access status.",
             "Non-code external inputs still required: author metadata, DKE author biography and photograph materials, Elsevier competing-interest declaration file generated by the declarations tool, target-journal confirmation, selected author-guide source and rechecked date, template requirements confirmation, ranking/category confirmation source and date, funding statement, author contribution statement, permissions statement, generative AI declaration, live submission-system fields, and artifact release URL or DOI.",
             "Next revision trigger: repeat the editorial desk check after target-journal template binding, cover-letter customization, or artifact-link insertion.",
@@ -7379,6 +7379,14 @@ def test_check_reviewer_readiness_audit_accepts_complete_audit() -> None:
             "build-environment diagnosis, not PDF freshness",
             "does not rebuild manuscript PDFs",
             "LaTeX environment diagnostics are clean",
+            "## Readiness Gate 121: Conclusion Claim Boundary Gate",
+            "conclusion first-screen claim-boundary coverage",
+            "conservative pair-level conclusion",
+            "scope-bounded mechanism evidence rather than as a same-scope comparative ranking",
+            "ordinary FMR still reported separately as 0.001",
+            "cluster-level deployment quality, broad method ranking, and source-heldout generalization",
+            "conclusion claim boundary, not new empirical evidence",
+            "Conclusion preserves the same first-screen claim boundary as the abstract, cover letter, and highlights",
             "## Minimum Gate Before Final Upload",
             "The Q2/B acceptance gate is either fully ready.",
             "python manuscript/scripts/validate_submission_package.py --final-upload --artifact-dir /path/to/release",
@@ -7397,7 +7405,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
     for marker in [
         "Readiness Summary",
-        "Readiness gates covered: 120",
+        "Readiness gates covered: 121",
         "Highest current reviewer-facing risks",
         "Current stopping rule",
         "Non-code external inputs still required",
@@ -7408,7 +7416,7 @@ def test_check_reviewer_readiness_audit_rejects_missing_iteration_summary() -> N
     errors = module.check_reviewer_readiness_audit(audit_text)
 
     assert any("Readiness Summary" in error for error in errors)
-    assert any("Readiness gates covered: 120" in error for error in errors)
+    assert any("Readiness gates covered: 121" in error for error in errors)
     assert any("Highest current reviewer-facing risks" in error for error in errors)
     assert any("Non-code external inputs still required" in error for error in errors)
 
@@ -8183,6 +8191,32 @@ def test_check_reviewer_readiness_audit_rejects_missing_latex_environment_diagno
     assert any("does not rebuild manuscript PDFs" in error for error in errors)
 
 
+def test_check_reviewer_readiness_audit_rejects_missing_conclusion_claim_boundary_gate() -> None:
+    """验证审稿准备度审计必须覆盖结论首屏主张边界门禁。"""
+
+    module = _load_validate_manuscript_module()
+    audit_text = Path("manuscript/reviewer_readiness_audit.md").read_text(encoding="utf-8")
+    for marker in [
+        "Readiness Gate 121: Conclusion Claim Boundary Gate",
+        "conclusion first-screen boundary alignment",
+        "conclusion first-screen claim-boundary coverage",
+        "conservative pair-level conclusion",
+        "scope-bounded mechanism evidence rather than as a same-scope comparative ranking",
+        "ordinary FMR still reported separately as 0.001",
+        "cluster-level deployment quality, broad method ranking, and source-heldout generalization",
+        "conclusion claim boundary, not new empirical evidence",
+        "Conclusion preserves the same first-screen claim boundary as the abstract, cover letter, and highlights",
+    ]:
+        audit_text = audit_text.replace(marker, "")
+
+    errors = module.check_reviewer_readiness_audit(audit_text)
+
+    assert any("Conclusion Claim Boundary Gate" in error for error in errors)
+    assert any("conclusion first-screen boundary alignment" in error for error in errors)
+    assert any("conservative pair-level conclusion" in error for error in errors)
+    assert any("scope-bounded mechanism evidence" in error for error in errors)
+
+
 def test_check_reviewer_readiness_audit_rejects_missing_fixture_evidence_isolation_gate() -> None:
     """验证审稿准备度审计必须隔离测试夹具和真实投稿证据。"""
 
@@ -8682,6 +8716,9 @@ def test_check_editorial_claim_alignment_accepts_consistent_submission_materials
             r"\section{Conclusion}",
             "IAD-Risk addresses a specific failure mode by separating identity and agenda evidence.",
             "It uses false-merge risk and supports targeted false-merge suppression.",
+            "The results support a conservative pair-level conclusion.",
+            "The result includes HNFMR 0.790--0.999 and zero observed HNFMR, with ordinary FMR still reported separately as 0.001.",
+            "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
             "The contribution includes a reproducible benchmark contract.",
             "It does not claim cluster-level deployment quality without cluster artifacts.",
             "Additional validation is needed before broad method ranking.",
@@ -8750,6 +8787,9 @@ def test_check_editorial_claim_alignment_rejects_abstract_without_scope_ranking_
             r"\section{Conclusion}",
             "IAD-Risk addresses a specific failure mode by separating identity and agenda evidence.",
             "It uses false-merge risk and supports targeted false-merge suppression.",
+            "The results support a conservative pair-level conclusion.",
+            "The result includes HNFMR 0.790--0.999 and zero observed HNFMR, with ordinary FMR still reported separately as 0.001.",
+            "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
             "The contribution includes a reproducible benchmark contract.",
             "It does not claim cluster-level deployment quality without cluster artifacts.",
             "Additional validation is needed before broad method ranking.",
@@ -8805,6 +8845,9 @@ def test_check_editorial_claim_alignment_rejects_abstract_without_pair_cluster_b
             r"\section{Conclusion}",
             "IAD-Risk addresses a specific failure mode by separating identity and agenda evidence.",
             "It uses false-merge risk and supports targeted false-merge suppression.",
+            "The results support a conservative pair-level conclusion.",
+            "The result includes HNFMR 0.790--0.999 and zero observed HNFMR, with ordinary FMR still reported separately as 0.001.",
+            "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
             "The contribution includes a reproducible benchmark contract.",
             "It does not claim cluster-level deployment quality without cluster artifacts.",
             "Additional validation is needed before broad method ranking.",
@@ -8872,6 +8915,9 @@ def test_check_editorial_claim_alignment_rejects_conclusion_without_cluster_boun
             r"\section{Conclusion}",
             "IAD-Risk addresses a specific failure mode by separating identity and agenda evidence.",
             "It uses false-merge risk and supports targeted false-merge suppression.",
+            "The results support a conservative pair-level conclusion.",
+            "The result includes HNFMR 0.790--0.999 and zero observed HNFMR, with ordinary FMR still reported separately as 0.001.",
+            "The result rows are scope-bounded mechanism evidence rather than a same-scope comparative ranking.",
             "The contribution includes a reproducible benchmark contract.",
             "Additional validation is needed before broad method ranking.",
         ]
